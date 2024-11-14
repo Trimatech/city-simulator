@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: 0BSD
 //
 
-import { type Vec2, type Vec6, type Geometry, GeometryEpsilon } from "./Geometry";
+import { type Point, type Vec6, type Geometry, GeometryEpsilon } from "./Geometry";
 import { Shape, type ShapeCombined } from "./Shape";
 import BuildLog from "./BuildLog";
 export * from "./Segment";
@@ -17,7 +17,7 @@ export * from "./Shape";
 export * from "./BuildLog";
 
 export interface Polygon {
-	regions: Array<Array<Vec2 | Vec6>>;
+	regions: Array<Array<Point | Vec6>>;
 	inverted: boolean;
 }
 
@@ -138,7 +138,7 @@ export class PolyBool {
 	}
 
 	polygon(segments: Segments): Polygon {
-		const regions: Array<Array<Vec2 | Vec6>> = [];
+		const regions: Array<Array<Point | Vec6>> = [];
 		const receiver = {
 			beginPath: () => {},
 			moveTo: () => {
@@ -166,6 +166,7 @@ export class PolyBool {
 	}
 
 	intersect(poly1: Polygon, poly2: Polygon): Polygon {
+		warn("intersect", poly1, poly2);
 		const seg1 = this.segments(poly1);
 		const seg2 = this.segments(poly2);
 		const comb = this.combine(seg1, seg2);

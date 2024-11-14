@@ -15,6 +15,8 @@ export interface FrameProps<T extends Instance = Frame> extends React.PropsWithC
 	zIndex?: number | React.Binding<number>;
 	layoutOrder?: number | React.Binding<number>;
 	cornerRadius?: UDim | React.Binding<UDim>;
+	borderSize?: number | React.Binding<number>;
+	borderColor?: Color3 | React.Binding<Color3>;
 }
 
 export const Frame = forwardRef((props: FrameProps, ref: Ref<Frame>) => {
@@ -31,7 +33,8 @@ export const Frame = forwardRef((props: FrameProps, ref: Ref<Frame>) => {
 			Visible={props.visible}
 			ZIndex={props.zIndex}
 			LayoutOrder={props.layoutOrder}
-			BorderSizePixel={0}
+			BorderSizePixel={props.borderSize ?? 0}
+			BorderColor3={props.borderColor}
 			Event={props.event}
 			Change={props.change}
 		>

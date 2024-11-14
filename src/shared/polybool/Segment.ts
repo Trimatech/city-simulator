@@ -5,18 +5,18 @@
 // SPDX-License-Identifier: 0BSD
 //
 
-import { boundingBoxesIntersect, type Geometry, lerpVec2, type Vec2 } from "./Geometry";
+import { boundingBoxesIntersect, type Geometry, lerpVec2, type Point } from "./Geometry";
 import { type IPolyBoolReceiver } from "./SegmentChainer";
 
 export interface SegmentTValuePairs {
 	kind: "tValuePairs";
-	tValuePairs: Vec2[]; // [seg1T, seg2T][]
+	tValuePairs: Point[]; // [seg1T, seg2T][]
 }
 
 export interface SegmentTRangePairs {
 	kind: "tRangePairs";
-	tStart: Vec2; // [seg1TStart, seg2TStart]
-	tEnd: Vec2; // [seg1TEnd, seg2TEnd]
+	tStart: Point; // [seg1TStart, seg2TStart]
+	tEnd: Point; // [seg1TEnd, seg2TEnd]
 }
 
 export class SegmentTValuesBuilder {
@@ -60,7 +60,7 @@ export class SegmentTValuesBuilder {
 }
 
 export class SegmentTValuePairsBuilder {
-	tValuePairs: Vec2[] = [];
+	tValuePairs: Point[] = [];
 	allowOutOfRange: boolean;
 	geo: Geometry;
 
@@ -107,26 +107,26 @@ export class SegmentTValuePairsBuilder {
 export abstract class SegmentBase<T> {
 	abstract copy(): T;
 	abstract isEqual(other: T): boolean;
-	abstract start(): Vec2;
-	abstract start2(): Vec2;
-	abstract end2(): Vec2;
-	abstract end(): Vec2;
-	abstract setStart(p: Vec2): void;
-	abstract setEnd(p: Vec2): void;
-	abstract point(t: number): Vec2;
+	abstract start(): Point;
+	abstract start2(): Point;
+	abstract end2(): Point;
+	abstract end(): Point;
+	abstract setStart(p: Point): void;
+	abstract setEnd(p: Point): void;
+	abstract point(t: number): Point;
 	abstract split(t: number[]): T[];
 	abstract reverse(): T;
-	abstract boundingBox(): [Vec2, Vec2];
-	abstract pointOn(p: Vec2): boolean;
+	abstract boundingBox(): [Point, Point];
+	abstract pointOn(p: Point): boolean;
 	abstract draw<TRecv extends IPolyBoolReceiver>(ctx: TRecv): TRecv;
 }
 
 export class SegmentLine extends SegmentBase<SegmentLine> {
-	p0: Vec2;
-	p1: Vec2;
+	p0: Point;
+	p1: Point;
 	geo: Geometry;
 
-	constructor(p0: Vec2, p1: Vec2, geo: Geometry) {
+	constructor(p0: Point, p1: Point, geo: Geometry) {
 		super();
 		this.p0 = p0;
 		this.p1 = p1;
@@ -157,15 +157,15 @@ export class SegmentLine extends SegmentBase<SegmentLine> {
 		return this.p1;
 	}
 
-	setStart(p0: Vec2) {
+	setStart(p0: Point) {
 		this.p0 = p0;
 	}
 
-	setEnd(p1: Vec2) {
+	setEnd(p1: Point) {
 		this.p1 = p1;
 	}
 
-	point(t: number): Vec2 {
+	point(t: number): Point {
 		const p0 = this.p0;
 		const p1 = this.p1;
 
@@ -197,7 +197,7 @@ export class SegmentLine extends SegmentBase<SegmentLine> {
 		return new SegmentLine(this.p1, this.p0, this.geo);
 	}
 
-	boundingBox(): [Vec2, Vec2] {
+	boundingBox(): [Point, Point] {
 		const p0 = this.p0;
 		const p1 = this.p1;
 		return [
@@ -206,7 +206,7 @@ export class SegmentLine extends SegmentBase<SegmentLine> {
 		];
 	}
 
-	pointOn(p: Vec2) {
+	pointOn(p: Point) {
 		return this.geo.isCollinear(p, this.p0, this.p1);
 	}
 
@@ -220,13 +220,13 @@ export class SegmentLine extends SegmentBase<SegmentLine> {
 }
 
 export class SegmentCurve extends SegmentBase<SegmentCurve> {
-	p0: Vec2;
-	p1: Vec2;
-	p2: Vec2;
-	p3: Vec2;
+	p0: Point;
+	p1: Point;
+	p2: Point;
+	p3: Point;
 	geo: Geometry;
 
-	constructor(p0: Vec2, p1: Vec2, p2: Vec2, p3: Vec2, geo: Geometry) {
+	constructor(p0: Point, p1: Point, p2: Point, p3: Point, geo: Geometry) {
 		super();
 		this.p0 = p0;
 		this.p1 = p1;
@@ -264,15 +264,15 @@ export class SegmentCurve extends SegmentBase<SegmentCurve> {
 		return this.p3;
 	}
 
-	setStart(p0: Vec2) {
+	setStart(p0: Point) {
 		this.p0 = p0;
 	}
 
-	setEnd(p3: Vec2) {
+	setEnd(p3: Point) {
 		this.p3 = p3;
 	}
 
-	point(t: number): Vec2 {
+	point(t: number): Point {
 		const p0 = this.p0;
 		const p1 = this.p1;
 		const p2 = this.p2;
@@ -299,7 +299,7 @@ export class SegmentCurve extends SegmentBase<SegmentCurve> {
 			return [this];
 		}
 		const result: SegmentCurve[] = [];
-		const splitSingle = (pts: [Vec2, Vec2, Vec2, Vec2], t: number): [Vec2, Vec2, Vec2, Vec2] => {
+		const splitSingle = (pts: [Point, Point, Point, Point], t: number): [Point, Point, Point, Point] => {
 			const [p0, p1, p2, p3] = pts;
 			const p4 = lerpVec2(p0, p1, t);
 			const p5 = lerpVec2(p1, p2, t);
@@ -310,7 +310,7 @@ export class SegmentCurve extends SegmentBase<SegmentCurve> {
 			result.push(new SegmentCurve(p0, p4, p7, p9, this.geo));
 			return [p9, p8, p6, p3];
 		};
-		let last: [Vec2, Vec2, Vec2, Vec2] = [this.p0, this.p1, this.p2, this.p3];
+		let last: [Point, Point, Point, Point] = [this.p0, this.p1, this.p2, this.p3];
 		let lastT = 0;
 		for (const t of ts) {
 			last = splitSingle(last, (t - lastT) / (1 - lastT));
@@ -398,11 +398,11 @@ export class SegmentCurve extends SegmentBase<SegmentCurve> {
 		return result.list();
 	}
 
-	boundingBox(): [Vec2, Vec2] {
+	boundingBox(): [Point, Point] {
 		const p0 = this.p0;
 		const p3 = this.p3;
-		const min: Vec2 = [math.min(p0[0], p3[0]), math.min(p0[1], p3[1])];
-		const max: Vec2 = [math.max(p0[0], p3[0]), math.max(p0[1], p3[1])];
+		const min: Point = [math.min(p0[0], p3[0]), math.min(p0[1], p3[1])];
+		const max: Point = [math.max(p0[0], p3[0]), math.max(p0[1], p3[1])];
 		for (const t of this.boundingTValues()) {
 			const p = this.point(t);
 			min[0] = math.min(min[0], p[0]);
@@ -466,7 +466,7 @@ export class SegmentCurve extends SegmentBase<SegmentCurve> {
 		return this.point(t)[1];
 	}
 
-	pointOn(p: Vec2) {
+	pointOn(p: Point) {
 		if (this.geo.isEqualVec2(this.p0, p) || this.geo.isEqualVec2(this.p3, p)) {
 			return true;
 		}
@@ -511,7 +511,7 @@ export class SegmentCurve extends SegmentBase<SegmentCurve> {
 
 export type Segment = SegmentLine | SegmentCurve;
 
-export function projectPointOntoSegmentLine(p: Vec2, seg: SegmentLine) {
+export function projectPointOntoSegmentLine(p: Point, seg: SegmentLine) {
 	const dx = seg.p1[0] - seg.p0[0];
 	const dy = seg.p1[1] - seg.p0[1];
 	const px = p[0] - seg.p0[0];

@@ -7,7 +7,7 @@
 
 import Object from "@rbxts/object-utils";
 
-import { type Vec2 } from "./Geometry";
+import { type Point } from "./Geometry";
 import { type SegmentBool } from "./Intersecter";
 import { type Segment } from "./Segment";
 
@@ -43,7 +43,7 @@ export default class BuildLog {
 		this.push("check", { seg1, seg2 });
 	}
 
-	segmentDivide(seg: SegmentBool, p: Vec2) {
+	segmentDivide(seg: SegmentBool, p: Point) {
 		this.push("div_seg", { seg, p });
 	}
 

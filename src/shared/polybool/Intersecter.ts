@@ -6,7 +6,7 @@
 //
 
 import type BuildLog from "./BuildLog";
-import { type Geometry, type Vec2 } from "./Geometry";
+import { type Geometry, type Point } from "./Geometry";
 import { type Segment, SegmentCurve, SegmentLine, segmentsIntersect } from "./Segment";
 
 export interface SegmentBoolFill {
@@ -59,13 +59,13 @@ export function copySegmentBool(seg: SegmentBool, log: BuildLog | undefined): Se
 
 export class EventBool {
 	isStart: boolean;
-	p: Vec2;
+	p: Point;
 	seg: SegmentBool;
 	primary: boolean;
 	other!: EventBool;
 	status: EventBool | undefined = undefined;
 
-	constructor(isStart: boolean, p: Vec2, seg: SegmentBool, primary: boolean) {
+	constructor(isStart: boolean, p: Point, seg: SegmentBool, primary: boolean) {
 		this.isStart = isStart;
 		this.p = p;
 		this.seg = seg;
@@ -145,12 +145,12 @@ export class Intersecter {
 
 	compareEvents(
 		aStart: boolean,
-		a1: Vec2,
-		a2: Vec2,
+		a1: Point,
+		a2: Point,
 		aSeg: Segment,
 		bStart: boolean,
-		b1: Vec2,
-		b2: Vec2,
+		b1: Point,
+		b2: Point,
 		bSeg: Segment,
 	): number {
 		// compare the selected points first
@@ -191,7 +191,7 @@ export class Intersecter {
 		});
 	}
 
-	divideEvent(ev: EventBool, t: number, p: Vec2) {
+	divideEvent(ev: EventBool, t: number, p: Point) {
 		this.log?.segmentDivide(ev.seg, p);
 
 		const [left, right] = ev.seg.data.split([t]) as [Segment, Segment];
@@ -240,7 +240,7 @@ export class Intersecter {
 		return evStart;
 	}
 
-	addLine(from: Vec2, to: Vec2, primary = true) {
+	addLine(from: Point, to: Point, primary = true) {
 		const f = this.geo.compareVec2(from, to);
 		if (f === 0) {
 			// points are equal, so we have a zero-length segment
@@ -256,7 +256,7 @@ export class Intersecter {
 		this.addSegment(seg, primary);
 	}
 
-	addCurve(from: Vec2, c1: Vec2, c2: Vec2, to: Vec2, primary = true) {
+	addCurve(from: Point, c1: Point, c2: Point, to: Point, primary = true) {
 		const original = new SegmentCurve(from, c1, c2, to, this.geo);
 		const curves = original.split(original.inflectionTValues());
 		for (const curve of curves) {

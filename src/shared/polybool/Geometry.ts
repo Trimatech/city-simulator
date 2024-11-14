@@ -5,18 +5,18 @@
 // SPDX-License-Identifier: 0BSD
 //
 
-export type Vec2 = [number, number];
+export type Point = [number, number];
 export type Vec6 = [number, number, number, number, number, number];
 
 export function lerp(a: number, b: number, t: number) {
 	return a + (b - a) * t;
 }
 
-export function lerpVec2(a: Vec2, b: Vec2, t: number): Vec2 {
+export function lerpVec2(a: Point, b: Point, t: number): Point {
 	return [lerp(a[0], b[0], t), lerp(a[1], b[1], t)];
 }
 
-export function boundingBoxesIntersect(bbox1: [Vec2, Vec2], bbox2: [Vec2, Vec2]) {
+export function boundingBoxesIntersect(bbox1: [Point, Point], bbox2: [Point, Point]) {
 	const [b1min, b1max] = bbox1;
 	const [b2min, b2max] = bbox2;
 	return !(b1min[0] > b2max[0] || b1max[0] < b2min[0] || b1min[1] > b2max[1] || b1max[1] < b2min[1]);
@@ -25,10 +25,10 @@ export function boundingBoxesIntersect(bbox1: [Vec2, Vec2], bbox2: [Vec2, Vec2])
 export abstract class Geometry {
 	abstract snap0(v: number): number;
 	abstract snap01(v: number): number;
-	abstract isCollinear(p1: Vec2, p2: Vec2, p3: Vec2): boolean;
+	abstract isCollinear(p1: Point, p2: Point, p3: Point): boolean;
 	abstract solveCubic(a: number, b: number, c: number, d: number): number[];
-	abstract isEqualVec2(a: Vec2, b: Vec2): boolean;
-	abstract compareVec2(a: Vec2, b: Vec2): number;
+	abstract isEqualVec2(a: Point, b: Point): boolean;
+	abstract compareVec2(a: Point, b: Point): number;
 }
 
 export class GeometryEpsilon extends Geometry {
@@ -56,7 +56,7 @@ export class GeometryEpsilon extends Geometry {
 		return v;
 	}
 
-	isCollinear(p1: Vec2, p2: Vec2, p3: Vec2) {
+	isCollinear(p1: Point, p2: Point, p3: Point) {
 		// does pt1->pt2->pt3 make a straight line?
 		// essentially this is just checking to see if
 		//   slope(pt1->pt2) === slope(pt2->pt3)
@@ -126,11 +126,11 @@ export class GeometryEpsilon extends Geometry {
 		return this.solveCubicNormalized(b / a, c / a, d / a);
 	}
 
-	isEqualVec2(a: Vec2, b: Vec2) {
+	isEqualVec2(a: Point, b: Point) {
 		return math.abs(a[0] - b[0]) < this.epsilon && math.abs(a[1] - b[1]) < this.epsilon;
 	}
 
-	compareVec2(a: Vec2, b: Vec2) {
+	compareVec2(a: Point, b: Point) {
 		// returns -1 if a is smaller, 1 if b is smaller, 0 if equal
 		if (math.abs(b[0] - a[0]) < this.epsilon) {
 			return math.abs(b[1] - a[1]) < this.epsilon ? 0 : a[1] < b[1] ? -1 : 1;

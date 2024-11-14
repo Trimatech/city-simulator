@@ -6,7 +6,7 @@
 //
 
 import type BuildLog from "./BuildLog";
-import { type Geometry, type Vec2, type Vec6 } from "./Geometry";
+import { type Geometry, type Point, type Vec6 } from "./Geometry";
 import { copySegmentBool, Intersecter, type SegmentBool } from "./Intersecter";
 import { type Segment } from "./Segment";
 import { type IPolyBoolReceiver, SegmentChainer, segmentsToReceiver } from "./SegmentChainer";
@@ -20,8 +20,8 @@ interface IPathStateCommon<K extends string> {
 interface IPathStateBeginPath extends IPathStateCommon<"beginPath"> {}
 
 interface IPathStateMoveTo extends IPathStateCommon<"moveTo"> {
-	start: Vec2;
-	current: Vec2;
+	start: Point;
+	current: Point;
 }
 
 type IPathState = IPathStateBeginPath | IPathStateMoveTo;
@@ -142,7 +142,7 @@ export class Shape {
 		return this;
 	}
 
-	transformPoint(x: number, y: number): Vec2 {
+	transformPoint(x: number, y: number): Point {
 		const [a, b, c, d, e, f] = this.matrix;
 		return [a * x + c * y + e, b * x + d * y + f];
 	}
