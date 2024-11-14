@@ -30,9 +30,11 @@ jobs:
         with:
           version: 9.2.0
           run_install: true
-      - uses: ok-nick/setup-aftman@v0.4.2
+      - uses: Roblox/setup-foreman@v3.2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          github-api-url: 'https://api.github.com'
+          allow-external-github-orgs: true
 
       - name: Compile
         run: pnpm build --verbose
@@ -53,9 +55,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: ok-nick/setup-aftman@v0.4.2
+      - uses: Roblox/setup-foreman@v3.2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          github-api-url: 'https://api.github.com'
+          allow-external-github-orgs: true
 
       - name: Download place artifact
         uses: actions/download-artifact@v4
