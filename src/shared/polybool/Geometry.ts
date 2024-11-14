@@ -40,17 +40,17 @@ export class GeometryEpsilon extends Geometry {
 	}
 
 	snap0(v: number) {
-		if (Math.abs(v) < this.epsilon) {
+		if (math.abs(v) < this.epsilon) {
 			return 0;
 		}
 		return v;
 	}
 
 	snap01(v: number) {
-		if (Math.abs(v) < this.epsilon) {
+		if (math.abs(v) < this.epsilon) {
 			return 0;
 		}
-		if (Math.abs(1 - v) < this.epsilon) {
+		if (math.abs(1 - v) < this.epsilon) {
 			return 1;
 		}
 		return v;
@@ -65,7 +65,7 @@ export class GeometryEpsilon extends Geometry {
 		const dy1 = p1[1] - p2[1];
 		const dx2 = p2[0] - p3[0];
 		const dy2 = p2[1] - p3[1];
-		return Math.abs(dx1 * dy2 - dx2 * dy1) < this.epsilon;
+		return math.abs(dx1 * dy2 - dx2 * dy1) < this.epsilon;
 	}
 
 	private solveCubicNormalized(a: number, b: number, c: number) {
@@ -74,49 +74,52 @@ export class GeometryEpsilon extends Geometry {
 		const b3 = b / 3;
 		const Q = a3 * a3 - b3;
 		const R = a3 * (a3 * a3 - b / 2) + c / 2;
-		if (Math.abs(R) < this.epsilon && Math.abs(Q) < this.epsilon) {
+		if (math.abs(R) < this.epsilon && math.abs(Q) < this.epsilon) {
 			return [-a3];
 		}
 		const F = a3 * (a3 * (4 * a3 * c - b3 * b) - 2 * b * c) + 4 * b3 * b3 * b3 + c * c;
-		if (Math.abs(F) < this.epsilon) {
-			const sqrtQ = Math.sqrt(Q);
+		if (math.abs(F) < this.epsilon) {
+			const sqrtQ = math.sqrt(Q);
 			return R > 0 ? [-2 * sqrtQ - a / 3, sqrtQ - a / 3] : [-sqrtQ - a / 3, 2 * sqrtQ - a / 3];
 		}
 		const Q3 = Q * Q * Q;
 		const R2 = R * R;
 		if (R2 < Q3) {
-			const ratio = (R < 0 ? -1 : 1) * Math.sqrt(R2 / Q3);
-			const theta = Math.acos(ratio);
-			const norm = -2 * Math.sqrt(Q);
-			const x0 = norm * Math.cos(theta / 3) - a3;
-			const x1 = norm * Math.cos((theta + 2 * Math.PI) / 3) - a3;
-			const x2 = norm * Math.cos((theta - 2 * Math.PI) / 3) - a3;
-			return [x0, x1, x2].sort((x, y) => x - y);
+			const ratio = (R < 0 ? -1 : 1) * math.pow(math.abs(R) + math.sqrt(R2 - Q3), 1 / 3);
+			const theta = math.acos(ratio);
+			const norm = -2 * math.sqrt(Q);
+			const x0 = norm * math.cos(theta / 3) - a3;
+			const x1 = norm * math.cos((theta + 2 * math.pi) / 3) - a3;
+			const x2 = norm * math.cos((theta - 2 * math.pi) / 3) - a3;
+			return [x0, x1, x2].sort((a, b) => {
+				if (a === b) return false;
+				return a < b;
+			});
 		} else {
-			const A = (R < 0 ? 1 : -1) * Math.pow(Math.abs(R) + Math.sqrt(R2 - Q3), 1 / 3);
-			const B = Math.abs(A) >= this.epsilon ? Q / A : 0;
+			const A = (R < 0 ? 1 : -1) * math.pow(math.abs(R) + math.sqrt(R2 - Q3), 1 / 3);
+			const B = math.abs(A) >= this.epsilon ? Q / A : 0;
 			return [A + B - a3];
 		}
 	}
 
 	solveCubic(a: number, b: number, c: number, d: number) {
-		if (Math.abs(a) < this.epsilon) {
+		if (math.abs(a) < this.epsilon) {
 			// quadratic
-			if (Math.abs(b) < this.epsilon) {
+			if (math.abs(b) < this.epsilon) {
 				// linear case
-				if (Math.abs(c) < this.epsilon) {
+				if (math.abs(c) < this.epsilon) {
 					// horizontal line
-					return Math.abs(d) < this.epsilon ? [0] : [];
+					return math.abs(d) < this.epsilon ? [0] : [];
 				}
 				return [-d / c];
 			}
 			const b2 = 2 * b;
 			let D = c * c - 4 * b * d;
-			if (Math.abs(D) < this.epsilon) {
+			if (math.abs(D) < this.epsilon) {
 				return [-c / b2];
 			} else if (D > 0) {
-				D = Math.sqrt(D);
-				return [(-c + D) / b2, (-c - D) / b2].sort((x, y) => x - y);
+				D = math.sqrt(D);
+				return [(-c + D) / b2, (-c - D) / b2].sort((x, y) => x < y);
 			}
 			return [];
 		}
@@ -124,13 +127,13 @@ export class GeometryEpsilon extends Geometry {
 	}
 
 	isEqualVec2(a: Vec2, b: Vec2) {
-		return Math.abs(a[0] - b[0]) < this.epsilon && Math.abs(a[1] - b[1]) < this.epsilon;
+		return math.abs(a[0] - b[0]) < this.epsilon && math.abs(a[1] - b[1]) < this.epsilon;
 	}
 
 	compareVec2(a: Vec2, b: Vec2) {
 		// returns -1 if a is smaller, 1 if b is smaller, 0 if equal
-		if (Math.abs(b[0] - a[0]) < this.epsilon) {
-			return Math.abs(b[1] - a[1]) < this.epsilon ? 0 : a[1] < b[1] ? -1 : 1;
+		if (math.abs(b[0] - a[0]) < this.epsilon) {
+			return math.abs(b[1] - a[1]) < this.epsilon ? 0 : a[1] < b[1] ? -1 : 1;
 		}
 		return a[0] < b[0] ? -1 : 1;
 	}

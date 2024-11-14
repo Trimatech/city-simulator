@@ -5,8 +5,10 @@
 // SPDX-License-Identifier: 0BSD
 //
 
-import { type SegmentBool } from "./Intersecter";
+import Object from "@rbxts/object-utils";
+
 import { type Vec2 } from "./Geometry";
+import { type SegmentBool } from "./Intersecter";
 import { type Segment } from "./Segment";
 
 interface ISegFill {
@@ -17,15 +19,18 @@ interface ISegFill {
 export default class BuildLog {
 	list: Array<{ type: string; data: unknown }> = [];
 	nextSegmentId = 0;
-	curVert = NaN;
+	curVert?: number;
 
-	push(type: string, data: unknown) {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	push(pushedType: string, data: any) {
+		const clonedData = Object.deepCopy(data);
 		this.list.push({
-			type,
-			data: JSON.parse(JSON.stringify(data)),
+			type: pushedType,
+			data: clonedData,
 		});
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	info(msg: string, data?: any) {
 		this.push("info", { msg, data });
 	}
@@ -134,6 +139,6 @@ export default class BuildLog {
 	}
 
 	done() {
-		this.push("done", null);
+		this.push("done", undefined);
 	}
 }

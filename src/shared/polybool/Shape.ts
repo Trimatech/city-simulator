@@ -5,17 +5,18 @@
 // SPDX-License-Identifier: 0BSD
 //
 
-import { type Geometry, type Vec2, type Vec6 } from "./Geometry";
 import type BuildLog from "./BuildLog";
-import { type SegmentBool, Intersecter, copySegmentBool } from "./Intersecter";
-import { SegmentSelector } from "./SegmentSelector";
-import { SegmentChainer, segmentsToReceiver, type IPolyBoolReceiver } from "./SegmentChainer";
+import { type Geometry, type Vec2, type Vec6 } from "./Geometry";
+import { copySegmentBool, Intersecter, type SegmentBool } from "./Intersecter";
 import { type Segment } from "./Segment";
+import { type IPolyBoolReceiver, SegmentChainer, segmentsToReceiver } from "./SegmentChainer";
+import { SegmentSelector } from "./SegmentSelector";
 
 interface IPathStateCommon<K extends string> {
 	kind: K;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface IPathStateBeginPath extends IPathStateCommon<"beginPath"> {}
 
 interface IPathStateMoveTo extends IPathStateCommon<"moveTo"> {
@@ -27,7 +28,7 @@ type IPathState = IPathStateBeginPath | IPathStateMoveTo;
 
 export class Shape {
 	private readonly geo: Geometry;
-	private readonly log: BuildLog | null;
+	private readonly log: BuildLog | undefined;
 	private pathState: IPathState = { kind: "beginPath" };
 	private resultState:
 		| { state: "new"; selfIntersect: Intersecter }
@@ -37,7 +38,7 @@ export class Shape {
 	private readonly saveStack: Array<{ matrix: Vec6 }> = [];
 	private matrix: Vec6 = [1, 0, 0, 1, 0, 0];
 
-	constructor(geo: Geometry, segments: SegmentBool[] | null = null, log: BuildLog | null = null) {
+	constructor(geo: Geometry, segments: SegmentBool[] | undefined = undefined, log: BuildLog | undefined = undefined) {
 		this.geo = geo;
 		this.log = log;
 		if (segments) {
@@ -52,7 +53,7 @@ export class Shape {
 
 	setTransform(a: number, b: number, c: number, d: number, e: number, f: number) {
 		if (this.resultState.state !== "new") {
-			throw new Error("PolyBool: Cannot change shape after using it in an operation");
+			error("PolyBool: Cannot change shape after using it in an operation");
 		}
 		this.matrix = [a, b, c, d, e, f];
 		return this;
@@ -65,7 +66,7 @@ export class Shape {
 
 	getTransform() {
 		if (this.resultState.state !== "new") {
-			throw new Error("PolyBool: Cannot change shape after using it in an operation");
+			error("PolyBool: Cannot change shape after using it in an operation");
 		}
 		const [a, b, c, d, e, f] = this.matrix;
 		return { a, b, c, d, e, f };
@@ -85,8 +86,8 @@ export class Shape {
 	}
 
 	rotate(angle: number) {
-		const cos = Math.cos(angle);
-		const sin = Math.sin(angle);
+		const cos = math.cos(angle);
+		const sin = math.sin(angle);
 		const [a0, b0, c0, d0, e0, f0] = this.matrix;
 		this.matrix = [a0 * cos + c0 * sin, b0 * cos + d0 * sin, c0 * cos - a0 * sin, d0 * cos - b0 * sin, e0, f0];
 		return this;
@@ -99,51 +100,12 @@ export class Shape {
 		}
 		let cos = 0;
 		let sin = 0;
-		if (ang === 90) {
-			sin = 1;
-		} else if (ang === 180) {
-			cos = -1;
-		} else if (ang === 270) {
-			sin = -1;
-		} else if (ang === 45) {
-			cos = sin = Math.SQRT1_2;
-		} else if (ang === 135) {
-			sin = Math.SQRT1_2;
-			cos = -Math.SQRT1_2;
-		} else if (ang === 225) {
-			cos = sin = -Math.SQRT1_2;
-		} else if (ang === 315) {
-			cos = Math.SQRT1_2;
-			sin = -Math.SQRT1_2;
-		} else if (ang === 30) {
-			cos = Math.sqrt(3) / 2;
-			sin = 0.5;
-		} else if (ang === 60) {
-			cos = 0.5;
-			sin = Math.sqrt(3) / 2;
-		} else if (ang === 120) {
-			cos = -0.5;
-			sin = Math.sqrt(3) / 2;
-		} else if (ang === 150) {
-			cos = -Math.sqrt(3) / 2;
-			sin = 0.5;
-		} else if (ang === 210) {
-			cos = -Math.sqrt(3) / 2;
-			sin = -0.5;
-		} else if (ang === 240) {
-			cos = -0.5;
-			sin = -Math.sqrt(3) / 2;
-		} else if (ang === 300) {
-			cos = 0.5;
-			sin = -Math.sqrt(3) / 2;
-		} else if (ang === 330) {
-			cos = Math.sqrt(3) / 2;
-			sin = -0.5;
-		} else {
-			const rad = (Math.PI * ang) / 180;
-			cos = Math.cos(rad);
-			sin = Math.sin(rad);
+		if (ang === 45) {
+			cos = sin = math.sqrt(2) / 2;
 		}
+		const rad = (math.pi * ang) / 180;
+		cos = math.cos(rad);
+		sin = math.sin(rad);
 		const [a0, b0, c0, d0, e0, f0] = this.matrix;
 		this.matrix = [a0 * cos + c0 * sin, b0 * cos + d0 * sin, c0 * cos - a0 * sin, d0 * cos - b0 * sin, e0, f0];
 		return this;
@@ -163,7 +125,7 @@ export class Shape {
 
 	save() {
 		if (this.resultState.state !== "new") {
-			throw new Error("PolyBool: Cannot change shape after using it in an operation");
+			error("PolyBool: Cannot change shape after using it in an operation");
 		}
 		this.saveStack.push({ matrix: this.matrix });
 		return this;
@@ -171,7 +133,7 @@ export class Shape {
 
 	restore() {
 		if (this.resultState.state !== "new") {
-			throw new Error("PolyBool: Cannot change shape after using it in an operation");
+			error("PolyBool: Cannot change shape after using it in an operation");
 		}
 		const s = this.saveStack.pop();
 		if (s) {
@@ -187,7 +149,7 @@ export class Shape {
 
 	beginPath() {
 		if (this.resultState.state !== "new") {
-			throw new Error("PolyBool: Cannot change shape after using it in an operation");
+			error("PolyBool: Cannot change shape after using it in an operation");
 		}
 		this.resultState.selfIntersect.beginPath();
 		return this.endPath();
@@ -195,7 +157,7 @@ export class Shape {
 
 	moveTo(x: number, y: number) {
 		if (this.resultState.state !== "new") {
-			throw new Error("PolyBool: Cannot change shape after using it in an operation");
+			error("PolyBool: Cannot change shape after using it in an operation");
 		}
 		if (this.pathState.kind !== "beginPath") {
 			this.beginPath();
@@ -211,10 +173,10 @@ export class Shape {
 
 	lineTo(x: number, y: number) {
 		if (this.resultState.state !== "new") {
-			throw new Error("PolyBool: Cannot change shape after using it in an operation");
+			error("PolyBool: Cannot change shape after using it in an operation");
 		}
 		if (this.pathState.kind !== "moveTo") {
-			throw new Error("PolyBool: Must call moveTo prior to calling lineTo");
+			error("PolyBool: Must call moveTo prior to calling lineTo");
 		}
 		const current = this.transformPoint(x, y);
 		this.resultState.selfIntersect.addLine(this.pathState.current, current);
@@ -233,10 +195,10 @@ export class Shape {
 
 	bezierCurveTo(cp1x: number, cp1y: number, cp2x: number, cp2y: number, x: number, y: number) {
 		if (this.resultState.state !== "new") {
-			throw new Error("PolyBool: Cannot change shape after using it in an operation");
+			error("PolyBool: Cannot change shape after using it in an operation");
 		}
 		if (this.pathState.kind !== "moveTo") {
-			throw new Error("PolyBool: Must call moveTo prior to calling bezierCurveTo");
+			error("PolyBool: Must call moveTo prior to calling bezierCurveTo");
 		}
 		const current = this.transformPoint(x, y);
 		this.resultState.selfIntersect.addCurve(
@@ -251,7 +213,7 @@ export class Shape {
 
 	closePath() {
 		if (this.resultState.state !== "new") {
-			throw new Error("PolyBool: Cannot change shape after using it in an operation");
+			error("PolyBool: Cannot change shape after using it in an operation");
 		}
 		// close with a line if needed
 		if (this.pathState.kind === "moveTo" && !this.geo.isEqualVec2(this.pathState.start, this.pathState.current)) {
@@ -264,7 +226,7 @@ export class Shape {
 
 	endPath() {
 		if (this.resultState.state !== "new") {
-			throw new Error("PolyBool: Cannot change shape after using it in an operation");
+			error("PolyBool: Cannot change shape after using it in an operation");
 		}
 		this.pathState = { kind: "beginPath" };
 		return this;
@@ -310,10 +272,10 @@ export class Shape {
 
 export class ShapeCombined {
 	private readonly geo: Geometry;
-	private readonly log: BuildLog | null;
+	private readonly log: BuildLog | undefined;
 	private readonly segments: SegmentBool[];
 
-	constructor(segments: SegmentBool[], geo: Geometry, log: BuildLog | null = null) {
+	constructor(segments: SegmentBool[], geo: Geometry, log: BuildLog | undefined = undefined) {
 		this.geo = geo;
 		this.segments = segments;
 		this.log = log;

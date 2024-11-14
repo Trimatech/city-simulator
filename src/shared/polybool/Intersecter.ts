@@ -5,18 +5,18 @@
 // SPDX-License-Identifier: 0BSD
 //
 
-import { type Vec2, type Geometry } from "./Geometry";
 import type BuildLog from "./BuildLog";
-import { type Segment, SegmentLine, SegmentCurve, segmentsIntersect } from "./Segment";
+import { type Geometry, type Vec2 } from "./Geometry";
+import { type Segment, SegmentCurve, SegmentLine, segmentsIntersect } from "./Segment";
 
 export interface SegmentBoolFill {
-	above: boolean | null;
-	below: boolean | null;
+	above: boolean | undefined;
+	below: boolean | undefined;
 }
 
 export interface ListBoolTransition<T> {
-	before: T | null;
-	after: T | null;
+	before: T | undefined;
+	after: T | undefined;
 	insert: (node: T) => T;
 }
 
@@ -24,15 +24,20 @@ export class SegmentBoolBase<T> {
 	id: number;
 	data: T;
 	myFill: SegmentBoolFill;
-	otherFill: SegmentBoolFill | null = null;
+	otherFill: SegmentBoolFill | undefined = undefined;
 	closed: boolean;
 
-	constructor(data: T, fill: SegmentBoolFill | null = null, closed = false, log: BuildLog | null = null) {
+	constructor(
+		data: T,
+		fill: SegmentBoolFill | undefined = undefined,
+		closed = false,
+		log: BuildLog | undefined = undefined,
+	) {
 		this.id = log?.segmentId() ?? -1;
 		this.data = data;
 		this.myFill = {
-			above: fill?.above ?? null,
-			below: fill?.below ?? null,
+			above: fill?.above ?? undefined,
+			below: fill?.below ?? undefined,
 		};
 		this.closed = closed;
 	}
@@ -43,13 +48,13 @@ export class SegmentBoolCurve extends SegmentBoolBase<SegmentCurve> {}
 
 export type SegmentBool = SegmentBoolLine | SegmentBoolCurve;
 
-export function copySegmentBool(seg: SegmentBool, log: BuildLog | null): SegmentBool {
+export function copySegmentBool(seg: SegmentBool, log: BuildLog | undefined): SegmentBool {
 	if (seg instanceof SegmentBoolLine) {
 		return new SegmentBoolLine(seg.data, seg.myFill, seg.closed, log);
 	} else if (seg instanceof SegmentBoolCurve) {
 		return new SegmentBoolCurve(seg.data, seg.myFill, seg.closed, log);
 	}
-	throw new Error("PolyBool: Unknown SegmentBool in copySegmentBool");
+	error("PolyBool: Unknown SegmentBool in copySegmentBool");
 }
 
 export class EventBool {
@@ -58,7 +63,7 @@ export class EventBool {
 	seg: SegmentBool;
 	primary: boolean;
 	other!: EventBool;
-	status: EventBool | null = null;
+	status: EventBool | undefined = undefined;
 
 	constructor(isStart: boolean, p: Vec2, seg: SegmentBool, primary: boolean) {
 		this.isStart = isStart;
@@ -68,13 +73,13 @@ export class EventBool {
 	}
 }
 
-export class ListBool<T> {
+export class ListBool<T extends defined> {
 	readonly nodes: T[] = [];
 
 	remove(node: T) {
 		const i = this.nodes.indexOf(node);
 		if (i >= 0) {
-			this.nodes.splice(i, 1);
+			this.nodes.remove(i);
 		}
 	}
 
@@ -83,7 +88,7 @@ export class ListBool<T> {
 	}
 
 	isEmpty() {
-		return this.nodes.length <= 0;
+		return this.nodes.size() <= 0;
 	}
 
 	getHead() {
@@ -99,23 +104,25 @@ export class ListBool<T> {
 	}
 
 	findTransition(node: T, check: (node: T) => number): ListBoolTransition<T> {
-		// bisect to find the transition point
 		const compare = (a: T, b: T) => check(b) - check(a);
+
 		let i = 0;
-		let high = this.nodes.length;
+		let high = this.nodes.size();
+
 		while (i < high) {
-			const mid = (i + high) >> 1;
+			const mid = math.floor((i + high) / 2);
 			if (compare(this.nodes[mid], node) > 0) {
 				high = mid;
 			} else {
 				i = mid + 1;
 			}
 		}
+
 		return {
-			before: i <= 0 ? null : (this.nodes[i - 1] ?? null),
-			after: this.nodes[i] ?? null,
+			before: i <= 0 ? undefined : this.nodes[i - 1],
+			after: i < this.nodes.size() ? this.nodes[i] : undefined,
 			insert: (node: T) => {
-				this.nodes.splice(i, 0, node);
+				this.nodes.insert(i, node);
 				return node;
 			},
 		};
@@ -127,10 +134,10 @@ export class Intersecter {
 	private readonly geo: Geometry;
 	private readonly events = new ListBool<EventBool>();
 	private readonly status = new ListBool<EventBool>();
-	private readonly log: BuildLog | null;
+	private readonly log: BuildLog | undefined;
 	private currentPath: SegmentBool[] = [];
 
-	constructor(selfIntersection: boolean, geo: Geometry, log: BuildLog | null = null) {
+	constructor(selfIntersection: boolean, geo: Geometry, log: BuildLog | undefined = undefined) {
 		this.selfIntersection = selfIntersection;
 		this.geo = geo;
 		this.log = log;
@@ -198,9 +205,9 @@ export class Intersecter {
 				? new SegmentBoolLine(right, ev.seg.myFill, ev.seg.closed, this.log)
 				: right instanceof SegmentCurve
 					? new SegmentBoolCurve(right, ev.seg.myFill, ev.seg.closed, this.log)
-					: null;
+					: undefined;
 		if (!ns) {
-			throw new Error("PolyBool: Unknown segment data in divideEvent");
+			error("PolyBool: Unknown segment data in divideEvent");
 		}
 		// slides an end backwards
 		//   (start)------------(end)    to:
@@ -241,7 +248,7 @@ export class Intersecter {
 		}
 		const seg = new SegmentBoolLine(
 			new SegmentLine(f < 0 ? from : to, f < 0 ? to : from, this.geo),
-			null,
+			undefined,
 			false,
 			this.log,
 		);
@@ -263,7 +270,7 @@ export class Intersecter {
 			if (line) {
 				this.addLine(line.p0, line.p1, primary);
 			} else {
-				const seg = new SegmentBoolCurve(f < 0 ? curve : curve.reverse(), null, false, this.log);
+				const seg = new SegmentBoolCurve(f < 0 ? curve : curve.reverse(), undefined, false, this.log);
 				this.currentPath.push(seg);
 				this.addSegment(seg, primary);
 			}
@@ -315,7 +322,7 @@ export class Intersecter {
 				if (this.geo.snap0(A[0] - C[0]) === 0 && this.geo.snap0(B[0] - C[0]) === 0) {
 					// seg2 is a curve, but the tangent line (C-B) at the start point is vertical, and
 					// collinear with A... so... just sort based on the Y values I guess?
-					return Math.sign(C[1] - A[1]);
+					return math.sign(C[1] - A[1]);
 				}
 			}
 		} else {
@@ -323,7 +330,7 @@ export class Intersecter {
 				// find seg2's position at A[0] and see if it's above or below A[1]
 				const y = seg2.mapXtoY(A[0], true);
 				if (y !== false) {
-					return Math.sign(y - A[1]);
+					return math.sign(y - A[1]);
 				}
 			}
 			if (seg1 instanceof SegmentCurve) {
@@ -348,7 +355,7 @@ export class Intersecter {
 		const [Ax, Ay] = A;
 		const [Bx, By] = B;
 		const [Cx, Cy] = C;
-		return Math.sign((Bx - Ax) * (Cy - Ay) - (By - Ay) * (Cx - Ax));
+		return math.sign((Bx - Ax) * (Cy - Ay) - (By - Ay) * (Cx - Ax));
 	}
 
 	statusFindSurrounding(ev: EventBool) {
@@ -361,7 +368,7 @@ export class Intersecter {
 		});
 	}
 
-	checkIntersection(ev1: EventBool, ev2: EventBool): EventBool | null {
+	checkIntersection(ev1: EventBool, ev2: EventBool): EventBool | undefined {
 		// returns the segment equal to ev1, or null if nothing equal
 		const seg1 = ev1.seg;
 		const seg2 = ev2.seg;
@@ -370,9 +377,9 @@ export class Intersecter {
 
 		const i = segmentsIntersect(seg1.data, seg2.data, false);
 
-		if (i === null) {
+		if (i === undefined) {
 			// no intersections
-			return null;
+			return undefined;
 		} else if (i.kind === "tRangePairs") {
 			// segments are parallel or coincident
 			const {
@@ -384,7 +391,7 @@ export class Intersecter {
 				(tA1 === 1 && tA2 === 1 && tB1 === 0 && tB2 === 0) ||
 				(tA1 === 0 && tA2 === 0 && tB1 === 1 && tB2 === 1)
 			) {
-				return null; // segments touch at endpoints... no intersection
+				return undefined; // segments touch at endpoints... no intersection
 			}
 
 			if (tA1 === 0 && tA2 === 1 && tB1 === 0 && tB2 === 1) {
@@ -427,10 +434,10 @@ export class Intersecter {
 					this.divideEvent(ev2, tB1, a1);
 				}
 			}
-			return null;
+			return undefined;
 		} else if (i.kind === "tValuePairs") {
-			if (i.tValuePairs.length <= 0) {
-				return null;
+			if (i.tValuePairs.size() <= 0) {
+				return undefined;
 			}
 			// process a single intersection
 
@@ -438,7 +445,7 @@ export class Intersecter {
 			let minPair = i.tValuePairs[0];
 			for (
 				let j = 1;
-				j < i.tValuePairs.length &&
+				j < i.tValuePairs.size() &&
 				((minPair[0] === 0 && minPair[1] === 0) ||
 					(minPair[0] === 0 && minPair[1] === 1) ||
 					(minPair[0] === 1 && minPair[1] === 0) ||
@@ -471,9 +478,9 @@ export class Intersecter {
 			if (tB > 0 && tB < 1) {
 				this.divideEvent(ev2, tB, p);
 			}
-			return null;
+			return undefined;
 		}
-		throw new Error("PolyBool: Unknown intersection type");
+		error("PolyBool: Unknown intersection type");
 	}
 
 	calculate() {
@@ -502,7 +509,7 @@ export class Intersecter {
 					if (below) {
 						return this.checkIntersection(ev, below);
 					}
-					return null;
+					return undefined;
 				};
 
 				const eve = checkBothIntersections();
@@ -514,7 +521,7 @@ export class Intersecter {
 
 					if (this.selfIntersection) {
 						let toggle: boolean; // are we a toggling edge?
-						if (ev.seg.myFill.below === null) {
+						if (ev.seg.myFill.below === undefined) {
 							toggle = ev.seg.closed;
 						} else {
 							toggle = ev.seg.myFill.above !== ev.seg.myFill.below;
@@ -554,7 +561,7 @@ export class Intersecter {
 				//
 				if (this.selfIntersection) {
 					let toggle: boolean; // are we a toggling edge?
-					if (ev.seg.myFill.below === null) {
+					if (ev.seg.myFill.below === undefined) {
 						// if we are new then we toggle if we're part of a closed path
 						toggle = ev.seg.closed;
 					} else {
@@ -581,10 +588,10 @@ export class Intersecter {
 					// now we fill in any missing transition information, since we are
 					// all-knowing at this point
 
-					if (ev.seg.otherFill === null) {
+					if (ev.seg.otherFill === undefined) {
 						// if we don't have other information, then we need to figure out if
 						// we're inside the other polygon
-						let inside: boolean | null;
+						let inside: boolean | undefined;
 						if (!below) {
 							// if nothing is below us, then we're not filled
 							inside = false;
@@ -592,8 +599,8 @@ export class Intersecter {
 							// otherwise, something is below us
 							// so copy the below segment's other polygon's above
 							if (ev.primary === below.primary) {
-								if (below.seg.otherFill === null) {
-									throw new Error("PolyBool: Unexpected state of otherFill (null)");
+								if (below.seg.otherFill === undefined) {
+									error("PolyBool: Unexpected state of otherFill (null)");
 								}
 								inside = below.seg.otherFill.above;
 							} else {
@@ -615,8 +622,8 @@ export class Intersecter {
 				// end
 				const st = ev.status;
 
-				if (st === null) {
-					throw new Error(
+				if (st === undefined) {
+					error(
 						"PolyBool: Zero-length segment detected; your epsilon is " + "probably too small or too large",
 					);
 				}
@@ -624,7 +631,7 @@ export class Intersecter {
 				// removing the status will create two new adjacent edges, so we'll need
 				// to check for those
 				const i = this.status.getIndex(st);
-				if (i > 0 && i < this.status.nodes.length - 1) {
+				if (i > 0 && i < this.status.nodes.size() - 1) {
 					const before = this.status.nodes[i - 1];
 					const after = this.status.nodes[i + 1];
 					this.checkIntersection(before, after);
@@ -641,7 +648,7 @@ export class Intersecter {
 					// make sure `seg.myFill` actually points to the primary polygon
 					// though
 					if (!ev.seg.otherFill) {
-						throw new Error("PolyBool: Unexpected state of otherFill (null)");
+						error("PolyBool: Unexpected state of otherFill (null)");
 					}
 					const s = ev.seg.myFill;
 					ev.seg.myFill = ev.seg.otherFill;

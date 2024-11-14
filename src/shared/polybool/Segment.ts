@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: 0BSD
 //
 
-import { type Vec2, type Geometry, lerpVec2, boundingBoxesIntersect } from "./Geometry";
+import { boundingBoxesIntersect, type Geometry, lerpVec2, type Vec2 } from "./Geometry";
 import { type IPolyBoolReceiver } from "./SegmentChainer";
 
 export interface SegmentTValuePairs {
@@ -51,7 +51,10 @@ export class SegmentTValuesBuilder {
 	}
 
 	list() {
-		this.tValues.sort((a, b) => a - b);
+		this.tValues.sort((a, b) => {
+			if (a === b) return false;
+			return a < b;
+		});
 		return this.tValues;
 	}
 }
@@ -84,13 +87,16 @@ export class SegmentTValuePairsBuilder {
 	}
 
 	list() {
-		this.tValuePairs.sort((a, b) => a[0] - b[0]);
+		this.tValuePairs.sort((a, b) => {
+			if (a[0] === b[0]) return false;
+			return a[0] < b[0];
+		});
 		return this.tValuePairs;
 	}
 
-	done(): SegmentTValuePairs | null {
-		return this.tValuePairs.length <= 0
-			? null
+	done(): SegmentTValuePairs | undefined {
+		return this.tValuePairs.size() <= 0
+			? undefined
 			: {
 					kind: "tValuePairs",
 					tValuePairs: this.list(),
@@ -173,7 +179,7 @@ export class SegmentLine extends SegmentBase<SegmentLine> {
 	}
 
 	split(ts: number[]): SegmentLine[] {
-		if (ts.length <= 0) {
+		if (ts.size() <= 0) {
 			return [this];
 		}
 		const pts = ts.map((t) => this.point(t));
@@ -195,8 +201,8 @@ export class SegmentLine extends SegmentBase<SegmentLine> {
 		const p0 = this.p0;
 		const p1 = this.p1;
 		return [
-			[Math.min(p0[0], p1[0]), Math.min(p0[1], p1[1])],
-			[Math.max(p0[0], p1[0]), Math.max(p0[1], p1[1])],
+			[math.min(p0[0], p1[0]), math.min(p0[1], p1[1])],
+			[math.max(p0[0], p1[0]), math.max(p0[1], p1[1])],
 		];
 	}
 
@@ -289,7 +295,7 @@ export class SegmentCurve extends SegmentBase<SegmentCurve> {
 	}
 
 	split(ts: number[]): SegmentCurve[] {
-		if (ts.length <= 0) {
+		if (ts.size() <= 0) {
 			return [this];
 		}
 		const result: SegmentCurve[] = [];
@@ -337,7 +343,7 @@ export class SegmentCurve extends SegmentBase<SegmentCurve> {
 			} else {
 				const disc = b * b - 4 * a * c;
 				if (disc >= 0) {
-					const sq = Math.sqrt(disc);
+					const sq = math.sqrt(disc);
 					result.add((-b + sq) / (2 * a));
 					result.add((-b - sq) / (2 * a));
 				}
@@ -395,14 +401,14 @@ export class SegmentCurve extends SegmentBase<SegmentCurve> {
 	boundingBox(): [Vec2, Vec2] {
 		const p0 = this.p0;
 		const p3 = this.p3;
-		const min: Vec2 = [Math.min(p0[0], p3[0]), Math.min(p0[1], p3[1])];
-		const max: Vec2 = [Math.max(p0[0], p3[0]), Math.max(p0[1], p3[1])];
+		const min: Vec2 = [math.min(p0[0], p3[0]), math.min(p0[1], p3[1])];
+		const max: Vec2 = [math.max(p0[0], p3[0]), math.max(p0[1], p3[1])];
 		for (const t of this.boundingTValues()) {
 			const p = this.point(t);
-			min[0] = Math.min(min[0], p[0]);
-			min[1] = Math.min(min[1], p[1]);
-			max[0] = Math.max(max[0], p[0]);
-			max[1] = Math.max(max[1], p[1]);
+			min[0] = math.min(min[0], p[0]);
+			min[1] = math.min(min[1], p[1]);
+			max[0] = math.max(max[0], p[0]);
+			max[1] = math.max(max[1], p[1]);
 		}
 		return [min, max];
 	}
@@ -426,12 +432,12 @@ export class SegmentCurve extends SegmentBase<SegmentCurve> {
 			}
 		}
 		// force a solution if we know there is one...
-		if (force || (x >= Math.min(this.p0[0], this.p3[0]) && x <= Math.max(this.p0[0], this.p3[0]))) {
+		if (force || (x >= math.min(this.p0[0], this.p3[0]) && x <= math.max(this.p0[0], this.p3[0]))) {
 			for (let attempt = 0; attempt < 4; attempt++) {
 				// collapse an R value to 0, this is so wrong!!!
 				let ii = -1;
 				for (let i = 0; i < 4; i++) {
-					if (R[i] !== 0 && (ii < 0 || Math.abs(R[i]) < Math.abs(R[ii]))) {
+					if (R[i] !== 0 && (ii < 0 || math.abs(R[i]) < math.abs(R[ii]))) {
 						ii = i;
 					}
 				}
@@ -471,7 +477,7 @@ export class SegmentCurve extends SegmentBase<SegmentCurve> {
 		return this.geo.snap0(y - p[1]) === 0;
 	}
 
-	toLine(): SegmentLine | null {
+	toLine(): SegmentLine | undefined {
 		// note: this won't work for arbitrary curves, because they could loop back on themselves,
 		// but will work fine for curves that have already been split at all inflection points
 		const p0 = this.p0;
@@ -489,7 +495,7 @@ export class SegmentCurve extends SegmentBase<SegmentCurve> {
 		) {
 			return new SegmentLine(p0, p3, this.geo);
 		}
-		return null;
+		return undefined;
 	}
 
 	draw<TRecv extends IPolyBoolReceiver>(ctx: TRecv): TRecv {
@@ -519,7 +525,7 @@ export function segmentLineIntersectSegmentLine(
 	segA: SegmentLine,
 	segB: SegmentLine,
 	allowOutOfRange: boolean,
-): SegmentTValuePairs | SegmentTRangePairs | null {
+): SegmentTValuePairs | SegmentTRangePairs | undefined {
 	const geo = segA.geo;
 	const a0 = segA.p0;
 	const a1 = segA.p1;
@@ -535,29 +541,29 @@ export function segmentLineIntersectSegmentLine(
 		// lines are coincident or parallel
 		if (!geo.isCollinear(a0, a1, b0)) {
 			// they're not coincident, so they're parallel, with no intersections
-			return null;
+			return undefined;
 		}
 		// otherwise, segments are on top of each other somehow (aka coincident)
 		const tB0onA = projectPointOntoSegmentLine(segB.p0, segA);
 		const tB1onA = projectPointOntoSegmentLine(segB.p1, segA);
-		const tAMin = geo.snap01(Math.min(tB0onA, tB1onA));
-		const tAMax = geo.snap01(Math.max(tB0onA, tB1onA));
+		const tAMin = geo.snap01(math.min(tB0onA, tB1onA));
+		const tAMax = geo.snap01(math.max(tB0onA, tB1onA));
 		if (tAMax < 0 || tAMin > 1) {
-			return null;
+			return undefined;
 		}
 
 		const tA0onB = projectPointOntoSegmentLine(segA.p0, segB);
 		const tA1onB = projectPointOntoSegmentLine(segA.p1, segB);
-		const tBMin = geo.snap01(Math.min(tA0onB, tA1onB));
-		const tBMax = geo.snap01(Math.max(tA0onB, tA1onB));
+		const tBMin = geo.snap01(math.min(tA0onB, tA1onB));
+		const tBMax = geo.snap01(math.max(tA0onB, tA1onB));
 		if (tBMax < 0 || tBMin > 1) {
-			return null;
+			return undefined;
 		}
 
 		return {
 			kind: "tRangePairs",
-			tStart: [Math.max(0, tAMin), Math.max(0, tBMin)],
-			tEnd: [Math.min(1, tAMax), Math.min(1, tBMax)],
+			tStart: [math.max(0, tAMin), math.max(0, tBMin)],
+			tEnd: [math.min(1, tAMax), math.min(1, tBMax)],
 		};
 	}
 
@@ -574,7 +580,7 @@ export function segmentLineIntersectSegmentCurve(
 	segB: SegmentCurve,
 	allowOutOfRange: boolean,
 	invert: boolean,
-): SegmentTValuePairs | null {
+): SegmentTValuePairs | undefined {
 	const geo = segA.geo;
 	const a0 = segA.p0;
 	const a1 = segA.p1;
@@ -586,7 +592,7 @@ export function segmentLineIntersectSegmentCurve(
 		// vertical line
 		const t = segB.mapXtoT(a0[0], false);
 		if (t === false) {
-			return null;
+			return undefined;
 		}
 		const y = segB.point(t)[1];
 		const s = (y - a0[1]) / A;
@@ -644,7 +650,7 @@ export function segmentCurveIntersectSegmentCurve(
 	segA: SegmentCurve,
 	segB: SegmentCurve,
 	allowOutOfRange: boolean,
-): SegmentTValuePairs | SegmentTRangePairs | null {
+): SegmentTValuePairs | SegmentTRangePairs | undefined {
 	const geo = segA.geo;
 
 	// dummy coincident calculation for now
@@ -730,7 +736,7 @@ export function segmentsIntersect(
 	segA: Segment,
 	segB: Segment,
 	allowOutOfRange: boolean,
-): SegmentTValuePairs | SegmentTRangePairs | null {
+): SegmentTValuePairs | SegmentTRangePairs | undefined {
 	if (segA instanceof SegmentLine) {
 		if (segB instanceof SegmentLine) {
 			return segmentLineIntersectSegmentLine(segA, segB, allowOutOfRange);
@@ -744,5 +750,5 @@ export function segmentsIntersect(
 			return segmentCurveIntersectSegmentCurve(segA, segB, allowOutOfRange);
 		}
 	}
-	throw new Error("PolyBool: Unknown segment instance in segmentsIntersect");
+	error("PolyBool: Unknown segment instance in segmentsIntersect");
 }

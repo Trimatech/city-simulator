@@ -34,19 +34,19 @@ export interface CombinedSegments {
 
 export class PolyBool {
 	private readonly geo: Geometry;
-	private log: BuildLog | null;
+	private log: BuildLog | undefined;
 
-	constructor(geo: Geometry = new GeometryEpsilon(), log: BuildLog | null = null) {
+	constructor(geo: Geometry = new GeometryEpsilon(), log: BuildLog | undefined = undefined) {
 		this.geo = geo;
 		this.log = log;
 	}
 
 	shape() {
-		return new Shape(this.geo, null, this.log);
+		return new Shape(this.geo, undefined, this.log);
 	}
 
 	buildLog(enable: boolean) {
-		this.log = enable ? new BuildLog() : null;
+		this.log = enable ? new BuildLog() : undefined;
 		return this.log?.list;
 	}
 
@@ -54,15 +54,15 @@ export class PolyBool {
 		const shape = this.shape();
 		shape.beginPath();
 		for (const region of poly.regions) {
-			const lastPoint = region[region.length - 1];
-			shape.moveTo(lastPoint[lastPoint.length - 2], lastPoint[lastPoint.length - 1]);
+			const lastPoint = region[region.size() - 1];
+			shape.moveTo(lastPoint[lastPoint.size() - 2], lastPoint[lastPoint.size() - 1]);
 			for (const p of region) {
-				if (p.length === 2) {
+				if (p.size() === 2) {
 					shape.lineTo(p[0], p[1]);
-				} else if (p.length === 6) {
-					shape.bezierCurveTo(p[0], p[1], p[2], p[3], p[4], p[5]);
+				} else if (p.size() === 6) {
+					shape.bezierCurveTo(p[0]!, p[1]!, p[2]!, p[3]!, p[4]!, p[5]!);
 				} else {
-					throw new Error("PolyBool: Invalid point in region");
+					error("PolyBool: Invalid point in region");
 				}
 			}
 			shape.closePath();
@@ -145,10 +145,10 @@ export class PolyBool {
 				regions.push([]);
 			},
 			lineTo: (x: number, y: number) => {
-				regions[regions.length - 1].push([x, y]);
+				regions[regions.size() - 1].push([x, y]);
 			},
 			bezierCurveTo: (c1x: number, c1y: number, c2x: number, c2y: number, x: number, y: number) => {
-				regions[regions.length - 1].push([c1x, c1y, c2x, c2y, x, y]);
+				regions[regions.size() - 1].push([c1x, c1y, c2x, c2y, x, y]);
 			},
 			closePath: () => {},
 		};

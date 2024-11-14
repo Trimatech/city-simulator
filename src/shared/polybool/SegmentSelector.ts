@@ -5,14 +5,14 @@
 // SPDX-License-Identifier: 0BSD
 //
 
-import { type SegmentBool, SegmentBoolLine, SegmentBoolCurve } from "./Intersecter";
 import type BuildLog from "./BuildLog";
+import { type SegmentBool, SegmentBoolCurve, SegmentBoolLine } from "./Intersecter";
 
 //
 // filter a list of segments based on boolean operations
 //
 
-function select(segments: SegmentBool[], selection: number[], log: BuildLog | null): SegmentBool[] {
+function selectSegment(segments: SegmentBool[], selection: number[], logger: BuildLog | undefined): SegmentBool[] {
 	const result: SegmentBool[] = [];
 	for (const seg of segments) {
 		const index =
@@ -27,21 +27,21 @@ function select(segments: SegmentBool[], selection: number[], log: BuildLog | nu
 			// copy the segment to the results, while also calculating the fill status
 			const fill = { above, below };
 			if (seg instanceof SegmentBoolLine) {
-				result.push(new SegmentBoolLine(seg.data, fill, seg.closed, log));
+				result.push(new SegmentBoolLine(seg.data, fill, seg.closed, logger));
 			} else if (seg instanceof SegmentBoolCurve) {
-				result.push(new SegmentBoolCurve(seg.data, fill, seg.closed, log));
+				result.push(new SegmentBoolCurve(seg.data, fill, seg.closed, logger));
 			} else {
-				throw new Error("PolyBool: Unknown SegmentBool type in SegmentSelector");
+				error("PolyBool: Unknown SegmentBool type in SegmentSelector");
 			}
 		}
 	}
-	log?.selected(result);
+	logger?.selected(result);
 	return result;
 }
 
 export class SegmentSelector {
 	// prettier-ignore
-	static union(segments: SegmentBool[], log: BuildLog | null) {
+	static union(segments: SegmentBool[], log: BuildLog | undefined) {
     // primary | secondary
     // above1 below1 above2 below2    Keep?               Value
     //    0      0      0      0   =>   yes if open         4
@@ -60,7 +60,7 @@ export class SegmentSelector {
     //    1      1      0      1   =>   no                  0
     //    1      1      1      0   =>   no                  0
     //    1      1      1      1   =>   no                  0
-    return select(
+    return selectSegment(
       segments,
       [
         4, 2, 1, 0,
@@ -73,7 +73,7 @@ export class SegmentSelector {
   }
 
 	// prettier-ignore
-	static intersect(segments: SegmentBool[], log: BuildLog | null) {
+	static intersect(segments: SegmentBool[], log: BuildLog | undefined) {
     // primary & secondary
     // above1 below1 above2 below2    Keep?               Value
     //    0      0      0      0   =>   no                  0
@@ -92,7 +92,7 @@ export class SegmentSelector {
     //    1      1      0      1   =>   yes filled below    2
     //    1      1      1      0   =>   yes filled above    1
     //    1      1      1      1   =>   no                  0
-    return select(
+    return selectSegment(
       segments,
       [
         0, 0, 0, 4,
@@ -105,7 +105,7 @@ export class SegmentSelector {
   }
 
 	// prettier-ignore
-	static difference(segments: SegmentBool[], log: BuildLog | null) {
+	static difference(segments: SegmentBool[], log: BuildLog | undefined) {
     // primary - secondary
     // above1 below1 above2 below2    Keep?               Value
     //    0      0      0      0   =>   yes if open         4
@@ -124,7 +124,7 @@ export class SegmentSelector {
     //    1      1      0      1   =>   yes filled above    1
     //    1      1      1      0   =>   yes filled below    2
     //    1      1      1      1   =>   no                  0
-    return select(
+    return selectSegment(
       segments,
       [
         4, 0, 0, 0,
@@ -137,7 +137,7 @@ export class SegmentSelector {
   }
 
 	// prettier-ignore
-	static differenceRev(segments: SegmentBool[], log: BuildLog | null) {
+	static differenceRev(segments: SegmentBool[], log: BuildLog | undefined) {
     // secondary - primary
     // above1 below1 above2 below2    Keep?               Value
     //    0      0      0      0   =>   yes if open         4
@@ -156,7 +156,7 @@ export class SegmentSelector {
     //    1      1      0      1   =>   no                  0
     //    1      1      1      0   =>   no                  0
     //    1      1      1      1   =>   no                  0
-    return select(
+    return selectSegment(
       segments,
       [
         4, 2, 1, 0,
@@ -169,7 +169,7 @@ export class SegmentSelector {
   }
 
 	// prettier-ignore
-	static xor(segments: SegmentBool[], log: BuildLog | null) {
+	static xor(segments: SegmentBool[], log: BuildLog | undefined) {
     // primary ^ secondary
     // above1 below1 above2 below2    Keep?               Value
     //    0      0      0      0   =>   yes if open         4
@@ -188,7 +188,7 @@ export class SegmentSelector {
     //    1      1      0      1   =>   yes filled above    1
     //    1      1      1      0   =>   yes filled below    2
     //    1      1      1      1   =>   no                  0
-    return select(
+    return selectSegment(
       segments,
       [
         4, 2, 1, 0,

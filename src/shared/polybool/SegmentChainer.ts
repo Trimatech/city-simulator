@@ -5,10 +5,10 @@
 // SPDX-License-Identifier: 0BSD
 //
 
+import type BuildLog from "./BuildLog";
 import { type Geometry, type Vec6 } from "./Geometry";
 import { type SegmentBool } from "./Intersecter";
-import type BuildLog from "./BuildLog";
-import { type Segment, SegmentLine, SegmentCurve } from "./Segment";
+import { type Segment, SegmentCurve, SegmentLine } from "./Segment";
 
 //
 // converts a list of segments into a list of regions, while also removing
@@ -34,7 +34,7 @@ export function joinCurves(seg1: SegmentCurve, seg2: SegmentCurve, geo: Geometry
 	if (geo.isCollinear(seg1.p2, seg1.p3, seg2.p1)) {
 		const dx = seg2.p1[0] - seg1.p2[0];
 		const dy = seg2.p1[1] - seg1.p2[1];
-		const t = Math.abs(dx) > Math.abs(dy) ? (seg1.p3[0] - seg1.p2[0]) / dx : (seg1.p3[1] - seg1.p2[1]) / dy;
+		const t = math.abs(dx) > math.abs(dy) ? (seg1.p3[0] - seg1.p2[0]) / dx : (seg1.p3[1] - seg1.p2[1]) / dy;
 		const ts = geo.snap01(t);
 		if (ts !== 0 && ts !== 1) {
 			const ns = new SegmentCurve(
@@ -75,7 +75,7 @@ interface ISegsFill {
 	fill: boolean;
 }
 
-export function SegmentChainer(segments: SegmentBool[], geo: Geometry, log: BuildLog | null): Segment[][] {
+export function SegmentChainer(segments: SegmentBool[], geo: Geometry, log: BuildLog | undefined): Segment[][] {
 	const closedChains: ISegsFill[] = [];
 	const openChains: ISegsFill[] = [];
 	const regions: Segment[][] = [];
@@ -83,7 +83,7 @@ export function SegmentChainer(segments: SegmentBool[], geo: Geometry, log: Buil
 	for (const segb of segments) {
 		let seg = segb.data;
 		const closed = segb.closed;
-		const chains = closed ? closedChains : openChains;
+		let chains = closed ? closedChains : openChains;
 		const pt1 = seg.start();
 		const pt2 = seg.end();
 
@@ -101,9 +101,7 @@ export function SegmentChainer(segments: SegmentBool[], geo: Geometry, log: Buil
 		};
 
 		if (seg instanceof SegmentLine && geo.isEqualVec2(pt1, pt2)) {
-			console.warn(
-				"PolyBool: Warning: Zero-length segment detected; your epsilon is " + "probably too small or too large",
-			);
+			print("PolyBool: Warning: Zero-length segment detected; your epsilon is probably too small or too large");
 			continue;
 		}
 
@@ -120,7 +118,9 @@ export function SegmentChainer(segments: SegmentBool[], geo: Geometry, log: Buil
 			matchesHead: false,
 			matchesPt1: false,
 		};
-		let nextMatch: typeof firstMatch | null = firstMatch;
+		let nextMatch: typeof firstMatch | undefined = firstMatch;
+
+		// eslint-disable-next-line no-inner-declarations
 		function setMatch(index: number, matchesHead: boolean, matchesPt1: boolean) {
 			// return true if we've matched twice
 			if (nextMatch) {
@@ -132,13 +132,13 @@ export function SegmentChainer(segments: SegmentBool[], geo: Geometry, log: Buil
 				nextMatch = secondMatch;
 				return false;
 			}
-			nextMatch = null;
+			nextMatch = undefined;
 			return true; // we've matched twice, we're done here
 		}
-		for (let i = 0; i < chains.length; i++) {
+		for (let i = 0; i < chains.size(); i++) {
 			const chain = chains[i].segs;
 			const head = chain[0].start();
-			const tail = chain[chain.length - 1].end();
+			const tail = chain[chain.size() - 1].end();
 			if (geo.isEqualVec2(head, pt1)) {
 				if (setMatch(i, true, true)) {
 					break;
@@ -192,19 +192,19 @@ export function SegmentChainer(segments: SegmentBool[], geo: Geometry, log: Buil
 
 			// simplify chain
 			if (firstMatch.matchesHead) {
-				const next = chain[1];
-				const newSeg = joinSegments(seg, next, geo);
+				const nextItem = chain[1];
+				const newSeg = joinSegments(seg, nextItem, geo);
 				if (newSeg) {
 					chain.shift();
 					chain[0] = newSeg;
 					log?.chainSimplifyHead(index, { seg: newSeg, fill }, closed);
 				}
 			} else {
-				const next = chain[chain.length - 2];
-				const newSeg = joinSegments(next, seg, geo);
+				const nextItem = chain[chain.size() - 2];
+				const newSeg = joinSegments(nextItem, seg, geo);
 				if (newSeg) {
 					chain.pop();
-					chain[chain.length - 1] = newSeg;
+					chain[chain.size() - 1] = newSeg;
 					log?.chainSimplifyTail(index, { seg: newSeg, fill }, closed);
 				}
 			}
@@ -213,8 +213,8 @@ export function SegmentChainer(segments: SegmentBool[], geo: Geometry, log: Buil
 			if (closed) {
 				let finalChain = chain;
 				let segS = finalChain[0];
-				let segE = finalChain[finalChain.length - 1];
-				if (finalChain.length > 0 && geo.isEqualVec2(segS.start(), segE.end())) {
+				let segE = finalChain[finalChain.size() - 1];
+				if (finalChain.size() > 0 && geo.isEqualVec2(segS.start(), segE.end())) {
 					// see if chain is clockwise
 					let winding = 0;
 					let last = finalChain[0].start();
@@ -228,7 +228,7 @@ export function SegmentChainer(segments: SegmentBool[], geo: Geometry, log: Buil
 					if (isClockwise === fill) {
 						finalChain = reverseChain(index);
 						segS = finalChain[0];
-						segE = finalChain[finalChain.length - 1];
+						segE = finalChain[finalChain.size() - 1];
 					}
 
 					const newStart = joinSegments(segE, segS, geo);
@@ -240,7 +240,7 @@ export function SegmentChainer(segments: SegmentBool[], geo: Geometry, log: Buil
 
 					// we have a closed chain!
 					log?.chainClose(index, closed);
-					chains.splice(index, 1);
+					chains = chains.filter((_, i) => i !== index);
 					regions.push(finalChain);
 				}
 			}
@@ -256,27 +256,27 @@ export function SegmentChainer(segments: SegmentBool[], geo: Geometry, log: Buil
 				chain1.push(seg);
 
 				// simplify chain1's tail
-				const next = chain1[chain1.length - 2];
-				const newEnd = joinSegments(next, seg, geo);
+				const nextItem = chain1[chain1.size() - 2];
+				const newEnd = joinSegments(nextItem, seg, geo);
 				if (newEnd) {
 					chain1.pop();
-					chain1[chain1.length - 1] = newEnd;
+					chain1[chain1.size() - 1] = newEnd;
 					log?.chainSimplifyTail(index1, { seg: newEnd, fill }, closed);
 				}
 
 				// simplify chain2's head
-				const tail = chain1[chain1.length - 1];
+				const tail = chain1[chain1.size() - 1];
 				const head = chain2[0];
 				const newJoin = joinSegments(tail, head, geo);
 				if (newJoin) {
 					chain2.shift();
-					chain1[chain1.length - 1] = newJoin;
+					chain1[chain1.size() - 1] = newJoin;
 					log?.chainSimplifyJoin(index1, index2, { seg: newJoin, fill }, closed);
 				}
 
 				log?.chainJoin(index1, index2, closed);
-				chains[index1].segs = chain1.concat(chain2);
-				chains.splice(index2, 1);
+				chains[index1].segs = [...chain1, ...chain2];
+				chains = chains.filter((_, i) => i !== index2);
 			};
 
 			const F = firstMatch.index;
@@ -285,7 +285,7 @@ export function SegmentChainer(segments: SegmentBool[], geo: Geometry, log: Buil
 			log?.chainConnect(F, S, closed);
 
 			// reverse the shorter chain, if needed
-			const reverseF = chains[F].segs.length < chains[S].segs.length;
+			const reverseF = chains[F].segs.size() < chains[S].segs.size();
 			if (firstMatch.matchesHead) {
 				if (secondMatch.matchesHead) {
 					if (reverseF) {
@@ -365,10 +365,10 @@ export function segmentsToReceiver<T extends IPolyBoolReceiver>(
 	const [a, b, c, d, e, f] = matrix;
 	receiver.beginPath();
 	for (const region of segments) {
-		if (region.length <= 0) {
+		if (region.size() <= 0) {
 			continue;
 		}
-		for (let i = 0; i < region.length; i++) {
+		for (let i = 0; i < region.size(); i++) {
 			const seg = region[i];
 			if (i === 0) {
 				const [p0x, p0y] = seg.start();
@@ -390,11 +390,11 @@ export function segmentsToReceiver<T extends IPolyBoolReceiver>(
 					b * p3x + d * p3y + f,
 				);
 			} else {
-				throw new Error("PolyBool: Unknown segment instance");
+				error("PolyBool: Unknown segment instance");
 			}
 		}
 		const first = region[0];
-		const last = region[region.length - 1];
+		const last = region[region.size() - 1];
 		if (geo.isEqualVec2(first.start(), last.end())) {
 			receiver.closePath();
 		}
