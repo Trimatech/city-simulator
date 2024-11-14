@@ -39,12 +39,8 @@ target:
     icon: assets/marketing/game_icon.png
     thumbnails: [assets/marketing/game_thumbnail.png]
     socialLinks:
-      - title: "📌・@littensy"
-        url: https://twitter.com/littensy
-      - title: 💬・Chat
-        url: https://discord.gg/tyjBaP44sK
       - title: 🤝・Community
-        url: https://www.roblox.com/groups/4918739/littens-Games#!/about
+        url: https://www.roblox.com/groups/34579161/Trimatech-Games#!/about
     configuration:
       playableDevices: [computer, console, phone, tablet]
       privateServers:
