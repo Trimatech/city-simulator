@@ -110,7 +110,8 @@ export class ListBool<T extends defined> {
 		let high = this.nodes.size();
 
 		while (i < high) {
-			const mid = math.floor((i + high) / 2);
+			const mid = (i + high) >> 1;
+
 			if (compare(this.nodes[mid], node) > 0) {
 				high = mid;
 			} else {
@@ -120,7 +121,7 @@ export class ListBool<T extends defined> {
 
 		return {
 			before: i <= 0 ? undefined : this.nodes[i - 1],
-			after: i < this.nodes.size() ? this.nodes[i] : undefined,
+			after: this.nodes[i] ?? undefined,
 			insert: (node: T) => {
 				this.nodes.insert(i, node);
 				return node;

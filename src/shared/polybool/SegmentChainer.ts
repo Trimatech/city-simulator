@@ -83,7 +83,7 @@ export function SegmentChainer(segments: SegmentBool[], geo: Geometry, log: Buil
 	for (const segb of segments) {
 		let seg = segb.data;
 		const closed = segb.closed;
-		let chains = closed ? closedChains : openChains;
+		const chains = closed ? closedChains : openChains;
 		const pt1 = seg.start();
 		const pt2 = seg.end();
 
@@ -240,7 +240,8 @@ export function SegmentChainer(segments: SegmentBool[], geo: Geometry, log: Buil
 
 					// we have a closed chain!
 					log?.chainClose(index, closed);
-					chains = chains.filter((_, i) => i !== index);
+					chains.remove(index);
+
 					regions.push(finalChain);
 				}
 			}
@@ -276,7 +277,7 @@ export function SegmentChainer(segments: SegmentBool[], geo: Geometry, log: Buil
 
 				log?.chainJoin(index1, index2, closed);
 				chains[index1].segs = [...chain1, ...chain2];
-				chains = chains.filter((_, i) => i !== index2);
+				chains.remove(index2);
 			};
 
 			const F = firstMatch.index;

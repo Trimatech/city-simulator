@@ -100,12 +100,52 @@ export class Shape {
 		}
 		let cos = 0;
 		let sin = 0;
-		if (ang === 45) {
+		if (ang === 90) {
+			sin = 1;
+		} else if (ang === 180) {
+			cos = -1;
+		} else if (ang === 270) {
+			sin = -1;
+		} else if (ang === 45) {
 			cos = sin = math.sqrt(2) / 2;
+		} else if (ang === 135) {
+			sin = math.sqrt(2) / 2;
+			cos = -math.sqrt(2) / 2;
+		} else if (ang === 225) {
+			cos = sin = -math.sqrt(2) / 2;
+		} else if (ang === 315) {
+			cos = math.sqrt(2) / 2;
+			sin = -math.sqrt(2) / 2;
+		} else if (ang === 30) {
+			cos = math.sqrt(3) / 2;
+			sin = 0.5;
+		} else if (ang === 60) {
+			cos = 0.5;
+			sin = math.sqrt(3) / 2;
+		} else if (ang === 120) {
+			cos = -0.5;
+			sin = math.sqrt(3) / 2;
+		} else if (ang === 150) {
+			cos = -math.sqrt(3) / 2;
+			sin = 0.5;
+		} else if (ang === 210) {
+			cos = -math.sqrt(3) / 2;
+			sin = -0.5;
+		} else if (ang === 240) {
+			cos = -0.5;
+			sin = -math.sqrt(3) / 2;
+		} else if (ang === 300) {
+			cos = 0.5;
+			sin = -math.sqrt(3) / 2;
+		} else if (ang === 330) {
+			cos = math.sqrt(3) / 2;
+			sin = -0.5;
+		} else {
+			const rad = (math.pi * ang) / 180;
+			cos = math.cos(rad);
+			sin = math.sin(rad);
 		}
-		const rad = (math.pi * ang) / 180;
-		cos = math.cos(rad);
-		sin = math.sin(rad);
+
 		const [a0, b0, c0, d0, e0, f0] = this.matrix;
 		this.matrix = [a0 * cos + c0 * sin, b0 * cos + d0 * sin, c0 * cos - a0 * sin, d0 * cos - b0 * sin, e0, f0];
 		return this;

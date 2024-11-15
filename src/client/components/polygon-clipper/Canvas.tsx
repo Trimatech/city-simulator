@@ -1,9 +1,11 @@
 import React, { useCallback, useRef } from "@rbxts/react";
 import { Point, Polygon } from "shared/polybool/polybool";
 
-import { findClosestPoint, snapToGrid } from "./Canvas.utils";
+import { snapToGrid } from "./Canvas.utils";
 import { PolygonState } from "./PolygonClipper.types";
 import { Line, Vertex } from "./PolygonElements";
+
+type PolygonName = "poly1" | "poly2" | "result";
 
 interface Props {
 	polygonState: PolygonState;
@@ -12,59 +14,101 @@ interface Props {
 }
 
 export function Canvas({ polygonState, snap, onPolygonChange }: Props) {
-	const canvasRef = useRef<Frame>();
 	const dragInfo = useRef<{
 		isDragging: boolean;
-		polygon: "poly1" | "poly2";
+		polygon: PolygonName;
 		regionIndex: number;
 		pointIndex: number;
-		startPos: Point;
 	}>();
 
 	const CANVAS_HEIGHT = 400;
 
-	const handleMouseDown = useCallback(
-		(x: number, y: number) => {
-			// Find closest point to click
-			const closestPoint = findClosestPoint([x, y], polygonState);
-			if (closestPoint && closestPoint.distance < 10) {
-				dragInfo.current = {
-					isDragging: true,
-					polygon: closestPoint.polygon,
-					regionIndex: closestPoint.regionIndex,
-					pointIndex: closestPoint.pointIndex,
-					startPos: [x, y],
-				};
+	const handleInputBegan = useCallback(
+		(rbx: Frame, input: InputObject) => {
+			if (input.UserInputType === Enum.UserInputType.MouseButton1) {
+				warn(`Input started`);
+				const mousePos = input.Position;
+				// Find closest vertex
+				let closestDist = math.huge;
+				let closest: { polygon: PolygonName; regionIndex: number; pointIndex: number } | undefined;
+
+				["poly1", "poly2"].forEach((polyName) => {
+					polygonState[polyName as PolygonName].regions.forEach((region, regionIndex) => {
+						region.forEach((point, pointIndex) => {
+							warn(`checking ${polyName} r${regionIndex} p${pointIndex}=${point[0]}_${point[1]}`);
+							const framePosition = rbx.AbsolutePosition;
+							const mouseX = mousePos.X - framePosition.X;
+							const mouseY = mousePos.Y - framePosition.Y;
+							warn(`.... mouse x=${mouseX}, y=${mouseY}`);
+
+							const dist = math.sqrt(
+								math.pow(mouseX - point[0], 2) + math.pow(CANVAS_HEIGHT - mouseY - point[1], 2),
+							);
+							warn(`....dist=${dist}`);
+							if (dist < closestDist && dist < 10) {
+								// 10 is hit radius
+								closestDist = dist;
+								closest = {
+									polygon: polyName as PolygonName,
+									regionIndex,
+									pointIndex,
+								};
+							}
+						});
+					});
+				});
+
+				if (closest) {
+					warn(`drag start for ${closest.polygon} ${closest.regionIndex} ${closest.pointIndex}`);
+					dragInfo.current = {
+						isDragging: true,
+						...closest,
+					};
+				} else {
+					warn(`no closest found`);
+				}
 			}
 		},
 		[polygonState],
 	);
 
-	const handleMouseMove = useCallback(
-		(x: number, y: number) => {
+	const handleInputChanged = useCallback(
+		(rbx: Frame, input: InputObject) => {
 			if (!dragInfo.current?.isDragging) return;
+			if (input.UserInputType === Enum.UserInputType.MouseMovement) {
+				warn(`drag changed`);
+				const position = input.Position;
+				const framePosition = rbx.AbsolutePosition;
+				const mouseX = position.X - framePosition.X;
+				const mouseY = position.Y - framePosition.Y;
+				const newPos: Point = [mouseX, CANVAS_HEIGHT - mouseY];
+				const snappedPos = snap ? snapToGrid(newPos) : newPos;
 
-			const { polygon, regionIndex, pointIndex } = dragInfo.current;
-			const newPoint: Point = snap ? snapToGrid([x, y]) : [x, y];
-
-			onPolygonChange({
-				...polygonState,
-				[polygon]: {
-					...polygonState[polygon],
-					regions: polygonState[polygon].regions.map((region, ri) =>
-						ri === regionIndex ? region.map((point, pi) => (pi === pointIndex ? newPoint : point)) : region,
-					),
-				},
-			});
+				const { polygon, regionIndex, pointIndex } = dragInfo.current;
+				onPolygonChange({
+					...polygonState,
+					[polygon]: {
+						...polygonState[polygon],
+						regions: polygonState[polygon].regions.map((region, ri) =>
+							ri === regionIndex
+								? region.map((point, pi) => (pi === pointIndex ? snappedPos : point))
+								: region,
+						),
+					},
+				});
+			}
 		},
-		[polygonState, snap],
+		[polygonState, snap, onPolygonChange],
 	);
 
-	const handleMouseUp = useCallback(() => {
-		dragInfo.current = undefined;
+	const handleInputEnded = useCallback((rbx: Frame, input: InputObject) => {
+		if (input.UserInputType === Enum.UserInputType.MouseButton1) {
+			warn(`drag ended`);
+			dragInfo.current = undefined;
+		}
 	}, []);
 
-	const renderPolygon = (polygon: Polygon, color: Color3, transparency = 0) => {
+	const renderPolygon = (polygon: Polygon, polyName: PolygonName, color: Color3, transparency = 0, thickness = 2) => {
 		return polygon.regions.map((region, regionIdx) => {
 			const elements: React.ReactElement[] = [];
 
@@ -81,11 +125,12 @@ export function Canvas({ polygonState, snap, onPolygonChange }: Props) {
 						color={color}
 						transparency={transparency}
 						canvasHeight={CANVAS_HEIGHT}
+						thickness={thickness}
 					/>,
 				);
 			}
 
-			// Draw vertices
+			// Draw vertices (now without drag handlers)
 			region.forEach((point, pointIdx) => {
 				elements.push(
 					<Vertex
@@ -106,30 +151,15 @@ export function Canvas({ polygonState, snap, onPolygonChange }: Props) {
 		<frame
 			BackgroundColor3={Color3.fromRGB(255, 255, 255)}
 			Size={new UDim2(1, 0, 0, CANVAS_HEIGHT)}
-			ref={canvasRef}
 			Event={{
-				InputBegan: (_, input) => {
-					if (input.UserInputType === Enum.UserInputType.MouseButton1) {
-						const position = input.Position;
-						handleMouseDown(position.X, position.Y);
-					}
-				},
-				InputChanged: (_, input) => {
-					if (input.UserInputType === Enum.UserInputType.MouseMovement) {
-						const position = input.Position;
-						handleMouseMove(position.X, position.Y);
-					}
-				},
-				InputEnded: (_, input) => {
-					if (input.UserInputType === Enum.UserInputType.MouseButton1) {
-						handleMouseUp();
-					}
-				},
+				InputBegan: handleInputBegan,
+				InputChanged: handleInputChanged,
+				InputEnded: handleInputEnded,
 			}}
 		>
-			{renderPolygon(polygonState.poly1, Color3.fromRGB(255, 0, 0), 0.5)}
-			{renderPolygon(polygonState.poly2, Color3.fromRGB(0, 0, 255), 0.5)}
-			{renderPolygon(polygonState.result, Color3.fromRGB(0, 255, 0), 0)}
+			{renderPolygon(polygonState.poly1, "poly1", Color3.fromRGB(255, 0, 0), 0.5, 4)}
+			{renderPolygon(polygonState.poly2, "poly2", Color3.fromRGB(0, 0, 255), 0.5, 4)}
+			{renderPolygon(polygonState.result, "result", Color3.fromRGB(0, 255, 0), 0, 1)}
 		</frame>
 	);
 }

@@ -162,6 +162,8 @@ export class PolyBool {
 		const seg2 = this.segments(poly2);
 		const comb = this.combine(seg1, seg2);
 		const seg3 = this.selectUnion(comb);
+
+		warn("union", poly1, poly2, seg3);
 		return this.polygon(seg3);
 	}
 

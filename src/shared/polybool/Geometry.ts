@@ -85,16 +85,13 @@ export class GeometryEpsilon extends Geometry {
 		const Q3 = Q * Q * Q;
 		const R2 = R * R;
 		if (R2 < Q3) {
-			const ratio = (R < 0 ? -1 : 1) * math.pow(math.abs(R) + math.sqrt(R2 - Q3), 1 / 3);
+			const ratio = (R < 0 ? -1 : 1) * math.sqrt(R2 / Q3);
 			const theta = math.acos(ratio);
 			const norm = -2 * math.sqrt(Q);
 			const x0 = norm * math.cos(theta / 3) - a3;
 			const x1 = norm * math.cos((theta + 2 * math.pi) / 3) - a3;
 			const x2 = norm * math.cos((theta - 2 * math.pi) / 3) - a3;
-			return [x0, x1, x2].sort((a, b) => {
-				if (a === b) return false;
-				return a < b;
-			});
+			return [x0, x1, x2].sort((x, y) => x < y);
 		} else {
 			const A = (R < 0 ? 1 : -1) * math.pow(math.abs(R) + math.sqrt(R2 - Q3), 1 / 3);
 			const B = math.abs(A) >= this.epsilon ? Q / A : 0;
