@@ -3,7 +3,7 @@ import { palette } from "shared/constants/palette";
 import { Point, Polygon } from "shared/polybool/polybool";
 
 import { Frame } from "../ui/frame";
-import { findClosestPoint, PolygonName, snapToGrid } from "./Canvas.utils";
+import { findClosestPoint, PolygonName, snapToGrid } from "./PolygonCanvas.utils";
 import { Line, Vertex } from "./PolygonElements";
 
 interface Props {
@@ -16,7 +16,7 @@ interface Props {
 	onPolygonChange: (isPoly1: boolean, polygon: Polygon) => void;
 }
 
-export function Canvas({ size, poly1, poly2, resultPolygon, snap, onPolygonChange }: Props) {
+export function PolygonCanvas({ size, poly1, poly2, resultPolygon, snap, onPolygonChange }: Props) {
 	const dragInfo = useRef<{
 		isDragging: boolean;
 		isPoly1: boolean;
