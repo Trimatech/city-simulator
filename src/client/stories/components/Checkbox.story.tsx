@@ -18,7 +18,7 @@ export = hoarcekat(() => {
 
 			<Checkbox checked={checked1} onChecked={setChecked1} text="Interactive Checkbox" />
 
-			<Checkbox checked={checked2} onChecked={setChecked2} text="Large Checkbox" size={new UDim2(0, 32, 0, 32)} />
+			<Checkbox checked={checked2} onChecked={setChecked2} text="Large Checkbox" variant="large" />
 
 			<Checkbox checked={checked3} onChecked={setChecked3} text="Disabled Checkbox" disabled={true} />
 		</frame>

@@ -1,8 +1,9 @@
 import { Polygon } from "shared/polybool/polybool";
 
+import { DemoPolygon } from "./demo-cases";
+
 export interface PolygonState {
-	poly1: Polygon;
-	poly2: Polygon;
+	demo: DemoPolygon;
 	result: Polygon;
 }
 

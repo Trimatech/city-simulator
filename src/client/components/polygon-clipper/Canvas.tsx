@@ -1,27 +1,37 @@
-import React, { useCallback, useRef } from "@rbxts/react";
+import React, { useCallback, useEffect, useRef, useState } from "@rbxts/react";
+import { palette } from "shared/constants/palette";
 import { Point, Polygon } from "shared/polybool/polybool";
 
-import { snapToGrid } from "./Canvas.utils";
-import { PolygonState } from "./PolygonClipper.types";
+import { Frame } from "../ui/frame";
+import { findClosestPoint, PolygonName, snapToGrid } from "./Canvas.utils";
 import { Line, Vertex } from "./PolygonElements";
 
-type PolygonName = "poly1" | "poly2" | "result";
-
 interface Props {
-	polygonState: PolygonState;
+	size: UDim2;
+	poly1: Polygon;
+
+	poly2: Polygon;
+	resultPolygon: Polygon;
 	snap: boolean;
-	onPolygonChange: (newState: PolygonState) => void;
+	onPolygonChange: (isPoly1: boolean, polygon: Polygon) => void;
 }
 
-export function Canvas({ polygonState, snap, onPolygonChange }: Props) {
+export function Canvas({ size, poly1, poly2, resultPolygon, snap, onPolygonChange }: Props) {
 	const dragInfo = useRef<{
 		isDragging: boolean;
-		polygon: PolygonName;
+		isPoly1: boolean;
 		regionIndex: number;
 		pointIndex: number;
 	}>();
 
-	const CANVAS_HEIGHT = 400;
+	const frameRef = useRef<Frame>();
+	const [canvasHeight, setCanvasHeight] = useState(400);
+
+	useEffect(() => {
+		if (frameRef.current) {
+			setCanvasHeight(frameRef.current.AbsoluteSize.Y);
+		}
+	}, [frameRef.current?.AbsoluteSize.Y]);
 
 	const handleInputBegan = useCallback(
 		(rbx: Frame, input: InputObject) => {
@@ -29,37 +39,10 @@ export function Canvas({ polygonState, snap, onPolygonChange }: Props) {
 				warn(`Input started`);
 				const mousePos = input.Position;
 				// Find closest vertex
-				let closestDist = math.huge;
-				let closest: { polygon: PolygonName; regionIndex: number; pointIndex: number } | undefined;
-
-				["poly1", "poly2"].forEach((polyName) => {
-					polygonState[polyName as PolygonName].regions.forEach((region, regionIndex) => {
-						region.forEach((point, pointIndex) => {
-							warn(`checking ${polyName} r${regionIndex} p${pointIndex}=${point[0]}_${point[1]}`);
-							const framePosition = rbx.AbsolutePosition;
-							const mouseX = mousePos.X - framePosition.X;
-							const mouseY = mousePos.Y - framePosition.Y;
-							warn(`.... mouse x=${mouseX}, y=${mouseY}`);
-
-							const dist = math.sqrt(
-								math.pow(mouseX - point[0], 2) + math.pow(CANVAS_HEIGHT - mouseY - point[1], 2),
-							);
-							warn(`....dist=${dist}`);
-							if (dist < closestDist && dist < 10) {
-								// 10 is hit radius
-								closestDist = dist;
-								closest = {
-									polygon: polyName as PolygonName,
-									regionIndex,
-									pointIndex,
-								};
-							}
-						});
-					});
-				});
+				const closest = findClosestPoint(canvasHeight, rbx.AbsolutePosition, mousePos, poly1, poly2);
 
 				if (closest) {
-					warn(`drag start for ${closest.polygon} ${closest.regionIndex} ${closest.pointIndex}`);
+					warn(`drag start for isPoly1=${closest.isPoly1} ${closest.regionIndex} ${closest.pointIndex}`);
 					dragInfo.current = {
 						isDragging: true,
 						...closest,
@@ -69,7 +52,7 @@ export function Canvas({ polygonState, snap, onPolygonChange }: Props) {
 				}
 			}
 		},
-		[polygonState],
+		[poly1, poly2, canvasHeight],
 	);
 
 	const handleInputChanged = useCallback(
@@ -81,24 +64,16 @@ export function Canvas({ polygonState, snap, onPolygonChange }: Props) {
 				const framePosition = rbx.AbsolutePosition;
 				const mouseX = position.X - framePosition.X;
 				const mouseY = position.Y - framePosition.Y;
-				const newPos: Point = [mouseX, CANVAS_HEIGHT - mouseY];
+				const newPos: Point = [mouseX, canvasHeight - mouseY];
 				const snappedPos = snap ? snapToGrid(newPos) : newPos;
 
-				const { polygon, regionIndex, pointIndex } = dragInfo.current;
-				onPolygonChange({
-					...polygonState,
-					[polygon]: {
-						...polygonState[polygon],
-						regions: polygonState[polygon].regions.map((region, ri) =>
-							ri === regionIndex
-								? region.map((point, pi) => (pi === pointIndex ? snappedPos : point))
-								: region,
-						),
-					},
-				});
+				const { isPoly1, regionIndex, pointIndex } = dragInfo.current;
+				const changedPolygon = isPoly1 ? poly1 : poly2;
+				changedPolygon.regions[regionIndex][pointIndex] = snappedPos;
+				onPolygonChange(isPoly1, changedPolygon);
 			}
 		},
-		[polygonState, snap, onPolygonChange],
+		[onPolygonChange, canvasHeight],
 	);
 
 	const handleInputEnded = useCallback((rbx: Frame, input: InputObject) => {
@@ -124,7 +99,7 @@ export function Canvas({ polygonState, snap, onPolygonChange }: Props) {
 						endPoint={nextPoint}
 						color={color}
 						transparency={transparency}
-						canvasHeight={CANVAS_HEIGHT}
+						canvasHeight={canvasHeight}
 						thickness={thickness}
 					/>,
 				);
@@ -138,7 +113,7 @@ export function Canvas({ polygonState, snap, onPolygonChange }: Props) {
 						point={point as Point}
 						color={color}
 						transparency={transparency}
-						canvasHeight={CANVAS_HEIGHT}
+						canvasHeight={canvasHeight}
 					/>,
 				);
 			});
@@ -148,18 +123,19 @@ export function Canvas({ polygonState, snap, onPolygonChange }: Props) {
 	};
 
 	return (
-		<frame
-			BackgroundColor3={Color3.fromRGB(255, 255, 255)}
-			Size={new UDim2(1, 0, 0, CANVAS_HEIGHT)}
-			Event={{
+		<Frame
+			ref={frameRef}
+			backgroundColor={palette.white}
+			size={size}
+			event={{
 				InputBegan: handleInputBegan,
 				InputChanged: handleInputChanged,
 				InputEnded: handleInputEnded,
 			}}
 		>
-			{renderPolygon(polygonState.poly1, "poly1", Color3.fromRGB(255, 0, 0), 0.5, 4)}
-			{renderPolygon(polygonState.poly2, "poly2", Color3.fromRGB(0, 0, 255), 0.5, 4)}
-			{renderPolygon(polygonState.result, "result", Color3.fromRGB(0, 255, 0), 0, 1)}
-		</frame>
+			{renderPolygon(poly1, "poly1", Color3.fromRGB(255, 0, 0), 0.5, 4)}
+			{renderPolygon(poly2, "poly2", Color3.fromRGB(0, 0, 255), 0.5, 4)}
+			{renderPolygon(resultPolygon, "result", Color3.fromRGB(0, 255, 0), 0, 1)}
+		</Frame>
 	);
 }

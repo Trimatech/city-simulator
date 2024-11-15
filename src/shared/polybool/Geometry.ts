@@ -8,6 +8,8 @@
 export type Point = [number, number];
 export type Vec6 = [number, number, number, number, number, number];
 
+export type PointShape = Point | Vec6;
+
 export function lerp(a: number, b: number, t: number) {
 	return a + (b - a) * t;
 }

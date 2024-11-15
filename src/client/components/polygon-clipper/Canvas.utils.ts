@@ -1,6 +1,7 @@
-import { Point } from "shared/polybool/Geometry";
+import { Point, PointShape } from "shared/polybool/Geometry";
 import { Polygon } from "shared/polybool/polybool";
 import { PolygonState } from "./PolygonClipper.types";
+import { DemoPolygon } from "./demo-cases";
 
 export function snapToGrid(point: Point): Point {
 	return [math.round(point[0] / 10) * 10, math.round(point[1] / 10) * 10];
@@ -43,34 +44,50 @@ export function drawPolygon(canvas: Frame, polygon: Polygon, color: Color3, tran
 		});
 	});
 }
+export type PolygonName = "poly1" | "poly2" | "result";
 
-export function findClosestPoint(point: Point, state: PolygonState) {
-	let closestDistance = math.huge;
-	let result:
-		| {
-				polygon: "poly1" | "poly2";
-				regionIndex: number;
-				pointIndex: number;
-				distance: number;
-		  }
-		| undefined;
+export interface ClosestPointResult {
+	isPoly1: boolean;
+	regionIndex: number;
+	pointIndex: number;
+	distance: number;
+}
 
-	["poly1", "poly2"].forEach((polyName) => {
-		state[polyName as keyof PolygonState].regions.forEach((region, regionIndex) => {
-			region.forEach((p, pointIndex) => {
-				const distance = math.sqrt(math.pow(point[0] - p[0], 2) + math.pow(point[1] - p[1], 2));
-				if (distance < closestDistance) {
-					closestDistance = distance;
-					result = {
-						polygon: polyName as "poly1" | "poly2",
-						regionIndex,
-						pointIndex,
-						distance,
-					};
-				}
-			});
+export function findClosestPoint(
+	canvasHeight: number,
+	framePosition: Vector2,
+	mousePos: Vector3,
+	poly1: Polygon,
+	poly2: Polygon,
+) {
+	let closestDist = math.huge;
+	let closest: ClosestPointResult | undefined;
+	// warn(`checking ${polyName} r${regionIndex} p${pointIndex}=${point[0]}_${point[1]}`);
+
+	const mouseX = mousePos.X - framePosition.X;
+	const mouseY = mousePos.Y - framePosition.Y;
+	// warn(`.... mouse x=${mouseX}, y=${mouseY}`);
+
+	const setClosestIfCloser = (point: PointShape, isPoly1: boolean, regionIndex: number, pointIndex: number) => {
+		const dist = math.sqrt(math.pow(mouseX - point[0], 2) + math.pow(canvasHeight - mouseY - point[1], 2));
+		if (dist < closestDist && dist < 10) {
+			// 10 is hit radius
+			closestDist = dist;
+			closest = { isPoly1, regionIndex, pointIndex, distance: dist };
+		}
+	};
+
+	poly1.regions.forEach((region, regionIndex) => {
+		region.forEach((point, pointIndex) => {
+			setClosestIfCloser(point, true, regionIndex, pointIndex);
 		});
 	});
 
-	return result;
+	poly2.regions.forEach((region, regionIndex) => {
+		region.forEach((point, pointIndex) => {
+			setClosestIfCloser(point, false, regionIndex, pointIndex);
+		});
+	});
+
+	return closest;
 }

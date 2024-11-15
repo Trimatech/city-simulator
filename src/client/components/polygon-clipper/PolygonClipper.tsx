@@ -1,56 +1,96 @@
-import React, { useCallback, useState } from "@rbxts/react";
+import React, { useCallback, useEffect, useState } from "@rbxts/react";
+import { useRem } from "client/hooks/use-rem";
+import { Polygon } from "shared/polybool/polybool";
 
 import { Checkbox } from "../ui/Checkbox";
+import { Frame } from "../ui/frame";
 import { Canvas } from "./Canvas";
 import { CanvasButton } from "./CanvasButton";
-import { demoPolygons } from "./demo-cases";
-import { PolygonOperation, PolygonState } from "./PolygonClipper.types";
-import { calculatePolygonOperation } from "./PolygonClipper.utils";
+import { DemoPolygon, demoPolygons } from "./demo-cases";
+import { PolygonOperation } from "./PolygonClipper.types";
+import { calculatePolygonOperation, shapeToPolygon } from "./PolygonClipper.utils";
 
 interface Props {
 	initialDemoIndex?: number;
 }
-
+// https://unpkg.com/@velipso/polybool@2.0.11/demo/demo.html
 export function PolygonClipper({ initialDemoIndex = 0 }: Props) {
-	const [currentDemo, setCurrentDemo] = useState(initialDemoIndex);
+	const rem = useRem();
+
 	const [operation, setOperation] = useState<PolygonOperation>("Intersect");
 	const [snap, setSnap] = useState(true);
-	const [polygonState, setPolygonState] = useState<PolygonState>(() => ({
-		poly1: demoPolygons[currentDemo].poly1,
-		poly2: demoPolygons[currentDemo].poly2,
-		result: calculatePolygonOperation(demoPolygons[currentDemo].poly1, demoPolygons[currentDemo].poly2, operation),
-	}));
+	const [selectedDemo, setSelectedDemo] = useState<DemoPolygon>(demoPolygons[initialDemoIndex]);
+	const [poly1, setPoly1] = useState<Polygon>();
+	const [poly2, setPoly2] = useState<Polygon>();
+	const [resultPolygon, setResultPolygon] = useState<Polygon>();
+
+	useEffect(() => {
+		if (selectedDemo) {
+			print("Selected demo changed");
+			if (selectedDemo.poly1 && selectedDemo.poly2) {
+				setPoly1(selectedDemo.poly1);
+				setPoly2(selectedDemo.poly2);
+			} else if (selectedDemo.shape1 && selectedDemo.shape2) {
+				setPoly1(shapeToPolygon(selectedDemo.shape1));
+				setPoly2(shapeToPolygon(selectedDemo.shape2));
+			}
+		}
+	}, [selectedDemo]);
+
+	const handleNextDemo = useCallback((direction: 1 | -1) => {
+		const currentIndex = demoPolygons.indexOf(selectedDemo!);
+		const nextDemoIndex = (currentIndex + direction + demoPolygons.size()) % demoPolygons.size();
+		const nextDemo = demoPolygons[nextDemoIndex];
+		setSelectedDemo(nextDemo);
+	}, []);
+
+	useEffect(() => {
+		print("Polygons changed");
+		if (poly1 && poly2) {
+			setResultPolygon(calculatePolygonOperation(poly1, poly2, operation));
+		} else {
+			print("No polygons to calculate");
+		}
+	}, [poly1, poly2, operation]);
 
 	const handleOperationChange = useCallback((newOperation: PolygonOperation) => {
 		setOperation(newOperation);
-		setPolygonState((prev) => ({
-			...prev,
-			result: calculatePolygonOperation(prev.poly1, prev.poly2, newOperation),
-		}));
 	}, []);
 
-	const handleNextDemo = useCallback(
-		(direction: 1 | -1) => {
-			setCurrentDemo((prev) => {
-				const nextDemo = ((prev + direction) % demoPolygons.size()) + demoPolygons.size();
-				const demo = demoPolygons[nextDemo];
-				setPolygonState({
-					poly1: demo.poly1,
-					poly2: demo.poly2,
-					result: calculatePolygonOperation(demo.poly1, demo.poly2, operation),
-				});
-				return nextDemo;
-			});
-		},
-		[operation],
-	);
+	const toolboxHeight = rem(6);
+
+	if (!poly1 || !poly2 || !resultPolygon) {
+		print("No polygons to display");
+		return undefined;
+	}
 
 	return (
-		<frame BackgroundTransparency={1} Size={new UDim2(1, 0, 1, 0)}>
-			<Canvas polygonState={polygonState} snap={snap} onPolygonChange={(newState) => setPolygonState(newState)} />
+		<Frame size={new UDim2(1, 0, 1, 0)}>
+			<uilistlayout FillDirection="Vertical" />
+			<Canvas
+				size={new UDim2(1, 0, 1, -toolboxHeight)}
+				poly1={poly1}
+				poly2={poly2}
+				resultPolygon={resultPolygon}
+				snap={snap}
+				onPolygonChange={(isPoly1, newPolygon) => {
+					if (isPoly1) {
+						setPoly1(newPolygon);
+						setResultPolygon(calculatePolygonOperation(newPolygon, poly2, operation));
+					} else {
+						setPoly2(newPolygon);
+						setResultPolygon(calculatePolygonOperation(poly1, newPolygon, operation));
+					}
+				}}
+			/>
 
-			<frame BackgroundTransparency={0} Position={new UDim2(0, 0, 0.8, 0)} Size={new UDim2(1, 0, 0.2, 0)}>
-				<uilistlayout FillDirection="Horizontal" Padding={new UDim(0, 10)} HorizontalAlignment="Center" />
+			<Frame position={new UDim2(0, 0, 0.8, 0)} size={new UDim2(1, 0, 0, toolboxHeight)}>
+				<uilistlayout
+					FillDirection="Horizontal"
+					Padding={new UDim(0, 10)}
+					HorizontalAlignment="Center"
+					VerticalAlignment="Center"
+				/>
 
 				<CanvasButton text="Intersect" onClick={() => handleOperationChange("Intersect")} />
 				<CanvasButton text="Union" onClick={() => handleOperationChange("Union")} />
@@ -61,7 +101,7 @@ export function PolygonClipper({ initialDemoIndex = 0 }: Props) {
 				<CanvasButton text="Prev Demo" onClick={() => handleNextDemo(-1)} />
 				<CanvasButton text="Next Demo" onClick={() => handleNextDemo(1)} />
 				<Checkbox checked={snap} onChecked={setSnap} text="Snap to Grid" />
-			</frame>
-		</frame>
+			</Frame>
+		</Frame>
 	);
 }
