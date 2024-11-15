@@ -5,9 +5,9 @@ import { Polygon } from "shared/polybool/polybool";
 import { Checkbox } from "../ui/Checkbox";
 import { Frame } from "../ui/frame";
 import { Text } from "../ui/text";
-import { Canvas } from "./Canvas";
 import { CanvasButton } from "./CanvasButton";
 import { DemoPolygon, demoPolygons } from "./demo-cases";
+import { PolygonCanvas } from "./PolygonCanvas";
 import { PolygonOperation } from "./PolygonClipper.types";
 import { calculatePolygonOperation, shapeToPolygon } from "./PolygonClipper.utils";
 
@@ -73,7 +73,7 @@ export function PolygonClipper({ initialDemoIndex = 0 }: Props) {
 	return (
 		<Frame size={new UDim2(1, 0, 1, 0)}>
 			<uilistlayout FillDirection="Vertical" />
-			<Canvas
+			<PolygonCanvas
 				size={new UDim2(1, 0, 1, -toolboxHeight)}
 				poly1={poly1}
 				poly2={poly2}
