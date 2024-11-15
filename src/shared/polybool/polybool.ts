@@ -6,7 +6,7 @@
 //
 
 import BuildLog from "./BuildLog";
-import { type Geometry, GeometryEpsilon, type Point, PointShape, type Vec6 } from "./Geometry";
+import { type Geometry, GeometryEpsilon, type PointShape } from "./Geometry";
 import { Shape, type ShapeCombined } from "./Shape";
 export * from "./BuildLog";
 export * from "./Geometry";
@@ -15,6 +15,10 @@ export * from "./Segment";
 export * from "./SegmentChainer";
 export * from "./SegmentSelector";
 export * from "./Shape";
+
+export const pointToPolygon = (points: PointShape[]): Polygon => {
+	return { regions: [points], inverted: false };
+};
 
 export interface Polygon {
 	regions: Array<Array<PointShape>>;

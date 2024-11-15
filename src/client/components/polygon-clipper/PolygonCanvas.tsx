@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from "@rbxts/react";
 import { palette } from "shared/constants/palette";
-import { Point, Polygon } from "shared/polybool/polybool";
+import { Polygon } from "shared/polybool/polybool";
 
 import { Frame } from "../ui/frame";
-import { findClosestPoint, getNextRegion, updatePolygonPoint } from "./PolygonCanvas.utils";
-import { Line, Vertex } from "./PolygonElements";
+import { findClosestPoint, updatePolygonPoint } from "./PolygonCanvas.utils";
+import { PolygonShape } from "./PolygonShape";
 
 interface Props {
 	size: UDim2;
@@ -84,40 +84,6 @@ export function PolygonCanvas({ size, poly1, poly2, resultPolygon, snap, onPolyg
 		}
 	}, []);
 
-	const renderPolygon = (polygon: Polygon, color: Color3, transparency = 0, thickness = 2) => {
-		return polygon.regions.map((region, regionIdx) => {
-			// Draw lines between points
-			const lineElements = region.map((_, i) => {
-				const current = region[i] as Point;
-				const nextPoint = getNextRegion(region, i);
-
-				return (
-					<Line
-						key={`line-${regionIdx}-${i}`}
-						startPoint={current}
-						endPoint={nextPoint}
-						color={color}
-						transparency={transparency}
-						canvasHeight={canvasHeight}
-						thickness={thickness}
-					/>
-				);
-			});
-
-			const vertexElements = region.map((point, pointIdx) => (
-				<Vertex
-					key={`vertex-${regionIdx}-${pointIdx}`}
-					point={point as Point}
-					color={color}
-					transparency={transparency}
-					canvasHeight={canvasHeight}
-				/>
-			));
-
-			return [...lineElements, ...vertexElements];
-		});
-	};
-
 	return (
 		<Frame
 			ref={frameRef}
@@ -129,9 +95,27 @@ export function PolygonCanvas({ size, poly1, poly2, resultPolygon, snap, onPolyg
 				InputEnded: handleInputEnded,
 			}}
 		>
-			{renderPolygon(poly1, Color3.fromRGB(255, 0, 0), 0.5, 4)}
-			{renderPolygon(poly2, Color3.fromRGB(0, 0, 255), 0.5, 4)}
-			{renderPolygon(resultPolygon, Color3.fromRGB(0, 255, 0), 0, 1)}
+			<PolygonShape
+				polygon={poly1}
+				color={Color3.fromRGB(255, 0, 0)}
+				transparency={0.5}
+				thickness={4}
+				canvasHeight={canvasHeight}
+			/>
+			<PolygonShape
+				polygon={poly2}
+				color={Color3.fromRGB(0, 0, 255)}
+				transparency={0.5}
+				thickness={4}
+				canvasHeight={canvasHeight}
+			/>
+			<PolygonShape
+				polygon={resultPolygon}
+				color={Color3.fromRGB(0, 255, 0)}
+				transparency={0}
+				thickness={1}
+				canvasHeight={canvasHeight}
+			/>
 		</Frame>
 	);
 }
