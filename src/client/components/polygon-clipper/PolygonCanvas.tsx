@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useRef, useState } from "@rbxts/react";
+import React, { useCallback, useRef } from "@rbxts/react";
 import { palette } from "shared/constants/palette";
 import { Polygon } from "shared/polybool/polybool";
 
 import { Frame } from "../ui/frame";
-import { findClosestPoint, updatePolygonPoint } from "./PolygonCanvas.utils";
+import { findClosestPoint, getNormMousePos, updatePolygonPoint } from "./PolygonCanvas.utils";
 import { PolygonShape } from "./PolygonShape";
 
 interface Props {
@@ -24,20 +24,13 @@ export function PolygonCanvas({ size, poly1, poly2, resultPolygon, snap, onPolyg
 	}>();
 
 	const frameRef = useRef<Frame>();
-	const [canvasHeight, setCanvasHeight] = useState(400);
-
-	useEffect(() => {
-		if (frameRef.current) {
-			setCanvasHeight(frameRef.current.AbsoluteSize.Y);
-		}
-	}, [frameRef.current?.AbsoluteSize.Y]);
 
 	const handleInputBegan = useCallback(
 		(rbx: Frame, input: InputObject) => {
 			if (input.UserInputType === Enum.UserInputType.MouseButton1) {
 				warn(`Input started`);
-				const mousePos = input.Position;
-				const closest = findClosestPoint(canvasHeight, rbx.AbsolutePosition, mousePos, poly1, poly2);
+				const mousePos = getNormMousePos(input.Position, rbx.AbsolutePosition);
+				const closest = findClosestPoint(mousePos, poly1, poly2);
 
 				if (closest) {
 					warn(`drag start for isPoly1=${closest.isPoly1} ${closest.regionIndex} ${closest.pointIndex}`);
@@ -50,7 +43,7 @@ export function PolygonCanvas({ size, poly1, poly2, resultPolygon, snap, onPolyg
 				}
 			}
 		},
-		[poly1, poly2, canvasHeight],
+		[poly1, poly2],
 	);
 
 	const handleInputChanged = useCallback(
@@ -62,7 +55,6 @@ export function PolygonCanvas({ size, poly1, poly2, resultPolygon, snap, onPolyg
 				const changedPolygon = updatePolygonPoint({
 					input,
 					rbx,
-					canvasHeight,
 					snap,
 					isPoly1: dragInfo.current.isPoly1,
 					regionIndex: dragInfo.current.regionIndex,
@@ -73,7 +65,7 @@ export function PolygonCanvas({ size, poly1, poly2, resultPolygon, snap, onPolyg
 				onPolygonChange(dragInfo.current.isPoly1, changedPolygon);
 			}
 		},
-		[onPolygonChange, canvasHeight],
+		[onPolygonChange],
 	);
 
 	const handleInputEnded = useCallback((rbx: Frame, input: InputObject) => {
@@ -94,27 +86,9 @@ export function PolygonCanvas({ size, poly1, poly2, resultPolygon, snap, onPolyg
 				InputEnded: handleInputEnded,
 			}}
 		>
-			<PolygonShape
-				polygon={poly1}
-				color={Color3.fromRGB(255, 0, 0)}
-				transparency={0.5}
-				thickness={4}
-				canvasHeight={canvasHeight}
-			/>
-			<PolygonShape
-				polygon={poly2}
-				color={Color3.fromRGB(0, 0, 255)}
-				transparency={0.5}
-				thickness={4}
-				canvasHeight={canvasHeight}
-			/>
-			<PolygonShape
-				polygon={resultPolygon}
-				color={Color3.fromRGB(0, 255, 0)}
-				transparency={0}
-				thickness={1}
-				canvasHeight={canvasHeight}
-			/>
+			<PolygonShape polygon={poly1} color={Color3.fromRGB(255, 0, 0)} transparency={0.5} thickness={4} />
+			<PolygonShape polygon={poly2} color={Color3.fromRGB(0, 0, 255)} transparency={0.5} thickness={4} />
+			<PolygonShape polygon={resultPolygon} color={Color3.fromRGB(0, 255, 0)} transparency={0} thickness={1} />
 		</Frame>
 	);
 }

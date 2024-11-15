@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "@rbxts/react";
+import React, { useCallback, useRef, useState } from "@rbxts/react";
 import { palette } from "shared/constants/palette";
 import { Point, pointToPolygon, Polygon } from "shared/polybool/polybool";
 
@@ -18,19 +18,12 @@ export function DrawingCanvas({ polygon, size, snap, onDrawingComplete }: Props)
 	const [previewPoints, setPreviewPoints] = useState<Point[]>([]);
 
 	const frameRef = useRef<Frame>();
-	const [canvasHeight, setCanvasHeight] = useState(400);
-
-	useEffect(() => {
-		if (frameRef.current) {
-			setCanvasHeight(frameRef.current.AbsoluteSize.Y);
-		}
-	}, [frameRef.current?.AbsoluteSize.Y]);
 
 	const handleInputBegan = useCallback(
 		(rbx: Frame, input: InputObject) => {
 			if (input.UserInputType === Enum.UserInputType.MouseButton1) {
 				warn("Input began");
-				const snappedPos = calculateSnappedPosition(input, rbx, canvasHeight, snap);
+				const snappedPos = calculateSnappedPosition(input, rbx, snap);
 
 				if (!isDrawing) {
 					setIsDrawing(true);
@@ -47,7 +40,7 @@ export function DrawingCanvas({ polygon, size, snap, onDrawingComplete }: Props)
 				}
 			}
 		},
-		[canvasHeight, snap, onDrawingComplete, isDrawing, previewPoints],
+		[snap, onDrawingComplete, isDrawing, previewPoints],
 	);
 
 	return (
@@ -64,15 +57,8 @@ export function DrawingCanvas({ polygon, size, snap, onDrawingComplete }: Props)
 				color={palette.red}
 				transparency={0.5}
 				thickness={4}
-				canvasHeight={canvasHeight}
 			/>
-			<PolygonShape
-				polygon={polygon}
-				color={palette.blue}
-				transparency={0.5}
-				thickness={4}
-				canvasHeight={canvasHeight}
-			/>
+			<PolygonShape polygon={polygon} color={palette.blue} transparency={0.5} thickness={4} />
 		</Frame>
 	);
 }

@@ -9,10 +9,9 @@ interface Props {
 	color: Color3;
 	transparency?: number;
 	thickness?: number;
-	canvasHeight: number;
 }
 
-export function PolygonShape({ polygon, color, transparency = 0, thickness = 2, canvasHeight }: Props) {
+export function PolygonShape({ polygon, color, transparency = 0, thickness = 2 }: Props) {
 	return (
 		<>
 			{polygon.regions.map((region, regionIdx) => {
@@ -28,7 +27,6 @@ export function PolygonShape({ polygon, color, transparency = 0, thickness = 2, 
 							endPoint={nextPoint}
 							color={color}
 							transparency={transparency}
-							canvasHeight={canvasHeight}
 							thickness={thickness}
 						/>
 					);
@@ -40,7 +38,6 @@ export function PolygonShape({ polygon, color, transparency = 0, thickness = 2, 
 						point={point as Point}
 						color={color}
 						transparency={transparency}
-						canvasHeight={canvasHeight}
 					/>
 				));
 

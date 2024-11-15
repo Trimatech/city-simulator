@@ -53,23 +53,21 @@ export interface ClosestPointResult {
 	distance: number;
 }
 
-export function findClosestPoint(
-	canvasHeight: number,
-	framePosition: Vector2,
-	mousePos: Vector3,
-	poly1: Polygon,
-	poly2: Polygon,
-) {
+export function getNormMousePos(mousePos: Vector3, framePosition: Vector2) {
+	return new Vector2(mousePos.X - framePosition.X, mousePos.Y - framePosition.Y);
+}
+
+export function findClosestPoint(mousePos: Vector2, poly1: Polygon, poly2: Polygon) {
 	let closestDist = math.huge;
 	let closest: ClosestPointResult | undefined;
 	// warn(`checking ${polyName} r${regionIndex} p${pointIndex}=${point[0]}_${point[1]}`);
 
-	const mouseX = mousePos.X - framePosition.X;
-	const mouseY = mousePos.Y - framePosition.Y;
+	const mouseX = mousePos.X;
+	const mouseY = mousePos.Y;
 	// warn(`.... mouse x=${mouseX}, y=${mouseY}`);
 
 	const setClosestIfCloser = (point: PointShape, isPoly1: boolean, regionIndex: number, pointIndex: number) => {
-		const dist = math.sqrt(math.pow(mouseX - point[0], 2) + math.pow(canvasHeight - mouseY - point[1], 2));
+		const dist = math.sqrt(math.pow(mouseX - point[0], 2) + math.pow(mouseY - point[1], 2));
 		if (dist < closestDist && dist < 10) {
 			// 10 is hit radius
 			closestDist = dist;
@@ -92,19 +90,18 @@ export function findClosestPoint(
 	return closest;
 }
 
-export function calculateSnappedPosition(input: InputObject, rbx: Frame, canvasHeight: number, snap: boolean) {
+export function calculateSnappedPosition(input: InputObject, rbx: Frame, snap: boolean) {
 	const position = input.Position;
 	const framePosition = rbx.AbsolutePosition;
 	const mouseX = position.X - framePosition.X;
 	const mouseY = position.Y - framePosition.Y;
-	const newPos: Point = [mouseX, canvasHeight - mouseY];
+	const newPos: Point = [mouseX, mouseY];
 	return snap ? snapToGrid(newPos) : newPos;
 }
 
 export const updatePolygonPoint = (params: {
 	input: InputObject;
 	rbx: Frame;
-	canvasHeight: number;
 	snap: boolean;
 	isPoly1: boolean;
 	regionIndex: number;
@@ -112,8 +109,8 @@ export const updatePolygonPoint = (params: {
 	poly1: Polygon;
 	poly2: Polygon;
 }) => {
-	const { input, rbx, canvasHeight, snap, isPoly1, regionIndex, pointIndex, poly1, poly2 } = params;
-	const snappedPos = calculateSnappedPosition(input, rbx, canvasHeight, snap);
+	const { input, rbx, snap, isPoly1, regionIndex, pointIndex, poly1, poly2 } = params;
+	const snappedPos = calculateSnappedPosition(input, rbx, snap);
 
 	const changedPolygon = isPoly1 ? poly1 : poly2;
 	changedPolygon.regions[regionIndex][pointIndex] = snappedPos;

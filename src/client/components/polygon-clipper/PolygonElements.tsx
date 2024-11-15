@@ -9,12 +9,11 @@ interface LineProps {
 	color: Color3;
 	transparency?: number;
 	thickness?: number;
-	canvasHeight: number;
 }
 
-export function Line({ startPoint, endPoint, color, transparency = 0, thickness = 2, canvasHeight }: LineProps) {
-	const newStart = [startPoint[0], canvasHeight - startPoint[1]] as Point;
-	const newEnd = [endPoint[0], canvasHeight - endPoint[1]] as Point;
+export function Line({ startPoint, endPoint, color, transparency = 0, thickness = 2 }: LineProps) {
+	const newStart = [startPoint[0], startPoint[1]] as Point;
+	const newEnd = [endPoint[0], endPoint[1]] as Point;
 
 	const distance = math.sqrt(math.pow(newStart[0] - newEnd[0], 2) + math.pow(newStart[1] - newEnd[1], 2));
 
@@ -42,19 +41,17 @@ interface VertexProps {
 	color: Color3;
 	transparency?: number;
 	size?: number;
-	canvasHeight: number;
 }
 
-export function Vertex({ point, color, transparency = 0, size = 6, canvasHeight }: VertexProps) {
+export function Vertex({ point, color, transparency = 0, size = 6 }: VertexProps) {
 	const offset = size / 2;
-	const flippedY = canvasHeight - point[1];
 
 	return (
 		<Frame
 			backgroundColor={color}
 			backgroundTransparency={transparency}
 			size={new UDim2(0, size, 0, size)}
-			position={new UDim2(0, point[0] - offset, 0, flippedY - offset)}
+			position={new UDim2(0, point[0] - offset, 0, point[1] - offset)}
 			cornerRadius={new UDim(1, 0)}
 		/>
 	);
