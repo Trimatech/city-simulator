@@ -4,6 +4,7 @@ import { Polygon } from "shared/polybool/polybool";
 
 import { Checkbox } from "../ui/Checkbox";
 import { Frame } from "../ui/frame";
+import { Text } from "../ui/text";
 import { Canvas } from "./Canvas";
 import { CanvasButton } from "./CanvasButton";
 import { DemoPolygon, demoPolygons } from "./demo-cases";
@@ -37,12 +38,17 @@ export function PolygonClipper({ initialDemoIndex = 0 }: Props) {
 		}
 	}, [selectedDemo]);
 
-	const handleNextDemo = useCallback((direction: 1 | -1) => {
-		const currentIndex = demoPolygons.indexOf(selectedDemo!);
-		const nextDemoIndex = (currentIndex + direction + demoPolygons.size()) % demoPolygons.size();
-		const nextDemo = demoPolygons[nextDemoIndex];
-		setSelectedDemo(nextDemo);
-	}, []);
+	const handleNextDemo = useCallback(
+		(direction: 1 | -1) => {
+			const currentIndex = demoPolygons.findIndex((demo) => demo.name === selectedDemo.name);
+
+			const nextDemoIndex = (currentIndex + direction + demoPolygons.size()) % demoPolygons.size();
+			const nextDemo = demoPolygons[nextDemoIndex];
+			print(`Next demo: ${nextDemo.name} currentIndex ${currentIndex} nextDemoIndex ${nextDemoIndex}`);
+			setSelectedDemo(nextDemo);
+		},
+		[selectedDemo],
+	);
 
 	useEffect(() => {
 		print("Polygons changed");
@@ -92,6 +98,7 @@ export function PolygonClipper({ initialDemoIndex = 0 }: Props) {
 					VerticalAlignment="Center"
 				/>
 
+				<Text key={"02"} text={selectedDemo.name} size={new UDim2(0, rem(9), 1, 0)} />
 				<CanvasButton text="Intersect" onClick={() => handleOperationChange("Intersect")} />
 				<CanvasButton text="Union" onClick={() => handleOperationChange("Union")} />
 				<CanvasButton text="Red - Blue" onClick={() => handleOperationChange("Difference")} />
