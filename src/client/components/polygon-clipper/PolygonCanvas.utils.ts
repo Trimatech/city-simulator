@@ -92,6 +92,15 @@ export function findClosestPoint(
 	return closest;
 }
 
+export function calculateSnappedPosition(input: InputObject, rbx: Frame, canvasHeight: number, snap: boolean) {
+	const position = input.Position;
+	const framePosition = rbx.AbsolutePosition;
+	const mouseX = position.X - framePosition.X;
+	const mouseY = position.Y - framePosition.Y;
+	const newPos: Point = [mouseX, canvasHeight - mouseY];
+	return snap ? snapToGrid(newPos) : newPos;
+}
+
 export const updatePolygonPoint = (params: {
 	input: InputObject;
 	rbx: Frame;
@@ -104,12 +113,7 @@ export const updatePolygonPoint = (params: {
 	poly2: Polygon;
 }) => {
 	const { input, rbx, canvasHeight, snap, isPoly1, regionIndex, pointIndex, poly1, poly2 } = params;
-	const position = input.Position;
-	const framePosition = rbx.AbsolutePosition;
-	const mouseX = position.X - framePosition.X;
-	const mouseY = position.Y - framePosition.Y;
-	const newPos: Point = [mouseX, canvasHeight - mouseY];
-	const snappedPos = snap ? snapToGrid(newPos) : newPos;
+	const snappedPos = calculateSnappedPosition(input, rbx, canvasHeight, snap);
 
 	const changedPolygon = isPoly1 ? poly1 : poly2;
 	changedPolygon.regions[regionIndex][pointIndex] = snappedPos;

@@ -9,7 +9,6 @@ import { PolygonShape } from "./PolygonShape";
 interface Props {
 	size: UDim2;
 	poly1: Polygon;
-
 	poly2: Polygon;
 	resultPolygon: Polygon;
 	snap: boolean;
