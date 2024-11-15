@@ -3,7 +3,7 @@ import { palette } from "shared/constants/palette";
 import { Point, Polygon } from "shared/polybool/polybool";
 
 import { Frame } from "../ui/frame";
-import { findClosestPoint, PolygonName, snapToGrid } from "./PolygonCanvas.utils";
+import { findClosestPoint, getNextRegion, updatePolygonPoint } from "./PolygonCanvas.utils";
 import { Line, Vertex } from "./PolygonElements";
 
 interface Props {
@@ -38,7 +38,6 @@ export function PolygonCanvas({ size, poly1, poly2, resultPolygon, snap, onPolyg
 			if (input.UserInputType === Enum.UserInputType.MouseButton1) {
 				warn(`Input started`);
 				const mousePos = input.Position;
-				// Find closest vertex
 				const closest = findClosestPoint(canvasHeight, rbx.AbsolutePosition, mousePos, poly1, poly2);
 
 				if (closest) {
@@ -60,17 +59,19 @@ export function PolygonCanvas({ size, poly1, poly2, resultPolygon, snap, onPolyg
 			if (!dragInfo.current?.isDragging) return;
 			if (input.UserInputType === Enum.UserInputType.MouseMovement) {
 				warn(`drag changed`);
-				const position = input.Position;
-				const framePosition = rbx.AbsolutePosition;
-				const mouseX = position.X - framePosition.X;
-				const mouseY = position.Y - framePosition.Y;
-				const newPos: Point = [mouseX, canvasHeight - mouseY];
-				const snappedPos = snap ? snapToGrid(newPos) : newPos;
 
-				const { isPoly1, regionIndex, pointIndex } = dragInfo.current;
-				const changedPolygon = isPoly1 ? poly1 : poly2;
-				changedPolygon.regions[regionIndex][pointIndex] = snappedPos;
-				onPolygonChange(isPoly1, changedPolygon);
+				const changedPolygon = updatePolygonPoint({
+					input,
+					rbx,
+					canvasHeight,
+					snap,
+					isPoly1: dragInfo.current.isPoly1,
+					regionIndex: dragInfo.current.regionIndex,
+					pointIndex: dragInfo.current.pointIndex,
+					poly1,
+					poly2,
+				});
+				onPolygonChange(dragInfo.current.isPoly1, changedPolygon);
 			}
 		},
 		[onPolygonChange, canvasHeight],
@@ -83,16 +84,14 @@ export function PolygonCanvas({ size, poly1, poly2, resultPolygon, snap, onPolyg
 		}
 	}, []);
 
-	const renderPolygon = (polygon: Polygon, polyName: PolygonName, color: Color3, transparency = 0, thickness = 2) => {
+	const renderPolygon = (polygon: Polygon, color: Color3, transparency = 0, thickness = 2) => {
 		return polygon.regions.map((region, regionIdx) => {
-			const elements: React.ReactElement[] = [];
-
 			// Draw lines between points
-			for (let i = 0; i < region.size(); i++) {
+			const lineElements = region.map((_, i) => {
 				const current = region[i] as Point;
-				const nextPoint = region[(i + 1) % region.size()] as Point;
+				const nextPoint = getNextRegion(region, i);
 
-				elements.push(
+				return (
 					<Line
 						key={`line-${regionIdx}-${i}`}
 						startPoint={current}
@@ -101,24 +100,21 @@ export function PolygonCanvas({ size, poly1, poly2, resultPolygon, snap, onPolyg
 						transparency={transparency}
 						canvasHeight={canvasHeight}
 						thickness={thickness}
-					/>,
-				);
-			}
-
-			// Draw vertices (now without drag handlers)
-			region.forEach((point, pointIdx) => {
-				elements.push(
-					<Vertex
-						key={`vertex-${regionIdx}-${pointIdx}`}
-						point={point as Point}
-						color={color}
-						transparency={transparency}
-						canvasHeight={canvasHeight}
-					/>,
+					/>
 				);
 			});
 
-			return elements;
+			const vertexElements = region.map((point, pointIdx) => (
+				<Vertex
+					key={`vertex-${regionIdx}-${pointIdx}`}
+					point={point as Point}
+					color={color}
+					transparency={transparency}
+					canvasHeight={canvasHeight}
+				/>
+			));
+
+			return [...lineElements, ...vertexElements];
 		});
 	};
 
@@ -133,9 +129,9 @@ export function PolygonCanvas({ size, poly1, poly2, resultPolygon, snap, onPolyg
 				InputEnded: handleInputEnded,
 			}}
 		>
-			{renderPolygon(poly1, "poly1", Color3.fromRGB(255, 0, 0), 0.5, 4)}
-			{renderPolygon(poly2, "poly2", Color3.fromRGB(0, 0, 255), 0.5, 4)}
-			{renderPolygon(resultPolygon, "result", Color3.fromRGB(0, 255, 0), 0, 1)}
+			{renderPolygon(poly1, Color3.fromRGB(255, 0, 0), 0.5, 4)}
+			{renderPolygon(poly2, Color3.fromRGB(0, 0, 255), 0.5, 4)}
+			{renderPolygon(resultPolygon, Color3.fromRGB(0, 255, 0), 0, 1)}
 		</Frame>
 	);
 }

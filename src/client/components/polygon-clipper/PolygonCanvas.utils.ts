@@ -91,3 +91,31 @@ export function findClosestPoint(
 
 	return closest;
 }
+
+export const updatePolygonPoint = (params: {
+	input: InputObject;
+	rbx: Frame;
+	canvasHeight: number;
+	snap: boolean;
+	isPoly1: boolean;
+	regionIndex: number;
+	pointIndex: number;
+	poly1: Polygon;
+	poly2: Polygon;
+}) => {
+	const { input, rbx, canvasHeight, snap, isPoly1, regionIndex, pointIndex, poly1, poly2 } = params;
+	const position = input.Position;
+	const framePosition = rbx.AbsolutePosition;
+	const mouseX = position.X - framePosition.X;
+	const mouseY = position.Y - framePosition.Y;
+	const newPos: Point = [mouseX, canvasHeight - mouseY];
+	const snappedPos = snap ? snapToGrid(newPos) : newPos;
+
+	const changedPolygon = isPoly1 ? poly1 : poly2;
+	changedPolygon.regions[regionIndex][pointIndex] = snappedPos;
+	return changedPolygon;
+};
+
+export function getNextRegion(region: PointShape[], i: number) {
+	return region[(i + 1) % region.size()] as Point;
+}
