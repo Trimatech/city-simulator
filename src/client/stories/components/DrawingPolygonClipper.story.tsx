@@ -7,10 +7,10 @@ import { RootProvider } from "client/providers/root-provider";
 import { pointToPolygon } from "shared/polybool/polybool";
 
 const starterPolygon = pointToPolygon([
-	[0, 0],
-	[10, 0],
-	[10, 10],
-	[0, 10],
+	[200, 50],
+	[600, 50],
+	[600, 150],
+	[200, 150],
 ]);
 
 export = hoarcekat(() => {
