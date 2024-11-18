@@ -61,8 +61,8 @@ importers:
         specifier: 3.0.0-types.0
         version: 3.0.0-types.0
       '@rbxts/types':
-        specifier: ^1.0.810
-        version: 1.0.810
+        specifier: ^1.0.813
+        version: 1.0.813
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.8.1
         version: 8.8.1(@typescript-eslint/parser@8.8.1(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2)
@@ -205,8 +205,8 @@ packages:
   '@rbxts/testez@0.4.2-ts.0':
     resolution: {integrity: sha512-8Q+OG9ddTD2P3aARCuRKpPqUBvuifgSnHvQMZ6jBMqUzxhIysnb0l4c3vnnaQnvdyZ1OW9tKxcdEHMGTb67uOw==}
 
-  '@rbxts/types@1.0.810':
-    resolution: {integrity: sha512-N9jLmuKsDxE9VR1lIp7MhWO0nS7O6DxNExpBVjH95U+B8dLAfrj2bRlQa96x7+jv5RDOLwX1zIbABe2h3quK+g==}
+  '@rbxts/types@1.0.813':
+    resolution: {integrity: sha512-Qpsmqnl+TNdl5AYqKFkYHyUrv652r30qK6A3GObOyDz+cvn8i+HE61mO021oq0nu1FcA4pMHbYqLSbv2CMF9Ig==}
 
   '@rbxts/validate-tree@2.0.2':
     resolution: {integrity: sha512-OA0E9ZjEeOpPa3XeV5/oC51aro2QFcL5dItufbagYZW8TOsX8C+FDXLx+A/ulMwcF42WcFNcQybxzcWSS/QSrA==}
@@ -1053,7 +1053,7 @@ snapshots:
 
   '@rbxts/testez@0.4.2-ts.0': {}
 
-  '@rbxts/types@1.0.810': {}
+  '@rbxts/types@1.0.813': {}
 
   '@rbxts/validate-tree@2.0.2': {}
 
