@@ -30,7 +30,7 @@ export function PolygonCanvas({ size, poly1, poly2, resultPolygon, snap, onPolyg
 			if (input.UserInputType === Enum.UserInputType.MouseButton1) {
 				warn(`Input started`);
 				const mousePos = getNormMousePos(input.Position, rbx.AbsolutePosition);
-				const closest = findClosestPoint(mousePos, [poly1, poly2]);
+				const closest = findClosestPoint(mousePos, [poly1, poly2], 10);
 
 				const isPoly1 = closest?.polygonIndex === 0;
 
