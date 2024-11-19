@@ -104,8 +104,8 @@ export function getNextRegion(region: PointShape[], i: number) {
 	return region[(i + 1) % region.size()] as Point;
 }
 
-export function findIntersection(line1: [Point, Point], line2: [Point, Point]): Point | undefined {
-	const [p1, p2] = line1;
+export function findIntersection(currentLine: [Point, Point], line2: [Point, Point]): Point | undefined {
+	const [p1, p2] = currentLine;
 	const [p3, p4] = line2;
 
 	const denominator = (p4[1] - p3[1]) * (p2[0] - p1[0]) - (p4[0] - p3[0]) * (p2[1] - p1[1]);
@@ -350,54 +350,6 @@ function findNearestIntersection(
 	return undefined;
 }
 
-/**
- * Attempts to find intersections with extended lines if initial attempt fails
- */
-function findIntersectionsWithExtendedLines(lines: Line[], polygon: Polygon) {
-	// Try with original lines first
-	const initialResult = addIntersectionPointsWithLines(lines, polygon);
-
-	if (initialResult.intersectionIndexes.size() === 1) {
-		warn("Only one intersection found with original lines");
-	}
-
-	if (initialResult.intersectionIndexes.size() >= 2) {
-		return initialResult;
-	}
-
-	// If initial attempt failed, try with extended lines
-	const extendedLines = lines.map((line) => extendLine(line));
-	const newPolygon = Object.deepCopy(polygon);
-	const cutPoints: Point[] = [];
-	const regionIndex = 0;
-	const points = newPolygon.regions[regionIndex];
-
-	// For each extended line
-	for (let i = 0; i < extendedLines.size(); i++) {
-		const extendedLine = extendedLines[i];
-		const originalLine = lines[i];
-		const referencePoint = originalLine[0]; // Use the start of original line as reference
-
-		const nearest = findNearestIntersection(extendedLine, polygon, referencePoint);
-
-		if (nearest) {
-			const insertIndex = points.findIndex((p) => pointEquals(p as Point, nearest.intersectedLine[0])) + 1;
-
-			points.insert(insertIndex, nearest.intersection);
-			cutPoints.push(nearest.intersection);
-		}
-	}
-
-	const intersectionIndexes = cutPoints.map((point) => points.findIndex((p) => pointEquals(p as Point, point)));
-
-	return {
-		polygon: newPolygon,
-		intersectionIndexes,
-		cutPoints,
-		regionIndexes: [0],
-	};
-}
-
 // Update setIntersectionPoints to use the new function
 export function setIntersectionPoints(polygon: Polygon, drawPoints: Point[]) {
 	const clonedPolygon = Object.deepCopy(polygon);
@@ -406,7 +358,7 @@ export function setIntersectionPoints(polygon: Polygon, drawPoints: Point[]) {
 		polygon: polygonWithIntersections,
 		intersectionIndexes,
 		cutPoints,
-	} = findIntersectionsWithExtendedLines(getFirstAndLastLines(drawPoints), clonedPolygon);
+	} = addIntersectionPointsWithLines(getFirstAndLastLines(drawPoints), clonedPolygon);
 
 	const isValid = intersectionIndexes.size() >= 2 && cutPoints.size() >= 2;
 
