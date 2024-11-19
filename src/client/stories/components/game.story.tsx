@@ -7,12 +7,11 @@ import { Game } from "client/components/game";
 import { World } from "client/components/world";
 import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
-import { USER_NAME, WORLD_BOUNDS, WORLD_TICK } from "shared/constants/core";
+import { USER_NAME, WORLD_BOUNDS } from "shared/constants/core";
 import { getRandomAccent } from "shared/constants/palette";
 import { getRandomBaseSnakeSkin } from "shared/constants/skins";
 import { CandyType } from "shared/store/candy";
 import { fillArray } from "shared/utils/object-utils";
-import { createScheduler } from "shared/utils/scheduler";
 
 import { useMockRemotes } from "../utils/use-mock-remotes";
 
@@ -25,7 +24,7 @@ export = hoarcekat(() => {
 		for (const id of IDS) {
 			store.addSnake(id, {
 				name: id,
-				head:
+				position:
 					id === USER_NAME
 						? Vector2.zero
 						: new Vector2(
@@ -49,12 +48,6 @@ export = hoarcekat(() => {
 				color: getRandomAccent(),
 			})),
 		);
-
-		return createScheduler({
-			name: "world-tick",
-			tick: WORLD_TICK,
-			onTick: store.snakeTick,
-		});
 	}, []);
 
 	useTimeout(() => {
@@ -66,7 +59,7 @@ export = hoarcekat(() => {
 	useInterval(() => {
 		for (const id of IDS) {
 			if (id !== USER_NAME) {
-				store.turnSnake(id, math.random() * 2 * math.pi);
+				//store.turnSnake(id, math.random() * 2 * math.pi);
 			}
 		}
 	}, 1.5);

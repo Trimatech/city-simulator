@@ -2,7 +2,7 @@ import { store } from "server/store";
 
 import { updateSnakeGrid } from "./snake-grid";
 
-const nextSnakeInputs = new Map<string, number>();
+const nextSnakeInputs = new Map<string, Vector2>();
 
 export function onSnakeTick() {
 	consumeNextSnakeInputs();
@@ -10,8 +10,8 @@ export function onSnakeTick() {
 	updateSnakeGrid(); //
 }
 
-export function registerSnakeInput(id: string, angle: number) {
-	nextSnakeInputs.set(id, angle);
+export function registerSnakeInput(id: string, position: Vector2) {
+	nextSnakeInputs.set(id, position);
 }
 
 export function deleteSnakeInput(id: string) {
@@ -19,8 +19,8 @@ export function deleteSnakeInput(id: string) {
 }
 
 function consumeNextSnakeInputs() {
-	for (const [id, angle] of nextSnakeInputs) {
-		store.turnSnake(id, angle);
+	for (const [id, position] of nextSnakeInputs) {
+		store.moveSnake(id, position);
 	}
 
 	nextSnakeInputs.clear();

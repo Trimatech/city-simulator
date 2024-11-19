@@ -14,7 +14,7 @@ export function updateSnakeGrid() {
 			continue;
 		}
 
-		snakeGrid.insert(snake.head, { id: snake.id });
+		snakeGrid.insert(snake.position, { id: snake.id });
 
 		for (const tracer of snake.tracers) {
 			snakeGrid.insert(tracer, { id: snake.id });

@@ -49,7 +49,7 @@ export = () => {
 
 	it("should create candy when a snake dies", () => {
 		store.addSnake("__test__");
-		store.snakeTick(0);
+
 		store.flush();
 		store.setSnakeIsDead("__test__");
 		store.flush();
@@ -59,7 +59,7 @@ export = () => {
 		const initialCandy = store.getState(selectCandies);
 
 		store.addSnake("__test__");
-		store.snakeTick(0);
+
 		store.flush();
 		store.setSnakeIsDead("__test__");
 		store.flush();
@@ -79,7 +79,7 @@ export = () => {
 	it("should eat candy when a snake is close", () => {
 		const candy = createCandy({ size: 10, position: new Vector2(1000, 1000) });
 		store.addCandy(candy);
-		store.addSnake("__test__", { head: new Vector2(1000, 1000.1) });
+		store.addSnake("__test__", { position: new Vector2(1000, 1000.1) });
 		store.flush();
 		onCandyTick();
 		expect(didEatCandy(candy.id)).to.equal(true);
@@ -89,7 +89,7 @@ export = () => {
 	it("should not eat candy if a snake is far away", () => {
 		const candy = createCandy({ size: 10, position: Vector2.zero });
 		store.addCandy(candy);
-		store.addSnake("__test__", { head: new Vector2(100, 100) });
+		store.addSnake("__test__", { position: new Vector2(100, 100) });
 		store.flush();
 		onCandyTick();
 		expect(didEatCandy(candy.id)).to.equal(false);

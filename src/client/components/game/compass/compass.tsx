@@ -44,9 +44,9 @@ export function Compass() {
 
 	useEffect(() => {
 		if (subject && leader && subject !== leader) {
-			displacementMotion.spring(leader.head.sub(subject.head));
+			displacementMotion.spring(leader.position.sub(subject.position));
 
-			if (leader.head.sub(subject.head).Magnitude > MIN_RANGE) {
+			if (leader.position.sub(subject.position).Magnitude > MIN_RANGE) {
 				visibleMotion.spring(1);
 				return;
 			}

@@ -1,4 +1,3 @@
-import { initBotFactory } from "server/bots";
 import { store } from "server/store";
 import {
 	CANDY_LIMITS,
@@ -42,7 +41,7 @@ async function setup() {
 		const position = new Vector2(x, y);
 
 		store.addSnake(`Snake ${index}`, {
-			head: position,
+			position,
 			score: 1000 + 160 * index,
 			desiredAngle: 0.5 * index,
 		});
@@ -55,7 +54,7 @@ async function setup() {
 	initCandyService();
 	initSnakeService();
 	initCollisionService();
-	initBotFactory();
+
 	disconnectAllSchedulers();
 }
 

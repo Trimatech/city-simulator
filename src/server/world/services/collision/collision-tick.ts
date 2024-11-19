@@ -40,18 +40,18 @@ export function onCollisionTick() {
 function isInsidePolygon(snake: SnakeEntity) {
 	const polygon = vectorsToPoints(snake.polygon as Vector2[]);
 
-	return isPointInPolygon(vector2ToPoint(snake.head), polygon);
+	return isPointInPolygon(vector2ToPoint(snake.position), polygon);
 }
 
 function isCollidingWithWall(snake: SnakeEntity) {
 	const radius = describeSnakeFromScore(snake.score).radius;
-	return snake.head.Magnitude + radius > WORLD_BOUNDS;
+	return snake.position.Magnitude + radius > WORLD_BOUNDS;
 }
 
 function isCollidingWithSnake(snake: SnakeEntity) {
 	const radius = describeSnakeFromScore(snake.score).radius;
 
-	const nearest = snakeGrid.nearest(snake.head, radius + 5, (data) => {
+	const nearest = snakeGrid.nearest(snake.position, radius + 5, (data) => {
 		const enemy = getSnake(data.metadata.id);
 		return enemy !== undefined && !enemy.dead && enemy.id !== snake.id;
 	});
@@ -63,7 +63,7 @@ function isCollidingWithSnake(snake: SnakeEntity) {
 	}
 
 	const enemyRadius = describeSnakeFromScore(enemy.score).radius;
-	const distance = nearest.position.sub(snake.head).Magnitude;
+	const distance = nearest.position.sub(snake.position).Magnitude;
 
 	if (distance <= 0.8 * (radius + enemyRadius)) {
 		return enemy;

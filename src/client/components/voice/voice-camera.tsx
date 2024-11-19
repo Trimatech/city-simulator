@@ -17,12 +17,12 @@ export function VoiceCamera() {
 
 	useEventListener(RunService.RenderStepped, () => {
 		if (snake) {
-			camera.CFrame = getCameraCFrame(snake.head);
+			//camera.CFrame = getCameraCFrame(snake.head);
 		}
 	});
 
 	useInterval(() => {
-		camera.CameraType = Enum.CameraType.Scriptable;
+		//camera.CameraType = Enum.CameraType.Scriptable;
 	}, 1);
 
 	return <></>;

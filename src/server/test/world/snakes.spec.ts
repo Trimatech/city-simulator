@@ -4,12 +4,6 @@ import { store } from "server/store";
 import { getSnake, onSnakeTick } from "server/world";
 
 export = () => {
-	it("should update snake target angle", () => {
-		store.addSnake("__test__");
-		store.turnSnake("__test__", 1);
-		expect(getSnake("__test__")?.desiredAngle).to.equal(1);
-	});
-
 	it("should update snake boost", () => {
 		store.addSnake("__test__");
 		store.boostSnake("__test__", true);
@@ -20,7 +14,7 @@ export = () => {
 		store.addSnake("__test__");
 		onSnakeTick();
 		const snake = getSnake("__test__")!;
-		expect(snake.head).to.never.equal(Vector2.zero);
+		expect(snake.position).to.never.equal(Vector2.zero);
 		expect(snake.tracers.size()).to.never.equal(0);
 	});
 
@@ -30,6 +24,6 @@ export = () => {
 		const initialSnake = getSnake("__test__")!;
 		onSnakeTick();
 		const finalSnake = getSnake("__test__")!;
-		expect(initialSnake.head).to.equal(finalSnake.head);
+		expect(initialSnake.position).to.equal(finalSnake.position);
 	});
 };

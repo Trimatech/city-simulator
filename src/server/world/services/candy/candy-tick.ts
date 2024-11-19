@@ -14,7 +14,7 @@ export function onCandyTick() {
 
 		const range = describeSnakeFromScore(snake.score).radius * 1.25 + 1;
 
-		const nearest = candyGrid.nearest(snake.head, range, (point) => {
+		const nearest = candyGrid.nearest(snake.position, range, (point) => {
 			const candy = getCandy(point.metadata.id);
 			return candy !== undefined && !candy.eatenAt;
 		});

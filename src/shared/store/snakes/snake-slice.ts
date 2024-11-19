@@ -1,5 +1,4 @@
 import { createProducer } from "@rbxts/reflex";
-import { SNAKE_BOOST_SPEED, SNAKE_SPEED, WORLD_TICK } from "shared/constants/core";
 import {
 	calculatePolygonOperation,
 	pointsToVectors,
@@ -7,10 +6,7 @@ import {
 	vectorsToPoints,
 } from "shared/polybool/poly-utils";
 import { Point, pointsToPolygon } from "shared/polybool/polybool";
-import { turnRadians } from "shared/utils/math-utils";
 import { fillArray, mapProperties, mapProperty } from "shared/utils/object-utils";
-
-import { describeSnakeFromScore, snakeIsBoosting } from "./snake-utils";
 
 export interface SnakesState {
 	readonly [id: string]: SnakeEntity | undefined;
@@ -19,7 +15,7 @@ export interface SnakesState {
 export interface SnakeEntity {
 	readonly id: string;
 	readonly name: string;
-	readonly head: Vector2;
+	readonly position: Vector2;
 	readonly angle: number;
 	readonly desiredAngle: number;
 	readonly score: number;
@@ -38,7 +34,7 @@ const TINY = 0.0001;
 const defaultEntity: SnakeEntity = {
 	id: "",
 	name: "",
-	head: new Vector2(),
+	position: new Vector2(),
 	angle: 0,
 	desiredAngle: 0,
 	score: 10,
@@ -66,7 +62,7 @@ const createPolygonAroundHead = (head: Vector2) => {
 
 export const snakesSlice = createProducer(initialState, {
 	addSnake: (state, id: string, patch?: Partial<SnakeEntity>) => {
-		const polygon = createPolygonAroundHead(patch?.head || defaultEntity.head);
+		const polygon = createPolygonAroundHead(patch?.position || defaultEntity.position);
 
 		return {
 			...state,
@@ -79,24 +75,11 @@ export const snakesSlice = createProducer(initialState, {
 		[id]: undefined,
 	}),
 
-	snakeTick: (state, deltaTime: number = WORLD_TICK) => {
+	snakeTick: (state) => {
 		return mapProperties(state, (snake) => {
 			if (snake.dead) {
 				return snake;
 			}
-
-			if (snake.score < 0) {
-				// It's possible for score to be patched to a negative value, so
-				// correct it here
-				snake = { ...snake, score: 0 };
-			}
-
-			const description = describeSnakeFromScore(snake.score);
-
-			const speed = snakeIsBoosting(snake) ? SNAKE_BOOST_SPEED : SNAKE_SPEED;
-			const angle = turnRadians(snake.angle, snake.desiredAngle, description.turnSpeed * deltaTime);
-			const direction = new Vector2(math.cos(angle), math.sin(angle));
-			const head = snake.head.add(direction.mul(speed * deltaTime));
 
 			const currentLength = snake.tracers.size();
 
@@ -107,16 +90,16 @@ export const snakesSlice = createProducer(initialState, {
 			// Add a tracer if the distance between the last tracer and the current head is 1.5
 			if (currentLength > 0) {
 				const lastTracer = snake.tracers[currentLength - 1];
-				const distance = lastTracer.sub(head).Magnitude;
+				const distance = lastTracer.sub(snake.position).Magnitude;
 				warn("Distance", distance);
 				if (distance > bodyPieceLength) {
-					tracers.push(head);
+					tracers.push(snake.position);
 				}
 			} else {
-				tracers.push(head);
+				tracers.push(snake.position);
 			}
 
-			return { ...snake, head, angle, tracers };
+			return { ...snake, tracers };
 		});
 	},
 
@@ -170,10 +153,10 @@ export const snakesSlice = createProducer(initialState, {
 		});
 	},
 
-	turnSnake: (state, id: string, desiredAngle: number) => {
+	moveSnake: (state, id: string, position: Vector2) => {
 		return mapProperty(state, id, (snake) => ({
 			...snake,
-			desiredAngle,
+			position,
 		}));
 	},
 

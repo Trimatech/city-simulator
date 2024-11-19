@@ -12,7 +12,7 @@ export function serializeSnakes(state: SnakesState): string {
 	for (const [, snake] of pairs(state)) {
 		buffer.WriteString(snake.id);
 		buffer.WriteString(snake.name);
-		writeVector2(buffer, snake.head);
+		writeVector2(buffer, snake.position);
 		buffer.WriteFloat32(snake.angle);
 		buffer.WriteFloat32(snake.desiredAngle);
 		buffer.WriteUInt(32, snake.score);
@@ -39,7 +39,7 @@ export function deserializeSnakes(data: string): SnakesState {
 		state[id] = {
 			id,
 			name: buffer.ReadString(),
-			head: readVector2(buffer),
+			position: readVector2(buffer),
 			angle: buffer.ReadFloat32(),
 			desiredAngle: buffer.ReadFloat32(),
 			score: buffer.ReadUInt(32),

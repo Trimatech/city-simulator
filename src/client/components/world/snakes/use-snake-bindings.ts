@@ -84,7 +84,7 @@ function createSnakeBindings(snake: SnakeEntity, scale: number): SnakeBindings {
 
 		const update = (snake: SnakeEntity, scale: number, boosting: boolean, isSubject: boolean) => {
 			const tracer = snake.tracers[index];
-			const previousTracer = snake.tracers[index - 1] || snake.head;
+			const previousTracer = snake.tracers[index - 1] || snake.position;
 
 			if (!tracer || !previousTracer) {
 				return;
@@ -113,7 +113,7 @@ function createSnakeBindings(snake: SnakeEntity, scale: number): SnakeBindings {
 		return { index, line, effects, update, destroy };
 	};
 
-	const headBinding = createTracerBindings(snake, 0, scale, snake.head);
+	const headBinding = createTracerBindings(snake, 0, scale, snake.position);
 
 	const update = ({ snake, tracers }: SnakeOnScreen, scale: number, boosting: boolean, isSubject: boolean) => {
 		headBinding.update(snake, scale, boosting, isSubject);

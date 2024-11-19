@@ -13,7 +13,8 @@
 		"deploy:prod": "pnpm build && mantle deploy --environment production",
 		"output:dev": "mantle outputs --environment canary > mantle-output.json",
 		"output:prod": "mantle outputs --environment production > mantle-output.json",
-		"github": "./actions-runner/run.sh"
+		"github": "./actions-runner/run.sh",
+		"models": "lune run get-models"
 	},
 	"devDependencies": {
 		"@rbxts/compiler-types": "3.0.0-types.0",

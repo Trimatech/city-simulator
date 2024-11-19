@@ -52,7 +52,7 @@ export function eatCandy(candyId: string, snakeId: string) {
 	const snake = getSnake(snakeId);
 
 	if (snake && candy && !candy.eatenAt) {
-		removeCandy(candy.id, snake.head);
+		removeCandy(candy.id, snake.position);
 		store.incrementSnakeScore(snake.id, candy.size);
 	}
 }
@@ -113,7 +113,7 @@ export function dropCandyOnDeath(id: string): void {
 		return;
 	}
 
-	const tracers = [...snake.tracers, snake.head];
+	const tracers = [...snake.tracers, snake.position];
 	const tracerRadius = describeSnakeFromScore(snake.score).radius;
 	const candyPositions: Vector2[] = [];
 	let lastTracer: Vector2 | undefined;

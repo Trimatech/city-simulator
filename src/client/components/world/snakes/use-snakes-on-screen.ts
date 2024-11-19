@@ -39,7 +39,7 @@ export function useSnakesOnScreen(scale: number, offset: Vector2) {
 		grid.clear();
 
 		for (const [, snake] of pairs(snakes)) {
-			grid.insert(snake.head, { id: snake.id, type: "head", index: -1 });
+			grid.insert(snake.position, { id: snake.id, type: "head", index: -1 });
 
 			snake.tracers.forEach((tracer, index) => {
 				grid.insert(tracer, { id: snake.id, type: "tracer", index });

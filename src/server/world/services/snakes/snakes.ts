@@ -30,14 +30,14 @@ export async function initSnakeService() {
 
 		store.addSnake(player.Name, {
 			name: player.DisplayName,
-			head: getSafePointInWorld(),
+			position: getSafePointInWorld(),
 			skin: currentSkin !== RANDOM_SKIN ? currentSkin : randomSkin,
 			score: 10,
 		});
 	});
 
-	remotes.snake.move.connect((player, angle) => {
-		registerSnakeInput(player.Name, angle);
+	remotes.snake.move.connect((player, position) => {
+		registerSnakeInput(player.Name, position);
 	});
 
 	remotes.snake.boost.connect((player, boost) => {

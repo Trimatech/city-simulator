@@ -27,7 +27,7 @@ export function MinimapNodes() {
 		for (const [, snake] of pairs(snakes)) {
 			const size = snake.tracers.size();
 			const step = math.floor(map(size, 0, 100, 2, 10));
-			let previous = snake.head;
+			let previous = snake.position;
 
 			const isPlayer = isValidPlayer(snake.id);
 			const isFriend = friends.includes(snake.id);
@@ -67,7 +67,7 @@ export function MinimapNodes() {
 				{nodes}
 			</CanvasGroup>
 
-			{snake && <MinimapCursor point={normalizeToWorldBounds(snake.head)} angle={snake.angle} />}
+			{snake && <MinimapCursor point={normalizeToWorldBounds(snake.position)} angle={snake.angle} />}
 		</>
 	);
 }

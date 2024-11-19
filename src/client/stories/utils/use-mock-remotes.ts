@@ -8,8 +8,8 @@ import { selectPlayerBalance } from "shared/store/saves";
 export function useMockRemotes() {
 	useEffect(() => {
 		const connections = [
-			remotes.snake.move.test.onFire((angle) => {
-				store.turnSnake(USER_NAME, angle);
+			remotes.snake.move.test.onFire((position) => {
+				store.moveSnake(USER_NAME, position);
 			}),
 
 			remotes.snake.boost.test.onFire((boost) => {

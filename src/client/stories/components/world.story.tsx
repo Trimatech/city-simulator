@@ -6,12 +6,11 @@ import { Controller } from "client/components/controller";
 import { World } from "client/components/world/world";
 import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
-import { USER_NAME, WORLD_TICK } from "shared/constants/core";
+import { USER_NAME } from "shared/constants/core";
 import { getRandomAccent } from "shared/constants/palette";
 import { getRandomBaseSnakeSkin } from "shared/constants/skins";
 import { CandyType } from "shared/store/candy";
 import { fillArray } from "shared/utils/object-utils";
-import { createScheduler } from "shared/utils/scheduler";
 
 import { useMockRemotes } from "../utils/use-mock-remotes";
 
@@ -24,7 +23,7 @@ export = hoarcekat(() => {
 		for (const id of IDS) {
 			store.addSnake(id, {
 				name: id,
-				head: new Vector2(math.random(-10, 10), math.random(-10, 10)),
+				position: new Vector2(math.random(-10, 10), math.random(-10, 10)),
 				skin: getRandomBaseSnakeSkin().id,
 				score: math.random(0, 8000),
 			});
@@ -39,18 +38,12 @@ export = hoarcekat(() => {
 				type: CandyType.Default,
 			})),
 		);
-
-		return createScheduler({
-			name: "world-tick",
-			tick: WORLD_TICK,
-			onTick: store.snakeTick,
-		});
 	}, []);
 
 	useInterval(() => {
 		for (const id of IDS) {
 			if (id !== USER_NAME) {
-				store.turnSnake(id, math.random() * 2 * math.pi);
+				//	store.moveSnake(id, math.random() * 2 * math.pi);
 			}
 		}
 	}, 1.5);

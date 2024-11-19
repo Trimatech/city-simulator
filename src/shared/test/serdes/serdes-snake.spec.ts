@@ -12,7 +12,7 @@ export = () => {
 		return {
 			id: id ?? HttpService.GenerateGUID(false),
 			name: HttpService.GenerateGUID(false),
-			head: new Vector2(math.random(), math.random()),
+			position: new Vector2(math.random(), math.random()),
 			angle: math.random() * math.pi * 2,
 			desiredAngle: math.random() * math.pi * 2,
 			score: math.random(0, 10000),

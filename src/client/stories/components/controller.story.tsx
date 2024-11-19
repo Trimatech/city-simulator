@@ -13,11 +13,10 @@ import { useRem } from "client/hooks";
 import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
 import { selectWorldCamera } from "client/store/world";
-import { USER_NAME, WORLD_TICK } from "shared/constants/core";
+import { USER_NAME } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
 import { getRandomBaseSnakeSkin } from "shared/constants/skins";
 import { describeSnakeFromScore, selectLocalSnake } from "shared/store/snakes";
-import { createScheduler } from "shared/utils/scheduler";
 
 import { useMockRemotes } from "../utils/use-mock-remotes";
 
@@ -102,12 +101,6 @@ export = hoarcekat(() => {
 			name: Players.LocalPlayer.DisplayName,
 			skin: getRandomBaseSnakeSkin().id,
 			score: START_SIZE,
-		});
-
-		return createScheduler({
-			name: "world-tick",
-			tick: WORLD_TICK,
-			onTick: store.snakeTick,
 		});
 	}, []);
 

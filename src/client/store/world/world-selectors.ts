@@ -49,7 +49,7 @@ export const selectWorldCamera = createSelector(
 
 		return {
 			subject: snake.id,
-			offset: snake.head.mul(-1),
+			offset: snake.position.mul(-1),
 			scale: mapStrict(radius, 0.5, 3, WORLD_SCALE, WORLD_SCALE * 0.5),
 		};
 	},
