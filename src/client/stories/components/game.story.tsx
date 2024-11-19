@@ -1,6 +1,6 @@
 import "client/app/react-config";
 
-import { hoarcekat, useInterval } from "@rbxts/pretty-react-hooks";
+import { hoarcekat, useInterval, useTimeout } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { Controller } from "client/components/controller";
 import { Game } from "client/components/game";
@@ -56,6 +56,12 @@ export = hoarcekat(() => {
 			onTick: store.snakeTick,
 		});
 	}, []);
+
+	useTimeout(() => {
+		for (const id of IDS) {
+			store.setSnakeIsInside(id, false);
+		}
+	}, 2);
 
 	useInterval(() => {
 		for (const id of IDS) {

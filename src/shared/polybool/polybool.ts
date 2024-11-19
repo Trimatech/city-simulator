@@ -16,7 +16,7 @@ export * from "./SegmentChainer";
 export * from "./SegmentSelector";
 export * from "./Shape";
 
-export const pointToPolygon = (points: PointShape[]): Polygon => {
+export const pointsToPolygon = (points: PointShape[]): Polygon => {
 	return { regions: [points], inverted: false };
 };
 

@@ -6,6 +6,7 @@ import { describeSnakeFromScore } from "shared/store/snakes";
 
 import { SnakeHead } from "./snake-head";
 import { SnakeNameTag } from "./snake-name-tag";
+import { SnakePolygon } from "./snake-polygon";
 import { SnakeTracer } from "./snake-tracer";
 import { SnakeBindings, useSnakeBindings } from "./use-snake-bindings";
 import { SnakeOnScreen } from "./use-snakes-on-screen";
@@ -59,25 +60,28 @@ function SnakeComponent({ snakeOnScreen, scale, offset, subject, setSnakeBinding
 		<>
 			{children}
 			{snakeOnScreen.head && (
-				<SnakeHead
-					angle={snake.angle}
-					desiredAngle={snake.desiredAngle}
-					line={snakeBindings.head.line}
-					effects={snakeBindings.head.effects}
-					skinId={skin}
-					isClient={snake.id === USER_NAME}
-				>
-					<SnakeNameTag
-						name={snake.name}
-						head={snake.head}
-						headOffset={offset}
+				<>
+					<SnakePolygon points={snake.polygon as Vector2[]} scale={scale} />
+					<SnakeHead
 						angle={snake.angle}
-						radius={radius}
-						scale={scale}
-						skin={skin}
-						visible={showNameTag}
-					/>
-				</SnakeHead>
+						desiredAngle={snake.desiredAngle}
+						line={snakeBindings.head.line}
+						effects={snakeBindings.head.effects}
+						skinId={skin}
+						isClient={snake.id === USER_NAME}
+					>
+						<SnakeNameTag
+							name={snake.name}
+							head={snake.head}
+							headOffset={offset}
+							angle={snake.angle}
+							radius={radius}
+							scale={scale}
+							skin={skin}
+							visible={showNameTag}
+						/>
+					</SnakeHead>
+				</>
 			)}
 		</>
 	);

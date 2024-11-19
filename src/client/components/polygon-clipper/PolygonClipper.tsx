@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "@rbxts/react";
 import { useRem } from "client/hooks/use-rem";
+import { calculatePolygonOperation, shapeToPolygon } from "shared/polybool/poly-utils";
 import { Polygon } from "shared/polybool/polybool";
 
 import { Checkbox } from "../ui/Checkbox";
@@ -9,7 +10,6 @@ import { CanvasButton } from "./CanvasButton";
 import { DemoPolygon, demoPolygons } from "./demo-cases";
 import { PolygonCanvas } from "./PolygonCanvas";
 import { PolygonOperation } from "./PolygonClipper.types";
-import { calculatePolygonOperation, shapeToPolygon } from "./PolygonClipper.utils";
 
 interface Props {
 	initialDemoIndex?: number;

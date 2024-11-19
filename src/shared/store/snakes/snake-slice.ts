@@ -1,7 +1,14 @@
 import { createProducer } from "@rbxts/reflex";
 import { SNAKE_BOOST_SPEED, SNAKE_SPEED, WORLD_TICK } from "shared/constants/core";
+import {
+	calculatePolygonOperation,
+	pointsToVectors,
+	setIntersectionPoints,
+	vectorsToPoints,
+} from "shared/polybool/poly-utils";
+import { Point, pointsToPolygon } from "shared/polybool/polybool";
 import { map, turnRadians } from "shared/utils/math-utils";
-import { mapProperties, mapProperty } from "shared/utils/object-utils";
+import { fillArray, mapProperties, mapProperty } from "shared/utils/object-utils";
 
 import { describeSnakeFromScore, snakeIsBoosting } from "./snake-utils";
 
@@ -21,6 +28,8 @@ export interface SnakeEntity {
 	readonly skin: string;
 	readonly dead: boolean;
 	readonly eliminations: number;
+	readonly polygon: readonly Vector2[];
+	readonly isInside: boolean;
 }
 
 // Used to prevent tracers from overlapping
@@ -38,15 +47,32 @@ const defaultEntity: SnakeEntity = {
 	skin: "",
 	dead: false,
 	eliminations: 0,
+	polygon: [],
+	isInside: true,
 };
 
 const initialState: SnakesState = {};
 
+const createPolygonAroundHead = (head: Vector2) => {
+	const diameter = 5;
+	const items = 20;
+
+	print("Create polygon to head:", head);
+	return fillArray(items, (index) => {
+		const angle = (index / items) * (2 * math.pi);
+		return head.add(new Vector2(math.cos(angle), math.sin(angle)).mul(diameter));
+	});
+};
+
 export const snakesSlice = createProducer(initialState, {
-	addSnake: (state, id: string, patch?: Partial<SnakeEntity>) => ({
-		...state,
-		[id]: { ...defaultEntity, id, name: id, ...patch },
-	}),
+	addSnake: (state, id: string, patch?: Partial<SnakeEntity>) => {
+		const polygon = createPolygonAroundHead(patch?.head || defaultEntity.head);
+
+		return {
+			...state,
+			[id]: { ...defaultEntity, id, name: id, polygon, ...patch },
+		};
+	},
 
 	removeSnake: (state, id: string) => ({
 		...state,
@@ -73,11 +99,11 @@ export const snakesSlice = createProducer(initialState, {
 			const head = snake.head.add(direction.mul(speed * deltaTime));
 
 			const currentLength = snake.tracers.size();
-			const desiredLength = math.floor(description.length);
+			const desiredLength = 100;
 			let tail = head;
 
 			const tracers = snake.tracers.mapFiltered((tracer, index) => {
-				if (index >= desiredLength) {
+				if (snake.isInside) {
 					return;
 				}
 
@@ -109,6 +135,47 @@ export const snakesSlice = createProducer(initialState, {
 			}
 
 			return { ...snake, head, angle, tracers };
+		});
+	},
+
+	setSnakeIsInside: (state, id: string, isInside: boolean) => {
+		return mapProperty(state, id, (snake) => {
+			const hasChanged = snake.isInside !== isInside;
+			warn(`Snake is inside: ${isInside}`);
+			if (hasChanged) {
+				if (isInside) {
+					// Calculate new polygon based on old polygon and tracers
+
+					const resultPolygon = pointsToPolygon(vectorsToPoints(snake.polygon as Vector2[]));
+					const points = vectorsToPoints(snake.tracers as Vector2[]);
+					const newCutPolygon = setIntersectionPoints(resultPolygon, points);
+
+					if (newCutPolygon) {
+						const result = calculatePolygonOperation(resultPolygon, newCutPolygon, "Union");
+
+						if (result.regions.size() > 0 && result.regions[0].size() > 2) {
+							const resultPolygon = pointsToVectors(result.regions[0] as Point[]);
+							warn("Snake is inside and intersection found", resultPolygon);
+							return {
+								...snake,
+								isInside,
+								polygon: resultPolygon,
+							};
+						} else {
+							warn("Snake is inside but no regions found");
+						}
+					} else {
+						warn("Snake is inside but no intersection found");
+					}
+				}
+
+				return {
+					...snake,
+					isInside,
+				};
+			}
+
+			return snake;
 		});
 	},
 

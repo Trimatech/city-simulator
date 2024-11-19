@@ -1,9 +1,9 @@
 import React, { useState } from "@rbxts/react";
 import { useRem } from "client/hooks/use-rem";
-import { pointToPolygon, Polygon } from "shared/polybool/polybool";
+import { calculatePolygonOperation, pointToVector2, setIntersectionPoints } from "shared/polybool/poly-utils";
+import { pointsToPolygon, Polygon } from "shared/polybool/polybool";
 
-import { cutLinesFromPolygon, findClosestPoint, pointToVector2 } from "../polygon-clipper/PolygonCanvas.utils";
-import { calculatePolygonOperation } from "../polygon-clipper/PolygonClipper.utils";
+import { findClosestPoint } from "../polygon-clipper/PolygonCanvas.utils";
 import { Checkbox } from "../ui/Checkbox";
 import { Frame } from "../ui/frame";
 import { DrawingCanvas } from "./DrawingCanvas";
@@ -53,18 +53,23 @@ export function DrawingPolygonClipper({ starterPolygon }: Props) {
 
 							const addToPoints = takeFromPoints.move(startIndex, endIndex, 0, []);
 
-							const newPolygon = pointToPolygon([...addToPoints, ...points]);
+							const newPolygon = pointsToPolygon([...addToPoints, ...points]);
 
 							setResultPolygon(calculatePolygonOperation(resultPolygon, newPolygon, operation));
 						} else {
 							warn(`no closest found`);
 						}
 					} else if (cutLine) {
-						const newPolygon = cutLinesFromPolygon(resultPolygon, points);
-						warn(`newPolygon............`, newPolygon);
-						setResultPolygon(calculatePolygonOperation(resultPolygon, newPolygon, operation));
+						const newPolygon = setIntersectionPoints(resultPolygon, points);
+
+						if (newPolygon) {
+							warn(`newPolygon............`, newPolygon);
+							setResultPolygon(calculatePolygonOperation(resultPolygon, newPolygon, operation));
+						} else {
+							warn(`no newPolygon found`);
+						}
 					} else {
-						const newPolygon = pointToPolygon(points);
+						const newPolygon = pointsToPolygon(points);
 						setResultPolygon(calculatePolygonOperation(resultPolygon, newPolygon, operation));
 					}
 				}}

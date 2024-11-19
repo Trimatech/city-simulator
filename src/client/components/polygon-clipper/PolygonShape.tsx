@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
+import { getNextRegion } from "shared/polybool/poly-utils";
 import { Point, Polygon } from "shared/polybool/polybool";
 
-import { getNextRegion } from "./PolygonCanvas.utils";
 import { Line, Vertex } from "./PolygonElements";
 
 interface Props {

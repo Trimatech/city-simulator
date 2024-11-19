@@ -7,7 +7,7 @@ const nextSnakeInputs = new Map<string, number>();
 export function onSnakeTick() {
 	consumeNextSnakeInputs();
 	store.snakeTick();
-	updateSnakeGrid();
+	updateSnakeGrid(); //
 }
 
 export function registerSnakeInput(id: string, angle: number) {

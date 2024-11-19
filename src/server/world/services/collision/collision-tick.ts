@@ -1,6 +1,7 @@
 import { store } from "server/store";
 import { getSnake, killSnake } from "server/world/utils";
 import { WORLD_BOUNDS } from "shared/constants/core";
+import { isPointInPolygon, vector2ToPoint, vectorsToPoints } from "shared/polybool/poly-utils";
 import { describeSnakeFromScore, selectSnakesSorted, SnakeEntity } from "shared/store/snakes";
 
 import { snakeGrid } from "../snakes";
@@ -19,6 +20,13 @@ export function onCollisionTick() {
 			continue;
 		}
 
+		const isInside = isInsidePolygon(snake);
+
+		const hasChanged = snake.isInside !== isInside;
+		if (hasChanged) {
+			store.setSnakeIsInside(snake.id, isInside);
+		}
+
 		const enemy = isCollidingWithSnake(snake);
 
 		if (enemy) {
@@ -27,6 +35,12 @@ export function onCollisionTick() {
 			store.incrementSnakeEliminations(enemy.id);
 		}
 	}
+}
+
+function isInsidePolygon(snake: SnakeEntity) {
+	const polygon = vectorsToPoints(snake.polygon as Vector2[]);
+
+	return isPointInPolygon(vector2ToPoint(snake.head), polygon);
 }
 
 function isCollidingWithWall(snake: SnakeEntity) {

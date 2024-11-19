@@ -21,6 +21,8 @@ export = () => {
 			skin: getRandomBaseSnakeSkin().id,
 			dead: math.random() > 0.5,
 			eliminations: math.random(1, 100),
+			polygon: fillArray(10, () => new Vector2(math.random(), math.random())),
+			isInside: true,
 		};
 	}
 
@@ -28,6 +30,8 @@ export = () => {
 		for (const [key, value] of pairs(snake)) {
 			if (key === "tracers") {
 				assert(shallowEqual(value, deserialized[key]), "tracers are not equal");
+			} else if (key === "polygon") {
+				assert(shallowEqual(value, deserialized[key]), "polygon are not equal");
 			} else if (key === "angle" || key === "desiredAngle") {
 				expect(value).to.be.near(deserialized[key], 0.0001);
 			} else {

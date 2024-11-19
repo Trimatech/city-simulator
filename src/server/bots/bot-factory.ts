@@ -6,7 +6,7 @@ import { selectSnakeCount, selectSnakeIsDead } from "shared/store/snakes";
 import { BotBehavior } from "./bot-behavior";
 import { generateBotName } from "./bot-names";
 
-const MIN_SNAKES = 25;
+const MIN_SNAKES = 1;
 
 let nextBotId = 0;
 

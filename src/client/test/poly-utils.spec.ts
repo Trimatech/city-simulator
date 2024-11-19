@@ -2,20 +2,32 @@
 
 import Object from "@rbxts/object-utils";
 import { HttpService } from "@rbxts/services";
-import { calculatePolygonOperation } from "client/components/polygon-clipper/PolygonClipper.utils";
-import { Line, Point, Polygon } from "shared/polybool/polybool";
-
 import {
 	addIntersectionPointsWithLines,
-	cutLinesFromPolygon,
+	calculatePolygonOperation,
 	getFirstAndLastLines,
 	getJoinedPoints,
 	getLastPoint,
 	replaceFirstAndLastPoints,
 	replaceFirstAndLastPointsWith,
-	reverseArray,
+	setIntersectionPoints,
 	takePartOfPolygon,
-} from "../components/polygon-clipper/PolygonCanvas.utils";
+} from "shared/polybool/poly-utils";
+import { Line, Point, Polygon } from "shared/polybool/polybool";
+
+function verySimpleRect(): Polygon {
+	return {
+		inverted: false,
+		regions: [
+			[
+				[0, 0],
+				[4, 0],
+				[4, 3],
+				[0, 3],
+			],
+		],
+	};
+}
 
 function simpleRect(): Polygon {
 	return {
@@ -485,16 +497,16 @@ export = () => {
 		it("should cut V shape from rectangle polygon", () => {
 			const polygon = simpleRect();
 
-			const newPolygon = cutLinesFromPolygon(polygon, vShapePoints);
+			const newPolygon = setIntersectionPoints(polygon, vShapePoints);
 			const expectedPoints = [
 				[70, 100],
 				[30, 100],
 				[50, 120],
 			];
 
-			expect(HttpService.JSONEncode(newPolygon.regions[0])).to.equal(HttpService.JSONEncode(expectedPoints));
+			expect(HttpService.JSONEncode(newPolygon?.regions[0])).to.equal(HttpService.JSONEncode(expectedPoints));
 
-			const resultPolygon = calculatePolygonOperation(polygon, newPolygon, "Union");
+			const resultPolygon = calculatePolygonOperation(polygon, newPolygon as Polygon, "Union");
 
 			const expectedResultPoints = [
 				[100, 100],
@@ -514,7 +526,7 @@ export = () => {
 		it("should cut lines from M shape polygon", () => {
 			const polygon = simpleMShape();
 
-			const newPolygon = cutLinesFromPolygon(polygon, cutLineFromMShape);
+			const newPolygon = setIntersectionPoints(polygon, cutLineFromMShape);
 
 			const expectedPoints = [
 				[30, 30],
@@ -522,9 +534,9 @@ export = () => {
 				[10, 30],
 			];
 
-			expect(HttpService.JSONEncode(newPolygon.regions[0])).to.equal(HttpService.JSONEncode(expectedPoints));
+			expect(HttpService.JSONEncode(newPolygon?.regions[0])).to.equal(HttpService.JSONEncode(expectedPoints));
 
-			const resultPolygon = calculatePolygonOperation(polygon, newPolygon, "Union");
+			const resultPolygon = calculatePolygonOperation(polygon, newPolygon as Polygon, "Union");
 
 			const expectedResultPoints = [
 				[40, 40],
@@ -549,16 +561,16 @@ export = () => {
 				[60, 100],
 			];
 
-			const newPolygon = cutLinesFromPolygon(polygon, points);
+			const newPolygon = setIntersectionPoints(polygon, points);
 			const expectedPoints = [
 				[60, 100],
 				[40, 100],
 				[40, 110],
 				[60, 110],
 			];
-			expect(HttpService.JSONEncode(newPolygon.regions[0])).to.equal(HttpService.JSONEncode(expectedPoints));
+			expect(HttpService.JSONEncode(newPolygon?.regions[0])).to.equal(HttpService.JSONEncode(expectedPoints));
 
-			const resultPolygon = calculatePolygonOperation(polygon, newPolygon, "Union");
+			const resultPolygon = calculatePolygonOperation(polygon, newPolygon as Polygon, "Union");
 
 			// **********
 			// **********
@@ -583,7 +595,7 @@ export = () => {
 
 			const points = uShapePoints;
 
-			const newPolygon = cutLinesFromPolygon(polygon, points);
+			const newPolygon = setIntersectionPoints(polygon, points);
 			const expectedPoints = [
 				[60, 10],
 				[50, 10],
@@ -595,9 +607,9 @@ export = () => {
 				[40, 30],
 			];
 
-			expect(HttpService.JSONEncode(newPolygon.regions[0])).to.equal(HttpService.JSONEncode(expectedPoints));
+			expect(HttpService.JSONEncode(newPolygon?.regions[0])).to.equal(HttpService.JSONEncode(expectedPoints));
 
-			const resultPolygon = calculatePolygonOperation(polygon, newPolygon, "Union");
+			const resultPolygon = calculatePolygonOperation(polygon, newPolygon as Polygon, "Union");
 
 			const expectedResultPoints = [
 				[70, 10],
@@ -613,6 +625,50 @@ export = () => {
 			expect(HttpService.JSONEncode(resultPolygon.regions[0])).to.equal(
 				HttpService.JSONEncode(expectedResultPoints),
 			);
+		});
+
+		it("should extend lines and find intersections", () => {
+			const polygon = verySimpleRect();
+
+			const cutLine: Point[] = [
+				[1, 4],
+				[1, 5],
+				[3, 5],
+				[3, 4],
+			];
+
+			const result = setIntersectionPoints(polygon, cutLine);
+
+			const expectedPoints = [
+				[3, 3],
+				[1, 3],
+				[1, 5],
+				[3, 5],
+			];
+
+			expect(HttpService.JSONEncode(result?.regions[0])).to.equal(HttpService.JSONEncode(expectedPoints));
+		});
+
+		it("should extend one line and find intersections", () => {
+			const polygon = verySimpleRect();
+
+			const cutLine: Point[] = [
+				[1, 4],
+				[1, 5],
+				[3, 5],
+				[3, 2],
+			];
+
+			const result = setIntersectionPoints(polygon, cutLine);
+
+			const expectedPoints = [
+				[3, 3],
+				[1, 3],
+				[1, 5],
+				[3, 5],
+			];
+
+			expect(HttpService.JSONEncode(result?.regions[0])).to.equal(HttpService.JSONEncode(expectedPoints));
 		});
 	});
 };
