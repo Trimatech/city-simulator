@@ -1,7 +1,7 @@
 import { Players } from "@rbxts/services";
 import { store } from "server/store";
 import { SNAKE_TICK_PHASE } from "server/world/constants";
-import { getSafePointInWorld, killSnake, playerIsSpawned } from "server/world/utils";
+import { killSnake, playerIsSpawned } from "server/world/utils";
 import { WORLD_TICK } from "shared/constants/core";
 import { remotes } from "shared/remotes";
 import { defaultPlayerSave, RANDOM_SKIN, selectPlayerSave } from "shared/store/saves";
@@ -28,9 +28,13 @@ export async function initSnakeService() {
 		const randomSkin = save.skins[math.random(1, save.skins.size() - 1)];
 		const currentSkin = save.skin;
 
+		const position = player.Character?.PrimaryPart?.Position;
+
+		print("Spawn snake for", player.Name, position);
+
 		store.addSnake(player.Name, {
 			name: player.DisplayName,
-			position: getSafePointInWorld(),
+			position: position ? new Vector2(position.X, position.Y) : undefined,
 			skin: currentSkin !== RANDOM_SKIN ? currentSkin : randomSkin,
 			score: 10,
 		});

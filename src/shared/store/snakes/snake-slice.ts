@@ -81,6 +81,10 @@ export const snakesSlice = createProducer(initialState, {
 				return snake;
 			}
 
+			if (snake.isInside) {
+				return snake;
+			}
+
 			const currentLength = snake.tracers.size();
 
 			const tracers = [...snake.tracers];
@@ -91,8 +95,9 @@ export const snakesSlice = createProducer(initialState, {
 			if (currentLength > 0) {
 				const lastTracer = snake.tracers[currentLength - 1];
 				const distance = lastTracer.sub(snake.position).Magnitude;
-				warn("Distance", distance);
+
 				if (distance > bodyPieceLength) {
+					warn("Distance", { distance, position: snake.position });
 					tracers.push(snake.position);
 				}
 			} else {
@@ -106,8 +111,9 @@ export const snakesSlice = createProducer(initialState, {
 	setSnakeIsInside: (state, id: string, isInside: boolean) => {
 		return mapProperty(state, id, (snake) => {
 			const hasChanged = snake.isInside !== isInside;
-			//warn(`Snake is inside: ${isInside}`);
+
 			if (hasChanged) {
+				warn(`Snake is inside: ${isInside}`);
 				if (isInside) {
 					// Calculate new polygon based on old polygon and tracers
 
@@ -145,7 +151,7 @@ export const snakesSlice = createProducer(initialState, {
 				return {
 					...snake,
 					isInside,
-					tracers: [],
+					tracers: [snake.position],
 				};
 			}
 

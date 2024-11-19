@@ -1,90 +1,66 @@
-import React, { memo, useEffect, useMemo } from "@rbxts/react";
-import { useSelector } from "@rbxts/react-reflex";
-import { selectSkinOverride } from "client/store/menu";
-import { USER_NAME } from "shared/constants/core";
-import { describeSnakeFromScore } from "shared/store/snakes";
+import React from "@rbxts/react";
+import { Walls } from "client/components/walls/Walls";
+import { Line, Point } from "shared/polybool/polybool";
+import { SnakeEntity } from "shared/store/snakes/snake-slice";
 
-import { SnakeHead } from "./snake-head";
-import { SnakeNameTag } from "./snake-name-tag";
-import { SnakePolygon } from "./snake-polygon";
-import { SnakeTracer } from "./snake-tracer";
-import { SnakeBindings, useSnakeBindings } from "./use-snake-bindings";
-import { SnakeOnScreen } from "./use-snakes-on-screen";
+import { Wall } from "../../walls/Wall";
 
-interface SnakeProps {
-	readonly snakeOnScreen: SnakeOnScreen;
-	readonly scale: number;
-	readonly offset: Vector2;
-	readonly subject?: string;
-	readonly setSnakeBindings: (bindings: SnakeBindings) => void;
+interface Props {
+	snake: SnakeEntity;
+
+	color?: Color3;
+	transparency?: number;
+	thickness?: number;
+	height?: number;
+	position?: Vector3;
+	showTracers?: boolean;
+	tracerColor?: Color3;
+	tracerTransparency?: number;
 }
 
-function SnakeComponent({ snakeOnScreen, scale, offset, subject, setSnakeBindings }: SnakeProps) {
-	const snake = snakeOnScreen.snake;
-	const snakeBindings = useSnakeBindings(snakeOnScreen, scale, snake.id === subject);
-	const snakeSkinOverride = useSelector(selectSkinOverride);
+export function Snake({ snake, color = new Color3(1, 1, 1), transparency = 0, position = new Vector3() }: Props) {
+	const segments = snake.tracers;
 
-	const radius = describeSnakeFromScore(snake.score).radius;
-	const distance = snake.position.sub(offset.mul(-1)).Magnitude;
-	const skin = snake.id !== subject ? snake.skin : (snakeSkinOverride ?? snake.skin);
-	const showNameTag = snake.id !== subject && !snake.dead && distance < 16;
-
-	const children = useMemo(() => {
-		return snakeOnScreen.tracers.mapFiltered((tracer) => {
-			const index = tracer.index;
-			const bindings = snakeBindings.bindings.get(index);
-
-			if (!bindings) {
-				return;
-			}
-
-			return (
-				<SnakeTracer
-					key={`tracer-${index}`}
-					line={bindings.line}
-					effects={bindings.effects}
-					index={index}
-					skinId={skin}
-				/>
-			);
-		});
-	}, [snakeOnScreen]);
-
-	useEffect(() => {
-		if (snake.id === subject) {
-			setSnakeBindings(snakeBindings);
-		}
-	}, [snakeBindings, subject]);
+	// Convert segments to array of line segments
+	const tracerLines = segments
+		.mapFiltered((segment, index) => {
+			if (index === segments.size() - 1) return undefined; // Skip last point
+			const currentPoint: Point = [segment.X, segment.Y];
+			const nextPoint: Point = [segments[index + 1].X, segments[index + 1].Y];
+			return [currentPoint, nextPoint] as [Point, Point];
+		})
+		.filter((line) => line !== undefined);
 
 	return (
 		<>
-			{children}
-			{snakeOnScreen.head && (
-				<>
-					<SnakePolygon points={snake.polygon as Vector2[]} scale={scale} />
-					<SnakeHead
-						angle={snake.angle}
-						desiredAngle={snake.desiredAngle}
-						line={snakeBindings.head.line}
-						effects={snakeBindings.head.effects}
-						skinId={skin}
-						isClient={snake.id === USER_NAME}
-					>
-						<SnakeNameTag
-							name={snake.name}
-							head={snake.position}
-							headOffset={offset}
-							angle={snake.angle}
-							radius={radius}
-							scale={scale}
-							skin={skin}
-							visible={showNameTag}
-						/>
-					</SnakeHead>
-				</>
-			)}
+			{/* Main snake body */}
+			{tracerLines.map((line, index) => (
+				<Wall
+					key={`snake-segment-${index}`}
+					line={line as Line}
+					color={color}
+					transparency={transparency}
+					position={position}
+				/>
+			))}
+
+			<Walls points={snake.polygon as Vector2[]} />
+
+			{/* Tracers for input visualization */}
+			{/* {showTracers && snake.position && (
+				<Wall
+					key="snake-input-tracer"
+					line={[
+						[segments[0].X, segments[0].Y],
+						[segments[0].X + snake.position.X * 5, segments[0].Y + snake.position.Y * 5],
+					]}
+					height={height}
+					thickness={thickness * 0.5}
+					color={tracerColor}
+					transparency={tracerTransparency}
+					position={position}
+				/>
+			)} */}
 		</>
 	);
 }
-
-export const Snake = memo(SnakeComponent);

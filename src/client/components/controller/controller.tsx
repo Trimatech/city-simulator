@@ -21,7 +21,7 @@ export function Controller() {
 	useInterval(() => {
 		const position = Players.LocalPlayer.Character?.PrimaryPart?.Position;
 		if (position) {
-			const vector2 = new Vector2(position.X, position.Y);
+			const vector2 = new Vector2(position.X, position.Z);
 			remotes.snake.move.fire(vector2);
 		}
 	}, TICK);
