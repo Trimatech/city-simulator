@@ -78,6 +78,11 @@ export function getLastPoint<T>(arr: T[], nth = 0) {
 }
 
 export function pointEquals(p1: Point, p2: Point) {
+	if (p1 === undefined || p2 === undefined) {
+		warn("pointEquals is undefined", { p1, p2 });
+		return false;
+	}
+
 	if (p1.size() !== 2 || p2.size() !== 2) {
 		warn("pointEquals is null", { p1, p2 });
 		return false;

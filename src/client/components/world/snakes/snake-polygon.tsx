@@ -12,7 +12,7 @@ function SnakePolygonTemp({ points, scale }: SnakePolygonProps) {
 	const rem = useRem();
 	// const style = useTracerStyle(line, effects, 0, skin.headColor || tracerSkin.tint);
 
-	print("Render polygon");
+	print("Render polygon", points);
 
 	const polygon: Polygon = {
 		regions: [points.map((point) => [rem(point.X * scale), rem(point.Y * scale)])],

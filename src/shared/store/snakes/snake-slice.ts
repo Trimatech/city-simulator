@@ -7,7 +7,7 @@ import {
 	vectorsToPoints,
 } from "shared/polybool/poly-utils";
 import { Point, pointsToPolygon } from "shared/polybool/polybool";
-import { map, turnRadians } from "shared/utils/math-utils";
+import { turnRadians } from "shared/utils/math-utils";
 import { fillArray, mapProperties, mapProperty } from "shared/utils/object-utils";
 
 import { describeSnakeFromScore, snakeIsBoosting } from "./snake-utils";
@@ -99,39 +99,21 @@ export const snakesSlice = createProducer(initialState, {
 			const head = snake.head.add(direction.mul(speed * deltaTime));
 
 			const currentLength = snake.tracers.size();
-			const desiredLength = 100;
-			let tail = head;
 
-			const tracers = snake.tracers.mapFiltered((tracer, index) => {
-				if (snake.isInside) {
-					return;
+			const tracers = [...snake.tracers];
+
+			const bodyPieceLength = 0.5;
+
+			// Add a tracer if the distance between the last tracer and the current head is 1.5
+			if (currentLength > 0) {
+				const lastTracer = snake.tracers[currentLength - 1];
+				const distance = lastTracer.sub(head).Magnitude;
+				warn("Distance", distance);
+				if (distance > bodyPieceLength) {
+					tracers.push(head);
 				}
-
-				const previous = snake.tracers[index - 1] || snake.head;
-
-				// spacing should be longer near the end of the snake to allow longer
-				// snakes but with less tracers
-				const spacing = map(index, 0, currentLength, description.spacingAtHead, description.spacingAtTail);
-
-				// the alpha of the interpolation that will decide the space between
-				// the current tracer and the previous tracer
-				const alpha = math.clamp((deltaTime * speed) / spacing, TINY, 1 - TINY);
-
-				if (index === desiredLength - 1) {
-					// the tail's spacing from the previous tracer should be proportional
-					// to the score needed to reach the next length
-					tail = tail.Lerp(tracer.Lerp(previous, alpha), math.max(description.length % 1, TINY));
-				} else {
-					tail = tracer.Lerp(previous, alpha);
-				}
-
-				return tail;
-			});
-
-			if (currentLength < desiredLength) {
-				for (const index of $range(currentLength, desiredLength - 1)) {
-					tracers.push(tail.add(new Vector2(TINY * (index + 1), 0)));
-				}
+			} else {
+				tracers.push(head);
 			}
 
 			return { ...snake, head, angle, tracers };
@@ -141,7 +123,7 @@ export const snakesSlice = createProducer(initialState, {
 	setSnakeIsInside: (state, id: string, isInside: boolean) => {
 		return mapProperty(state, id, (snake) => {
 			const hasChanged = snake.isInside !== isInside;
-			warn(`Snake is inside: ${isInside}`);
+			//warn(`Snake is inside: ${isInside}`);
 			if (hasChanged) {
 				if (isInside) {
 					// Calculate new polygon based on old polygon and tracers
@@ -155,23 +137,32 @@ export const snakesSlice = createProducer(initialState, {
 
 						if (result.regions.size() > 0 && result.regions[0].size() > 2) {
 							const resultPolygon = pointsToVectors(result.regions[0] as Point[]);
-							warn("Snake is inside and intersection found", resultPolygon);
+							//warn("Snake is inside and intersection found", resultPolygon);
 							return {
 								...snake,
 								isInside,
 								polygon: resultPolygon,
+								tracers: [],
 							};
 						} else {
-							warn("Snake is inside but no regions found");
+							warn("No valid REGIONS found", {
+								result,
+								points,
+								newCutPolygon,
+							});
 						}
 					} else {
-						warn("Snake is inside but no intersection found");
+						warn("No INTERSECTION found", {
+							points,
+							newCutPolygon,
+						});
 					}
 				}
 
 				return {
 					...snake,
 					isInside,
+					tracers: [],
 				};
 			}
 
