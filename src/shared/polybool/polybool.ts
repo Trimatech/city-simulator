@@ -167,12 +167,10 @@ export class PolyBool {
 		const comb = this.combine(seg1, seg2);
 		const seg3 = this.selectUnion(comb);
 
-		warn("union", poly1, poly2, seg3);
 		return this.polygon(seg3);
 	}
 
 	intersect(poly1: Polygon, poly2: Polygon): Polygon {
-		warn("intersect", poly1, poly2);
 		const seg1 = this.segments(poly1);
 		const seg2 = this.segments(poly2);
 		const comb = this.combine(seg1, seg2);

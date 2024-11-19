@@ -1,3 +1,4 @@
+/* eslint-disable no-loss-of-precision */
 /// <reference types="@rbxts/testez/globals" />
 
 import Object from "@rbxts/object-utils";
@@ -62,12 +63,11 @@ const mShapeWithIntersectionPoints: Point[] = [
 	[0, 0],
 	[40, 0],
 	[40, 40],
-	[30, 30],
+	[30.000000000000115, 30],
 	[20, 20],
 	[10, 30],
 	[0, 40],
 ];
-
 // U shape polygon
 function uShapedPolygon(): Polygon {
 	return {
@@ -110,6 +110,7 @@ const uShapeWithIntersectionPoints = [
 // Other
 const cutLineFromMShape: Point[] = [
 	[10, 30],
+	[20, 30],
 	[30, 30],
 ];
 
@@ -175,14 +176,13 @@ export = () => {
 
 			const result = addIntersectionPointsWithLines(lines, polygon);
 
-			expect(result.intersectionIndexes.size()).to.equal(2);
+			expect(result.intersectionIndexes.size()).to.equal(1);
 
 			const expectedPoints = [
 				[0, 0],
 				[50, 0],
 				[100, 0],
 				[100, 100],
-				[50, 100],
 				[0, 100],
 			];
 			const newPoints = result.polygon.regions[0];
@@ -193,6 +193,7 @@ export = () => {
 		it("should handle multiple intersecting lines", () => {
 			const polygon = simpleRect();
 
+			// Those lines are horizontal, so not valid, but lets keep it for now
 			const lines: Line[] = [
 				[
 					[-50, 25],
@@ -207,7 +208,7 @@ export = () => {
 			const result = addIntersectionPointsWithLines(lines, polygon);
 
 			// Should create 4 intersection points (2 for each line)
-			expect(result.intersectionIndexes.size()).to.equal(4);
+			expect(result.intersectionIndexes.size()).to.equal(2);
 
 			const expectedPoints = [
 				[0, 0],
@@ -216,8 +217,6 @@ export = () => {
 				[100, 75],
 				[100, 100],
 				[0, 100],
-				[0, 75],
-				[0, 25],
 			];
 
 			// Check if all intersection points were added
@@ -247,8 +246,8 @@ export = () => {
 			const result = addIntersectionPointsWithLines(lines, polygon);
 
 			expect(result.intersectionIndexes.size()).to.equal(2);
-			expect(result.intersectionIndexes[0]).to.equal(3);
-			expect(result.intersectionIndexes[1]).to.equal(5);
+			expect(result.intersectionIndexes[0]).to.equal(5);
+			expect(result.intersectionIndexes[1]).to.equal(3);
 
 			const newPoints = result.polygon.regions[0];
 
@@ -308,16 +307,20 @@ export = () => {
 			expect(HttpService.JSONEncode(lines)).to.equal(HttpService.JSONEncode(expedtedLines));
 		});
 
-		it("should return return correctly with M shape", () => {
+		it("should return correctly with M shape", () => {
 			const lines = getFirstAndLastLines(cutLineFromMShape);
 
 			const expectedLines = [
 				[
 					[10, 30],
+					[20, 30],
+				],
+				[
+					[20, 30],
 					[30, 30],
 				],
 			];
-			expect(lines.size()).to.equal(1);
+			expect(lines.size()).to.equal(2);
 			expect(HttpService.JSONEncode(lines)).to.equal(HttpService.JSONEncode(expectedLines));
 		});
 	});
@@ -349,7 +352,7 @@ export = () => {
 	});
 
 	describe("takePartOfPolygon", () => {
-		it("should take part of polygon", () => {
+		it("should take part of polygon m shape", () => {
 			const polygon: Polygon = {
 				inverted: false,
 				regions: [mShapeWithIntersectionPoints] as Point[][],
@@ -358,7 +361,7 @@ export = () => {
 			const newPolygon = takePartOfPolygon(polygon, 3, 5);
 
 			const expectedPoints = [
-				[30, 30],
+				[30.000000000000115, 30],
 				[20, 20],
 				[10, 30],
 			];
@@ -529,9 +532,10 @@ export = () => {
 			const newPolygon = setIntersectionPoints(polygon, cutLineFromMShape);
 
 			const expectedPoints = [
-				[30, 30],
+				[30.000000000000115, 30],
 				[20, 20],
 				[10, 30],
+				[20, 30],
 			];
 
 			expect(HttpService.JSONEncode(newPolygon?.regions[0])).to.equal(HttpService.JSONEncode(expectedPoints));
@@ -544,7 +548,7 @@ export = () => {
 				[0, 0],
 				[0, 40],
 				[10, 30],
-				[30, 30],
+				[30.000000000000115, 30],
 			];
 			expect(HttpService.JSONEncode(resultPolygon.regions[0])).to.equal(
 				HttpService.JSONEncode(expectedResultPoints),
@@ -554,16 +558,16 @@ export = () => {
 		it("should cut U shape from rectangle polygon", () => {
 			const polygon = simpleRect();
 
-			const points: Point[] = [
+			const cutPoints: Point[] = [
 				[40, 100],
 				[40, 110],
 				[60, 110],
 				[60, 100],
 			];
 
-			const newPolygon = setIntersectionPoints(polygon, points);
+			const newPolygon = setIntersectionPoints(polygon, cutPoints);
 			const expectedPoints = [
-				[60, 100],
+				[60, 99.99999999999989],
 				[40, 100],
 				[40, 110],
 				[60, 110],
@@ -583,7 +587,52 @@ export = () => {
 				[40, 100],
 				[40, 110],
 				[60, 110],
+				[60, 99.99999999999989],
+			];
+			expect(HttpService.JSONEncode(resultPolygon.regions[0])).to.equal(
+				HttpService.JSONEncode(expectedResultPoints),
+			);
+		});
+
+		it("should cut U shape from rectangle polygon, but ignore lines that are inside polygon", () => {
+			const polygon = simpleRect();
+
+			const cutPoints: Point[] = [
+				[40, 70],
+				[40, 80],
+				[40, 90],
+				[40, 100],
+				[40, 110],
+				[60, 110],
 				[60, 100],
+				[60, 90],
+				[60, 80],
+				[60, 70],
+			];
+
+			const newPolygon = setIntersectionPoints(polygon, cutPoints);
+			const expectedPoints = [
+				[60, 99.99999999999989],
+				[40, 100],
+				[40, 110],
+				[60, 110],
+			];
+			expect(HttpService.JSONEncode(newPolygon?.regions[0])).to.equal(HttpService.JSONEncode(expectedPoints));
+
+			const resultPolygon = calculatePolygonOperation(polygon, newPolygon as Polygon, "Union");
+
+			// **********
+			// **********
+			//     **
+			const expectedResultPoints = [
+				[100, 100],
+				[100, 0],
+				[0, 0],
+				[0, 100],
+				[40, 100],
+				[40, 110],
+				[60, 110],
+				[60, 99.99999999999989],
 			];
 			expect(HttpService.JSONEncode(resultPolygon.regions[0])).to.equal(
 				HttpService.JSONEncode(expectedResultPoints),

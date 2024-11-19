@@ -78,7 +78,12 @@ export function getLastPoint<T>(arr: T[], nth = 0) {
 }
 
 export function pointEquals(p1: Point, p2: Point) {
-	return p1[0] === p2[0] && p1[1] === p2[1];
+	if (p1.size() !== 2 || p2.size() !== 2) {
+		warn("pointEquals is null", { p1, p2 });
+		return false;
+	}
+
+	return roundCoordinate(p1[0]) === roundCoordinate(p2[0]) && roundCoordinate(p1[1]) === roundCoordinate(p2[1]);
 }
 
 export function shapeToPolygon(shape: PointShape[][]): Polygon {
@@ -125,7 +130,7 @@ export function findIntersection(currentLine: [Point, Point], line2: [Point, Poi
 	const x = p1[0] + ua * (p2[0] - p1[0]);
 	const y = p1[1] + ua * (p2[1] - p1[1]);
 
-	return [x, y];
+	return roundPoint([x, y]);
 }
 
 export function findIntersectionWithPolygon(
@@ -134,7 +139,7 @@ export function findIntersectionWithPolygon(
 ): { intersection: Point; intersectedLine: [Point, Point] } | undefined {
 	for (const region of polygon.regions) {
 		for (let i = 0; i < region.size(); i++) {
-			const nextPoint = getNextRegion(region, i);
+			const nextPoint = region[(i + 1) % region.size()] as Point;
 			const intersectedLine: [Point, Point] = [region[i] as Point, nextPoint];
 			const intersection = findIntersection(line, intersectedLine);
 			if (intersection) {
@@ -145,7 +150,19 @@ export function findIntersectionWithPolygon(
 	return undefined;
 }
 
-export function addIntersectionPointsWithLines(lines: Line[], polygon: Polygon) {
+// Add this helper function to calculate distance between points
+function getDistanceBetweenPoints(p1: Point, p2: Point): number {
+	const dx = math.abs(p2[0] - p1[0]);
+	const dy = math.abs(p2[1] - p1[1]);
+	return math.sqrt(dx * dx + dy * dy);
+}
+
+function getCenterPoint(line: Line): Point {
+	const [startPoint, endPoint] = line;
+	return [(startPoint[0] + endPoint[0]) / 2, (startPoint[1] + endPoint[1]) / 2];
+}
+
+export function addIntersectionPointsWithLines(cutLines: Line[], polygon: Polygon) {
 	const newPolygon = Object.deepCopy(polygon);
 	const cutPoints: Point[] = [];
 
@@ -153,27 +170,44 @@ export function addIntersectionPointsWithLines(lines: Line[], polygon: Polygon) 
 	const points = newPolygon.regions[regionIndex];
 
 	// For each line we're checking against
-	for (const line of lines) {
-		// For each edge in the polygon
+	for (const cutLine of cutLines) {
+		let closestIntersection: { point: Point; distance: number; index: number } | undefined;
+
 		let i = 0;
 		while (i < points.size()) {
 			const currentPoint = points[i] as Point;
-			const nextPoint = getNextRegion(points, i);
+			const nextPoint = points[(i + 1) % points.size()] as Point;
 			const currentEdge: Line = [currentPoint, nextPoint];
 
-			const intersectionPoint = findIntersection(extendLine(currentEdge), line);
+			const intersectionPoint = findIntersection(extendLine(cutLine), currentEdge);
 			if (intersectionPoint) {
-				// Insert the intersection point immediately after the current point
-				const insertIndex = i + 1;
-				points.insert(insertIndex, intersectionPoint);
-				cutPoints.push(intersectionPoint);
-				i++; // Skip over the point we just inserted
+				const distance = getDistanceBetweenPoints(getCenterPoint(cutLine), intersectionPoint);
+
+				if (!closestIntersection || distance < closestIntersection.distance) {
+					closestIntersection = { point: intersectionPoint, distance, index: i };
+				}
 			}
 			i++;
+		}
+
+		// Insert only the closest intersection point if one was found
+		if (closestIntersection) {
+			const insertIndex = closestIntersection.index + 1;
+			points.insert(insertIndex, closestIntersection.point);
+			cutPoints.push(closestIntersection.point);
 		}
 	}
 
 	const intersectionIndexes = cutPoints.map((point) => points.findIndex((p) => pointEquals(p as Point, point)));
+
+	if (intersectionIndexes.size() < 2) {
+		warn("Not enough intersection indexes found", {
+			intersectionIndexes,
+			cutPoints,
+			cutLines,
+			extendedCutLines: cutLines.map(extendLine),
+		});
+	}
 
 	return {
 		polygon: newPolygon,
@@ -185,7 +219,8 @@ export function addIntersectionPointsWithLines(lines: Line[], polygon: Polygon) 
 
 export function getFirstAndLastLines(points: Point[]): Line[] {
 	if (points.size() <= 1) {
-		error(`points.size() <= 1`);
+		warn(`points.size() <= 1`);
+		return [];
 	}
 
 	if (points.size() === 2) {
@@ -238,6 +273,16 @@ export function sliceArray<T extends defined>(arr: T[], startIndex: number, endI
 }
 
 export function getJoinedPoints(existingPoints: Point[], drawPoints: Point[]) {
+	if (drawPoints.size() === 0) {
+		warn("drawPoints.size() === 0");
+		return [];
+	}
+
+	if (existingPoints.size() === 0) {
+		warn("existingPoints.size() === 0");
+		return [];
+	}
+
 	const firstPoint = drawPoints[0];
 	const lastPoint = getLastPoint(drawPoints);
 
@@ -302,17 +347,62 @@ export function replaceFirstAndLastPointsWith(points: Point[], cutPoints: Point[
 /**
  * Extends a line segment in both directions by a given factor
  */
-function extendLine(line: Line, extensionFactor = 1000): Line {
+function extendLine(line: Line): Line {
 	const [startPoint, endPoint] = line;
 
+	const direction = [endPoint[0] - startPoint[0], endPoint[1] - startPoint[1]];
+	const length = math.sqrt(direction[0] ** 2 + direction[1] ** 2);
+	const unitDirection = [direction[0] / length, direction[1] / length];
+
+	const extensionFactor = 1000;
+	const extendedLength = math.max(length, extensionFactor);
+
 	return [
-		[startPoint[0] - extensionFactor, startPoint[1] - extensionFactor],
-		[endPoint[0] + extensionFactor, endPoint[1] + extensionFactor],
+		[startPoint[0] - unitDirection[0] * extendedLength, startPoint[1] - unitDirection[1] * extendedLength],
+		[endPoint[0] + unitDirection[0] * extendedLength, endPoint[1] + unitDirection[1] * extendedLength],
 	];
 }
 
+const filterOutPointsInsidePolygon = (points: Point[], polygon: Polygon) => {
+	const region = polygon.regions[0] as Point[];
+	const pointsCopy = [...points];
+
+	// Remove points from the beginning but leave the last point that is inside
+	while (
+		pointsCopy.size() > 1 &&
+		isPointInPolygon(pointsCopy[0], region) &&
+		isPointInPolygon(pointsCopy[1], region)
+	) {
+		pointsCopy.shift();
+	}
+
+	// Remove points from the end but leave the last point that is inside
+	while (
+		pointsCopy.size() > 1 &&
+		isPointInPolygon(pointsCopy[pointsCopy.size() - 1], region) &&
+		isPointInPolygon(pointsCopy[pointsCopy.size() - 2], region)
+	) {
+		pointsCopy.pop();
+	}
+
+	return pointsCopy;
+};
+
 // Update setIntersectionPoints to use the new function
-export function setIntersectionPoints(polygon: Polygon, drawPoints: Point[]) {
+export function setIntersectionPoints(polygon: Polygon, drawPointsTemp: Point[]) {
+	const drawPoints = filterOutPointsInsidePolygon(drawPointsTemp, polygon);
+	if (drawPoints.size() < 3) {
+		warn("drawPoints.size() < 3");
+		return undefined;
+	}
+
+	const points = polygon.regions[0];
+
+	if (points.size() < 4) {
+		warn("points.size() < 4");
+		return undefined;
+	}
+
 	const clonedPolygon = Object.deepCopy(polygon);
 
 	const {
@@ -333,11 +423,30 @@ export function setIntersectionPoints(polygon: Polygon, drawPoints: Point[]) {
 
 		const partOfResultPolygon = takePartOfPolygon(polygonWithIntersections, startIndex, endIndex);
 		const existingPoints = partOfResultPolygon.regions[0] as Point[];
+
+		if (existingPoints.size() === 0) {
+			warn("existingPoints.size() === 0");
+			return undefined;
+		}
+
 		const joinedPoints = getJoinedPoints(existingPoints, replaceFirstAndLastPointsWith(drawPoints, cutPoints));
 
 		return pointsToPolygon(joinedPoints);
 	} else {
-		warn("No intersection points found even with extended lines");
+		warn("No intersection points found even with extended lines", {
+			intersectionIndexes,
+			cutPoints,
+			polygonWithIntersections,
+		});
 		return undefined;
 	}
+}
+
+// Add this helper function at the top with other utility functions
+function roundCoordinate(num: number): number {
+	return num; //math.round(num * 100000) / 100000;
+}
+
+function roundPoint(point: Point): Point {
+	return [roundCoordinate(point[0]), roundCoordinate(point[1])];
 }
