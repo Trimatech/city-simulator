@@ -161,7 +161,7 @@ export function addIntersectionPointsWithLines(lines: Line[], polygon: Polygon) 
 			const nextPoint = getNextRegion(points, i);
 			const currentEdge: Line = [currentPoint, nextPoint];
 
-			const intersectionPoint = findIntersection(currentEdge, line);
+			const intersectionPoint = findIntersection(extendLine(currentEdge), line);
 			if (intersectionPoint) {
 				// Insert the intersection point immediately after the current point
 				const insertIndex = i + 1;
@@ -304,50 +304,11 @@ export function replaceFirstAndLastPointsWith(points: Point[], cutPoints: Point[
  */
 function extendLine(line: Line, extensionFactor = 1000): Line {
 	const [startPoint, endPoint] = line;
-	const dx = endPoint[0] - startPoint[0];
-	const dy = endPoint[1] - startPoint[1];
 
 	return [
-		[startPoint[0] - dx * extensionFactor, startPoint[1] - dy * extensionFactor],
-		[endPoint[0] + dx * extensionFactor, endPoint[1] + dy * extensionFactor],
+		[startPoint[0] - extensionFactor, startPoint[1] - extensionFactor],
+		[endPoint[0] + extensionFactor, endPoint[1] + extensionFactor],
 	];
-}
-
-/**
- * Finds the nearest intersection point between a line and a polygon
- */
-function findNearestIntersection(
-	line: Line,
-	polygon: Polygon,
-	referencePoint: Point,
-): { intersection: Point; intersectedLine: Line } | undefined {
-	let nearestIntersection: Point | undefined;
-	let nearestDistance = math.huge;
-	let nearestIntersectedLine: Line | undefined;
-
-	for (const region of polygon.regions) {
-		for (let i = 0; i < region.size(); i++) {
-			const nextPoint = getNextRegion(region, i);
-			const intersectedLine: Line = [region[i] as Point, nextPoint];
-			const intersection = findIntersection(line, intersectedLine);
-
-			if (intersection) {
-				const distance =
-					math.abs(intersection[0] - referencePoint[0]) + math.abs(intersection[1] - referencePoint[1]);
-
-				if (distance < nearestDistance) {
-					nearestDistance = distance;
-					nearestIntersection = intersection;
-					nearestIntersectedLine = intersectedLine;
-				}
-			}
-		}
-	}
-
-	if (nearestIntersection && nearestIntersectedLine) {
-		return { intersection: nearestIntersection, intersectedLine: nearestIntersectedLine };
-	}
-	return undefined;
 }
 
 // Update setIntersectionPoints to use the new function
