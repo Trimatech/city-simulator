@@ -33,6 +33,7 @@ function WallComponent({
 	isCrumbling = false,
 }: Props) {
 	const mainPartRef = useRef<Part>();
+	const cylinderRef = useRef<Part>();
 	const debrisRef = useRef<Part[]>([]);
 	const cleanupRef = useRef<() => void>();
 
@@ -43,9 +44,13 @@ function WallComponent({
 		if (isCrumbling) return;
 
 		setupCollisionGroup();
-		const { width, center, rotation } = calculateWallTransform([startPoint, endPoint], position, height);
+		const { width, center, rotation, startPosition } = calculateWallTransform(
+			[startPoint, endPoint],
+			position,
+			height,
+		);
 
-		// Create single wall part
+		// Create main wall part
 		const part = new Instance("Part");
 		part.Name = name;
 		part.Size = new Vector3(width, height, thickness);
@@ -59,12 +64,35 @@ function WallComponent({
 		part.CFrame = new CFrame(center).mul(rotation);
 		part.Parent = Workspace;
 
+		// Create cylinder for smooth start
+		const cylinder = new Instance("Part");
+		cylinder.Name = `${name}_cylinder`;
+		cylinder.Size = new Vector3(height, thickness, thickness);
+		cylinder.Color = color;
+		cylinder.Transparency = transparency;
+		cylinder.Material = Enum.Material.SmoothPlastic;
+		cylinder.TopSurface = Enum.SurfaceType.Smooth;
+		cylinder.BottomSurface = Enum.SurfaceType.Smooth;
+		cylinder.Shape = Enum.PartType.Cylinder;
+		cylinder.Anchored = true;
+		cylinder.CanCollide = false;
+
+		// Position cylinder at start of wall
+		const cylinderCFrame = new CFrame(startPosition).mul(CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90))); // Rotate cylinder to stand upright
+		cylinder.CFrame = cylinderCFrame;
+		cylinder.Parent = Workspace;
+
 		mainPartRef.current = part;
+		cylinderRef.current = cylinder;
 
 		return () => {
 			if (mainPartRef.current) {
 				mainPartRef.current.Destroy();
 				mainPartRef.current = undefined;
+			}
+			if (cylinderRef.current) {
+				cylinderRef.current.Destroy();
+				cylinderRef.current = undefined;
 			}
 		};
 	}, [
@@ -84,10 +112,14 @@ function WallComponent({
 	useEffect(() => {
 		if (!isCrumbling) return;
 
-		// Clean up main wall if it exists
+		// Clean up main wall and cylinder if they exist
 		if (mainPartRef.current) {
 			mainPartRef.current.Destroy();
 			mainPartRef.current = undefined;
+		}
+		if (cylinderRef.current) {
+			cylinderRef.current.Destroy();
+			cylinderRef.current = undefined;
 		}
 
 		const { width, center, rotation } = calculateWallTransform([startPoint, endPoint], position, height);

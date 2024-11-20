@@ -24,11 +24,11 @@ interface Props {
 
 export function Snake({
 	snake,
-	color = palette.blue,
+	color = palette.white,
 	transparency = 0,
 	position = new Vector3(),
 	tracerColor = palette.blue,
-	tracerTransparency = 0.5,
+	tracerTransparency = 0,
 	lastTracerColor = palette.red,
 	lastTracerTransparency = 0.5,
 }: Props) {

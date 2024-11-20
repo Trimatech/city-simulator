@@ -161,6 +161,9 @@ export function calculateWallTransform(line: [Point, Point], position: Vector3, 
 		groundCenter.Z + position.Z,
 	);
 
+	// Calculate start position for cylinder
+	const startPosition = new Vector3(startPoint.X + position.X, height / 2 + position.Y, startPoint.Z + position.Z);
+
 	const rotation = CFrame.lookAt(new Vector3(), new Vector3(direction.X, 0, direction.Z)).mul(
 		CFrame.fromEulerAnglesXYZ(0, math.rad(90), 0),
 	);
@@ -169,6 +172,7 @@ export function calculateWallTransform(line: [Point, Point], position: Vector3, 
 		width,
 		center,
 		rotation,
+		startPosition,
 	};
 }
 
