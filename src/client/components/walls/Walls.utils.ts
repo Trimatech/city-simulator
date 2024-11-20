@@ -1,13 +1,13 @@
-import { PhysicsService, TweenService } from "@rbxts/services";
+import { TweenService } from "@rbxts/services";
+import { CollisionGroups } from "shared/constants/collision-groups";
 import { sliceArray } from "shared/polybool/poly-utils";
 import { Point } from "shared/polybool/polybool";
 
-export const COLLISION_GROUP = "WallDebris";
 export const FORCE_MULTIPLIER = 15;
 export const UPWARD_FORCE_BIAS = 0.3;
 export const SPIN_FORCE = 90;
 export const PIECE_SIZE = 1; // Each debris piece is 1x1x1 studs
-export const FADE_DELAY = 10; // Seconds to wait before starting fade
+export const FADE_DELAY = 5; // Seconds to wait before starting fade
 export const FADE_DURATION = 1; // Duration of fade animation
 export const MIN_PIECE_SIZE = 1;
 export const MAX_PIECE_SIZE = 3;
@@ -107,13 +107,6 @@ function sliceWallBox(box: WallBox, minSize: number): WallBox[] {
 	return boxes;
 }
 
-export function setupCollisionGroup() {
-	pcall(() => {
-		PhysicsService.CreateCollisionGroup(COLLISION_GROUP);
-		PhysicsService.CollisionGroupSetCollidable(COLLISION_GROUP, COLLISION_GROUP, true);
-	});
-}
-
 export function createWallPieces({ position, size, rotation, color, transparency }: CreateWallPiecesOptions) {
 	// Initial wall box
 	const initialBox: WallBox = {
@@ -135,7 +128,7 @@ export function createWallPieces({ position, size, rotation, color, transparency
 		piece.Material = Enum.Material.SmoothPlastic;
 		piece.TopSurface = Enum.SurfaceType.Smooth;
 		piece.BottomSurface = Enum.SurfaceType.Smooth;
-		piece.CollisionGroup = COLLISION_GROUP;
+		piece.CollisionGroup = CollisionGroups.WALL;
 		piece.CFrame = new CFrame(box.position).mul(box.rotation);
 
 		return piece;

@@ -3,13 +3,7 @@ import { Workspace } from "@rbxts/services";
 import { palette } from "shared/constants/palette";
 import { Point } from "shared/polybool/polybool";
 
-import {
-	calculateWallTransform,
-	createWallPieces,
-	setupCollisionGroup,
-	startCrumbling,
-	startFadeOut,
-} from "./Walls.utils";
+import { calculateWallTransform, createWallPieces, startCrumbling, startFadeOut } from "./Walls.utils";
 
 interface Props {
 	startPoint: Point;
@@ -43,7 +37,6 @@ function WallComponent({
 	useEffect(() => {
 		if (isCrumbling) return;
 
-		setupCollisionGroup();
 		const { width, center, rotation, startPosition } = calculateWallTransform(
 			[startPoint, endPoint],
 			position,
