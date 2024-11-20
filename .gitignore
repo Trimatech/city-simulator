@@ -2,9 +2,8 @@
 /out
 /include
 *.tsbuildinfo
-*.rbxl
-*.rbxlx
 .DS_Store
 .env
 mantle-output.json
 actions-runner
+place.rbxlx
