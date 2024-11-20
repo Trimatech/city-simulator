@@ -1,5 +1,5 @@
 import { createSelector } from "@rbxts/reflex";
-import { describeSnakeFromScore } from "shared/store/snakes";
+import { describeSoldierFromScore } from "shared/store/soldiers";
 import { mapStrict } from "shared/utils/math-utils";
 
 import { RootState } from "..";
@@ -20,8 +20,8 @@ export const selectWorldSpectating = (state: RootState) => {
 	return state.world.spectating;
 };
 
-export const selectSnakeSpectated = (state: RootState) => {
-	return state.snakes[state.world.spectating];
+export const selectSoldierspectated = (state: RootState) => {
+	return state.soldiers[state.world.spectating];
 };
 
 export const selectWorldInputAngle = (isClient = true) => {
@@ -30,14 +30,14 @@ export const selectWorldInputAngle = (isClient = true) => {
 	};
 };
 
-export const selectSnakeFromWorldSubject = (state: RootState) => {
-	return state.snakes[state.world.subject];
+export const selectSoldierFromWorldSubject = (state: RootState) => {
+	return state.soldiers[state.world.subject];
 };
 
 export const selectWorldCamera = createSelector(
-	[selectSnakeFromWorldSubject],
-	(snake) => {
-		if (!snake) {
+	[selectSoldierFromWorldSubject],
+	(soldier) => {
+		if (!soldier) {
 			return {
 				subject: undefined,
 				offset: new Vector2(),
@@ -45,16 +45,16 @@ export const selectWorldCamera = createSelector(
 			};
 		}
 
-		const { radius } = describeSnakeFromScore(snake.score);
+		const { radius } = describeSoldierFromScore(soldier.score);
 
 		return {
-			subject: snake.id,
-			offset: snake.position.mul(-1),
+			subject: soldier.id,
+			offset: soldier.position.mul(-1),
 			scale: mapStrict(radius, 0.5, 3, WORLD_SCALE, WORLD_SCALE * 0.5),
 		};
 	},
 	{
-		// only re-compute if the snake is not null
+		// only re-compute if the soldier is not null
 		equalityCheck: (current, previous) => current === previous || current === undefined,
 	},
 );

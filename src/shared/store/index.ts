@@ -2,12 +2,12 @@ import { CombineStates } from "@rbxts/reflex";
 
 import { candySlice } from "./candy";
 import { saveSlice } from "./saves";
-import { snakesSlice } from "./snakes";
+import { soldiersSlice } from "./soldiers";
 
 export type SharedState = CombineStates<typeof slices>;
 
 export const slices = {
 	candy: candySlice,
-	snakes: snakesSlice,
+	soldiers: soldiersSlice,
 	saves: saveSlice,
 };

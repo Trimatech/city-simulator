@@ -1,22 +1,22 @@
 import { store } from "server/store";
-import { identifySnake, selectPlayerSnakesById, selectSnakeRanking, selectSnakeScore } from "shared/store/snakes";
+import { identifySoldier, selectPlayerSoldiersById, selectSoldierRanking, selectSoldierscore } from "shared/store/soldiers";
 
 import { shouldGrantReward } from "../utils";
 
 export async function initMilestoneService() {
-	store.observe(selectPlayerSnakesById, identifySnake, (snake) => {
-		return observePlayer(snake.id);
+	store.observe(selectPlayerSoldiersById, identifySoldier, (soldier) => {
+		return observePlayer(soldier.id);
 	});
 }
 
 function observePlayer(id: string) {
-	const unsubscribeRanking = store.subscribe(selectSnakeRanking(id), (ranking) => {
+	const unsubscribeRanking = store.subscribe(selectSoldierRanking(id), (ranking) => {
 		if (ranking !== undefined && shouldGrantReward()) {
 			store.setMilestoneRank(id, ranking);
 		}
 	});
 
-	const unsubscribeScore = store.subscribe(selectSnakeScore(id), (score) => {
+	const unsubscribeScore = store.subscribe(selectSoldierscore(id), (score) => {
 		if (score !== undefined && shouldGrantReward()) {
 			store.setMilestoneScore(id, score);
 		}

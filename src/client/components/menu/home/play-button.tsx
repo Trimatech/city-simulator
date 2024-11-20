@@ -27,7 +27,7 @@ export function PlayButton({ anchorPoint, size, position }: PlayButtonProps) {
 	});
 
 	const onClick = () => {
-		remotes.snake.spawn.fire();
+		remotes.soldier.spawn.fire();
 	};
 
 	return (

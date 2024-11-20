@@ -1,14 +1,14 @@
 import { useEffect, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { setTimeout } from "@rbxts/set-timeout";
-import { selectTopSnake } from "shared/store/snakes";
+import { selectTopSoldier } from "shared/store/soldiers";
 
 /**
  * Returns the current leader's state. If the ID changed, this value
  * will be debounced to prevent jitter and excess updates.
  */
 export function useLeader() {
-	const currentLeader = useSelector(selectTopSnake);
+	const currentLeader = useSelector(selectTopSoldier);
 	const [leader, setLeader] = useState(currentLeader);
 
 	useEffect(() => {

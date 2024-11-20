@@ -8,7 +8,7 @@ import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
 import { USER_NAME } from "shared/constants/core";
 import { getRandomAccent } from "shared/constants/palette";
-import { getRandomBaseSnakeSkin } from "shared/constants/skins";
+import { getRandomBaseSoldierskin } from "shared/constants/skins";
 import { CandyType } from "shared/store/candy";
 import { fillArray } from "shared/utils/object-utils";
 
@@ -21,10 +21,10 @@ export = hoarcekat(() => {
 
 	useEffect(() => {
 		for (const id of IDS) {
-			store.addSnake(id, {
+			store.addSoldier(id, {
 				name: id,
 				position: new Vector2(math.random(-10, 10), math.random(-10, 10)),
-				skin: getRandomBaseSnakeSkin().id,
+				skin: getRandomBaseSoldierskin().id,
 				score: math.random(0, 8000),
 			});
 		}
@@ -43,7 +43,7 @@ export = hoarcekat(() => {
 	useInterval(() => {
 		for (const id of IDS) {
 			if (id !== USER_NAME) {
-				//	store.moveSnake(id, math.random() * 2 * math.pi);
+				//	store.moveSoldier(id, math.random() * 2 * math.pi);
 			}
 		}
 	}, 1.5);

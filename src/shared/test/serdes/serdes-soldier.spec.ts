@@ -2,13 +2,13 @@
 
 import { shallowEqual } from "@rbxts/reflex";
 import { HttpService } from "@rbxts/services";
-import { getRandomBaseSnakeSkin } from "shared/constants/skins";
-import { deserializeSnakes, serializeSnakes } from "shared/serdes/handlers/serdes-snake";
-import { SnakeEntity, SnakesState } from "shared/store/snakes";
+import { getRandomBaseSoldierskin } from "shared/constants/skins";
+import { deserializeSoldiers, serializeSoldiers } from "shared/serdes/handlers/serdes-soldier";
+import { SoldierEntity, SoldiersState } from "shared/store/soldiers";
 import { fillArray } from "shared/utils/object-utils";
 
 export = () => {
-	function generateSnake(id?: string): SnakeEntity {
+	function generateSoldier(id?: string): SoldierEntity {
 		return {
 			id: id ?? HttpService.GenerateGUID(false),
 			name: HttpService.GenerateGUID(false),
@@ -18,7 +18,7 @@ export = () => {
 			score: math.random(0, 10000),
 			boost: math.random() > 0.5,
 			tracers: fillArray(10, () => new Vector2(math.random(), math.random())),
-			skin: getRandomBaseSnakeSkin().id,
+			skin: getRandomBaseSoldierskin().id,
 			dead: math.random() > 0.5,
 			eliminations: math.random(1, 100),
 			polygon: fillArray(10, () => new Vector2(math.random(), math.random())),
@@ -27,8 +27,8 @@ export = () => {
 		};
 	}
 
-	function assertSnakeEqual(snake: SnakeEntity, deserialized: SnakeEntity) {
-		for (const [key, value] of pairs(snake)) {
+	function assertSoldierEqual(soldier: SoldierEntity, deserialized: SoldierEntity) {
+		for (const [key, value] of pairs(soldier)) {
 			if (key === "tracers") {
 				assert(shallowEqual(value, deserialized[key]), "tracers are not equal");
 			} else if (key === "polygon") {
@@ -42,43 +42,43 @@ export = () => {
 	}
 
 	it("should serialize an entity", () => {
-		const state: SnakesState = {
-			"1": generateSnake("1"),
+		const state: SoldiersState = {
+			"1": generateSoldier("1"),
 		};
 
-		const serialized = serializeSnakes(state);
-		const deserialized = deserializeSnakes(serialized);
+		const serialized = serializeSoldiers(state);
+		const deserialized = deserializeSoldiers(serialized);
 
-		for (const [id, snake] of pairs(state)) {
+		for (const [id, soldier] of pairs(state)) {
 			expect(deserialized[id]).to.be.ok();
-			assertSnakeEqual(snake, deserialized[id]!);
+			assertSoldierEqual(soldier, deserialized[id]!);
 		}
 	});
 
 	it("should serialize a record of entities", () => {
-		const state: SnakesState = {
-			"1": generateSnake("1"),
-			"2": generateSnake("2"),
-			"3": generateSnake("3"),
+		const state: SoldiersState = {
+			"1": generateSoldier("1"),
+			"2": generateSoldier("2"),
+			"3": generateSoldier("3"),
 		};
 
-		const serialized = serializeSnakes(state);
-		const deserialized = deserializeSnakes(serialized);
+		const serialized = serializeSoldiers(state);
+		const deserialized = deserializeSoldiers(serialized);
 
-		for (const [id, snake] of pairs(state)) {
+		for (const [id, soldier] of pairs(state)) {
 			expect(deserialized[id]).to.be.ok();
-			assertSnakeEqual(snake, deserialized[id]!);
+			assertSoldierEqual(soldier, deserialized[id]!);
 		}
 	});
 
 	it("should compress the data", () => {
-		const state: SnakesState = {
-			"1": generateSnake("1"),
-			"2": generateSnake("2"),
-			"3": generateSnake("3"),
+		const state: SoldiersState = {
+			"1": generateSoldier("1"),
+			"2": generateSoldier("2"),
+			"3": generateSoldier("3"),
 		};
 
-		const serialized = serializeSnakes(state);
+		const serialized = serializeSoldiers(state);
 		const json = HttpService.JSONEncode(state);
 
 		expect(serialized.size() < json.size()).to.equal(true);

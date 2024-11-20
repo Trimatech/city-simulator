@@ -1,35 +1,35 @@
-import { baseSnakeSkins, snakeSkins } from "./skins";
-import { SnakeSkin } from "./types";
+import { baseSoldierskins, soldierskins } from "./skins";
+import { Soldierskin } from "./types";
 
 export * from "./skins";
 export * from "./types";
 
-const snakeSkinsById = new Map(snakeSkins.map((skin) => [skin.id, skin]));
+const soldierskinsById = new Map(soldierskins.map((skin) => [skin.id, skin]));
 
 /**
- * Returns the snake skin with the given id, or a default skin
+ * Returns the soldier skin with the given id, or a default skin
  * if the id is invalid.
  */
-export function getSnakeSkin(id: string): SnakeSkin {
-	return snakeSkinsById.get(id) || baseSnakeSkins[0];
+export function getSoldierskin(id: string): Soldierskin {
+	return soldierskinsById.get(id) || baseSoldierskins[0];
 }
 
 /**
- * Returns the snake skin with the given id, or undefined.
+ * Returns the soldier skin with the given id, or undefined.
  */
-export function findSnakeSkin(id: string): SnakeSkin | undefined {
-	return snakeSkinsById.get(id);
+export function findSoldierskin(id: string): Soldierskin | undefined {
+	return soldierskinsById.get(id);
 }
 
 /**
- * Returns the texture and tint of a snake tracer at this index.
- * Used to apply repeating patterns to the snake.
+ * Returns the texture and tint of a soldier tracer at this index.
+ * Used to apply repeating patterns to the soldier.
  */
-export function getSnakeSkinForTracer(
+export function getSoldierskinForTracer(
 	id: string,
 	index: number,
 ): { readonly texture: string; readonly tint: Color3; readonly boostTint?: Color3 } {
-	const { texture, tint, boostTint } = getSnakeSkin(id);
+	const { texture, tint, boostTint } = getSoldierskin(id);
 
 	return {
 		texture: texture[index % texture.size()],
@@ -39,8 +39,8 @@ export function getSnakeSkinForTracer(
 }
 
 /**
- * Returns a random default snake skin.
+ * Returns a random default soldier skin.
  */
-export function getRandomBaseSnakeSkin(): SnakeSkin {
-	return baseSnakeSkins[math.random(0, baseSnakeSkins.size() - 1)];
+export function getRandomBaseSoldierskin(): Soldierskin {
+	return baseSoldierskins[math.random(0, baseSoldierskins.size() - 1)];
 }

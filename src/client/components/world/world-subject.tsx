@@ -2,25 +2,25 @@ import { useInterval } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { useStore } from "client/hooks";
-import { selectSnakeSpectated } from "client/store/world";
-import { cycleNextSnake, selectLocalSnake } from "shared/store/snakes";
+import { selectSoldierspectated } from "client/store/world";
+import { cycleNextSoldier, selectLocalSoldier } from "shared/store/soldiers";
 
 export function WorldSubject() {
 	const store = useStore();
-	const snakeClient = useSelector(selectLocalSnake);
-	const snakeSpectated = useSelector(selectSnakeSpectated);
+	const soldierClient = useSelector(selectLocalSoldier);
+	const soldierspectated = useSelector(selectSoldierspectated);
 
 	useEffect(() => {
-		if (snakeClient) {
-			store.setWorldSubject(snakeClient.id);
-		} else if (snakeSpectated) {
-			store.setWorldSubject(snakeSpectated.id);
+		if (soldierClient) {
+			store.setWorldSubject(soldierClient.id);
+		} else if (soldierspectated) {
+			store.setWorldSubject(soldierspectated.id);
 		}
-	}, [snakeClient?.id, snakeSpectated?.id]);
+	}, [soldierClient?.id, soldierspectated?.id]);
 
 	useInterval(() => {
-		if (!snakeSpectated) {
-			store.setWorldSpectating(store.getState(cycleNextSnake("")));
+		if (!soldierspectated) {
+			store.setWorldSpectating(store.getState(cycleNextSoldier("")));
 		}
 	}, 1);
 

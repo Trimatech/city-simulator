@@ -1,36 +1,36 @@
 import BitBuffer from "@rbxts/bitbuffer2";
-import { SnakesState } from "shared/store/snakes";
+import { SoldiersState } from "shared/store/soldiers";
 import { countProperties } from "shared/utils/object-utils";
 
 import { readArray, readVector2, writeArray, writeVector2 } from "../utils";
 
-export function serializeSnakes(state: SnakesState): string {
+export function serializeSoldiers(state: SoldiersState): string {
 	const buffer = new BitBuffer();
 
 	buffer.WriteUInt(16, countProperties(state));
 
-	for (const [, snake] of pairs(state)) {
-		buffer.WriteString(snake.id);
-		buffer.WriteString(snake.name);
-		writeVector2(buffer, snake.position);
-		buffer.WriteFloat32(snake.angle);
-		buffer.WriteFloat32(snake.desiredAngle);
-		buffer.WriteUInt(32, snake.score);
-		buffer.WriteBool(snake.boost);
-		writeArray(buffer, snake.tracers, writeVector2);
-		writeArray(buffer, snake.polygon, writeVector2);
-		buffer.WriteString(snake.skin);
-		buffer.WriteBool(snake.dead);
-		buffer.WriteUInt(16, snake.eliminations);
-		buffer.WriteBool(snake.isInside);
-		buffer.WriteFloat32(snake.polygonAreaSize);
+	for (const [, soldier] of pairs(state)) {
+		buffer.WriteString(soldier.id);
+		buffer.WriteString(soldier.name);
+		writeVector2(buffer, soldier.position);
+		buffer.WriteFloat32(soldier.angle);
+		buffer.WriteFloat32(soldier.desiredAngle);
+		buffer.WriteUInt(32, soldier.score);
+		buffer.WriteBool(soldier.boost);
+		writeArray(buffer, soldier.tracers, writeVector2);
+		writeArray(buffer, soldier.polygon, writeVector2);
+		buffer.WriteString(soldier.skin);
+		buffer.WriteBool(soldier.dead);
+		buffer.WriteUInt(16, soldier.eliminations);
+		buffer.WriteBool(soldier.isInside);
+		buffer.WriteFloat32(soldier.polygonAreaSize);
 	}
 
 	return buffer.ToString();
 }
 
-export function deserializeSnakes(data: string): SnakesState {
-	const state: Writable<SnakesState> = {};
+export function deserializeSoldiers(data: string): SoldiersState {
+	const state: Writable<SoldiersState> = {};
 	const buffer = BitBuffer.FromString(data);
 	const size = buffer.ReadUInt(16);
 

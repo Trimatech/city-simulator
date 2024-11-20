@@ -1,6 +1,6 @@
-import { SnakeEntity } from "./snake-slice";
+import { SoldierEntity } from "./soldier-slice";
 
-interface SnakeDescription {
+interface SoldierDescription {
 	readonly length: number;
 	readonly radius: number;
 	readonly spacingAtHead: number;
@@ -8,11 +8,11 @@ interface SnakeDescription {
 	readonly turnSpeed: number;
 }
 
-export function snakeIsBoosting(snake: SnakeEntity) {
-	return snake.boost && snake.score > 10;
+export function soldierIsBoosting(soldier: SoldierEntity) {
+	return soldier.boost && soldier.score > 10;
 }
 
-export function describeSnakeFromScore(score: number): SnakeDescription {
+export function describeSoldierFromScore(score: number): SoldierDescription {
 	const radius = math.max(0.7 * math.log10(score / 300 + 2), 0.5);
 
 	return {

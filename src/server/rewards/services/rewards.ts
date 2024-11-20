@@ -8,11 +8,11 @@ import {
 	selectMilestones,
 	selectMilestoneScore,
 } from "server/store/milestones";
-import { getSnake } from "server/world";
+import { getSoldier } from "server/world";
 import { sounds } from "shared/assets";
 import { palette } from "shared/constants/palette";
 import { remotes } from "shared/remotes";
-import { describeSnakeFromScore, selectSnakeRanking } from "shared/store/snakes";
+import { describeSoldierFromScore, selectSoldierRanking } from "shared/store/soldiers";
 import { getPlayerByName } from "shared/utils/player-utils";
 
 import { grantMoney, shouldGrantReward } from "../utils";
@@ -68,13 +68,13 @@ function observeMilestone(id: string) {
 		}
 	});
 
-	// When the player kills a snake, grant them a reward based on the
-	// length of the snake they killed
+	// When the player kills a soldier, grant them a reward based on the
+	// length of the soldier they killed
 	const unsubscribeKill = store.observeWhile(selectMilestoneLastKilled(id), (enemyId) => {
-		const enemy = getSnake(enemyId);
+		const enemy = getSoldier(enemyId);
 
 		if (enemy && shouldGrantReward()) {
-			const length = describeSnakeFromScore(enemy.score).length;
+			const length = describeSoldierFromScore(enemy.score).length;
 			const bounty = math.ceil(length / 3);
 			grantMoneyReward(id, bounty, `eliminating <font color="#fff">${enemy.name}</font>`, true);
 		}
@@ -85,11 +85,11 @@ function observeMilestone(id: string) {
 	// While the player is in the top 3, grant them a reward every minute
 	// as long as they stay in the top 3
 	const unsubscribePassive = store.observeWhile(
-		selectSnakeRanking(id),
+		selectSoldierRanking(id),
 		(rank = 4) => rank <= 3,
 		() => {
 			return setInterval(() => {
-				const rank = store.getState(selectSnakeRanking(id)) ?? 0;
+				const rank = store.getState(selectSoldierRanking(id)) ?? 0;
 				const reward = RANK_REWARDS_PASSIVE[rank];
 
 				if (reward !== undefined && shouldGrantReward()) {

@@ -1,6 +1,6 @@
 import { store } from "server/store";
 import { selectPlayerBalance } from "shared/store/saves";
-import { selectSnakeById } from "shared/store/snakes";
+import { selectSoldierById } from "shared/store/soldiers";
 import { onPlayerAdded, promisePlayerDisconnected } from "shared/utils/player-utils";
 
 export async function initScoreboardService() {
@@ -26,9 +26,9 @@ export async function initScoreboardService() {
 		isPrimary.Value = true;
 		isPrimary.Parent = score;
 
-		const unsubscribeFromSnake = store.subscribe(selectSnakeById(player.Name), (snake) => {
-			score.Value = snake ? snake.score : 0;
-			knockouts.Value = snake ? snake.eliminations : 0;
+		const unsubscribeFromSoldier = store.subscribe(selectSoldierById(player.Name), (soldier) => {
+			score.Value = soldier ? soldier.score : 0;
+			knockouts.Value = soldier ? soldier.eliminations : 0;
 		});
 
 		const unsubscribeFromCash = store.subscribe(selectPlayerBalance(player.Name), (balance) => {
@@ -36,7 +36,7 @@ export async function initScoreboardService() {
 		});
 
 		promisePlayerDisconnected(player).then(() => {
-			unsubscribeFromSnake();
+			unsubscribeFromSoldier();
 			unsubscribeFromCash();
 		});
 	});

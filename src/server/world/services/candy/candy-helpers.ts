@@ -1,11 +1,11 @@
 import { setInterval, setTimeout } from "@rbxts/set-timeout";
 import { store } from "server/store";
 import { CANDY_LIMITS } from "server/world/constants";
-import { getCandy, getRandomPointNearWorldOrigin, getSnake } from "server/world/utils";
+import { getCandy, getRandomPointNearWorldOrigin, getSoldier } from "server/world/utils";
 import { getRandomAccent } from "shared/constants/palette";
-import { getSnakeSkinForTracer } from "shared/constants/skins";
+import { getSoldierskinForTracer } from "shared/constants/skins";
 import { CandyEntity, CandyType, selectCandyById, selectCandyCount } from "shared/store/candy";
-import { describeSnakeFromScore, selectSnakeIsBoosting } from "shared/store/snakes";
+import { describeSoldierFromScore, selectSoldierIsBoosting } from "shared/store/soldiers";
 import { Grid } from "shared/utils/grid";
 import { fillArray } from "shared/utils/object-utils";
 
@@ -47,13 +47,13 @@ export function removeCandy(id: string, eatenAt?: Vector2) {
 	}, 5);
 }
 
-export function eatCandy(candyId: string, snakeId: string) {
+export function eatCandy(candyId: string, soldierId: string) {
 	const candy = getCandy(candyId);
-	const snake = getSnake(snakeId);
+	const soldier = getSoldier(soldierId);
 
-	if (snake && candy && !candy.eatenAt) {
-		removeCandy(candy.id, snake.position);
-		store.incrementSnakeScore(snake.id, candy.size);
+	if (soldier && candy && !candy.eatenAt) {
+		removeCandy(candy.id, soldier.position);
+		store.incrementSoldierscore(soldier.id, candy.size);
 	}
 }
 
@@ -71,15 +71,15 @@ export function removeCandyIfAtLimit(candyType: CandyType) {
 }
 
 export function dropCandyWhileBoosting(id: string) {
-	return store.observeWhile(selectSnakeIsBoosting(id), () => {
+	return store.observeWhile(selectSoldierIsBoosting(id), () => {
 		let previousTail = Vector2.zero;
 
 		const dropCandy = () => {
-			const snake = getSnake(id);
+			const soldier = getSoldier(id);
 
-			if (snake) {
-				const description = describeSnakeFromScore(snake.score);
-				const tail: Vector2 | undefined = snake.tracers[snake.tracers.size() - 1];
+			if (soldier) {
+				const description = describeSoldierFromScore(soldier.score);
+				const tail: Vector2 | undefined = soldier.tracers[soldier.tracers.size() - 1];
 
 				if (tail && tail.sub(previousTail).Magnitude > description.radius * 2) {
 					previousTail = tail;
@@ -89,11 +89,11 @@ export function dropCandyWhileBoosting(id: string) {
 		};
 
 		const decrementScore = () => {
-			const snake = getSnake(id);
+			const soldier = getSoldier(id);
 
-			if (snake) {
-				const maxDecrease = math.clamp(math.round(3 + 0.001 * snake.score), 2, 10);
-				store.incrementSnakeScore(id, random.NextInteger(-maxDecrease, -1));
+			if (soldier) {
+				const maxDecrease = math.clamp(math.round(3 + 0.001 * soldier.score), 2, 10);
+				store.incrementSoldierscore(id, random.NextInteger(-maxDecrease, -1));
 			}
 		};
 
@@ -107,14 +107,14 @@ export function dropCandyWhileBoosting(id: string) {
 }
 
 export function dropCandyOnDeath(id: string): void {
-	const snake = getSnake(id);
+	const soldier = getSoldier(id);
 
-	if (!snake) {
+	if (!soldier) {
 		return;
 	}
 
-	const tracers = [...snake.tracers, snake.position];
-	const tracerRadius = describeSnakeFromScore(snake.score).radius;
+	const tracers = [...soldier.tracers, soldier.position];
+	const tracerRadius = describeSoldierFromScore(soldier.score).radius;
 	const candyPositions: Vector2[] = [];
 	let lastTracer: Vector2 | undefined;
 
@@ -139,12 +139,12 @@ export function dropCandyOnDeath(id: string): void {
 	}
 
 	// the total worth of the loot should scale logarithmically with the
-	// snake's score, but not exceed the score itself
-	const sum = math.min(8000 * math.log10(snake.score / 3000 + 1), snake.score);
+	// soldier's score, but not exceed the score itself
+	const sum = math.min(8000 * math.log10(soldier.score / 3000 + 1), soldier.score);
 	const total = candyPositions.size();
 
 	const candies = candyPositions.mapFiltered((position, index) => {
-		const skin = getSnakeSkinForTracer(snake.skin, index);
+		const skin = getSoldierskinForTracer(soldier.skin, index);
 
 		return createCandy({
 			position,

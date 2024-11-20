@@ -7,7 +7,7 @@ import { fonts } from "client/constants/fonts";
 import { useRem, useStore } from "client/hooks";
 import { selectWorldSpectating } from "client/store/world";
 import { palette } from "shared/constants/palette";
-import { cycleNextSnake } from "shared/store/snakes";
+import { cycleNextSoldier } from "shared/store/soldiers";
 
 export function SpectateButton() {
 	const rem = useRem();
@@ -16,7 +16,7 @@ export function SpectateButton() {
 
 	const onClick = useThrottleCallback(
 		() => {
-			store.setWorldSpectating(store.getState(cycleNextSnake(spectating)));
+			store.setWorldSpectating(store.getState(cycleNextSoldier(spectating)));
 		},
 		{ wait: 0.5, trailing: false },
 	);

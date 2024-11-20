@@ -10,7 +10,7 @@ import {
 	selectLocalPolygonAreaSize,
 	selectLocalScore,
 	selectRankForDisplay,
-} from "shared/store/snakes";
+} from "shared/store/soldiers";
 
 import { StatsCard } from "./stats-card";
 

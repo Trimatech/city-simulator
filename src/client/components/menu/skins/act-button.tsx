@@ -14,7 +14,7 @@ import { formatInteger } from "client/utils/format-integer";
 import { sounds } from "shared/assets";
 import { USER_NAME } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
-import { findSnakeSkin } from "shared/constants/skins";
+import { findSoldierskin } from "shared/constants/skins";
 import { remotes } from "shared/remotes";
 import { RANDOM_SKIN, selectCurrentPlayerSkin, selectPlayerBalance, selectPlayerSkins } from "shared/store/saves";
 import { darken } from "shared/utils/color-utils";
@@ -38,8 +38,8 @@ function stylize(text: unknown, color: Color3) {
 }
 
 function getStatus(equipped: string, current: string, inventory: readonly string[] = [], balance = 0): Status {
-	const equippedSkin = findSnakeSkin(equipped);
-	const currentSkin = findSnakeSkin(current);
+	const equippedSkin = findSoldierskin(equipped);
+	const currentSkin = findSoldierskin(current);
 	const ownsCurrentSkin = inventory.includes(current);
 
 	if (equippedSkin === currentSkin) {

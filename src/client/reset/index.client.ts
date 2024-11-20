@@ -5,7 +5,7 @@ async function setCore() {
 	const resetBindable = new Instance("BindableEvent");
 
 	resetBindable.Event.Connect(() => {
-		remotes.snake.kill.fire();
+		remotes.soldier.kill.fire();
 	});
 
 	StarterGui.SetCore("ResetButtonCallback", resetBindable);

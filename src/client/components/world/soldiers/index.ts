@@ -1,2 +1,2 @@
 export * from "./constants";
-export * from "./snakes";
+export * from "./soldiers";

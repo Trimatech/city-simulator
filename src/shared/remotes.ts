@@ -13,7 +13,7 @@ export const remotes = createRemotes({
 		start: remote<Server>(),
 	}),
 
-	snake: namespace({
+	soldier: namespace({
 		spawn: remote<Server>(),
 		kill: remote<Server>(),
 		move: remote<Server, [position: Vector2]>(t.Vector2),

@@ -6,11 +6,11 @@ import {
 	getSafePointInWorld,
 	initCandyService,
 	initCollisionService,
-	initSnakeService,
+	initSoldierservice,
 	onCandyTick,
 	onCollisionTick,
-	onSnakeTick,
-	snakeGrid,
+	onSoldierTick,
+	soldierGrid,
 } from "server/world";
 import { WORLD_BOUNDS } from "shared/constants/core";
 import { CandyType } from "shared/store/candy";
@@ -20,7 +20,7 @@ import { disconnectAllSchedulers } from "shared/utils/scheduler";
 
 export = benchmark({
 	functions: {
-		onSnakeTick,
+		onSoldierTick,
 		onCandyTick,
 		onCollisionTick,
 		getSafePointInWorld,
@@ -32,15 +32,15 @@ async function setup() {
 	store.destroy();
 	store.resetState();
 	candyGrid.clear();
-	snakeGrid.clear();
+	soldierGrid.clear();
 
-	// Generate 50 snakes of varying lengths
+	// Generate 50 soldiers of varying lengths
 	for (const index of $range(0, 50)) {
 		const x = (index * 4) % WORLD_BOUNDS;
 		const y = math.floor(index / 4) * 4;
 		const position = new Vector2(x, y);
 
-		store.addSnake(`Snake ${index}`, {
+		store.addSoldier(`Soldier ${index}`, {
 			position,
 			score: 1000 + 160 * index,
 			desiredAngle: 0.5 * index,
@@ -52,7 +52,7 @@ async function setup() {
 
 	// Initialize core services
 	initCandyService();
-	initSnakeService();
+	initSoldierservice();
 	initCollisionService();
 
 	disconnectAllSchedulers();

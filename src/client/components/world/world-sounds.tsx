@@ -1,49 +1,49 @@
 import { useDebounceEffect, usePrevious } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { useSelector, useSelectorCreator } from "@rbxts/react-reflex";
-import { selectSnakeFromWorldSubject } from "client/store/world";
+import { selectSoldierFromWorldSubject } from "client/store/world";
 import { playSound, sounds } from "shared/assets";
-import { selectHasLocalSnake, selectSnakeIsBoosting } from "shared/store/snakes";
+import { selectHasLocalSoldier, selectSoldierIsBoosting } from "shared/store/soldiers";
 
 const ERROR_SOUNDS = [sounds.error_1, sounds.error_2, sounds.error_3];
 
 const random = new Random();
 
 export function WorldSounds() {
-	const snake = useSelector(selectSnakeFromWorldSubject);
-	const boosting = useSelectorCreator(selectSnakeIsBoosting, snake?.id ?? "");
-	const hasLocalSnake = useSelector(selectHasLocalSnake);
-	const previousScore = usePrevious(snake?.score);
+	const soldier = useSelector(selectSoldierFromWorldSubject);
+	const boosting = useSelectorCreator(selectSoldierIsBoosting, soldier?.id ?? "");
+	const hasLocalSoldier = useSelector(selectHasLocalSoldier);
+	const previousScore = usePrevious(soldier?.score);
 
-	const volume = hasLocalSnake ? 0.5 : 0.25;
+	const volume = hasLocalSoldier ? 0.5 : 0.25;
 
 	// Death sound
 	useEffect(() => {
-		if (snake?.dead) {
+		if (soldier?.dead) {
 			const index = random.NextInteger(0, ERROR_SOUNDS.size() - 1);
 			playSound(ERROR_SOUNDS[index], { volume: 2 * volume });
 		}
-	}, [snake?.dead]);
+	}, [soldier?.dead]);
 
 	// Spawn sound
 	useEffect(() => {
-		if (hasLocalSnake) {
+		if (hasLocalSoldier) {
 			playSound(sounds.start_game);
 		}
-	}, [hasLocalSnake]);
+	}, [hasLocalSoldier]);
 
 	// Candy eat sound
 	useEffect(() => {
-		if ((snake?.score ?? 0) > (previousScore ?? 0)) {
+		if ((soldier?.score ?? 0) > (previousScore ?? 0)) {
 			const speed = random.NextNumber(0.87, 1);
 			playSound(sounds.whoosh, { volume: 0.6 * volume, speed });
 		}
-	}, [snake?.score]);
+	}, [soldier?.score]);
 
 	// Boost sound
 	useDebounceEffect(
 		() => {
-			if (snake) {
+			if (soldier) {
 				playSound(boosting ? sounds.boost_start : sounds.boost_stop, { volume });
 			}
 		},

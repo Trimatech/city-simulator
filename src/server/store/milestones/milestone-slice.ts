@@ -69,7 +69,7 @@ export const milestoneSlice = createProducer(initialState, {
 		});
 	},
 
-	playerKilledSnake: (state, playerId: string, lastKilled: string) => {
+	playerKilledSoldier: (state, playerId: string, lastKilled: string) => {
 		return mapProperty(state, playerId, (milestone) => ({
 			...milestone,
 			lastKilled,

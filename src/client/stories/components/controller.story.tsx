@@ -15,8 +15,8 @@ import { store } from "client/store";
 import { selectWorldCamera } from "client/store/world";
 import { USER_NAME } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
-import { getRandomBaseSnakeSkin } from "shared/constants/skins";
-import { describeSnakeFromScore, selectLocalSnake } from "shared/store/snakes";
+import { getRandomBaseSoldierskin } from "shared/constants/skins";
+import { describeSoldierFromScore, selectLocalSoldier } from "shared/store/soldiers";
 
 import { useMockRemotes } from "../utils/use-mock-remotes";
 
@@ -26,19 +26,19 @@ const DEBUG_SIZES = [0, 500, 1000, 2500, 5000, 10000, 20000, 40000, 80000, 16000
 
 function Debugger() {
 	const rem = useRem();
-	const snake = useSelector(selectLocalSnake);
+	const soldier = useSelector(selectLocalSoldier);
 	const world = useSelector(selectWorldCamera);
 
-	if (!snake) {
+	if (!soldier) {
 		return <></>;
 	}
 
-	const description = describeSnakeFromScore(snake.score);
+	const description = describeSoldierFromScore(soldier.score);
 
 	return (
 		<>
 			<Text
-				text={`Score: ${snake.score}`}
+				text={`Score: ${soldier.score}`}
 				textColor={palette.text}
 				textXAlignment="Left"
 				textYAlignment="Bottom"
@@ -62,7 +62,7 @@ function Debugger() {
 				/>
 
 				{DEBUG_SIZES.map((score, index) => {
-					const description = describeSnakeFromScore(score);
+					const description = describeSoldierFromScore(score);
 					const diameter = rem(world.scale * description.radius * 2);
 
 					return (
@@ -97,15 +97,15 @@ export = hoarcekat(() => {
 	useMockRemotes();
 
 	useEffect(() => {
-		store.addSnake(USER_NAME, {
+		store.addSoldier(USER_NAME, {
 			name: Players.LocalPlayer.DisplayName,
-			skin: getRandomBaseSnakeSkin().id,
+			skin: getRandomBaseSoldierskin().id,
 			score: START_SIZE,
 		});
 	}, []);
 
 	useInterval(() => {
-		store.incrementSnakeScore(USER_NAME, SIZE_INCREMENT);
+		store.incrementSoldierscore(USER_NAME, SIZE_INCREMENT);
 	}, 0.5);
 
 	return (

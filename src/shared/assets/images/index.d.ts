@@ -1,22 +1,22 @@
 export const images: {
 	readonly skins: {
-		readonly snake_eye_left: string;
-		readonly snake_eye_right: string;
-		readonly snake_no_eye: string;
-		readonly snake_main: string;
-		readonly snake_stars: string;
-		readonly snake_jelly: string;
-		readonly snake_jelly_red: string;
-		readonly snake_jelly_blue: string;
-		readonly snake_canada: string;
-		readonly snake_outlined: string;
-		readonly snake_black_ice: string;
-		readonly snake_awesome_body: string;
-		readonly snake_awesome_head: string;
-		readonly snake_stare_body: string;
-		readonly snake_stare_head: string;
-		readonly snake_vamp_body: string;
-		readonly snake_vamp_head: string;
+		readonly soldier_eye_left: string;
+		readonly soldier_eye_right: string;
+		readonly soldier_no_eye: string;
+		readonly soldier_main: string;
+		readonly soldier_stars: string;
+		readonly soldier_jelly: string;
+		readonly soldier_jelly_red: string;
+		readonly soldier_jelly_blue: string;
+		readonly soldier_canada: string;
+		readonly soldier_outlined: string;
+		readonly soldier_black_ice: string;
+		readonly soldier_awesome_body: string;
+		readonly soldier_awesome_head: string;
+		readonly soldier_stare_body: string;
+		readonly soldier_stare_head: string;
+		readonly soldier_vamp_body: string;
+		readonly soldier_vamp_head: string;
 	};
 	readonly ui: {
 		readonly alert_dismiss: string;

@@ -1,23 +1,23 @@
 import { Players } from "@rbxts/services";
 import { store } from "server/store";
-import { SNAKE_TICK_PHASE } from "server/world/constants";
-import { killSnake, playerIsSpawned } from "server/world/utils";
+import { SOLDIER_TICK_PHASE } from "server/world/constants";
+import { killSoldier, playerIsSpawned } from "server/world/utils";
 import { WORLD_TICK } from "shared/constants/core";
 import { remotes } from "shared/remotes";
 import { defaultPlayerSave, RANDOM_SKIN, selectPlayerSave } from "shared/store/saves";
 import { createScheduler } from "shared/utils/scheduler";
 
-import { deleteSnakeInput, onSnakeTick, registerSnakeInput } from "./snake-tick";
+import { deleteSoldierInput, onSoldierTick, registerSoldierInput } from "./soldier-tick";
 
-export async function initSnakeService() {
+export async function initSoldierservice() {
 	createScheduler({
-		name: "snake",
+		name: "soldier",
 		tick: WORLD_TICK,
-		phase: SNAKE_TICK_PHASE,
-		onTick: onSnakeTick,
+		phase: SOLDIER_TICK_PHASE,
+		onTick: onSoldierTick,
 	});
 
-	remotes.snake.spawn.connect((player) => {
+	remotes.soldier.spawn.connect((player) => {
 		if (playerIsSpawned(player)) {
 			return;
 		}
@@ -30,9 +30,9 @@ export async function initSnakeService() {
 
 		const position = player.Character?.PrimaryPart?.Position;
 
-		print("Spawn snake for", player.Name, position);
+		print("Spawn soldier for", player.Name, position);
 
-		store.addSnake(player.Name, {
+		store.addSoldier(player.Name, {
 			name: player.DisplayName,
 			position: position ? new Vector2(position.X, position.Y) : undefined,
 			skin: currentSkin !== RANDOM_SKIN ? currentSkin : randomSkin,
@@ -40,20 +40,20 @@ export async function initSnakeService() {
 		});
 	});
 
-	remotes.snake.move.connect((player, position) => {
-		registerSnakeInput(player.Name, position);
+	remotes.soldier.move.connect((player, position) => {
+		registerSoldierInput(player.Name, position);
 	});
 
-	remotes.snake.boost.connect((player, boost) => {
-		store.boostSnake(player.Name, boost);
+	remotes.soldier.boost.connect((player, boost) => {
+		store.boostSoldier(player.Name, boost);
 	});
 
-	remotes.snake.kill.connect((player) => {
-		killSnake(player.Name);
+	remotes.soldier.kill.connect((player) => {
+		killSoldier(player.Name);
 	});
 
 	Players.PlayerRemoving.Connect((player) => {
-		deleteSnakeInput(player.Name);
-		killSnake(player.Name);
+		deleteSoldierInput(player.Name);
+		killSoldier(player.Name);
 	});
 }

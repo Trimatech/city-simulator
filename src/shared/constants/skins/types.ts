@@ -1,6 +1,6 @@
 import { images } from "shared/assets";
 
-export interface SnakeSkin {
+export interface Soldierskin {
 	readonly id: string;
 	readonly price: number;
 	readonly size: Vector2;
@@ -15,12 +15,12 @@ export interface SnakeSkin {
 	readonly secondary?: Color3;
 }
 
-export const defaultSnakeSkin: SnakeSkin = {
+export const defaultSoldierskin: Soldierskin = {
 	id: "default",
 	price: 0,
 	size: new Vector2(512, 512),
 	tint: [Color3.fromRGB(255, 255, 255)],
-	texture: [images.skins.snake_main],
-	eyeTextureLeft: images.skins.snake_eye_left,
-	eyeTextureRight: images.skins.snake_eye_right,
+	texture: [images.skins.soldier_main],
+	eyeTextureLeft: images.skins.soldier_eye_left,
+	eyeTextureRight: images.skins.soldier_eye_right,
 };

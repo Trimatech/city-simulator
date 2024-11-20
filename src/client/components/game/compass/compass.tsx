@@ -6,7 +6,7 @@ import { Group } from "client/components/ui/group";
 import { Image } from "client/components/ui/image";
 import { Text } from "client/components/ui/text";
 import { useMotion, useRem } from "client/hooks";
-import { selectSnakeFromWorldSubject } from "client/store/world";
+import { selectSoldierFromWorldSubject } from "client/store/world";
 import { images } from "shared/assets";
 
 import { useLeader } from "./utils";
@@ -18,7 +18,7 @@ export function Compass() {
 	const rem = useRem();
 	const viewport = useViewport();
 	const leader = useLeader();
-	const subject = useSelector(selectSnakeFromWorldSubject);
+	const subject = useSelector(selectSoldierFromWorldSubject);
 
 	const [displacement, displacementMotion] = useMotion(new Vector2());
 	const [visible, visibleMotion] = useMotion(0);

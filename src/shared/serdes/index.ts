@@ -1,39 +1,39 @@
 import { SharedState } from "shared/store";
 import { CandyState } from "shared/store/candy";
-import { SnakesState } from "shared/store/snakes";
+import { SoldiersState } from "shared/store/soldiers";
 
 import { deserializeCandy, serializeCandy } from "./handlers/serdes-candy";
-import { deserializeSnakes, serializeSnakes } from "./handlers/serdes-snake";
+import { deserializeSoldiers, serializeSoldiers } from "./handlers/serdes-soldier";
 
-export interface SharedStateSerialized extends Omit<SharedState, "candy" | "snakes"> {
+export interface SharedStateSerialized extends Omit<SharedState, "candy" | "soldiers"> {
 	candy?: string;
-	snakes?: string;
+	soldiers?: string;
 }
 
-interface SharedStateForSerdes extends Omit<SharedState, "candy" | "snakes"> {
+interface SharedStateForSerdes extends Omit<SharedState, "candy" | "soldiers"> {
 	candy?: CandyState;
-	snakes?: SnakesState;
+	soldiers?: SoldiersState;
 }
 
 // Store the last serialized state to avoid unnecessary re-computations
 let lastSerialized: SharedStateSerialized | undefined;
 let lastCandy: CandyState | undefined;
-let lastSnakes: SnakesState | undefined;
+let lastSoldiers: SoldiersState | undefined;
 
 export function serializeState(state: SharedStateForSerdes, includeCandy = true): SharedStateSerialized {
-	if (state.candy === lastCandy && state.snakes === lastSnakes) {
+	if (state.candy === lastCandy && state.soldiers === lastSoldiers) {
 		return lastSerialized!;
 	}
 
 	const serialized = {
 		...state,
 		candy: state.candy && includeCandy ? serializeCandy(state.candy) : undefined,
-		snakes: state.snakes && serializeSnakes(state.snakes),
+		soldiers: state.soldiers && serializeSoldiers(state.soldiers),
 	};
 
 	lastSerialized = serialized;
 	lastCandy = state.candy;
-	lastSnakes = state.snakes;
+	lastSoldiers = state.soldiers;
 
 	return serialized;
 }
@@ -42,6 +42,6 @@ export function deserializeState(state: SharedStateSerialized): SharedStateForSe
 	return {
 		...state,
 		candy: state.candy !== undefined ? deserializeCandy(state.candy) : undefined,
-		snakes: state.snakes !== undefined ? deserializeSnakes(state.snakes) : undefined,
+		soldiers: state.soldiers !== undefined ? deserializeSoldiers(state.soldiers) : undefined,
 	};
 }

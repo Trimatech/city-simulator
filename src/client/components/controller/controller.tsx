@@ -5,39 +5,39 @@ import { Players } from "@rbxts/services";
 import { useInputDevice, useStore } from "client/hooks";
 import { WORLD_TICK } from "shared/constants/core";
 import { remotes } from "shared/remotes";
-import { selectLocalSnake } from "shared/store/snakes";
+import { selectLocalSoldier } from "shared/store/soldiers";
 
 import { useToggleTouchControls } from "./utils/use-toggle-touch-controls";
 
 export function Controller() {
 	const store = useStore();
 	const device = useInputDevice();
-	const snake = useSelector(selectLocalSnake);
+	const soldier = useSelector(selectLocalSoldier);
 
-	useToggleTouchControls(snake !== undefined);
+	useToggleTouchControls(soldier !== undefined);
 
 	useInterval(() => {
 		const position = Players.LocalPlayer.Character?.PrimaryPart?.Position;
 		if (position) {
 			const vector2 = new Vector2(position.X, position.Z);
-			remotes.snake.move.fire(vector2);
+			remotes.soldier.move.fire(vector2);
 		}
 	}, WORLD_TICK);
 
 	const setBoost = useThrottleCallback(
 		(boost: boolean) => {
-			remotes.snake.boost.fire(boost);
+			remotes.soldier.boost.fire(boost);
 		},
 		{ wait: WORLD_TICK, leading: true, trailing: true },
 	);
 
 	useEffect(() => {
-		if (snake) {
+		if (soldier) {
 			store.setWorldInputAngle(0);
 		}
-	}, [!snake]);
+	}, [!soldier]);
 
-	if (!snake) {
+	if (!soldier) {
 		return <></>;
 	}
 

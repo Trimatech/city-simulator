@@ -2,13 +2,13 @@ import { useCamera, useEventListener, useInterval } from "@rbxts/pretty-react-ho
 import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { RunService } from "@rbxts/services";
-import { selectSnakeFromWorldSubject } from "client/store/world";
+import { selectSoldierFromWorldSubject } from "client/store/world";
 
 import { toRealSpace } from "./utils";
 
 export function VoiceCamera() {
 	const camera = useCamera();
-	const snake = useSelector(selectSnakeFromWorldSubject);
+	const soldier = useSelector(selectSoldierFromWorldSubject);
 
 	const getCameraCFrame = (position: Vector2) => {
 		const origin = toRealSpace(position).Position;
@@ -16,8 +16,8 @@ export function VoiceCamera() {
 	};
 
 	useEventListener(RunService.RenderStepped, () => {
-		if (snake) {
-			//camera.CFrame = getCameraCFrame(snake.head);
+		if (soldier) {
+			//camera.CFrame = getCameraCFrame(soldier.head);
 		}
 	});
 

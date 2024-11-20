@@ -1,23 +1,23 @@
 import { useEffect } from "@rbxts/react";
 import { store } from "client/store";
 import { USER_NAME } from "shared/constants/core";
-import { getSnakeSkin } from "shared/constants/skins";
+import { getSoldierskin } from "shared/constants/skins";
 import { remotes } from "shared/remotes";
 import { selectPlayerBalance } from "shared/store/saves";
 
 export function useMockRemotes() {
 	useEffect(() => {
 		const connections = [
-			remotes.snake.move.test.onFire((position) => {
-				store.moveSnake(USER_NAME, position);
+			remotes.soldier.move.test.onFire((position) => {
+				store.moveSoldier(USER_NAME, position);
 			}),
 
-			remotes.snake.boost.test.onFire((boost) => {
-				store.boostSnake(USER_NAME, boost);
+			remotes.soldier.boost.test.onFire((boost) => {
+				store.boostSoldier(USER_NAME, boost);
 			}),
 
-			remotes.snake.spawn.test.onFire(() => {
-				store.addSnake(USER_NAME);
+			remotes.soldier.spawn.test.onFire(() => {
+				store.addSoldier(USER_NAME);
 			}),
 
 			remotes.save.setSkin.test.onFire((skin) => {
@@ -26,7 +26,7 @@ export function useMockRemotes() {
 
 			remotes.save.buySkin.test.onFire((skinId) => {
 				const balance = store.getState(selectPlayerBalance(USER_NAME)) ?? 0;
-				const skin = getSnakeSkin(skinId);
+				const skin = getSoldierskin(skinId);
 
 				if (balance >= skin.price) {
 					store.givePlayerSkin(USER_NAME, skinId);

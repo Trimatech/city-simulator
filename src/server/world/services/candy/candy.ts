@@ -2,7 +2,7 @@ import { store } from "server/store";
 import { CANDY_LIMITS, CANDY_TICK_PHASE } from "server/world/constants";
 import { WORLD_TICK } from "shared/constants/core";
 import { CandyType, selectCandyCount } from "shared/store/candy";
-import { identifySnake, selectAliveSnakesById } from "shared/store/snakes";
+import { identifySoldier, selectAliveSoldiersById } from "shared/store/soldiers";
 import { createScheduler } from "shared/utils/scheduler";
 
 import { dropCandyOnDeath, dropCandyWhileBoosting, populateCandy, removeCandyIfAtLimit } from "./candy-helpers";
@@ -38,12 +38,12 @@ export async function initCandyService() {
 		() => removeCandyIfAtLimit(CandyType.Dropping),
 	);
 
-	store.observe(selectAliveSnakesById, identifySnake, ({ id }) => {
-		// while boosting, decrement the snake's score and create candy
-		// on the snake's tail
+	store.observe(selectAliveSoldiersById, identifySoldier, ({ id }) => {
+		// while boosting, decrement the soldier's score and create candy
+		// on the soldier's tail
 		const disconnect = dropCandyWhileBoosting(id);
 
-		// when the snake dies, create candy on the snake's tracers
+		// when the soldier dies, create candy on the soldier's tracers
 		return () => {
 			disconnect();
 			dropCandyOnDeath(id);

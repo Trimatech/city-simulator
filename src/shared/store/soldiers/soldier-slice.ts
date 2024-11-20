@@ -8,11 +8,11 @@ import {
 import { Point, pointsToPolygon } from "shared/polybool/polybool";
 import { fillArray, mapProperties, mapProperty } from "shared/utils/object-utils";
 
-export interface SnakesState {
-	readonly [id: string]: SnakeEntity | undefined;
+export interface SoldiersState {
+	readonly [id: string]: SoldierEntity | undefined;
 }
 
-export interface SnakeEntity {
+export interface SoldierEntity {
 	readonly id: string;
 	readonly name: string;
 	readonly position: Vector2;
@@ -29,7 +29,7 @@ export interface SnakeEntity {
 	readonly isInside: boolean;
 }
 
-const defaultEntity: SnakeEntity = {
+const defaultEntity: SoldierEntity = {
 	id: "",
 	name: "",
 	position: new Vector2(),
@@ -46,7 +46,7 @@ const defaultEntity: SnakeEntity = {
 	isInside: true,
 };
 
-const initialState: SnakesState = {};
+const initialState: SoldiersState = {};
 
 const createPolygonAroundHead = (position: Vector2) => {
 	const diameter = 20;
@@ -74,8 +74,8 @@ const calculatePolygonArea = (polygon: readonly Vector2[]) => {
 	return math.round(math.abs(area) / 2);
 };
 
-export const snakesSlice = createProducer(initialState, {
-	addSnake: (state, id: string, patch?: Partial<SnakeEntity>) => {
+export const soldiersSlice = createProducer(initialState, {
+	addSoldier: (state, id: string, patch?: Partial<SoldierEntity>) => {
 		const polygon = createPolygonAroundHead(patch?.position || defaultEntity.position);
 		const polygonAreaSize = calculatePolygonArea(polygon);
 
@@ -85,52 +85,52 @@ export const snakesSlice = createProducer(initialState, {
 		};
 	},
 
-	removeSnake: (state, id: string) => ({
+	removeSoldier: (state, id: string) => ({
 		...state,
 		[id]: undefined,
 	}),
 
-	snakeTick: (state) => {
-		return mapProperties(state, (snake) => {
-			if (snake.dead) {
-				return snake;
+	soldierTick: (state) => {
+		return mapProperties(state, (soldier) => {
+			if (soldier.dead) {
+				return soldier;
 			}
 
-			if (snake.isInside) {
-				return snake;
+			if (soldier.isInside) {
+				return soldier;
 			}
 
-			const currentLength = snake.tracers.size();
-			const tracers = [...snake.tracers];
+			const currentLength = soldier.tracers.size();
+			const tracers = [...soldier.tracers];
 			const bodyPieceLength = 2;
 
 			if (currentLength > 0) {
-				const lastTracer = snake.tracers[currentLength - 1];
-				const distance = lastTracer.sub(snake.position).Magnitude;
+				const lastTracer = soldier.tracers[currentLength - 1];
+				const distance = lastTracer.sub(soldier.position).Magnitude;
 
 				if (distance > bodyPieceLength) {
-					warn("Distance", { distance, position: snake.position });
-					tracers.push(snake.position);
+					warn("Distance", { distance, position: soldier.position });
+					tracers.push(soldier.position);
 				}
 			} else {
-				tracers.push(snake.position);
+				tracers.push(soldier.position);
 			}
 
-			return { ...snake, tracers };
+			return { ...soldier, tracers };
 		});
 	},
 
-	setSnakeIsInside: (state, id: string, isInside: boolean) => {
-		return mapProperty(state, id, (snake) => {
-			const hasChanged = snake.isInside !== isInside;
+	setSoldierIsInside: (state, id: string, isInside: boolean) => {
+		return mapProperty(state, id, (soldier) => {
+			const hasChanged = soldier.isInside !== isInside;
 
 			if (hasChanged) {
-				warn(`Snake is inside: ${isInside}`);
+				warn(`Soldier is inside: ${isInside}`);
 				if (isInside) {
 					// Calculate new polygon based on old polygon and tracers
 
-					const resultPolygon = pointsToPolygon(vectorsToPoints(snake.polygon as Vector2[]));
-					const points = vectorsToPoints(snake.tracers as Vector2[]);
+					const resultPolygon = pointsToPolygon(vectorsToPoints(soldier.polygon as Vector2[]));
+					const points = vectorsToPoints(soldier.tracers as Vector2[]);
 					const newCutPolygon = setIntersectionPoints(resultPolygon, points);
 
 					if (newCutPolygon) {
@@ -139,7 +139,7 @@ export const snakesSlice = createProducer(initialState, {
 						if (result.regions.size() > 0 && result.regions[0].size() > 2) {
 							const resultPolygon = pointsToVectors(result.regions[0] as Point[]);
 							const polygonAreaSize = calculatePolygonArea(resultPolygon);
-							return { ...snake, isInside, polygon: resultPolygon, polygonAreaSize, tracers: [] };
+							return { ...soldier, isInside, polygon: resultPolygon, polygonAreaSize, tracers: [] };
 						} else {
 							warn("No valid REGIONS found", { result, points, newCutPolygon });
 						}
@@ -147,55 +147,55 @@ export const snakesSlice = createProducer(initialState, {
 						warn("No INTERSECTION found", { points, newCutPolygon });
 					}
 
-					return { ...snake, isInside, tracers: [] };
+					return { ...soldier, isInside, tracers: [] };
 				} else {
-					return { ...snake, isInside, tracers: [snake.position] };
+					return { ...soldier, isInside, tracers: [soldier.position] };
 				}
 			}
 
-			return snake;
+			return soldier;
 		});
 	},
 
-	moveSnake: (state, id: string, position: Vector2) => {
-		return mapProperty(state, id, (snake) => ({
-			...snake,
+	moveSoldier: (state, id: string, position: Vector2) => {
+		return mapProperty(state, id, (soldier) => ({
+			...soldier,
 			position,
 		}));
 	},
 
-	boostSnake: (state, id: string, boost: boolean) => {
-		return mapProperty(state, id, (snake) => ({
-			...snake,
+	boostSoldier: (state, id: string, boost: boolean) => {
+		return mapProperty(state, id, (soldier) => ({
+			...soldier,
 			boost,
 		}));
 	},
 
-	setSnakeIsDead: (state, id: string) => {
-		return mapProperty(state, id, (snake) => ({
-			...snake,
+	setSoldierIsDead: (state, id: string) => {
+		return mapProperty(state, id, (soldier) => ({
+			...soldier,
 			dead: true,
 		}));
 	},
 
-	patchSnake: (state, id: string, intersection: Partial<SnakeEntity>) => {
-		return mapProperty(state, id, (snake) => ({
-			...snake,
+	patchSoldier: (state, id: string, intersection: Partial<SoldierEntity>) => {
+		return mapProperty(state, id, (soldier) => ({
+			...soldier,
 			...intersection,
 		}));
 	},
 
-	incrementSnakeScore: (state, id: string, amount: number) => {
-		return mapProperty(state, id, (snake) => ({
-			...snake,
-			score: math.max(snake.score + amount, 0),
+	incrementSoldierscore: (state, id: string, amount: number) => {
+		return mapProperty(state, id, (soldier) => ({
+			...soldier,
+			score: math.max(soldier.score + amount, 0),
 		}));
 	},
 
-	incrementSnakeEliminations: (state, id: string) => {
-		return mapProperty(state, id, (snake) => ({
-			...snake,
-			eliminations: snake.eliminations + 1,
+	incrementSoldierEliminations: (state, id: string) => {
+		return mapProperty(state, id, (soldier) => ({
+			...soldier,
+			eliminations: soldier.eliminations + 1,
 		}));
 	},
 });

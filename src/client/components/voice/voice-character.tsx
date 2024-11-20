@@ -1,7 +1,7 @@
 import { useInterval } from "@rbxts/pretty-react-hooks";
 import React, { useRef } from "@rbxts/react";
 import { useSelectorCreator } from "@rbxts/react-reflex";
-import { selectSnakeById } from "shared/store/snakes";
+import { selectSoldierById } from "shared/store/soldiers";
 import { Character } from "shared/utils/player-utils";
 
 interface VoiceCharacterProps {
@@ -10,12 +10,12 @@ interface VoiceCharacterProps {
 }
 
 export function VoiceCharacter({ player, model }: VoiceCharacterProps) {
-	const snake = useSelectorCreator(selectSnakeById, player.Name);
+	const soldier = useSelectorCreator(selectSoldierById, player.Name);
 	const hidden = useRef<Model>();
 
 	useInterval(() => {
-		if (snake) {
-			//	model.PivotTo(toRealSpace(snake.head));
+		if (soldier) {
+			//	model.PivotTo(toRealSpace(soldier.head));
 		} else if (hidden.current !== model) {
 			model.PivotTo(new CFrame(100, 200, 100));
 			hidden.current = model;

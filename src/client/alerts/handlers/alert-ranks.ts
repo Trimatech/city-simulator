@@ -1,6 +1,6 @@
 import { store } from "client/store";
 import { palette } from "shared/constants/palette";
-import { selectLocalSnakeRanking } from "shared/store/snakes";
+import { selectLocalSoldierRanking } from "shared/store/soldiers";
 
 import { sendAlert } from "../alert-factory";
 
@@ -9,7 +9,7 @@ const SECOND_PLACE = 'Congratulations! You are in <font color="#fff">second plac
 const THIRD_PLACE = 'Congratulations! You are in <font color="#fff">third place</font>.';
 
 export function connectRankAlerts() {
-	store.subscribe(selectLocalSnakeRanking, (ranking) => {
+	store.subscribe(selectLocalSoldierRanking, (ranking) => {
 		if (ranking === 1) {
 			sendAlert({
 				scope: "ranking",

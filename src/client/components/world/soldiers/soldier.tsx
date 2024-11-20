@@ -3,12 +3,12 @@ import { Players } from "@rbxts/services";
 import { Walls } from "client/components/walls/Walls";
 import { palette } from "shared/constants/palette";
 import { Point } from "shared/polybool/polybool";
-import { SnakeEntity } from "shared/store/snakes/snake-slice";
+import { SoldierEntity } from "shared/store/soldiers/soldier-slice";
 
 import { Wall } from "../../walls/Wall";
 
 interface Props {
-	snake: SnakeEntity;
+	soldier: SoldierEntity;
 	color?: Color3;
 	transparency?: number;
 	thickness?: number;
@@ -22,8 +22,8 @@ interface Props {
 	isDead?: boolean;
 }
 
-export function Snake({
-	snake,
+export function Soldier({
+	soldier,
 	color = palette.white,
 	transparency = 0,
 	position = new Vector3(),
@@ -32,8 +32,8 @@ export function Snake({
 	lastTracerColor = palette.red,
 	lastTracerTransparency = 0.5,
 }: Props) {
-	const isDead = snake.dead;
-	const segments = snake.tracers;
+	const isDead = soldier.dead;
+	const segments = soldier.tracers;
 	const localPlayer = Players.LocalPlayer;
 	const character = localPlayer.Character;
 
@@ -55,7 +55,7 @@ export function Snake({
 			{/* Tracer lines */}
 			{tracerLines.map((line, index) => (
 				<Wall
-					key={`snake-segment-${index}`}
+					key={`soldier-segment-${index}`}
 					startPoint={line[0]}
 					endPoint={line[1]}
 					color={tracerColor}
@@ -66,7 +66,12 @@ export function Snake({
 			))}
 
 			{/* Home polygon */}
-			<Walls points={snake.polygon as Vector2[]} isCrumbling={isDead} color={color} transparency={transparency} />
+			<Walls
+				points={soldier.polygon as Vector2[]}
+				isCrumbling={isDead}
+				color={color}
+				transparency={transparency}
+			/>
 
 			{/* player connection line - hide if dead */}
 			{character && lastTracerPoint && !isDead && (
