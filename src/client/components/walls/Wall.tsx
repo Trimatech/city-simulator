@@ -1,4 +1,3 @@
-import Object from "@rbxts/object-utils";
 import { memo, useEffect, useRef } from "@rbxts/react";
 import { Workspace } from "@rbxts/services";
 import { palette } from "shared/constants/palette";
@@ -13,40 +12,38 @@ import {
 } from "./Walls.utils";
 
 interface Props {
-	line: [Point, Point];
+	startPoint: Point;
+	endPoint: Point;
 	color?: Color3;
 	transparency?: number;
 	height?: number;
 	thickness?: number;
 	position: Vector3;
 	isCrumbling?: boolean;
-	isDynamic?: boolean;
 }
 
 function WallComponent({
-	line,
+	startPoint,
+	endPoint,
 	color = palette.white,
 	transparency = 0,
 	height = 5,
 	thickness = 1,
 	position = new Vector3(),
 	isCrumbling = false,
-	isDynamic = false,
 }: Props) {
 	const mainPartRef = useRef<Part>();
 	const debrisRef = useRef<Part[]>([]);
 	const cleanupRef = useRef<() => void>();
 
-	const name = `wall_${line[0][0]}_${line[0][1]}_${line[1][0]}_${line[1][1]}`;
-
-	warn(`render ${name}`);
+	const name = `wall_${startPoint[0]}_${startPoint[1]}_${endPoint[0]}_${endPoint[1]}`;
 
 	// Main wall creation effect
 	useEffect(() => {
 		if (isCrumbling) return;
 
 		setupCollisionGroup();
-		const { width, center, rotation } = calculateWallTransform(line, position, height);
+		const { width, center, rotation } = calculateWallTransform([startPoint, endPoint], position, height);
 
 		// Create single wall part
 		const part = new Instance("Part");
@@ -70,7 +67,18 @@ function WallComponent({
 				mainPartRef.current = undefined;
 			}
 		};
-	}, [line, color, transparency, height, thickness, position, isCrumbling]);
+	}, [
+		startPoint[0],
+		startPoint[1],
+		endPoint[0],
+		endPoint[1],
+		color,
+		transparency,
+		height,
+		thickness,
+		position,
+		isCrumbling,
+	]);
 
 	// Crumbling effect
 	useEffect(() => {
@@ -82,7 +90,7 @@ function WallComponent({
 			mainPartRef.current = undefined;
 		}
 
-		const { width, center, rotation } = calculateWallTransform(line, position, height);
+		const { width, center, rotation } = calculateWallTransform([startPoint, endPoint], position, height);
 
 		// Create debris pieces
 		const pieces = createWallPieces({
@@ -110,17 +118,4 @@ function WallComponent({
 	return undefined;
 }
 
-export const Wall = memo(WallComponent, (prevProps, nextProps) => {
-	const propsAreEqual = (prevProps: Props, nextProps: Props) => {
-		for (const key of Object.keys(nextProps)) {
-			if (key !== "line" && nextProps[key] !== prevProps[key]) {
-				return false;
-			}
-		}
-		if (nextProps.isDynamic && prevProps.line !== nextProps.line) {
-			return false;
-		}
-		return true;
-	};
-	return propsAreEqual(prevProps, nextProps);
-});
+export const Wall = memo(WallComponent);

@@ -142,14 +142,24 @@ export function createWallPieces({ position, size, rotation, color, transparency
 	});
 }
 
-export function calculateWallTransform(line: [Point, Point], position: Vector3) {
+export function calculateWallTransform(line: [Point, Point], position: Vector3, height: number) {
 	const startP = line[0];
 	const endP = line[1];
+
+	// Create points at ground level (Y = 0)
 	const startPoint = new Vector3(startP[0], 0, startP[1]);
 	const endPoint = new Vector3(endP[0], 0, endP[1]);
+
 	const direction = endPoint.sub(startPoint);
 	const width = direction.Magnitude;
-	const center = startPoint.add(direction.mul(0.5)).add(position);
+
+	// Calculate center position at ground level, then move up by height/2
+	const groundCenter = startPoint.add(direction.mul(0.5));
+	const center = new Vector3(
+		groundCenter.X + position.X,
+		height / 2 + position.Y, // Move up by half height
+		groundCenter.Z + position.Z,
+	);
 
 	const rotation = CFrame.lookAt(new Vector3(), new Vector3(direction.X, 0, direction.Z)).mul(
 		CFrame.fromEulerAnglesXYZ(0, math.rad(90), 0),

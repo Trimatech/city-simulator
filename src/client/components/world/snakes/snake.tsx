@@ -2,7 +2,7 @@ import React from "@rbxts/react";
 import { Players } from "@rbxts/services";
 import { Walls } from "client/components/walls/Walls";
 import { palette } from "shared/constants/palette";
-import { Line, Point } from "shared/polybool/polybool";
+import { Point } from "shared/polybool/polybool";
 import { SnakeEntity } from "shared/store/snakes/snake-slice";
 
 import { Wall } from "../../walls/Wall";
@@ -56,7 +56,8 @@ export function Snake({
 			{tracerLines.map((line, index) => (
 				<Wall
 					key={`snake-segment-${index}`}
-					line={line as Line}
+					startPoint={line[0]}
+					endPoint={line[1]}
 					color={tracerColor}
 					transparency={tracerTransparency}
 					position={position}
@@ -71,10 +72,8 @@ export function Snake({
 			{character && lastTracerPoint && !isDead && (
 				<Wall
 					key="player-connection-line"
-					line={[
-						[lastTracerPoint.X, lastTracerPoint.Y],
-						[character.GetPivot().Position.X, character.GetPivot().Position.Z],
-					]}
+					startPoint={[lastTracerPoint.X, lastTracerPoint.Y]}
+					endPoint={[character.GetPivot().Position.X, character.GetPivot().Position.Z]}
 					color={lastTracerColor}
 					transparency={lastTracerTransparency}
 					position={position}

@@ -39,7 +39,8 @@ export function Walls({
 					return (
 						<Wall
 							key={`wall-${index}`}
-							line={[point as Point, nextPoint as Point]}
+							startPoint={point as Point}
+							endPoint={nextPoint as Point}
 							color={color}
 							transparency={transparency}
 							position={position}
