@@ -49,14 +49,14 @@ const defaultEntity: SnakeEntity = {
 
 const initialState: SnakesState = {};
 
-const createPolygonAroundHead = (head: Vector2) => {
-	const diameter = 5;
-	const items = 20;
+const createPolygonAroundHead = (position: Vector2) => {
+	const diameter = 20;
+	const items = 40;
 
-	print("Create polygon to head:", head);
+	print("Create polygon to head:", position);
 	return fillArray(items, (index) => {
 		const angle = (index / items) * (2 * math.pi);
-		return head.add(new Vector2(math.cos(angle), math.sin(angle)).mul(diameter));
+		return position.add(new Vector2(math.cos(angle) * diameter, math.sin(angle) * diameter));
 	});
 };
 
@@ -89,9 +89,8 @@ export const snakesSlice = createProducer(initialState, {
 
 			const tracers = [...snake.tracers];
 
-			const bodyPieceLength = 0.5;
+			const bodyPieceLength = 2;
 
-			// Add a tracer if the distance between the last tracer and the current head is 1.5
 			if (currentLength > 0) {
 				const lastTracer = snake.tracers[currentLength - 1];
 				const distance = lastTracer.sub(snake.position).Magnitude;

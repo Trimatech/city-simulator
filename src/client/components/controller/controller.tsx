@@ -9,8 +9,6 @@ import { selectLocalSnake } from "shared/store/snakes";
 
 import { useToggleTouchControls } from "./utils/use-toggle-touch-controls";
 
-const TICK = 1;
-
 export function Controller() {
 	const store = useStore();
 	const device = useInputDevice();
@@ -24,7 +22,7 @@ export function Controller() {
 			const vector2 = new Vector2(position.X, position.Z);
 			remotes.snake.move.fire(vector2);
 		}
-	}, TICK);
+	}, WORLD_TICK);
 
 	const setBoost = useThrottleCallback(
 		(boost: boolean) => {

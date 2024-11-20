@@ -1,4 +1,5 @@
 import React from "@rbxts/react";
+import { palette } from "shared/constants/palette";
 import { Point, Polygon } from "shared/polybool/polybool";
 
 import { Wall } from "./Wall";
@@ -12,7 +13,7 @@ interface Props {
 	position?: Vector3;
 }
 
-export function Walls({ points, color = new Color3(1, 1, 1), transparency = 0, position = new Vector3() }: Props) {
+export function Walls({ points, color = palette.white, transparency = 0, position = new Vector3() }: Props) {
 	if (!points || points.size() === 0) {
 		warn("No points found in polygon");
 		return undefined;
@@ -35,6 +36,7 @@ export function Walls({ points, color = new Color3(1, 1, 1), transparency = 0, p
 							color={color}
 							transparency={transparency}
 							position={position}
+							height={5.1}
 						/>
 					);
 				}),

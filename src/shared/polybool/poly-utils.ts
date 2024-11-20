@@ -360,11 +360,10 @@ function extendLine(line: Line): Line {
 	const unitDirection = [direction[0] / length, direction[1] / length];
 
 	const extensionFactor = 1000;
-	const extendedLength = math.max(length, extensionFactor);
 
 	return [
-		[startPoint[0] - unitDirection[0] * extendedLength, startPoint[1] - unitDirection[1] * extendedLength],
-		[endPoint[0] + unitDirection[0] * extendedLength, endPoint[1] + unitDirection[1] * extendedLength],
+		[startPoint[0] - unitDirection[0] * extensionFactor, startPoint[1] - unitDirection[1] * extensionFactor],
+		[endPoint[0] + unitDirection[0] * extensionFactor, endPoint[1] + unitDirection[1] * extensionFactor],
 	];
 }
 

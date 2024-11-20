@@ -1,5 +1,7 @@
 import React from "@rbxts/react";
+import { Players } from "@rbxts/services";
 import { Walls } from "client/components/walls/Walls";
+import { palette } from "shared/constants/palette";
 import { Line, Point } from "shared/polybool/polybool";
 import { SnakeEntity } from "shared/store/snakes/snake-slice";
 
@@ -7,7 +9,6 @@ import { Wall } from "../../walls/Wall";
 
 interface Props {
 	snake: SnakeEntity;
-
 	color?: Color3;
 	transparency?: number;
 	thickness?: number;
@@ -18,8 +19,17 @@ interface Props {
 	tracerTransparency?: number;
 }
 
-export function Snake({ snake, color = new Color3(1, 1, 1), transparency = 0, position = new Vector3() }: Props) {
+export function Snake({
+	snake,
+	color = palette.blue,
+	transparency = 0.2,
+	position = new Vector3(),
+	tracerColor = palette.red,
+	tracerTransparency = 0.5,
+}: Props) {
 	const segments = snake.tracers;
+	const localPlayer = Players.LocalPlayer;
+	const character = localPlayer.Character;
 
 	// Convert segments to array of line segments
 	const tracerLines = segments
@@ -30,6 +40,9 @@ export function Snake({ snake, color = new Color3(1, 1, 1), transparency = 0, po
 			return [currentPoint, nextPoint] as [Point, Point];
 		})
 		.filter((line) => line !== undefined);
+
+	// Get the last tracer point
+	const lastTracerPoint = segments[segments.size() - 1];
 
 	return (
 		<>
@@ -46,21 +59,19 @@ export function Snake({ snake, color = new Color3(1, 1, 1), transparency = 0, po
 
 			<Walls points={snake.polygon as Vector2[]} />
 
-			{/* Tracers for input visualization */}
-			{/* {showTracers && snake.position && (
+			{/* Line from last tracer to player position */}
+			{character && lastTracerPoint && (
 				<Wall
-					key="snake-input-tracer"
+					key="player-connection-line"
 					line={[
-						[segments[0].X, segments[0].Y],
-						[segments[0].X + snake.position.X * 5, segments[0].Y + snake.position.Y * 5],
+						[lastTracerPoint.X, lastTracerPoint.Y],
+						[character.GetPivot().Position.X, character.GetPivot().Position.Z],
 					]}
-					height={height}
-					thickness={thickness * 0.5}
 					color={tracerColor}
 					transparency={tracerTransparency}
 					position={position}
 				/>
-			)} */}
+			)}
 		</>
 	);
 }
