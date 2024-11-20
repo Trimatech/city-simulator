@@ -28,9 +28,6 @@ export interface SnakeEntity {
 	readonly isInside: boolean;
 }
 
-// Used to prevent tracers from overlapping
-const TINY = 0.0001;
-
 const defaultEntity: SnakeEntity = {
 	id: "",
 	name: "",
@@ -86,9 +83,7 @@ export const snakesSlice = createProducer(initialState, {
 			}
 
 			const currentLength = snake.tracers.size();
-
 			const tracers = [...snake.tracers];
-
 			const bodyPieceLength = 2;
 
 			if (currentLength > 0) {
@@ -126,32 +121,18 @@ export const snakesSlice = createProducer(initialState, {
 						if (result.regions.size() > 0 && result.regions[0].size() > 2) {
 							const resultPolygon = pointsToVectors(result.regions[0] as Point[]);
 							//warn("Snake is inside and intersection found", resultPolygon);
-							return {
-								...snake,
-								isInside,
-								polygon: resultPolygon,
-								tracers: [],
-							};
+							return { ...snake, isInside, polygon: resultPolygon, tracers: [] };
 						} else {
-							warn("No valid REGIONS found", {
-								result,
-								points,
-								newCutPolygon,
-							});
+							warn("No valid REGIONS found", { result, points, newCutPolygon });
 						}
 					} else {
-						warn("No INTERSECTION found", {
-							points,
-							newCutPolygon,
-						});
+						warn("No INTERSECTION found", { points, newCutPolygon });
 					}
-				}
 
-				return {
-					...snake,
-					isInside,
-					tracers: [snake.position],
-				};
+					return { ...snake, isInside, tracers: [] };
+				} else {
+					return { ...snake, isInside, tracers: [snake.position] };
+				}
 			}
 
 			return snake;

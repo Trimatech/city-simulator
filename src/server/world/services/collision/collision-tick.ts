@@ -6,6 +6,38 @@ import { describeSnakeFromScore, selectSnakesSorted, SnakeEntity } from "shared/
 
 import { snakeGrid } from "../snakes";
 
+function doLinesIntersect(p1: Vector2, p2: Vector2, q1: Vector2, q2: Vector2): boolean {
+	const det = (p2.X - p1.X) * (q2.Y - q1.Y) - (p2.Y - p1.Y) * (q2.X - q1.X);
+	if (det === 0) return false; // Lines are parallel
+
+	const lambda = ((q2.Y - q1.Y) * (q2.X - p1.X) + (q1.X - q2.X) * (q2.Y - p1.Y)) / det;
+	const gamma = ((p1.Y - p2.Y) * (q2.X - p1.X) + (p2.X - p1.X) * (q2.Y - p1.Y)) / det;
+
+	return 0 < lambda && lambda < 1 && 0 < gamma && gamma < 1;
+}
+
+function checkCollisionWithTracers(snake: SnakeEntity): boolean {
+	const headPosition = snake.position;
+	const lastPoint = snake.tracers[snake.tracers.size() - 1];
+
+	for (let i = 0; i < snake.tracers.size() - 1; i++) {
+		const startPoint = snake.tracers[i];
+		const endPoint = snake.tracers[i + 1];
+
+		if (doLinesIntersect(headPosition, lastPoint, startPoint, endPoint)) {
+			print(`Collision detected for snake ${snake.id} with its own tracer line ${i}`, {
+				headPosition,
+				lastPoint,
+				startPoint,
+				endPoint,
+			});
+			return true;
+		}
+	}
+
+	return false;
+}
+
 export function onCollisionTick() {
 	// in a head-on collision, the snake with the lowest score is killed
 	const snakes = store.getState(selectSnakesSorted((a, b) => a.score < b.score));
@@ -33,6 +65,14 @@ export function onCollisionTick() {
 			killSnake(snake.id);
 			store.playerKilledSnake(enemy.id, snake.id);
 			store.incrementSnakeEliminations(enemy.id);
+		}
+
+		// New check for collision with own tracers
+		if (checkCollisionWithTracers(snake)) {
+			// Handle collision with own tracers
+			print(`Collision detected for snake ${snake.id} with its own tracers.`);
+			// Implement collision response logic here
+			killSnake(snake.id);
 		}
 	}
 }

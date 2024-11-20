@@ -1,3 +1,4 @@
+import { Players } from "@rbxts/services";
 import { setTimeout } from "@rbxts/set-timeout";
 import { store } from "server/store";
 import { WORLD_BOUNDS } from "shared/constants/core";
@@ -18,6 +19,19 @@ export function getCandy(candyId: string) {
 
 export function killSnake(snakeId: string) {
 	store.setSnakeIsDead(snakeId);
+
+	const player = Players.GetPlayers().find((player) => player.Name === snakeId);
+	if (player) {
+		const humanoid = player.Character?.FindFirstChildOfClass("Humanoid");
+		if (humanoid) {
+			humanoid.TakeDamage(10000);
+		} else {
+			print(`No humanoid found for player ${snakeId}`);
+			player.Destroy();
+		}
+	} else {
+		warn(`No player found for snake ${snakeId}`);
+	}
 
 	setTimeout(() => {
 		store.removeSnake(snakeId);
