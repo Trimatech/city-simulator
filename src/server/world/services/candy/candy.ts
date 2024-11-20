@@ -46,6 +46,8 @@ export async function initCandyService() {
 		// when the soldier dies, create candy on the soldier's tracers
 		return () => {
 			disconnect();
+
+			// HERE WE DIE AND DROP STUFF
 			dropCandyOnDeath(id);
 		};
 	});

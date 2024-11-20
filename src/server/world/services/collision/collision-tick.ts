@@ -2,7 +2,8 @@ import { store } from "server/store";
 import { getSoldier, killSoldier } from "server/world/utils";
 import { WORLD_BOUNDS } from "shared/constants/core";
 import { isPointInPolygon, vector2ToPoint, vectorsToPoints } from "shared/polybool/poly-utils";
-import { describeSoldierFromScore, selectSoldiersSorted, SoldierEntity } from "shared/store/soldiers";
+import { selectSoldiersSorted, SoldierEntity } from "shared/store/soldiers";
+import { SOLDIER_RADIUS_BASE } from "shared/store/soldiers/soldier-utils";
 
 import { soldierGrid } from "../soldiers";
 
@@ -89,12 +90,12 @@ function isInsidePolygon(soldier: SoldierEntity) {
 }
 
 function isCollidingWithWall(soldier: SoldierEntity) {
-	const radius = describeSoldierFromScore(soldier.score).radius;
+	const radius = SOLDIER_RADIUS_BASE;
 	return soldier.position.Magnitude + radius > WORLD_BOUNDS;
 }
 
 function isCollidingWithSoldier(soldier: SoldierEntity) {
-	const radius = describeSoldierFromScore(soldier.score).radius;
+	const radius = SOLDIER_RADIUS_BASE;
 
 	const nearest = soldierGrid.nearest(soldier.position, radius + 5, (data) => {
 		const enemy = getSoldier(data.metadata.id);
@@ -107,7 +108,7 @@ function isCollidingWithSoldier(soldier: SoldierEntity) {
 		return;
 	}
 
-	const enemyRadius = describeSoldierFromScore(enemy.score).radius;
+	const enemyRadius = SOLDIER_RADIUS_BASE;
 	const distance = nearest.position.sub(soldier.position).Magnitude;
 
 	if (distance <= 0.8 * (radius + enemyRadius)) {

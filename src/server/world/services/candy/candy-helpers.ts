@@ -5,7 +5,8 @@ import { getCandy, getRandomPointNearWorldOrigin, getSoldier } from "server/worl
 import { getRandomAccent } from "shared/constants/palette";
 import { getSoldierskinForTracer } from "shared/constants/skins";
 import { CandyEntity, CandyType, selectCandyById, selectCandyCount } from "shared/store/candy";
-import { describeSoldierFromScore, selectSoldierIsBoosting } from "shared/store/soldiers";
+import { SOLDIER_RADIUS_BASE } from "shared/store/soldiers";
+import { selectSoldierIsBoosting } from "shared/store/soldiers";
 import { Grid } from "shared/utils/grid";
 import { fillArray } from "shared/utils/object-utils";
 
@@ -78,10 +79,9 @@ export function dropCandyWhileBoosting(id: string) {
 			const soldier = getSoldier(id);
 
 			if (soldier) {
-				const description = describeSoldierFromScore(soldier.score);
 				const tail: Vector2 | undefined = soldier.tracers[soldier.tracers.size() - 1];
 
-				if (tail && tail.sub(previousTail).Magnitude > description.radius * 2) {
+				if (tail && tail.sub(previousTail).Magnitude > SOLDIER_RADIUS_BASE * 2) {
 					previousTail = tail;
 					store.addCandy(createCandy({ position: tail, type: CandyType.Dropping }));
 				}
@@ -114,7 +114,7 @@ export function dropCandyOnDeath(id: string): void {
 	}
 
 	const tracers = [...soldier.tracers, soldier.position];
-	const tracerRadius = describeSoldierFromScore(soldier.score).radius;
+	const tracerRadius = SOLDIER_RADIUS_BASE;
 	const candyPositions: Vector2[] = [];
 	let lastTracer: Vector2 | undefined;
 

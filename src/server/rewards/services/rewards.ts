@@ -12,7 +12,7 @@ import { getSoldier } from "server/world";
 import { sounds } from "shared/assets";
 import { palette } from "shared/constants/palette";
 import { remotes } from "shared/remotes";
-import { describeSoldierFromScore, selectSoldierRanking } from "shared/store/soldiers";
+import { selectSoldierRanking } from "shared/store/soldiers";
 import { getPlayerByName } from "shared/utils/player-utils";
 
 import { grantMoney, shouldGrantReward } from "../utils";
@@ -74,7 +74,8 @@ function observeMilestone(id: string) {
 		const enemy = getSoldier(enemyId);
 
 		if (enemy && shouldGrantReward()) {
-			const length = describeSoldierFromScore(enemy.score).length;
+			// TODO: Calculate from area??
+			const length = enemy.polygonAreaSize;
 			const bounty = math.ceil(length / 3);
 			grantMoneyReward(id, bounty, `eliminating <font color="#fff">${enemy.name}</font>`, true);
 		}

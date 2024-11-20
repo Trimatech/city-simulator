@@ -1,5 +1,5 @@
 import { createSelector } from "@rbxts/reflex";
-import { describeSoldierFromScore } from "shared/store/soldiers";
+import { SOLDIER_RADIUS_BASE } from "shared/store/soldiers";
 import { mapStrict } from "shared/utils/math-utils";
 
 import { RootState } from "..";
@@ -45,7 +45,7 @@ export const selectWorldCamera = createSelector(
 			};
 		}
 
-		const { radius } = describeSoldierFromScore(soldier.score);
+		const radius = SOLDIER_RADIUS_BASE;
 
 		return {
 			subject: soldier.id,
