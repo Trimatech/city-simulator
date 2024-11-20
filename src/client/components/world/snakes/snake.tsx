@@ -17,16 +17,22 @@ interface Props {
 	showTracers?: boolean;
 	tracerColor?: Color3;
 	tracerTransparency?: number;
+	lastTracerColor?: Color3;
+	lastTracerTransparency?: number;
+	isDead?: boolean;
 }
 
 export function Snake({
 	snake,
 	color = palette.blue,
-	transparency = 0.2,
+	transparency = 0,
 	position = new Vector3(),
-	tracerColor = palette.red,
+	tracerColor = palette.blue,
 	tracerTransparency = 0.5,
+	lastTracerColor = palette.red,
+	lastTracerTransparency = 0.5,
 }: Props) {
+	const isDead = snake.dead;
 	const segments = snake.tracers;
 	const localPlayer = Players.LocalPlayer;
 	const character = localPlayer.Character;
@@ -46,29 +52,31 @@ export function Snake({
 
 	return (
 		<>
-			{/* Main snake body */}
+			{/* Tracer lines */}
 			{tracerLines.map((line, index) => (
 				<Wall
 					key={`snake-segment-${index}`}
 					line={line as Line}
-					color={color}
-					transparency={transparency}
+					color={tracerColor}
+					transparency={tracerTransparency}
 					position={position}
+					isCrumbling={isDead}
 				/>
 			))}
 
-			<Walls points={snake.polygon as Vector2[]} />
+			{/* Home polygon */}
+			<Walls points={snake.polygon as Vector2[]} isCrumbling={isDead} color={color} transparency={transparency} />
 
-			{/* Line from last tracer to player position */}
-			{character && lastTracerPoint && (
+			{/* player connection line - hide if dead */}
+			{character && lastTracerPoint && !isDead && (
 				<Wall
 					key="player-connection-line"
 					line={[
 						[lastTracerPoint.X, lastTracerPoint.Y],
 						[character.GetPivot().Position.X, character.GetPivot().Position.Z],
 					]}
-					color={tracerColor}
-					transparency={tracerTransparency}
+					color={lastTracerColor}
+					transparency={lastTracerTransparency}
 					position={position}
 				/>
 			)}

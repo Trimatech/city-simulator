@@ -11,9 +11,16 @@ interface Props {
 	thickness?: number;
 	height?: number;
 	position?: Vector3;
+	isCrumbling?: boolean;
 }
 
-export function Walls({ points, color = palette.white, transparency = 0, position = new Vector3() }: Props) {
+export function Walls({
+	points,
+	color = palette.white,
+	transparency = 0,
+	position = new Vector3(),
+	isCrumbling = false,
+}: Props) {
 	if (!points || points.size() === 0) {
 		warn("No points found in polygon");
 		return undefined;
@@ -37,6 +44,7 @@ export function Walls({ points, color = palette.white, transparency = 0, positio
 							transparency={transparency}
 							position={position}
 							height={5.1}
+							isCrumbling={isCrumbling}
 						/>
 					);
 				}),
