@@ -13,21 +13,26 @@ function doLinesIntersect(p1: Vector2, p2: Vector2, q1: Vector2, q2: Vector2): b
 	const lambda = ((q2.Y - q1.Y) * (q2.X - p1.X) + (q1.X - q2.X) * (q2.Y - p1.Y)) / det;
 	const gamma = ((p1.Y - p2.Y) * (q2.X - p1.X) + (p2.X - p1.X) * (q2.Y - p1.Y)) / det;
 
-	return 0 < lambda && lambda < 1 && 0 < gamma && gamma < 1;
+	return 0 <= lambda && lambda < 1 && 0 < gamma && gamma < 1;
 }
 
 function checkCollisionWithTracers(soldier: SoldierEntity): boolean {
 	const headPosition = soldier.position;
 	const lastPoint = soldier.tracers[soldier.tracers.size() - 1];
+	const secondLastPoint = soldier.tracers[soldier.tracers.size() - 2];
 
 	for (let i = 0; i < soldier.tracers.size() - 1; i++) {
 		const startPoint = soldier.tracers[i];
 		const endPoint = soldier.tracers[i + 1];
 
-		if (doLinesIntersect(headPosition, lastPoint, startPoint, endPoint)) {
+		if (
+			doLinesIntersect(headPosition, lastPoint, startPoint, endPoint) ||
+			doLinesIntersect(lastPoint, secondLastPoint, startPoint, endPoint)
+		) {
 			print(`Collision detected for soldier ${soldier.id} with its own tracer line ${i}`, {
 				headPosition,
 				lastPoint,
+				secondLastPoint,
 				startPoint,
 				endPoint,
 			});
