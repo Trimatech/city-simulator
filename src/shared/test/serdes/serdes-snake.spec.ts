@@ -22,6 +22,7 @@ export = () => {
 			dead: math.random() > 0.5,
 			eliminations: math.random(1, 100),
 			polygon: fillArray(10, () => new Vector2(math.random(), math.random())),
+			polygonAreaSize: 0,
 			isInside: true,
 		};
 	}

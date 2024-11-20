@@ -25,6 +25,7 @@ export interface SnakeEntity {
 	readonly dead: boolean;
 	readonly eliminations: number;
 	readonly polygon: readonly Vector2[];
+	readonly polygonAreaSize: number;
 	readonly isInside: boolean;
 }
 
@@ -41,6 +42,7 @@ const defaultEntity: SnakeEntity = {
 	dead: false,
 	eliminations: 0,
 	polygon: [],
+	polygonAreaSize: 0,
 	isInside: true,
 };
 
@@ -57,13 +59,29 @@ const createPolygonAroundHead = (position: Vector2) => {
 	});
 };
 
+const calculatePolygonArea = (polygon: readonly Vector2[]) => {
+	let area = 0;
+	const length = polygon.size();
+
+	if (length < 3) return 0;
+
+	for (let i = 0; i < length; i++) {
+		const j = (i + 1) % length;
+		area += polygon[i].X * polygon[j].Y;
+		area -= polygon[j].X * polygon[i].Y;
+	}
+
+	return math.round(math.abs(area) / 2);
+};
+
 export const snakesSlice = createProducer(initialState, {
 	addSnake: (state, id: string, patch?: Partial<SnakeEntity>) => {
 		const polygon = createPolygonAroundHead(patch?.position || defaultEntity.position);
+		const polygonAreaSize = calculatePolygonArea(polygon);
 
 		return {
 			...state,
-			[id]: { ...defaultEntity, id, name: id, polygon, ...patch },
+			[id]: { ...defaultEntity, id, name: id, polygon, polygonAreaSize, ...patch },
 		};
 	},
 
@@ -120,8 +138,8 @@ export const snakesSlice = createProducer(initialState, {
 
 						if (result.regions.size() > 0 && result.regions[0].size() > 2) {
 							const resultPolygon = pointsToVectors(result.regions[0] as Point[]);
-							//warn("Snake is inside and intersection found", resultPolygon);
-							return { ...snake, isInside, polygon: resultPolygon, tracers: [] };
+							const polygonAreaSize = calculatePolygonArea(resultPolygon);
+							return { ...snake, isInside, polygon: resultPolygon, polygonAreaSize, tracers: [] };
 						} else {
 							warn("No valid REGIONS found", { result, points, newCutPolygon });
 						}

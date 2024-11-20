@@ -23,6 +23,7 @@ export function serializeSnakes(state: SnakesState): string {
 		buffer.WriteBool(snake.dead);
 		buffer.WriteUInt(16, snake.eliminations);
 		buffer.WriteBool(snake.isInside);
+		buffer.WriteFloat32(snake.polygonAreaSize);
 	}
 
 	return buffer.ToString();
@@ -50,6 +51,7 @@ export function deserializeSnakes(data: string): SnakesState {
 			dead: buffer.ReadBool(),
 			eliminations: buffer.ReadUInt(16),
 			isInside: buffer.ReadBool(),
+			polygonAreaSize: buffer.ReadFloat32(),
 		};
 	}
 

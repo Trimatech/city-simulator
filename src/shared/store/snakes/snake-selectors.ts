@@ -77,6 +77,10 @@ export const selectLocalEliminations = (state: SharedState) => {
 	return state.snakes[USER_NAME]?.eliminations;
 };
 
+export const selectLocalPolygonAreaSize = (state: SharedState) => {
+	return state.snakes[USER_NAME]?.polygonAreaSize;
+};
+
 export const selectHasLocalSnake = (state: SharedState) => {
 	return USER_NAME in state.snakes;
 };

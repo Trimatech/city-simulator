@@ -5,7 +5,12 @@ import { useDefined, useRem, useStore } from "client/hooks";
 import { formatInteger } from "client/utils/format-integer";
 import { USER_NAME } from "shared/constants/core";
 import { selectPlayerBalance } from "shared/store/saves";
-import { selectLocalEliminations, selectLocalScore, selectRankForDisplay } from "shared/store/snakes";
+import {
+	selectLocalEliminations,
+	selectLocalPolygonAreaSize,
+	selectLocalScore,
+	selectRankForDisplay,
+} from "shared/store/snakes";
 
 import { StatsCard } from "./stats-card";
 
@@ -17,9 +22,10 @@ export function Stats() {
 	const currentScore = useSelector(selectLocalScore);
 	const currentRank = useSelector(selectRankForDisplay);
 	const currentBalance = useSelectorCreator(selectPlayerBalance, USER_NAME);
-
+	const currentArea = useSelector(selectLocalPolygonAreaSize);
 	// displays the previous value if any are set to undefined
 	const eliminations = useDefined<string | number>(currentEliminations, "N/A");
+	const area = useDefined<string | number>(currentArea, "N/A");
 	const score = useDefined<string | number>(currentScore, "N/A");
 	const rank = useDefined(currentRank, "N/A");
 	const balance = useDefined(currentBalance, 0);
@@ -34,6 +40,16 @@ export function Stats() {
 				VerticalAlignment="Bottom"
 				Padding={new UDim(0, rem(1))}
 				SortOrder="LayoutOrder"
+			/>
+
+			<StatsCard
+				emoji="📐"
+				label="Area"
+				value={`${formatInteger(area)} studs²`}
+				primary={Color3.fromRGB(255, 203, 80)}
+				secondary={Color3.fromRGB(255, 150, 79)}
+				enabled={currentArea !== undefined}
+				order={0}
 			/>
 
 			<StatsCard
