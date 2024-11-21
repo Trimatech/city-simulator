@@ -5,28 +5,27 @@ import { useRem } from "client/hooks";
 import { IS_PROD } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
 
-interface HomeVersionProps {
-	readonly position: UDim2;
-}
-
-const DIVIDER = `  <font transparency="0.75">—</font>  `;
-const REPO = "littensy/slither";
 const MODE = IS_PROD ? "production" : "development";
-
-export function HomeVersion({ position }: HomeVersionProps) {
+export function GameVersion() {
 	const rem = useRem();
+	const size = new UDim2(0, rem(20), 0, rem(1.25));
+
+	const position = new UDim2(1, -rem(0.5), 1, -rem(0.5));
+	const anchorPoint = new Vector2(1, 1);
 
 	return (
 		<Text
 			richText
 			font={fonts.inter.medium}
-			text={REPO + DIVIDER + MODE}
+			text={`${MODE}`}
 			textSize={rem(1.25)}
+			size={size}
 			textColor={palette.text}
 			textTransparency={0.5}
-			textXAlignment="Center"
-			textYAlignment="Top"
+			textXAlignment="Right"
+			textYAlignment="Bottom"
 			position={position}
+			anchorPoint={anchorPoint}
 		/>
 	);
 }

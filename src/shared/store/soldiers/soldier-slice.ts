@@ -90,7 +90,6 @@ export const soldiersSlice = createProducer(initialState, {
 				const distance = lastTracer.sub(soldier.position).Magnitude;
 
 				if (distance > bodyPieceLength) {
-					warn("Distance", { distance, position: soldier.position });
 					tracers.push(soldier.position);
 				}
 			} else {
@@ -106,7 +105,7 @@ export const soldiersSlice = createProducer(initialState, {
 			const hasChanged = soldier.isInside !== isInside;
 
 			if (hasChanged) {
-				warn(`Soldier is inside: ${isInside}`);
+				print(`Soldier is inside: ${isInside}`);
 				if (isInside) {
 					// Calculate new polygon based on old polygon and tracers
 

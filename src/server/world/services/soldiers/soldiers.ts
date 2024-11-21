@@ -19,6 +19,7 @@ export async function initSoldierservice() {
 
 	remotes.soldier.spawn.connect((player) => {
 		if (playerIsSpawned(player)) {
+			warn("Player already spawned");
 			return;
 		}
 

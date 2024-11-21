@@ -20,8 +20,6 @@ export function Menu() {
 
 	return (
 		<>
-			<MenuVignette />
-
 			<MenuContainer>
 				<Navigation />
 			</MenuContainer>
@@ -31,10 +29,12 @@ export function Menu() {
 			</MenuContainer>
 
 			<MenuContainer page="support">
+				<MenuVignette />
 				<Support />
 			</MenuContainer>
 
 			<MenuContainer page="skins">
+				<MenuVignette />
 				<Skins />
 			</MenuContainer>
 		</>
