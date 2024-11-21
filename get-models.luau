@@ -12,6 +12,6 @@ local function safeWriteModel(path, instance)
     end
 end
 
-safeWriteModel('./GamePlace.rbxmx', gamePlace.Workspace:FindFirstChild("Place"))
+safeWriteModel('./GamePlaceTemp.rbxmx', gamePlace.Workspace:FindFirstChild("Place"))
 
 print("Model extraction complete")

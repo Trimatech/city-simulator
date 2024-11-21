@@ -128,7 +128,7 @@
 		"Workspace": {
 			"$className": "Workspace",
 			"Place": {
-				"$path": "./GamePlace.rbxmx"
+				"$path": "./GamePlaceTemp.rbxmx"
 			},
 			"$properties": {
 				"SignalBehavior2": {
