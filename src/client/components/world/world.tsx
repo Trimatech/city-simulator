@@ -10,6 +10,7 @@ export function World() {
 		<RemProvider minimumRem={6}>
 			<Group>
 				<Soldiers />
+
 				<WorldSounds />
 			</Group>
 		</RemProvider>

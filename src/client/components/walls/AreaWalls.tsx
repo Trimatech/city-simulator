@@ -14,7 +14,7 @@ interface Props {
 	isCrumbling?: boolean;
 }
 
-export function Walls({
+export function AreaWalls({
 	points,
 	color = palette.white,
 	transparency = 0,

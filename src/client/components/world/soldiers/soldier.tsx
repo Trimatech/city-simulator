@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
 import { Players } from "@rbxts/services";
-import { Walls } from "client/components/walls/Walls";
+import { AreaWalls } from "client/components/walls/AreaWalls";
 import { palette } from "shared/constants/palette";
 import { Point } from "shared/polybool/polybool";
 import { SoldierEntity } from "shared/store/soldiers/soldier-slice";
@@ -37,6 +37,8 @@ export function Soldier({
 	const localPlayer = Players.LocalPlayer;
 	const character = localPlayer.Character;
 
+	const isClient = localPlayer.Name === soldier.name;
+
 	// Convert segments to array of line segments
 	const tracerLines = segments
 		.mapFiltered((segment, index) => {
@@ -66,7 +68,7 @@ export function Soldier({
 			))}
 
 			{/* Home polygon */}
-			<Walls
+			<AreaWalls
 				points={soldier.polygon as Vector2[]}
 				isCrumbling={isDead}
 				color={color}
@@ -74,7 +76,7 @@ export function Soldier({
 			/>
 
 			{/* player connection line - hide if dead */}
-			{character && lastTracerPoint && !isDead && (
+			{isClient && character && lastTracerPoint && !isDead && (
 				<Wall
 					key="player-connection-line"
 					startPoint={[lastTracerPoint.X, lastTracerPoint.Y]}

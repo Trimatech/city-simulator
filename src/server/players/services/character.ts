@@ -1,4 +1,5 @@
 import { CollisionGroups } from "shared/constants/collision-groups";
+import { SOLDIER_SPEED } from "shared/constants/core";
 import { Character, onPlayerAdded, promiseCharacter, promisePlayerDisconnected } from "shared/utils/player-utils";
 
 export async function initCharacterService() {
@@ -18,6 +19,13 @@ export async function initCharacterService() {
 				instance.CollisionGroup = CollisionGroups.PLAYER;
 			}
 		});
+
+		const humanoid = character.FindFirstChildOfClass("Humanoid");
+		if (humanoid) {
+			humanoid.WalkSpeed = SOLDIER_SPEED;
+		} else {
+			warn(`No humanoid found for character ${character.Name}`);
+		}
 	}
 
 	onPlayerAdded((player) => {

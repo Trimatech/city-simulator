@@ -1,7 +1,6 @@
 {
-	"name": "slither",
-	"version": "1.4.1",
-	"license": "MIT",
+	"name": "expr-2-qonquer",
+	"version": "0.0.1",
 	"scripts": {
 		"lint": "eslint src && prettier --check src",
 		"compile": "rbxtsc --verbose",

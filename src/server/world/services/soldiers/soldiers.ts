@@ -1,7 +1,7 @@
 import { Players } from "@rbxts/services";
 import { store } from "server/store";
 import { SOLDIER_TICK_PHASE } from "server/world/constants";
-import { killSoldier, playerIsSpawned } from "server/world/utils";
+import { getSafePointInWorld, killSoldier, playerIsSpawned } from "server/world/utils";
 import { WORLD_TICK } from "shared/constants/core";
 import { remotes } from "shared/remotes";
 import { defaultPlayerSave, RANDOM_SKIN, selectPlayerSave } from "shared/store/saves";
@@ -28,13 +28,23 @@ export async function initSoldierservice() {
 		const randomSkin = save.skins[math.random(1, save.skins.size() - 1)];
 		const currentSkin = save.skin;
 
-		const position = player.Character?.PrimaryPart?.Position;
+		const safePoint = getSafePointInWorld();
 
-		print("Spawn soldier for", player.Name, position);
-
+		const character = player.Character;
+		if (character) {
+			const primaryPart = character.PrimaryPart;
+			if (primaryPart) {
+				primaryPart.CFrame = new CFrame(safePoint.X, 10, safePoint.Y);
+			} else {
+				error(`No PrimaryPart found for player ${player.Name}`);
+			}
+		} else {
+			error(`No character found for player ${player.Name}`);
+		}
+		print("Spawn soldier for", player.Name, safePoint);
 		store.addSoldier(player.Name, {
 			name: player.DisplayName,
-			position: position ? new Vector2(position.X, position.Y) : undefined,
+			position: safePoint ? new Vector2(safePoint.X, safePoint.Y) : undefined,
 			skin: currentSkin !== RANDOM_SKIN ? currentSkin : randomSkin,
 			score: 10,
 		});

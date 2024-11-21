@@ -1,4 +1,5 @@
 import { createProducer } from "@rbxts/reflex";
+import { INITIAL_POLYGON_DIAMETER, INITIAL_POLYGON_ITEMS } from "shared/constants/core";
 import {
 	calculatePolygonOperation,
 	pointsToVectors,
@@ -6,7 +7,9 @@ import {
 	vectorsToPoints,
 } from "shared/polybool/poly-utils";
 import { Point, pointsToPolygon } from "shared/polybool/polybool";
-import { fillArray, mapProperties, mapProperty } from "shared/utils/object-utils";
+import { calculatePolygonArea } from "shared/polygon-extra.utils";
+import { createPolygonAroundPosition } from "shared/polygon-extra.utils";
+import { mapProperties, mapProperty } from "shared/utils/object-utils";
 
 export interface SoldiersState {
 	readonly [id: string]: SoldierEntity | undefined;
@@ -48,35 +51,13 @@ const defaultEntity: SoldierEntity = {
 
 const initialState: SoldiersState = {};
 
-const createPolygonAroundHead = (position: Vector2) => {
-	const diameter = 20;
-	const items = 40;
-
-	print("Create polygon to head:", position);
-	return fillArray(items, (index) => {
-		const angle = (index / items) * (2 * math.pi);
-		return position.add(new Vector2(math.cos(angle) * diameter, math.sin(angle) * diameter));
-	});
-};
-
-const calculatePolygonArea = (polygon: readonly Vector2[]) => {
-	let area = 0;
-	const length = polygon.size();
-
-	if (length < 3) return 0;
-
-	for (let i = 0; i < length; i++) {
-		const j = (i + 1) % length;
-		area += polygon[i].X * polygon[j].Y;
-		area -= polygon[j].X * polygon[i].Y;
-	}
-
-	return math.round(math.abs(area) / 2);
-};
-
 export const soldiersSlice = createProducer(initialState, {
 	addSoldier: (state, id: string, patch?: Partial<SoldierEntity>) => {
-		const polygon = createPolygonAroundHead(patch?.position || defaultEntity.position);
+		const polygon = createPolygonAroundPosition(
+			patch?.position || defaultEntity.position,
+			INITIAL_POLYGON_DIAMETER,
+			INITIAL_POLYGON_ITEMS,
+		);
 		const polygonAreaSize = calculatePolygonArea(polygon);
 
 		return {

@@ -27,27 +27,43 @@ export function MinimapNodes() {
 		for (const [, soldier] of pairs(soldiers)) {
 			const size = soldier.tracers.size();
 			const step = math.floor(map(size, 0, 100, 2, 10));
-			let previous = soldier.position;
 
 			const isPlayer = isValidPlayer(soldier.id);
 			const isFriend = friends.includes(soldier.id);
 			const isLeader = topSoldier?.id === soldier.id;
 
-			for (const index of $range(0, size - 1, step)) {
-				const tracer = soldier.tracers[index];
+			for (let i = 0; i < size - 1; i += step) {
+				const point = soldier.tracers[i];
+				const nextPoint = soldier.tracers[i + 1];
 
 				nodes.push(
 					<MinimapTracer
-						key={`${soldier.id}-${index}`}
-						from={normalizeToWorldBounds(previous)}
-						to={normalizeToWorldBounds(tracer)}
+						key={`tracer-${soldier.id}-${i}`}
+						from={normalizeToWorldBounds(point)}
+						to={normalizeToWorldBounds(nextPoint)}
 						isPlayer={isPlayer}
 						isFriend={isFriend}
 						isLeader={isLeader}
 					/>,
 				);
+			}
 
-				previous = tracer;
+			const polygonSize = soldier.polygon.size();
+
+			for (let i = 0; i < polygonSize - 1; i += step) {
+				const point = soldier.polygon[i];
+				const nextPoint = soldier.polygon[i + 1];
+
+				nodes.push(
+					<MinimapTracer
+						key={`poly-${soldier.id}-${i}`}
+						from={normalizeToWorldBounds(point)}
+						to={normalizeToWorldBounds(nextPoint)}
+						isPlayer={isPlayer}
+						isFriend={isFriend}
+						isLeader={isLeader}
+					/>,
+				);
 			}
 		}
 

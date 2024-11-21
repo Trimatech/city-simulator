@@ -54,6 +54,7 @@ export function onCollisionTick() {
 		}
 
 		if (isCollidingWithWall(soldier)) {
+			print(`Collided with wall, kill soldier ${soldier.id}`);
 			killSoldier(soldier.id);
 			continue;
 		}
@@ -68,6 +69,7 @@ export function onCollisionTick() {
 		const enemy = isCollidingWithSoldier(soldier);
 
 		if (enemy) {
+			print(`Collided with enemy, kill soldier ${soldier.id}`);
 			killSoldier(soldier.id);
 			store.playerKilledSoldier(enemy.id, soldier.id);
 			store.incrementSoldierEliminations(enemy.id);
@@ -76,7 +78,7 @@ export function onCollisionTick() {
 		// New check for collision with own tracers
 		if (checkCollisionWithTracers(soldier)) {
 			// Handle collision with own tracers
-			print(`Collision detected for soldier ${soldier.id} with its own tracers.`);
+			print(`Collided with own tracer, kill soldier ${soldier.id}`);
 			// Implement collision response logic here
 			killSoldier(soldier.id);
 		}
