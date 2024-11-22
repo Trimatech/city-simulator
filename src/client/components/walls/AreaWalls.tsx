@@ -1,6 +1,5 @@
 import React, { memo } from "@rbxts/react";
 import { palette } from "shared/constants/palette";
-import { Point, Polygon } from "shared/polybool/polybool";
 
 import { Wall } from "./Wall";
 
@@ -21,30 +20,24 @@ function AreaWallsComponent({ skinId, points, color = palette.white, transparenc
 		return undefined;
 	}
 
-	const polygon: Polygon = {
-		regions: [points.map((point) => [point.X, point.Y])],
-		inverted: false,
-	};
-
 	return (
 		<>
-			{polygon.regions.map((region) =>
-				region.map((point, index) => {
-					const nextPoint = region[index + 1] || region[0];
-					return (
-						<Wall
-							key={`wall-${index}`}
-							startPoint={point as Point}
-							endPoint={nextPoint as Point}
-							color={color}
-							transparency={transparency}
-							height={5.1}
-							isCrumbling={isCrumbling}
-							skinId={skinId}
-						/>
-					);
-				}),
-			)}
+			{points.map((point, index) => {
+				const nextPoint = points[index + 1] || points[0];
+				return (
+					<Wall
+						key={`wall-${index}`}
+						name={`wall_${point.X}_${point.Y}_${nextPoint.X}_${nextPoint.Y}`}
+						startPoint={point}
+						endPoint={nextPoint}
+						color={color}
+						transparency={transparency}
+						height={5.1}
+						isCrumbling={isCrumbling}
+						skinId={skinId}
+					/>
+				);
+			})}
 		</>
 	);
 }

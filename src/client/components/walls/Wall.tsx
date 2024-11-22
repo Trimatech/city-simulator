@@ -2,13 +2,13 @@ import { memo, useEffect, useRef } from "@rbxts/react";
 import { Workspace } from "@rbxts/services";
 import { palette } from "shared/constants/palette";
 import { getSoldierSkin, getSoldierSkinForTracer } from "shared/constants/skins";
-import { Point } from "shared/polybool/polybool";
 
 import { calculateWallTransform, createWallPieces, startCrumbling, startFadeOut } from "./Walls.utils";
 
 interface Props {
-	startPoint: Point;
-	endPoint: Point;
+	name: string;
+	startPoint: Vector2;
+	endPoint: Vector2;
 	color?: Color3;
 	transparency?: number;
 	height?: number;
@@ -19,6 +19,7 @@ interface Props {
 }
 
 function WallComponent({
+	name,
 	startPoint,
 	endPoint,
 	color = palette.white,
@@ -33,8 +34,6 @@ function WallComponent({
 	const cylinderRef = useRef<Part>();
 	const debrisRef = useRef<Part[]>([]);
 	const cleanupRef = useRef<() => void>();
-
-	const name = `wall_${startPoint[0]}_${startPoint[1]}_${endPoint[0]}_${endPoint[1]}`;
 
 	// Get skin properties
 	const wallProperties = (() => {
@@ -111,10 +110,10 @@ function WallComponent({
 			}
 		};
 	}, [
-		startPoint[0],
-		startPoint[1],
-		endPoint[0],
-		endPoint[1],
+		startPoint.X,
+		startPoint.Y,
+		endPoint.X,
+		endPoint.Y,
 		wallProperties.color,
 		wallProperties.transparency,
 		wallProperties.material,

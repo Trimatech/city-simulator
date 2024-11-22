@@ -1,6 +1,7 @@
 import React from "@rbxts/react";
 import { Players } from "@rbxts/services";
 import { AreaWalls } from "client/components/walls/AreaWalls";
+import { TracerLastWall } from "client/components/walls/TracerLastWall";
 import { TracerWalls } from "client/components/walls/TracerWalls";
 import { palette } from "shared/constants/palette";
 import { SoldierEntity } from "shared/store/soldiers/soldier-slice";
@@ -19,7 +20,7 @@ export function Soldier({ soldier, color = palette.white, transparency = 0 }: Pr
 	const isClient = localPlayer.Name === soldier.name;
 
 	// Get the last tracer point
-	//const lastTracerPoint = position[position.size() - 1];
+	const lastTracerPoint = soldier.tracers[soldier.tracers.size() - 1];
 
 	return (
 		<>
@@ -36,17 +37,9 @@ export function Soldier({ soldier, color = palette.white, transparency = 0 }: Pr
 			/>
 
 			{/* player connection line - hide if dead */}
-			{/* {isClient && character && lastTracerPoint && !isDead && (
-				<Wall
-					key="player-connection-line"
-					startPoint={[lastTracerPoint.X, lastTracerPoint.Y]}
-					endPoint={[character.GetPivot().Position.X, character.GetPivot().Position.Z]}
-					color={lastTracerColor}
-					transparency={lastTracerTransparency}
-					position={position}
-					skinId={soldier.skin}
-				/>
-			)} */}
+			{isClient && character && lastTracerPoint && !isDead && (
+				<TracerLastWall lastTracerPoint={lastTracerPoint} skinId={soldier.skin} />
+			)}
 		</>
 	);
 }

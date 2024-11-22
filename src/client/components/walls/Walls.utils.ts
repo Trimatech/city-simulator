@@ -1,7 +1,6 @@
 import { TweenService } from "@rbxts/services";
 import { CollisionGroups } from "shared/constants/collision-groups";
 import { sliceArray } from "shared/polybool/poly-utils";
-import { Point } from "shared/polybool/polybool";
 
 export const FORCE_MULTIPLIER = 15;
 export const UPWARD_FORCE_BIAS = 0.3;
@@ -143,13 +142,13 @@ export function createWallPieces({
 	});
 }
 
-export function calculateWallTransform(line: [Point, Point], height: number) {
+export function calculateWallTransform(line: [Vector2, Vector2], height: number) {
 	const startP = line[0];
 	const endP = line[1];
 
 	// Create points at ground level (Y = 0)
-	const startPoint = new Vector3(startP[0], 0, startP[1]);
-	const endPoint = new Vector3(endP[0], 0, endP[1]);
+	const startPoint = new Vector3(startP.X, 0, startP.Y);
+	const endPoint = new Vector3(endP.X, 0, endP.Y);
 
 	const direction = endPoint.sub(startPoint);
 	const width = direction.Magnitude;
