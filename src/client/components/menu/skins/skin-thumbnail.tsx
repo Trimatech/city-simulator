@@ -2,13 +2,13 @@ import React, { useEffect } from "@rbxts/react";
 import { CanvasGroup } from "client/components/ui/canvas-group";
 import { Image } from "client/components/ui/image";
 import { useMotion, useRem } from "client/hooks";
-import { Soldierskin } from "shared/constants/skins";
+import { SoldierSkin } from "shared/constants/skins";
 import { fillArray } from "shared/utils/object-utils";
 
 import { SOLDIER_ANGLE_OFFSET } from "../../world/soldiers";
 
 interface SkinThumbnailProps {
-	readonly skin: Soldierskin;
+	readonly skin: SoldierSkin;
 	readonly active: boolean;
 	readonly transparency: React.Binding<number>;
 }

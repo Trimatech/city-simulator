@@ -1,7 +1,7 @@
 import { useEffect } from "@rbxts/react";
 import { store } from "client/store";
 import { USER_NAME } from "shared/constants/core";
-import { getSoldierskin } from "shared/constants/skins";
+import { getSoldierSkin } from "shared/constants/skins";
 import { remotes } from "shared/remotes";
 import { selectPlayerBalance } from "shared/store/saves";
 
@@ -26,7 +26,7 @@ export function useMockRemotes() {
 
 			remotes.save.buySkin.test.onFire((skinId) => {
 				const balance = store.getState(selectPlayerBalance(USER_NAME)) ?? 0;
-				const skin = getSoldierskin(skinId);
+				const skin = getSoldierSkin(skinId);
 
 				if (balance >= skin.price) {
 					store.givePlayerSkin(USER_NAME, skinId);

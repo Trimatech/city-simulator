@@ -1,6 +1,6 @@
 import { images } from "shared/assets";
 
-export interface Soldierskin {
+export interface SoldierSkin {
 	readonly id: string;
 	readonly price: number;
 	readonly size: Vector2;
@@ -15,7 +15,7 @@ export interface Soldierskin {
 	readonly secondary?: Color3;
 }
 
-export const defaultSoldierskin: Soldierskin = {
+export const defaultSoldierSkin: SoldierSkin = {
 	id: "default",
 	price: 0,
 	size: new Vector2(512, 512),

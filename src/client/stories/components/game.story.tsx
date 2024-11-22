@@ -9,7 +9,7 @@ import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
 import { USER_NAME, WORLD_BOUNDS } from "shared/constants/core";
 import { getRandomAccent } from "shared/constants/palette";
-import { getRandomBaseSoldierskin } from "shared/constants/skins";
+import { getRandomBaseSoldierSkin } from "shared/constants/skins";
 import { CandyType } from "shared/store/candy";
 import { fillArray } from "shared/utils/object-utils";
 
@@ -31,7 +31,7 @@ export = hoarcekat(() => {
 								math.random(-WORLD_BOUNDS, WORLD_BOUNDS),
 								math.random(-WORLD_BOUNDS, WORLD_BOUNDS),
 							),
-				skin: getRandomBaseSoldierskin().id,
+				skin: getRandomBaseSoldierSkin().id,
 				score: math.random(0, 5000),
 			});
 		}

@@ -2,7 +2,7 @@
 
 import { shallowEqual } from "@rbxts/reflex";
 import { HttpService } from "@rbxts/services";
-import { getRandomBaseSoldierskin } from "shared/constants/skins";
+import { getRandomBaseSoldierSkin } from "shared/constants/skins";
 import { deserializeSoldiers, serializeSoldiers } from "shared/serdes/handlers/serdes-soldier";
 import { SoldierEntity, SoldiersState } from "shared/store/soldiers";
 import { fillArray } from "shared/utils/object-utils";
@@ -19,7 +19,7 @@ export = () => {
 			score: math.random(0, 10000),
 			boost: math.random() > 0.5,
 			tracers: fillArray(10, () => new Vector2(math.random(), math.random())),
-			skin: getRandomBaseSoldierskin().id,
+			skin: getRandomBaseSoldierSkin().id,
 			dead: math.random() > 0.5,
 			eliminations: math.random(1, 100),
 			polygon: fillArray(10, () => new Vector2(math.random(), math.random())),

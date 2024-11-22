@@ -2,29 +2,29 @@ import { images } from "shared/assets";
 import { darken } from "shared/utils/color-utils";
 
 import { accentList, accents, palette } from "../palette";
-import { defaultSoldierskin, Soldierskin } from "./types";
+import { defaultSoldierSkin, SoldierSkin } from "./types";
 import { blendColorSequence, duplicate } from "./utils";
 
-const catppuccinSoldierskins: readonly Soldierskin[] = accentList.map((id) => {
+const catppuccinSoldierSkins: readonly SoldierSkin[] = accentList.map((id) => {
 	return {
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id,
 		tint: blendColorSequence([accents[id], accents[id].Lerp(palette.black, 0.1)], 12),
 	};
 });
 
-export const soldierskins: readonly Soldierskin[] = [
-	...catppuccinSoldierskins,
+export const soldierskins: readonly SoldierSkin[] = [
+	...catppuccinSoldierSkins,
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "silver",
 		price: 100,
 		tint: [palette.text],
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "usa",
 		price: 100,
 		tint: [...duplicate([palette.red, palette.offwhite], 4), ...duplicate([palette.white], 8)],
@@ -35,7 +35,7 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "canada",
 		price: 100,
 		tint: [palette.red, palette.white, palette.offwhite],
@@ -44,14 +44,14 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "uk",
 		price: 100,
 		tint: [palette.red, palette.red, palette.offwhite, palette.blue, palette.blue, palette.offwhite],
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "france",
 		price: 100,
 		tint: [
@@ -67,35 +67,35 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "germany",
 		price: 100,
 		tint: [palette.surface1, palette.surface1, palette.red, palette.red, palette.yellow, palette.yellow],
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "japan",
 		price: 100,
 		tint: [palette.offwhite, palette.offwhite, palette.red],
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "mexico",
 		price: 100,
 		tint: [palette.blue, palette.blue, palette.offwhite, palette.offwhite, palette.red, palette.red],
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "brazil",
 		price: 100,
 		tint: [palette.green, palette.green, palette.yellow, palette.yellow, palette.blue, palette.blue],
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "australia",
 		price: 100,
 		tint: [
@@ -123,49 +123,49 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "estonia",
 		price: 100,
 		tint: [palette.blue, palette.blue, palette.surface1, palette.surface1, palette.offwhite, palette.offwhite],
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "finland",
 		price: 100,
 		tint: [palette.offwhite, palette.offwhite, palette.offwhite, palette.blue],
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "norway",
 		price: 100,
 		tint: [palette.red, palette.red, palette.offwhite, palette.blue, palette.blue],
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "denmark",
 		price: 100,
 		tint: [palette.red, palette.red, palette.offwhite],
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "sweden",
 		price: 100,
 		tint: [palette.blue, palette.blue, palette.yellow],
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "poland",
 		price: 100,
 		tint: [palette.offwhite, palette.offwhite, palette.red, palette.red],
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "czech",
 		price: 100,
 		tint: [
@@ -181,21 +181,21 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "ukraine",
 		price: 100,
 		tint: [palette.blue, palette.blue, palette.blue, palette.yellow, palette.yellow, palette.yellow],
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "hungary",
 		price: 100,
 		tint: [palette.red, palette.red, palette.offwhite, palette.offwhite, palette.green, palette.green],
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "south-africa",
 		price: 100,
 		tint: [
@@ -218,7 +218,7 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "pride",
 		price: 100,
 		tint: [
@@ -232,7 +232,7 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "bi-pride",
 		price: 100,
 		tint: [
@@ -247,7 +247,7 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "pan-pride",
 		price: 100,
 		tint: [
@@ -261,7 +261,7 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "lesbian-pride",
 		price: 100,
 		tint: [
@@ -276,14 +276,14 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "ace-pride",
 		price: 100,
 		tint: [palette.base, Color3.fromHex("#bcb6ba"), Color3.fromHex("#fcfffe"), Color3.fromHex("#b95bbd")],
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "aro-pride",
 		price: 100,
 		tint: [
@@ -296,7 +296,7 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "agender-pride",
 		price: 100,
 		tint: [
@@ -311,7 +311,7 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "genderfluid-pride",
 		price: 100,
 		tint: [
@@ -324,7 +324,7 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "genderqueer-pride",
 		price: 100,
 		tint: [
@@ -338,7 +338,7 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "trans-pride",
 		price: 100,
 		tint: [
@@ -350,14 +350,14 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "nonbinary-pride",
 		price: 100,
 		tint: [Color3.fromHex("#f4c757"), Color3.fromHex("#fcfffe"), Color3.fromHex("#b95bbd"), palette.base],
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "intersex-pride",
 		price: 100,
 		tint: [
@@ -369,56 +369,56 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "peppermint",
 		price: 150,
 		tint: [palette.red, palette.red, palette.offwhite, palette.offwhite],
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "candycorn",
 		price: 150,
 		tint: [palette.yellow, palette.yellow, palette.peach, palette.peach, palette.offwhite],
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "zebra",
 		price: 250,
 		tint: [palette.overlay0, palette.text],
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "honeybee",
 		price: 350,
 		tint: [palette.mantle, palette.mantle, palette.yellow],
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "space-cat",
 		price: 450,
 		tint: [palette.surface0, palette.offwhite, palette.mauve],
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "berries-and-cherries",
 		price: 750,
 		tint: blendColorSequence([palette.red, palette.mauve, palette.blue, palette.mauve], 16),
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "sunset",
 		price: 750,
 		tint: blendColorSequence([palette.mauve, palette.red, palette.peach, palette.red], 16),
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "siamese",
 		price: 750,
 		tint: blendColorSequence([Color3.fromRGB(99, 74, 61), palette.yellow], 16),
@@ -427,7 +427,7 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "stare",
 		price: 750,
 		tint: blendColorSequence([palette.white, darken(palette.white, 0.25)], 10),
@@ -441,7 +441,7 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "rainbow",
 		price: 1000,
 		tint: blendColorSequence(
@@ -463,7 +463,7 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "watermelon",
 		price: 1500,
 		tint: blendColorSequence([palette.white, Color3.fromRGB(97, 143, 122)], 12),
@@ -474,7 +474,7 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "red-cherry",
 		price: 1500,
 		tint: blendColorSequence([palette.white, Color3.fromRGB(140, 97, 110)], 12),
@@ -485,7 +485,7 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "blue-raspberry",
 		price: 1500,
 		tint: blendColorSequence([palette.white, Color3.fromRGB(97, 97, 140)], 12),
@@ -496,7 +496,7 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "black-ice",
 		price: 2750,
 		tint: [palette.white],
@@ -507,7 +507,7 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "neon",
 		price: 3500,
 		tint: blendColorSequence([Color3.fromRGB(186, 51, 84), Color3.fromRGB(94, 41, 153)], 16),
@@ -515,7 +515,7 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "nightwish",
 		price: 3750,
 		tint: blendColorSequence([Color3.fromRGB(61, 199, 207), Color3.fromRGB(166, 61, 186), palette.base], 16),
@@ -523,7 +523,7 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "epic",
 		price: 7331,
 		tint: [palette.white],
@@ -537,7 +537,7 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 
 	{
-		...defaultSoldierskin,
+		...defaultSoldierSkin,
 		id: "devious",
 		price: 13337,
 		tint: [palette.white],
@@ -551,6 +551,6 @@ export const soldierskins: readonly Soldierskin[] = [
 	},
 ];
 
-export const baseSoldierskins = soldierskins.filter((skin) => {
+export const baseSoldierSkins = soldierskins.filter((skin) => {
 	return skin.price === 0;
 });

@@ -3,7 +3,7 @@ import { store } from "server/store";
 import { CANDY_LIMITS } from "server/world/constants";
 import { getCandy, getRandomPointNearWorldOrigin, getSoldier } from "server/world/utils";
 import { getRandomAccent } from "shared/constants/palette";
-import { getSoldierskinForTracer } from "shared/constants/skins";
+import { getSoldierSkinForTracer } from "shared/constants/skins";
 import { CandyEntity, CandyType, selectCandyById, selectCandyCount } from "shared/store/candy";
 import { SOLDIER_RADIUS_BASE } from "shared/store/soldiers";
 import { selectSoldierIsBoosting } from "shared/store/soldiers";
@@ -144,7 +144,7 @@ export function dropCandyOnDeath(id: string): void {
 	const total = candyPositions.size();
 
 	const candies = candyPositions.mapFiltered((position, index) => {
-		const skin = getSoldierskinForTracer(soldier.skin, index);
+		const skin = getSoldierSkinForTracer(soldier.skin, index);
 
 		return createCandy({
 			position,
