@@ -12,6 +12,7 @@ export function serializeSoldiers(state: SoldiersState): string {
 	for (const [, soldier] of pairs(state)) {
 		buffer.WriteString(soldier.id);
 		buffer.WriteString(soldier.name);
+		writeVector2(buffer, soldier.lastPosition);
 		writeVector2(buffer, soldier.position);
 		buffer.WriteFloat32(soldier.angle);
 		buffer.WriteFloat32(soldier.desiredAngle);
@@ -40,6 +41,7 @@ export function deserializeSoldiers(data: string): SoldiersState {
 		state[id] = {
 			id,
 			name: buffer.ReadString(),
+			lastPosition: readVector2(buffer),
 			position: readVector2(buffer),
 			angle: buffer.ReadFloat32(),
 			desiredAngle: buffer.ReadFloat32(),

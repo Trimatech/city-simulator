@@ -45,6 +45,9 @@ export const selectAliveSoldiersById = createSelector(selectSoldiersById, (soldi
 	return mapProperties(soldiersById, (soldier) => (!soldier.dead ? soldier : undefined));
 });
 
+export const selectIsInsideBySoldierById = createSelector(selectSoldiersById, (soldiersById) => {
+	return mapProperties(soldiersById, (soldier) => (soldier.isInside ? soldier : undefined));
+});
 export const selectPlayerSoldiersById = createSelector(selectSoldiersById, (soldiersById) => {
 	return mapProperties(soldiersById, (soldier) => (getPlayerByName(soldier.id) ? soldier : undefined));
 });

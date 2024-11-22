@@ -167,6 +167,34 @@ function getCenterPoint(line: Line): Point {
 	return [(startPoint[0] + endPoint[0]) / 2, (startPoint[1] + endPoint[1]) / 2];
 }
 
+export function connectLineToPolygon(line: Line, polygon: Polygon) {
+	const region = polygon.regions[0] as Point[];
+	let closestIntersection: { point: Point; distance: number } | undefined;
+
+	for (let i = 0; i < region.size(); i++) {
+		const currentPoint = region[i] as Point;
+		const nextPoint = region[(i + 1) % region.size()] as Point;
+		const currentEdge: Line = [currentPoint, nextPoint];
+
+		const intersection = findIntersection(extendLine(line), currentEdge);
+
+		if (intersection) {
+			const distance = getDistanceBetweenPoints(getCenterPoint(line), intersection);
+			if (!closestIntersection || distance < closestIntersection.distance) {
+				closestIntersection = { point: intersection, distance };
+			}
+		}
+	}
+
+	if (closestIntersection) {
+		return [closestIntersection.point, line[1]];
+	}
+
+	warn("No intersection found when connecting line to polygon", { line, polygon });
+
+	return [getCenterPoint(line)];
+}
+
 export function addIntersectionPointsWithLines(cutLines: Line[], polygon: Polygon) {
 	const newPolygon = Object.deepCopy(polygon);
 	const cutPoints: Point[] = [];

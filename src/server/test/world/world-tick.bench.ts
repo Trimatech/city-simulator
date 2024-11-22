@@ -6,7 +6,7 @@ import {
 	getSafePointInWorld,
 	initCandyService,
 	initCollisionService,
-	initSoldierservice,
+	initSoldierService,
 	onCandyTick,
 	onCollisionTick,
 	onSoldierTick,
@@ -52,7 +52,7 @@ async function setup() {
 
 	// Initialize core services
 	initCandyService();
-	initSoldierservice();
+	initSoldierService();
 	initCollisionService();
 
 	disconnectAllSchedulers();

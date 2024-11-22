@@ -1,12 +1,7 @@
 import { createProducer } from "@rbxts/reflex";
 import { INITIAL_POLYGON_DIAMETER, INITIAL_POLYGON_ITEMS } from "shared/constants/core";
-import {
-	calculatePolygonOperation,
-	pointsToVectors,
-	setIntersectionPoints,
-	vectorsToPoints,
-} from "shared/polybool/poly-utils";
-import { Point, pointsToPolygon } from "shared/polybool/polybool";
+import { connectLineToPolygon, pointsToVectors, vector2ToPoint, vectorsToPoints } from "shared/polybool/poly-utils";
+import { pointsToPolygon } from "shared/polybool/polybool";
 import { calculatePolygonArea } from "shared/polygon-extra.utils";
 import { createPolygonAroundPosition } from "shared/polygon-extra.utils";
 import { mapProperties, mapProperty } from "shared/utils/object-utils";
@@ -18,6 +13,7 @@ export interface SoldiersState {
 export interface SoldierEntity {
 	readonly id: string;
 	readonly name: string;
+	readonly lastPosition: Vector2;
 	readonly position: Vector2;
 	readonly angle: number;
 	readonly desiredAngle: number;
@@ -36,6 +32,7 @@ const defaultEntity: SoldierEntity = {
 	id: "",
 	name: "",
 	position: new Vector2(),
+	lastPosition: new Vector2(),
 	angle: 0,
 	desiredAngle: 0,
 	score: 10,
@@ -82,7 +79,7 @@ export const soldiersSlice = createProducer(initialState, {
 			}
 
 			const currentLength = soldier.tracers.size();
-			const tracers = [...soldier.tracers];
+			const tracers = currentLength > 0 ? [...soldier.tracers] : [];
 			const bodyPieceLength = 2;
 
 			if (currentLength > 0) {
@@ -93,7 +90,16 @@ export const soldiersSlice = createProducer(initialState, {
 					tracers.push(soldier.position);
 				}
 			} else {
-				tracers.push(soldier.position);
+				const withIntersection = connectLineToPolygon(
+					[vector2ToPoint(soldier.lastPosition), vector2ToPoint(soldier.position)],
+					pointsToPolygon(vectorsToPoints(soldier.polygon)),
+				);
+				const points = pointsToVectors(withIntersection);
+				tracers.push(points[0]);
+
+				if (points.size() > 1) {
+					tracers.push(points[1]);
+				}
 			}
 
 			return { ...soldier, tracers };
@@ -101,46 +107,40 @@ export const soldiersSlice = createProducer(initialState, {
 	},
 
 	setSoldierIsInside: (state, id: string, isInside: boolean) => {
-		return mapProperty(state, id, (soldier) => {
-			const hasChanged = soldier.isInside !== isInside;
+		return mapProperty(state, id, (soldier) => ({
+			...soldier,
+			isInside,
+		}));
+	},
 
-			if (hasChanged) {
-				print(`Soldier is inside: ${isInside}`);
-				if (isInside) {
-					// Calculate new polygon based on old polygon and tracers
+	setSoldierPolygon: (state, id: string, polygon: Vector2[], polygonAreaSize: number) => {
+		return mapProperty(state, id, (soldier) => ({
+			...soldier,
+			polygon,
+			polygonAreaSize,
+			tracers: [],
+		}));
+	},
 
-					const resultPolygon = pointsToPolygon(vectorsToPoints(soldier.polygon as Vector2[]));
-					const points = vectorsToPoints(soldier.tracers as Vector2[]);
-					const newCutPolygon = setIntersectionPoints(resultPolygon, points);
+	clearSoldierTracers: (state, id: string) => {
+		return mapProperty(state, id, (soldier) => ({
+			...soldier,
+			tracers: [],
+		}));
+	},
 
-					if (newCutPolygon) {
-						const result = calculatePolygonOperation(resultPolygon, newCutPolygon, "Union");
-
-						if (result.regions.size() > 0 && result.regions[0].size() > 2) {
-							const resultPolygon = pointsToVectors(result.regions[0] as Point[]);
-							const polygonAreaSize = calculatePolygonArea(resultPolygon);
-							return { ...soldier, isInside, polygon: resultPolygon, polygonAreaSize, tracers: [] };
-						} else {
-							warn("No valid REGIONS found", { result, points, newCutPolygon });
-						}
-					} else {
-						warn("No INTERSECTION found", { points, newCutPolygon });
-					}
-
-					return { ...soldier, isInside, tracers: [] };
-				} else {
-					return { ...soldier, isInside, tracers: [soldier.position] };
-				}
-			}
-
-			return soldier;
-		});
+	setSoldierTracers: (state, id: string, tracers: Vector2[]) => {
+		return mapProperty(state, id, (soldier) => ({
+			...soldier,
+			tracers,
+		}));
 	},
 
 	moveSoldier: (state, id: string, position: Vector2) => {
 		return mapProperty(state, id, (soldier) => ({
 			...soldier,
 			position,
+			lastPosition: soldier.position,
 		}));
 	},
 

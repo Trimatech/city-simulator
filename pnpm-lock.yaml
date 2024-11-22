@@ -56,6 +56,9 @@ importers:
       '@rbxts/validate-tree':
         specifier: ^2.0.2
         version: 2.0.2
+      '@rbxts/wait-for':
+        specifier: ^0.1.5
+        version: 0.1.5
     devDependencies:
       '@rbxts/compiler-types':
         specifier: 3.0.0-types.0
@@ -210,6 +213,9 @@ packages:
 
   '@rbxts/validate-tree@2.0.2':
     resolution: {integrity: sha512-OA0E9ZjEeOpPa3XeV5/oC51aro2QFcL5dItufbagYZW8TOsX8C+FDXLx+A/ulMwcF42WcFNcQybxzcWSS/QSrA==}
+
+  '@rbxts/wait-for@0.1.5':
+    resolution: {integrity: sha512-EvETidsrsVYYvOata4TUmj6PD3Ia9YuOku2sGFO2D2303fqp14+dKsS1nVkorzgDB4jRTHQtmeWXDG/iRZXQ6Q==}
 
   '@roblox-ts/luau-ast@2.0.0':
     resolution: {integrity: sha512-cmMi093IdwBOLVxwuordhM8AmtbyTIyRpsTbB0D/JauidW4SXsQRQowSwWjHo4QP0DRJBXvOIlxtqEQi50uNzQ==}
@@ -1056,6 +1062,10 @@ snapshots:
   '@rbxts/types@1.0.813': {}
 
   '@rbxts/validate-tree@2.0.2': {}
+
+  '@rbxts/wait-for@0.1.5':
+    dependencies:
+      '@rbxts/services': 1.5.5
 
   '@roblox-ts/luau-ast@2.0.0': {}
 
