@@ -58,10 +58,11 @@ export async function initSoldierService() {
 
 		if (primaryPart) {
 			print("PrimaryPart found for", player.Name);
-			primaryPart.CFrame = new CFrame(safePoint.X, 10, safePoint.Y);
+			character.PivotTo(new CFrame(safePoint.X, 10, safePoint.Y));
 			print("Move soldier to point", player.Name, safePoint);
 			store.addSoldier(player.Name, {
 				name: player.DisplayName,
+				lastPosition: undefined,
 				position: safePoint ? new Vector2(safePoint.X, safePoint.Y) : undefined,
 				skin: currentSkin !== RANDOM_SKIN ? currentSkin : randomSkin,
 				score: 10,
@@ -94,6 +95,7 @@ export async function initSoldierService() {
 		const newCutPolygon = setIntersectionPoints(resultPolygon, points);
 
 		if (newCutPolygon) {
+			print(`newCutPolygon ${id}`, tracers);
 			const result = calculatePolygonOperation(resultPolygon, newCutPolygon, "Union");
 
 			if (result.regions.size() > 0 && result.regions[0].size() > 2) {

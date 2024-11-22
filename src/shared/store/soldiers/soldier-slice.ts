@@ -51,7 +51,7 @@ const initialState: SoldiersState = {};
 
 export const soldiersSlice = createProducer(initialState, {
 	addSoldier: (state, id: string, patch?: Partial<SoldierEntity>) => {
-		print("Add soldier", { id, patch });
+		print(`Add soldier ${id}`, { patch });
 		const polygon = createPolygonAroundPosition(
 			patch?.position || defaultEntity.position,
 			INITIAL_POLYGON_DIAMETER,
@@ -119,6 +119,7 @@ export const soldiersSlice = createProducer(initialState, {
 	},
 
 	setSoldierPolygon: (state, id: string, polygon: Vector2[], polygonAreaSize: number) => {
+		print(`setSoldierPolygon ${id}`, { polygon, polygonAreaSize });
 		return mapProperty(state, id, (soldier) => ({
 			...soldier,
 			polygon,

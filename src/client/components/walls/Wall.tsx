@@ -56,14 +56,14 @@ function WallComponent({
 		return { color, material: Enum.Material.SmoothPlastic, transparency };
 	})();
 
-	print("rendering properties", wallProperties);
+	//	print("rendering properties", wallProperties);
 
 	// Main wall creation effect
 	useEffect(() => {
 		if (isCrumbling) return;
 
 		const { width, center, rotation, startPosition } = calculateWallTransform([startPoint, endPoint], height);
-		print("Color");
+
 		// Create main wall part
 		const part = new Instance("Part");
 		part.Name = name;

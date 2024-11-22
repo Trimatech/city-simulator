@@ -12,12 +12,15 @@ interface Props {
 function TracerLastWallComponent({ lastTracerPoint, skinId }: Props) {
 	const characterPosition = useCharacterPosition();
 
+	const characterPositionValue = characterPosition.getValue();
+	if (!characterPositionValue) return undefined;
+
 	return (
 		<Wall
 			key="player-connection-line"
 			name={`player-connection-line_${lastTracerPoint.X}_${lastTracerPoint.Y}`}
 			startPoint={lastTracerPoint}
-			endPoint={characterPosition.getValue()}
+			endPoint={characterPositionValue}
 			skinId={skinId}
 		/>
 	);
