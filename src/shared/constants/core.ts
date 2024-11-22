@@ -21,3 +21,5 @@ export const USER_NAME = Players.LocalPlayer ? Players.LocalPlayer.Name : "(serv
 
 export const INITIAL_POLYGON_DIAMETER = 20;
 export const INITIAL_POLYGON_ITEMS = 40;
+
+export const TRACER_PIECE_LENGTH = 2;

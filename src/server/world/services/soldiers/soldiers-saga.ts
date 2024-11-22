@@ -1,3 +1,4 @@
+import Object from "@rbxts/object-utils";
 import { Players } from "@rbxts/services";
 import { waitForPrimaryPart } from "@rbxts/wait-for";
 import { store } from "server/store";
@@ -14,7 +15,7 @@ import { Point, pointsToPolygon } from "shared/polybool/polybool";
 import { calculatePolygonArea } from "shared/polygon-extra.utils";
 import { remotes } from "shared/remotes";
 import { defaultPlayerSave, RANDOM_SKIN, selectPlayerSave } from "shared/store/saves";
-import { selectIsInsideBySoldierById } from "shared/store/soldiers";
+import { selectIsInsideBySoldierById, selectSoldiersById } from "shared/store/soldiers";
 import { identifySoldier } from "shared/store/soldiers";
 import { createScheduler } from "shared/utils/scheduler";
 
@@ -58,7 +59,7 @@ export async function initSoldierService() {
 		if (primaryPart) {
 			print("PrimaryPart found for", player.Name);
 			primaryPart.CFrame = new CFrame(safePoint.X, 10, safePoint.Y);
-			print("Spawn soldier to point", player.Name, safePoint);
+			print("Move soldier to point", player.Name, safePoint);
 			store.addSoldier(player.Name, {
 				name: player.DisplayName,
 				position: safePoint ? new Vector2(safePoint.X, safePoint.Y) : undefined,
@@ -87,7 +88,7 @@ export async function initSoldierService() {
 		killSoldier(player.Name);
 	});
 
-	store.observe(selectIsInsideBySoldierById, identifySoldier, ({ id, polygon, tracers, position }) => {
+	store.observe(selectIsInsideBySoldierById, identifySoldier, ({ id, polygon, tracers }) => {
 		const resultPolygon = pointsToPolygon(vectorsToPoints(polygon as Vector2[]));
 		const points = vectorsToPoints(tracers as Vector2[]);
 		const newCutPolygon = setIntersectionPoints(resultPolygon, points);
@@ -98,9 +99,29 @@ export async function initSoldierService() {
 			if (result.regions.size() > 0 && result.regions[0].size() > 2) {
 				const resultPolygon = pointsToVectors(result.regions[0] as Point[]);
 				const polygonAreaSize = calculatePolygonArea(resultPolygon);
-				// return { ...soldier, isInside, polygon: resultPolygon, polygonAreaSize, tracers: [] };
 
 				store.setSoldierPolygon(id, resultPolygon, polygonAreaSize);
+
+				const state = store.getState();
+				const allSoldiers = Object.values(selectSoldiersById(state));
+
+				allSoldiers.forEach((soldier) => {
+					const soldierId = soldier.id;
+					if (soldierId !== id && soldier.polygon) {
+						const otherSoldierPolygon = pointsToPolygon(vectorsToPoints(soldier.polygon));
+						const differenceResult = calculatePolygonOperation(
+							otherSoldierPolygon,
+							newCutPolygon,
+							"Difference",
+						);
+
+						if (differenceResult.regions.size() > 0 && differenceResult.regions[0].size() > 2) {
+							const updatedPolygon = pointsToVectors(differenceResult.regions[0] as Point[]);
+							const updatedArea = calculatePolygonArea(updatedPolygon);
+							store.setSoldierPolygon(soldierId, updatedPolygon, updatedArea);
+						}
+					}
+				});
 			} else {
 				warn("No valid REGIONS found", { result, points, newCutPolygon });
 			}
@@ -110,10 +131,8 @@ export async function initSoldierService() {
 
 		store.clearSoldierTracers(id);
 
-		// when the soldier dies, create candy on the soldier's tracers
 		return () => {
-			warn(`Soldier ${id} is no longer inside--------------------`);
-			//	store.setSoldierTracers(id, [position]);
+			print(`Soldier ${id} is no longer inside--------------------`);
 		};
 	});
 }

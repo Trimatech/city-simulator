@@ -1,4 +1,5 @@
 import { createProducer } from "@rbxts/reflex";
+import { TRACER_PIECE_LENGTH } from "shared/constants/core";
 import { INITIAL_POLYGON_DIAMETER, INITIAL_POLYGON_ITEMS } from "shared/constants/core";
 import { connectLineToPolygon, pointsToVectors, vector2ToPoint, vectorsToPoints } from "shared/polybool/poly-utils";
 import { pointsToPolygon } from "shared/polybool/polybool";
@@ -50,6 +51,7 @@ const initialState: SoldiersState = {};
 
 export const soldiersSlice = createProducer(initialState, {
 	addSoldier: (state, id: string, patch?: Partial<SoldierEntity>) => {
+		print("Add soldier", { id, patch });
 		const polygon = createPolygonAroundPosition(
 			patch?.position || defaultEntity.position,
 			INITIAL_POLYGON_DIAMETER,
@@ -80,16 +82,15 @@ export const soldiersSlice = createProducer(initialState, {
 
 			const currentLength = soldier.tracers.size();
 			const tracers = currentLength > 0 ? [...soldier.tracers] : [];
-			const bodyPieceLength = 2;
 
 			if (currentLength > 0) {
 				const lastTracer = soldier.tracers[currentLength - 1];
 				const distance = lastTracer.sub(soldier.position).Magnitude;
 
-				if (distance > bodyPieceLength) {
+				if (distance >= TRACER_PIECE_LENGTH) {
 					tracers.push(soldier.position);
 				}
-			} else {
+			} else if (soldier.lastPosition) {
 				const withIntersection = connectLineToPolygon(
 					[vector2ToPoint(soldier.lastPosition), vector2ToPoint(soldier.position)],
 					pointsToPolygon(vectorsToPoints(soldier.polygon)),
