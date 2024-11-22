@@ -1,24 +1,24 @@
-import { baseSoldierSkins, soldierskins } from "./skins";
+import { baseSoldierSkins, soldierskins as soldierSkins } from "./skins";
 import { SoldierSkin } from "./types";
 
 export * from "./skins";
 export * from "./types";
 
-const soldierskinsById = new Map(soldierskins.map((skin) => [skin.id, skin]));
+const soldierSkinsById = new Map(soldierSkins.map((skin) => [skin.id, skin]));
 
 /**
  * Returns the soldier skin with the given id, or a default skin
  * if the id is invalid.
  */
 export function getSoldierSkin(id: string): SoldierSkin {
-	return soldierskinsById.get(id) || baseSoldierSkins[0];
+	return soldierSkinsById.get(id) || baseSoldierSkins[0];
 }
 
 /**
  * Returns the soldier skin with the given id, or undefined.
  */
 export function findSoldierSkin(id: string): SoldierSkin | undefined {
-	return soldierskinsById.get(id);
+	return soldierSkinsById.get(id);
 }
 
 /**

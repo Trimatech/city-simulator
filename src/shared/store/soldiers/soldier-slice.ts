@@ -81,7 +81,7 @@ export const soldiersSlice = createProducer(initialState, {
 			}
 
 			const currentLength = soldier.tracers.size();
-			const tracers = currentLength > 0 ? [...soldier.tracers] : [];
+			const tracers = [...soldier.tracers];
 
 			if (currentLength > 0) {
 				const lastTracer = soldier.tracers[currentLength - 1];
@@ -103,7 +103,11 @@ export const soldiersSlice = createProducer(initialState, {
 				}
 			}
 
-			return { ...soldier, tracers };
+			if (tracers.size() !== currentLength) {
+				return { ...soldier, tracers };
+			}
+
+			return soldier;
 		});
 	},
 

@@ -1,10 +1,11 @@
-import React from "@rbxts/react";
+import React, { memo } from "@rbxts/react";
 import { palette } from "shared/constants/palette";
 import { Point, Polygon } from "shared/polybool/polybool";
 
 import { Wall } from "./Wall";
 
 interface Props {
+	skinId?: string;
 	points: Vector2[];
 	color?: Color3;
 	transparency?: number;
@@ -14,13 +15,7 @@ interface Props {
 	isCrumbling?: boolean;
 }
 
-export function AreaWalls({
-	points,
-	color = palette.white,
-	transparency = 0,
-	position = new Vector3(),
-	isCrumbling = false,
-}: Props) {
+function AreaWallsComponent({ skinId, points, color = palette.white, transparency = 0, isCrumbling = false }: Props) {
 	if (!points || points.size() === 0) {
 		warn("No points found in polygon");
 		return undefined;
@@ -43,9 +38,9 @@ export function AreaWalls({
 							endPoint={nextPoint as Point}
 							color={color}
 							transparency={transparency}
-							position={position}
 							height={5.1}
 							isCrumbling={isCrumbling}
+							skinId={skinId}
 						/>
 					);
 				}),
@@ -53,3 +48,5 @@ export function AreaWalls({
 		</>
 	);
 }
+
+export const AreaWalls = memo(AreaWallsComponent);

@@ -1,6 +1,7 @@
 import { memo, useEffect, useRef } from "@rbxts/react";
 import { Workspace } from "@rbxts/services";
 import { palette } from "shared/constants/palette";
+import { getSoldierSkin, getSoldierSkinForTracer } from "shared/constants/skins";
 import { Point } from "shared/polybool/polybool";
 
 import { calculateWallTransform, createWallPieces, startCrumbling, startFadeOut } from "./Walls.utils";
@@ -12,8 +13,9 @@ interface Props {
 	transparency?: number;
 	height?: number;
 	thickness?: number;
-	position: Vector3;
 	isCrumbling?: boolean;
+	skinId?: string;
+	tracerIndex?: number;
 }
 
 function WallComponent({
@@ -23,8 +25,9 @@ function WallComponent({
 	transparency = 0,
 	height = 5,
 	thickness = 1,
-	position = new Vector3(),
 	isCrumbling = false,
+	skinId,
+	tracerIndex,
 }: Props) {
 	const mainPartRef = useRef<Part>();
 	const cylinderRef = useRef<Part>();
@@ -33,23 +36,42 @@ function WallComponent({
 
 	const name = `wall_${startPoint[0]}_${startPoint[1]}_${endPoint[0]}_${endPoint[1]}`;
 
+	// Get skin properties
+	const wallProperties = (() => {
+		if (skinId) {
+			if (tracerIndex !== undefined) {
+				const tracerSkin = getSoldierSkinForTracer(skinId, tracerIndex);
+				return {
+					color: tracerSkin.tint,
+					material: Enum.Material.SmoothPlastic,
+					transparency: transparency,
+				};
+			}
+			const skin = getSoldierSkin(skinId);
+			return {
+				color: skin.tint[0],
+				material: Enum.Material.SmoothPlastic,
+				transparency: transparency,
+			};
+		}
+		return { color, material: Enum.Material.SmoothPlastic, transparency };
+	})();
+
+	print("rendering properties", wallProperties);
+
 	// Main wall creation effect
 	useEffect(() => {
 		if (isCrumbling) return;
 
-		const { width, center, rotation, startPosition } = calculateWallTransform(
-			[startPoint, endPoint],
-			position,
-			height,
-		);
-
+		const { width, center, rotation, startPosition } = calculateWallTransform([startPoint, endPoint], height);
+		print("Color");
 		// Create main wall part
 		const part = new Instance("Part");
 		part.Name = name;
 		part.Size = new Vector3(width, height, thickness);
-		part.Color = color;
-		part.Transparency = transparency;
-		part.Material = Enum.Material.SmoothPlastic;
+		part.Color = wallProperties.color;
+		part.Transparency = wallProperties.transparency;
+		part.Material = wallProperties.material;
 		part.TopSurface = Enum.SurfaceType.Smooth;
 		part.BottomSurface = Enum.SurfaceType.Smooth;
 		part.Anchored = true;
@@ -61,9 +83,9 @@ function WallComponent({
 		const cylinder = new Instance("Part");
 		cylinder.Name = `${name}_cylinder`;
 		cylinder.Size = new Vector3(height, thickness, thickness);
-		cylinder.Color = color;
-		cylinder.Transparency = transparency;
-		cylinder.Material = Enum.Material.SmoothPlastic;
+		cylinder.Color = wallProperties.color;
+		cylinder.Transparency = wallProperties.transparency;
+		cylinder.Material = wallProperties.material;
 		cylinder.TopSurface = Enum.SurfaceType.Smooth;
 		cylinder.BottomSurface = Enum.SurfaceType.Smooth;
 		cylinder.Shape = Enum.PartType.Cylinder;
@@ -93,11 +115,11 @@ function WallComponent({
 		startPoint[1],
 		endPoint[0],
 		endPoint[1],
-		color,
-		transparency,
+		wallProperties.color,
+		wallProperties.transparency,
+		wallProperties.material,
 		height,
 		thickness,
-		position,
 		isCrumbling,
 	]);
 
@@ -115,15 +137,16 @@ function WallComponent({
 			cylinderRef.current = undefined;
 		}
 
-		const { width, center, rotation } = calculateWallTransform([startPoint, endPoint], position, height);
+		const { width, center, rotation } = calculateWallTransform([startPoint, endPoint], height);
 
 		// Create debris pieces
 		const pieces = createWallPieces({
 			position: center,
 			size: new Vector3(width, height, thickness),
 			rotation: rotation,
-			color: color,
-			transparency: transparency,
+			color: wallProperties.color,
+			transparency: wallProperties.transparency,
+			material: wallProperties.material,
 		});
 
 		// Add pieces to workspace

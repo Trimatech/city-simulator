@@ -23,6 +23,7 @@ interface CreateWallPiecesOptions {
 	rotation: CFrame;
 	color: Color3;
 	transparency: number;
+	material?: Enum.Material;
 }
 
 interface WallBox {
@@ -107,7 +108,14 @@ function sliceWallBox(box: WallBox, minSize: number): WallBox[] {
 	return boxes;
 }
 
-export function createWallPieces({ position, size, rotation, color, transparency }: CreateWallPiecesOptions) {
+export function createWallPieces({
+	position,
+	size,
+	rotation,
+	color,
+	transparency,
+	material = Enum.Material.SmoothPlastic,
+}: CreateWallPiecesOptions) {
 	// Initial wall box
 	const initialBox: WallBox = {
 		position,
@@ -125,7 +133,7 @@ export function createWallPieces({ position, size, rotation, color, transparency
 		piece.Size = box.size;
 		piece.Color = color;
 		piece.Transparency = transparency;
-		piece.Material = Enum.Material.SmoothPlastic;
+		piece.Material = material;
 		piece.TopSurface = Enum.SurfaceType.Smooth;
 		piece.BottomSurface = Enum.SurfaceType.Smooth;
 		piece.CollisionGroup = CollisionGroups.WALL;
@@ -135,7 +143,7 @@ export function createWallPieces({ position, size, rotation, color, transparency
 	});
 }
 
-export function calculateWallTransform(line: [Point, Point], position: Vector3, height: number) {
+export function calculateWallTransform(line: [Point, Point], height: number) {
 	const startP = line[0];
 	const endP = line[1];
 
@@ -148,14 +156,10 @@ export function calculateWallTransform(line: [Point, Point], position: Vector3, 
 
 	// Calculate center position at ground level, then move up by height/2
 	const groundCenter = startPoint.add(direction.mul(0.5));
-	const center = new Vector3(
-		groundCenter.X + position.X,
-		height / 2 + position.Y, // Move up by half height
-		groundCenter.Z + position.Z,
-	);
+	const center = new Vector3(groundCenter.X, height / 2, groundCenter.Z);
 
 	// Calculate start position for cylinder
-	const startPosition = new Vector3(startPoint.X + position.X, height / 2 + position.Y, startPoint.Z + position.Z);
+	const startPosition = new Vector3(startPoint.X, height / 2, startPoint.Z);
 
 	const rotation = CFrame.lookAt(new Vector3(), new Vector3(direction.X, 0, direction.Z)).mul(
 		CFrame.fromEulerAnglesXYZ(0, math.rad(90), 0),

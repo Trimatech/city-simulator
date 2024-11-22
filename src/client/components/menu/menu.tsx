@@ -29,13 +29,13 @@ export function Menu() {
 			</MenuContainer>
 
 			<MenuContainer page="support">
-				<MenuVignette />
 				<Support />
+				<MenuVignette />
 			</MenuContainer>
 
 			<MenuContainer page="skins">
-				<MenuVignette />
 				<Skins />
+				<MenuVignette />
 			</MenuContainer>
 		</>
 	);
