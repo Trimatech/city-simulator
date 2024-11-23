@@ -83,7 +83,7 @@ export = () => {
 		store.flush();
 		onCandyTick();
 		expect(didEatCandy(candy.id)).to.equal(true);
-		expect(getSoldier("__test__")!.score).to.never.equal(0);
+		expect(getSoldier("__test__")!.orbs).to.never.equal(0);
 	});
 
 	it("should not eat candy if a soldier is far away", () => {

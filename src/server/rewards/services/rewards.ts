@@ -3,10 +3,10 @@ import { store } from "server/store";
 import {
 	identifyMilestone,
 	ScoreMilestone,
+	selectMilestoneArea,
 	selectMilestoneLastKilled,
 	selectMilestoneRanking,
 	selectMilestones,
-	selectMilestoneScore,
 } from "server/store/milestones";
 import { getSoldier } from "server/world";
 import { sounds } from "shared/assets";
@@ -18,7 +18,6 @@ import { getPlayerByName } from "shared/utils/player-utils";
 import { grantMoney, shouldGrantReward } from "../utils";
 
 const SCORE_REWARDS: { readonly [K in ScoreMilestone]: number } = {
-	1_000: 20,
 	5_000: 50,
 	10_000: 100,
 	25_000: 250,
@@ -58,13 +57,13 @@ function observeMilestone(id: string) {
 		}
 	});
 
-	// When the player hits a new score milestone they haven't hit
+	// When the player hits a new area milestone they haven't hit
 	// during their current life, grant them a reward
-	const unsubscribeScore = store.subscribe(selectMilestoneScore(id), (score) => {
-		const reward = score && SCORE_REWARDS[score];
+	const unsubscribeArea = store.subscribe(selectMilestoneArea(id), (area) => {
+		const reward = area && SCORE_REWARDS[area];
 
 		if (reward !== undefined && shouldGrantReward()) {
-			grantMoneyReward(id, reward, `hitting a score of <font color="#fff">${score}</font>`);
+			grantMoneyReward(id, reward, `hitting a area of <font color="#fff">${area}</font>`);
 		}
 	});
 
@@ -102,7 +101,7 @@ function observeMilestone(id: string) {
 
 	return () => {
 		unsubscribeRanking();
-		unsubscribeScore();
+		unsubscribeArea();
 		unsubscribeKill();
 		unsubscribePassive();
 	};

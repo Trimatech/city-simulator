@@ -9,6 +9,10 @@ export async function initScoreboardService() {
 		stats.Name = "leaderstats";
 		stats.Parent = player;
 
+		const areaSize = new Instance("IntValue");
+		areaSize.Name = "📐 Area Size";
+		areaSize.Parent = stats;
+
 		const knockouts = new Instance("IntValue");
 		knockouts.Name = "☠️ KOs";
 		knockouts.Parent = stats;
@@ -17,17 +21,18 @@ export async function initScoreboardService() {
 		cash.Name = "💵 Cash";
 		cash.Parent = stats;
 
-		const score = new Instance("IntValue");
-		score.Name = "💯 Score";
-		score.Parent = stats;
+		const orbs = new Instance("IntValue");
+		orbs.Name = "🔵 Orbs";
+		orbs.Parent = stats;
 
 		const isPrimary = new Instance("BoolValue");
 		isPrimary.Name = "IsPrimary";
 		isPrimary.Value = true;
-		isPrimary.Parent = score;
+		isPrimary.Parent = areaSize;
 
 		const unsubscribeFromSoldier = store.subscribe(selectSoldierById(player.Name), (soldier) => {
-			score.Value = soldier ? soldier.score : 0;
+			orbs.Value = soldier ? soldier.orbs : 0;
+			areaSize.Value = soldier ? soldier.polygonAreaSize : 0;
 			knockouts.Value = soldier ? soldier.eliminations : 0;
 		});
 

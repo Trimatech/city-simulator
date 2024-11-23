@@ -45,8 +45,8 @@ function checkCollisionWithTracers(soldier: SoldierEntity): boolean {
 }
 
 export function onCollisionTick() {
-	// in a head-on collision, the soldier with the lowest score is killed
-	const soldiers = store.getState(selectSoldiersSorted((a, b) => a.score < b.score));
+	// in a head-on collision, the soldier with the lowest area is killed
+	const soldiers = store.getState(selectSoldiersSorted((a, b) => a.polygonAreaSize < b.polygonAreaSize));
 
 	for (const soldier of soldiers) {
 		if (soldier.dead) {

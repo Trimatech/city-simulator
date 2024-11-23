@@ -13,7 +13,7 @@ export const identifySoldier = (soldier: SoldierEntity) => {
 };
 
 export const cycleNextSoldier = (currentId: string) => (state: SharedState) => {
-	const soldiers = selectSoldiersSorted((a, b) => a.score > b.score)(state);
+	const soldiers = selectSoldiersSorted((a, b) => a.orbs > b.orbs)(state);
 	const index = soldiers.findIndex((soldier) => soldier.id === currentId);
 
 	if (index !== -1) {
@@ -72,8 +72,8 @@ export const selectLocalSoldier = (state: SharedState) => {
 	return state.soldiers[USER_NAME];
 };
 
-export const selectLocalScore = (state: SharedState) => {
-	return state.soldiers[USER_NAME]?.score;
+export const selectLocalOrbs = (state: SharedState) => {
+	return state.soldiers[USER_NAME]?.orbs;
 };
 
 export const selectLocalEliminations = (state: SharedState) => {
@@ -96,7 +96,7 @@ export const selectTopSoldier = createSelector(selectSoldiersById, (soldiersById
 	let topSoldier: SoldierEntity | undefined;
 
 	for (const [, soldier] of pairs(soldiersById)) {
-		if (topSoldier === undefined || soldier.score > topSoldier.score) {
+		if (topSoldier === undefined || soldier.orbs > topSoldier.orbs) {
 			topSoldier = soldier;
 		}
 	}
@@ -134,8 +134,12 @@ export const selectSoldierById = (id: string) => {
 	return (state: SharedState) => state.soldiers[id];
 };
 
-export const selectSoldierscore = (id: string) => {
-	return (state: SharedState) => state.soldiers[id]?.score;
+export const selectSoldierOrbs = (id: string) => {
+	return (state: SharedState) => state.soldiers[id]?.orbs;
+};
+
+export const selectSoldierArea = (id: string) => {
+	return (state: SharedState) => state.soldiers[id]?.polygonAreaSize;
 };
 
 export const selectSoldierIsDead = (id: string) => {
@@ -154,7 +158,7 @@ export const selectSoldierIsBoosting = (id: string) => {
 
 export const selectSoldierRanking = (id: string) => {
 	const comparator = (current: SoldierEntity, existing: SoldierEntity) => {
-		return current.score > existing.score;
+		return current.orbs > existing.orbs;
 	};
 
 	return createSelector(selectSoldiersSorted(comparator), (soldiers) => {

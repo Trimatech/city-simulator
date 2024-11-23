@@ -1,127 +1,127 @@
 # If it's a group, you need to change it to this:
 owner:
-  group: 34579161
+    group: 34579161
 
 state:
-  remote:
-    region:
-      custom:
-        name: eeur
-        endpoint: https://a8f126f6517bc4d89de7b0091a93209d.eu.r2.cloudflarestorage.com/trimateh-mantle-states
-    bucket: trimateh-mantle-states
-    key: exp2-qonquer
+    remote:
+        region:
+            custom:
+                name: eeur
+                endpoint: https://a8f126f6517bc4d89de7b0091a93209d.eu.r2.cloudflarestorage.com/trimateh-mantle-states
+        bucket: trimateh-mantle-states
+        key: exp2-qonquer
 
 environments:
-  - label: canary
-    targetNamePrefix: environmentLabel
-    targetAccess: public
-    targetOverrides:
-      icon: assets/marketing/game_icon_canary.png
-      thumbnails: [assets/marketing/game_thumbnail_canary.png]
-      places:
-        start:
-          configuration:
-            name: Divide and Qonquer DEV 🚧
-            description: |
-              This is a development build of Divide and Qonquer. Your feedback is appreciated ❤️
+    - label: canary
+      targetNamePrefix: environmentLabel
+      targetAccess: public
+      targetOverrides:
+          icon: assets/marketing/game_icon_canary.png
+          thumbnails: [assets/marketing/game_thumbnail_canary.png]
+          places:
+              start:
+                  configuration:
+                      name: Divide and Qonquer DEV 🚧
+                      description: |
+                          This is a development build of Divide and Qonquer. Your feedback is appreciated ❤️
 
-              🚧  Proceed with caution: You may encounter bugs, data resets, and instability.
-              🔥  Take a look at upcoming features before they're shipped to production.
-              🤝  Send your feedback to the group wall or the linked socials!
+                          🚧  Proceed with caution: You may encounter bugs, data resets, and instability.
+                          🔥  Take a look at upcoming features before they're shipped to production.
+                          🤝  Send your feedback to the group wall or the linked socials!
 
-            maxPlayerCount: 50
-  - label: production
-    branches: [main]
-    targetAccess: public
+                      maxPlayerCount: 50
+    - label: production
+      branches: [main]
+      targetAccess: public
 
 target:
-  experience:
-    icon: assets/marketing/game_icon.png
-    thumbnails: [assets/marketing/game_thumbnail.png]
-    socialLinks:
-      - title: 🤝・Community
-        url: https://www.roblox.com/groups/34579161/Trimatech-Games#!/about
-    configuration:
-      playableDevices: [computer, console, phone, tablet]
-      privateServers:
-        price: 10
-      enableStudioAccessToApis: true
-      avatarType: playerChoice
-      avatarAnimationType: playerChoice
-    spatialVoice:
-      enabled: true
-    places:
-      start:
-        file: place.rbxlx
+    experience:
+        icon: assets/marketing/game_icon.png
+        thumbnails: [assets/marketing/game_thumbnail.png]
+        socialLinks:
+            - title: 🤝・Community
+              url: https://www.roblox.com/groups/34579161/Trimatech-Games#!/about
         configuration:
-          name: Divide and Qonquer ⚔️
-          description: |
-            Experiment 2: Divide and Qonquer is a strategic game where players compete to claim sections of a large circular arena by drawing boundary lines from their territories.
+            playableDevices: [computer, console, phone, tablet]
+            privateServers:
+                price: 10
+            enableStudioAccessToApis: true
+            avatarType: playerChoice
+            avatarAnimationType: playerChoice
+        spatialVoice:
+            enabled: true
+        places:
+            start:
+                file: place.rbxlx
+                configuration:
+                    name: Divide and Qonquer ⚔️
+                    description: |
+                        Experiment 2: Divide and Qonquer is a strategic game where players compete to claim sections of a large circular arena by drawing boundary lines from their territories.
 
-            ⚔️  Conquer the largest share of the circle by expanding your territory.
-            🛡️  Strategically avoid other players to maintain your conquered area.
-            🎯  Balance offense and defense to establish dominance in the arena.
+                        ⚔️  Conquer the largest share of the circle by expanding your territory.
+                        🛡️  Strategically avoid other players to maintain your conquered area.
+                        🎯  Balance offense and defense to establish dominance in the arena.
 
-            Please like ❤️ and favorite ⭐️ if you enjoyed Divide and Qonquer!
-            Follow 🔔 to be notified of new updates!
+                        Please like ❤️ and favorite ⭐️ if you enjoyed Divide and Qonquer!
+                        Follow 🔔 to be notified of new updates!
 
-          maxPlayerCount: 25
-    assets:
-      - assets/sounds/*
-    badges:
-      1-score-25000:
-        name: ✨ 25,000 Score
-        description: Nothing can stop you now! Hit a score of 25,000.
-        icon: assets/badges/score_25000.png
-        enabled: true
-      2-score-50000:
-        name: 🔥 50,000 Score
-        description: You're on track to becoming the loooooongest. Hit a score of 50,000.
-        icon: assets/badges/score_50000.png
-        enabled: true
-      3-score-100000:
-        name: 🚀 100,000 Score
-        description: You're breaking records! Hit a score of 100,000.
-        icon: assets/badges/score_100000.png
-        enabled: true
-      4-3rd-place:
-        name: 🥉 3rd Place
-        description: You're among the greatest! Become the third largest in the server.
-        icon: assets/badges/third_place.png
-        enabled: true
-      5-2nd-place:
-        name: 🥈 2nd Place
-        description: Blaze through the competition! Become the second largest in the server.
-        icon: assets/badges/second_place.png
-        enabled: true
-      6-1st-place:
-        name: 🥇 1st Place
-        description: You're on top of the world! Become the largest in the server.
-        icon: assets/badges/first_place.png
-        enabled: true
-    products:
-      money-100:
-        price: 10
-        name: 💛 $100
-        description: Buy $100 to spend on skins and more!
-        icon: assets/marketing/game_icon.png
-      money-250:
-        price: 20
-        name: ❤️ $250
-        description: Buy $250 to spend on skins and more!
-        icon: assets/marketing/game_icon.png
-      money-500:
-        price: 40
-        name: 💚 $500
-        description: Buy $500 to spend on skins and more!
-        icon: assets/marketing/game_icon.png
-      money-1000:
-        price: 80
-        name: 💙 $1,000
-        description: Buy $1,000 to spend on skins and more!
-        icon: assets/marketing/game_icon.png
-      money-5000:
-        price: 375
-        name: 💜 $5,000
-        description: Buy $5,000 to spend on skins and more!
-        icon: assets/marketing/game_icon.png
+                    maxPlayerCount: 25
+        assets:
+            - assets/sounds/*
+        badges:
+            1-area-25000:
+                name: ✨ 25,000 studs² area
+                description: Nothing can stop you now! Hit a area of 25,000 studs².
+                icon: assets/badges/area_25000.png
+                enabled: true
+            2-area-50000:
+                name: 🔥 50,000 studs² area
+                description: You're on track to becoming the largest. Hit a area of 50,000 studs².
+                icon: assets/badges/area_50000.png
+                enabled: true
+            3-area-100000:
+                name: 🚀 100,000 studs² area
+                description: You're breaking records! Hit a area of 100,000 studs².
+                icon: assets/badges/area_100000.png
+                enabled: true
+            4-3rd-place:
+                name: 🥉 3rd Place
+                description: You're among the greatest! Become the third largest in the server.
+                icon: assets/badges/third_place.png
+                enabled: true
+            5-2nd-place:
+                name: 🥈 2nd Place
+                description: Blaze through the competition! Become the second largest in the server.
+                icon: assets/badges/second_place.png
+                enabled: true
+            6-1st-place:
+                name: 🥇 1st Place
+                description: You're on top of the world! Become the largest in the server.
+                icon: assets/badges/first_place.png
+                enabled: true
+        products:
+            money-100:
+                price: 10
+                name: 💛 $100
+                description: Buy $100 to spend on skins and more!
+                icon: assets/marketing/game_icon.png
+            money-250:
+                price: 20
+                name: ❤️ $250
+                description: Buy $250 to spend on skins and more!
+                icon: assets/marketing/game_icon.png
+            money-500:
+                price: 40
+                name: 💚 $500
+                description: Buy $500 to spend on skins and more!
+                icon: assets/marketing/game_icon.png
+            money-1000:
+                price: 80
+                name: 💙 $1,000
+                description: Buy $1,000 to spend on skins and more!
+                icon: assets/marketing/game_icon.png
+            money-5000:
+                price: 375
+                name: 💜 $5,000
+                description: Buy $5,000 to spend on skins and more!
+                icon: assets/marketing/game_icon.png

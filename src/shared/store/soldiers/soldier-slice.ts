@@ -18,7 +18,7 @@ export interface SoldierEntity {
 	readonly position: Vector2;
 	readonly angle: number;
 	readonly desiredAngle: number;
-	readonly score: number;
+	readonly orbs: number;
 	readonly boost: boolean;
 	readonly tracers: readonly Vector2[];
 	readonly skin: string;
@@ -36,7 +36,7 @@ const defaultEntity: SoldierEntity = {
 	lastPosition: new Vector2(),
 	angle: 0,
 	desiredAngle: 0,
-	score: 10,
+	orbs: 10,
 	boost: false,
 	tracers: [],
 	skin: "",
@@ -171,10 +171,10 @@ export const soldiersSlice = createProducer(initialState, {
 		}));
 	},
 
-	incrementSoldierscore: (state, id: string, amount: number) => {
+	incrementSoldierOrbs: (state, id: string, amount: number) => {
 		return mapProperty(state, id, (soldier) => ({
 			...soldier,
-			score: math.max(soldier.score + amount, 0),
+			orbs: math.max(soldier.orbs + amount, 0),
 		}));
 	},
 

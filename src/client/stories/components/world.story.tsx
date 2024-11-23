@@ -25,7 +25,7 @@ export = hoarcekat(() => {
 				name: id,
 				position: new Vector2(math.random(-10, 10), math.random(-10, 10)),
 				skin: getRandomBaseSoldierSkin().id,
-				score: math.random(0, 8000),
+				orbs: math.random(0, 8000),
 			});
 		}
 

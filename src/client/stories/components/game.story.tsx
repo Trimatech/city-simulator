@@ -32,7 +32,7 @@ export = hoarcekat(() => {
 								math.random(-WORLD_BOUNDS, WORLD_BOUNDS),
 							),
 				skin: getRandomBaseSoldierSkin().id,
-				score: math.random(0, 5000),
+				orbs: math.random(0, 5000),
 			});
 		}
 

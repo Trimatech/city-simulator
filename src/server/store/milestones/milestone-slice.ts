@@ -6,17 +6,17 @@ export type MilestoneState = {
 };
 
 export interface MilestoneEntity {
-	readonly topScore?: ScoreMilestone;
+	readonly topArea?: ScoreMilestone;
 	readonly topRank: number;
 	readonly lastKilled?: string;
 }
 
 export type ScoreMilestone = (typeof SCORE_MILESTONES)[number];
 
-export const SCORE_MILESTONES = [1_000, 5_000, 10_000, 25_000, 50_000, 100_000, 250_000, 500_000, 1_000_000] as const;
+export const SCORE_MILESTONES = [5_000, 10_000, 25_000, 50_000, 100_000, 250_000, 500_000, 1_000_000] as const;
 
-const SCORE_MILESTONES_REVERSE = SCORE_MILESTONES.reduce<ScoreMilestone[]>((acc, score, index) => {
-	acc[SCORE_MILESTONES.size() - index] = score;
+const SCORE_MILESTONES_REVERSE = SCORE_MILESTONES.reduce<ScoreMilestone[]>((acc, area, index) => {
+	acc[SCORE_MILESTONES.size() - index] = area;
 	return acc;
 }, []);
 
@@ -51,20 +51,22 @@ export const milestoneSlice = createProducer(initialState, {
 		}));
 	},
 
-	setMilestoneScore: (state, playerId: string, score: number) => {
+	setMilestoneArea: (state, playerId: string, area: number) => {
 		return mapProperty(state, playerId, (milestone) => {
 			const nextMilestone = math.max(
-				SCORE_MILESTONES_REVERSE.find((milestone) => score >= milestone) || 0,
-				milestone.topScore || 0,
+				SCORE_MILESTONES_REVERSE.find((milestone) => area >= milestone) || 0,
+				milestone.topArea || 0,
 			);
 
 			if (nextMilestone === 0) {
 				return milestone;
 			}
 
+			warn(`${playerId} reached area milestone ${nextMilestone}`);
+
 			return {
 				...milestone,
-				topScore: nextMilestone as ScoreMilestone,
+				topArea: nextMilestone as ScoreMilestone,
 			};
 		});
 	},

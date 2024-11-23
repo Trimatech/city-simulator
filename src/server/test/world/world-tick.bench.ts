@@ -42,7 +42,7 @@ async function setup() {
 
 		store.addSoldier(`Soldier ${index}`, {
 			position,
-			score: 1000 + 160 * index,
+			orbs: 1000 + 160 * index,
 			desiredAngle: 0.5 * index,
 		});
 	}

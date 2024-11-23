@@ -10,7 +10,7 @@ interface Props {
 }
 
 function TracerWallsComponent({ tracers, skinId, isCrumbling = false }: Props) {
-	warn("rendering tracer walls");
+	//	warn("rendering tracer walls");
 	// Convert segments to array of line segments
 	const tracerLines = tracers
 		.mapFiltered((segment, index) => {

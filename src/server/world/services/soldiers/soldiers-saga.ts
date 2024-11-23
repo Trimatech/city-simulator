@@ -71,7 +71,7 @@ export async function initSoldierService() {
 				lastPosition: undefined,
 				position: safePoint ? new Vector2(safePoint.X, safePoint.Y) : undefined,
 				skin: currentSkin !== RANDOM_SKIN ? currentSkin : randomSkin,
-				score: 10,
+				orbs: 10,
 			});
 		} else {
 			warn(`No PrimaryPart found for player ${player.Name}`);

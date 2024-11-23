@@ -16,7 +16,7 @@ export = () => {
 			lastPosition: new Vector2(math.random(), math.random()),
 			angle: math.random() * math.pi * 2,
 			desiredAngle: math.random() * math.pi * 2,
-			score: math.random(0, 10000),
+			orbs: math.random(0, 10000),
 			boost: math.random() > 0.5,
 			tracers: fillArray(10, () => new Vector2(math.random(), math.random())),
 			skin: getRandomBaseSoldierSkin().id,

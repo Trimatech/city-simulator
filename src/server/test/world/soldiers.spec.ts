@@ -10,9 +10,15 @@ export = () => {
 		expect(getSoldier("__test__")?.boost).to.equal(true);
 	});
 
-	it("should step soldier physics", () => {
+	itFOCUS("should step soldier physics", () => {
 		store.addSoldier("__test__");
+
+		store.moveSoldier("__test__", new Vector2(100, 100));
+
+		// tracers are created when soldier is outside
+		store.setSoldierIsInside("__test__", false);
 		onSoldierTick();
+
 		const soldier = getSoldier("__test__")!;
 		expect(soldier.position).to.never.equal(Vector2.zero);
 		expect(soldier.tracers.size()).to.never.equal(0);

@@ -5,8 +5,8 @@ import { selectSoldiers } from "shared/store/soldiers";
 
 import { createCommand } from "./create-command";
 
-createCommand("/score", (player, argument) => {
-	store.patchSoldier(player.Name, { score: tonumber(argument) });
+createCommand("/orbs", (player, argument) => {
+	store.patchSoldier(player.Name, { orbs: tonumber(argument) });
 });
 
 createCommand("/purge", (player, argument) => {

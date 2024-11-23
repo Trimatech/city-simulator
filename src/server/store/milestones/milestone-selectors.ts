@@ -21,9 +21,9 @@ export const selectMilestoneRanking = (playerId: string) => {
 	};
 };
 
-export const selectMilestoneScore = (playerId: string) => {
+export const selectMilestoneArea = (playerId: string) => {
 	return (state: RootState) => {
-		return state.milestones[playerId]?.topScore;
+		return state.milestones[playerId]?.topArea;
 	};
 };
 

@@ -1,5 +1,10 @@
 import { store } from "server/store";
-import { identifySoldier, selectPlayerSoldiersById, selectSoldierRanking, selectSoldierscore } from "shared/store/soldiers";
+import {
+	identifySoldier,
+	selectPlayerSoldiersById,
+	selectSoldierArea,
+	selectSoldierRanking,
+} from "shared/store/soldiers";
 
 import { shouldGrantReward } from "../utils";
 
@@ -16,9 +21,9 @@ function observePlayer(id: string) {
 		}
 	});
 
-	const unsubscribeScore = store.subscribe(selectSoldierscore(id), (score) => {
-		if (score !== undefined && shouldGrantReward()) {
-			store.setMilestoneScore(id, score);
+	const unsubscribeArea = store.subscribe(selectSoldierArea(id), (area) => {
+		if (area !== undefined && shouldGrantReward()) {
+			store.setMilestoneArea(id, area);
 		}
 	});
 
@@ -26,7 +31,7 @@ function observePlayer(id: string) {
 
 	return () => {
 		unsubscribeRanking();
-		unsubscribeScore();
+		unsubscribeArea();
 		store.removeMilestone(id);
 	};
 }

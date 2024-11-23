@@ -55,7 +55,7 @@ export function eatCandy(candyId: string, soldierId: string) {
 	if (soldier && candy && !candy.eatenAt) {
 		print(`Candy eaten with id ${candy.id}`);
 		removeCandy(candy.id, soldier.position);
-		store.incrementSoldierscore(soldier.id, candy.size);
+		store.incrementSoldierOrbs(soldier.id, candy.size);
 	}
 }
 
@@ -89,19 +89,19 @@ export function dropCandyWhileBoosting(id: string) {
 			}
 		};
 
-		const decrementScore = () => {
+		const decrementOrbs = () => {
 			const soldier = getSoldier(id);
 
 			if (soldier) {
-				const maxDecrease = math.clamp(math.round(3 + 0.001 * soldier.score), 2, 10);
-				store.incrementSoldierscore(id, random.NextInteger(-maxDecrease, -1));
+				const maxDecrease = math.clamp(math.round(3 + 0.001 * soldier.orbs), 2, 10);
+				store.incrementSoldierOrbs(id, random.NextInteger(-maxDecrease, -1));
 			}
 		};
 
-		decrementScore();
+		decrementOrbs();
 
 		return setInterval(() => {
-			decrementScore();
+			decrementOrbs();
 			dropCandy();
 		}, 0.15);
 	});
@@ -140,8 +140,10 @@ export function dropCandyOnDeath(id: string): void {
 	}
 
 	// the total worth of the loot should scale logarithmically with the
-	// soldier's score, but not exceed the score itself
-	const sum = math.min(8000 * math.log10(soldier.score / 3000 + 1), soldier.score);
+	// soldier's orbs, but not exceed the orbs itself
+
+	// TODO: should we use area instead?
+	const sum = math.min(8000 * math.log10(soldier.orbs / 3000 + 1), soldier.orbs);
 	const total = candyPositions.size();
 
 	const candies = candyPositions.mapFiltered((position, index) => {

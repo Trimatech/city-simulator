@@ -24,47 +24,47 @@ export = () => {
 			let milestone;
 
 			store.addSoldier(player.Name, {});
-			store.addSoldier("0", { score: 100 });
-			store.addSoldier("1", { score: 100 });
-			store.addSoldier("2", { score: 100 });
+			store.addSoldier("0", { orbs: 100 });
+			store.addSoldier("1", { orbs: 100 });
+			store.addSoldier("2", { orbs: 100 });
 			store.flush();
 
 			milestone = store.getState(selectMilestone(player.Name))!;
 			expect(milestone.topRank).to.equal(4);
 
-			store.patchSoldier(player.Name, { score: 200 });
+			store.patchSoldier(player.Name, { orbs: 200 });
 			store.flush();
 
 			milestone = store.getState(selectMilestone(player.Name))!;
 			expect(milestone.topRank).to.equal(1);
 		});
 
-		it("sets top score", () => {
+		it("sets top orbs", () => {
 			let milestone;
 
 			store.addSoldier(player.Name, {});
 			store.flush();
 
 			milestone = store.getState(selectMilestone(player.Name))!;
-			expect(milestone.topScore).to.equal(undefined);
+			expect(milestone.topArea).to.equal(undefined);
 
-			store.patchSoldier(player.Name, { score: 100 });
+			store.patchSoldier(player.Name, { orbs: 100 });
 			store.flush();
 
 			milestone = store.getState(selectMilestone(player.Name))!;
-			expect(milestone.topScore).to.equal(undefined);
+			expect(milestone.topArea).to.equal(undefined);
 
-			store.patchSoldier(player.Name, { score: SCORE_MILESTONES[2] });
+			store.patchSoldier(player.Name, { orbs: SCORE_MILESTONES[2] });
 			store.flush();
 
 			milestone = store.getState(selectMilestone(player.Name))!;
-			expect(milestone.topScore).to.equal(SCORE_MILESTONES[2]);
+			expect(milestone.topArea).to.equal(SCORE_MILESTONES[2]);
 
-			store.patchSoldier(player.Name, { score: SCORE_MILESTONES[1] });
+			store.patchSoldier(player.Name, { orbs: SCORE_MILESTONES[1] });
 			store.flush();
 
 			milestone = store.getState(selectMilestone(player.Name))!;
-			expect(milestone.topScore).to.equal(SCORE_MILESTONES[2]);
+			expect(milestone.topArea).to.equal(SCORE_MILESTONES[2]);
 		});
 	});
 

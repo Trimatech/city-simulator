@@ -13,8 +13,8 @@ export = () => {
 		onCollisionTick();
 		const soldier1 = getSoldier("__test1__");
 		const soldier2 = getSoldier("__test2__");
-		expect(soldier1?.dead).to.equal(true);
-		expect(soldier2?.dead).to.equal(false);
+		expect(soldier1?.dead).to.equal(false);
+		expect(soldier2?.dead).to.equal(true);
 	});
 
 	it("should not kill soldier on self-collision", () => {
