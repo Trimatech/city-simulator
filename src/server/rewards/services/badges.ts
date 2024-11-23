@@ -2,11 +2,11 @@ import { BadgeService } from "@rbxts/services";
 import { store } from "server/store";
 import {
 	identifyMilestone,
-	ScoreMilestone,
 	selectMilestoneArea,
 	selectMilestoneRanking,
 	selectMilestones,
 } from "server/store/milestones";
+import { ScoreMilestone } from "server/store/milestones/milestone-utils";
 import { Badge } from "shared/assets";
 import { getPlayerByName } from "shared/utils/player-utils";
 

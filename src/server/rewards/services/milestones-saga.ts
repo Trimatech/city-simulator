@@ -8,7 +8,7 @@ import {
 
 import { shouldGrantReward } from "../utils";
 
-export async function initMilestoneService() {
+export function initMilestoneService() {
 	store.observe(selectPlayerSoldiersById, identifySoldier, (soldier) => {
 		return observePlayer(soldier.id);
 	});

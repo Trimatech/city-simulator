@@ -2,12 +2,12 @@ import { setInterval } from "@rbxts/set-timeout";
 import { store } from "server/store";
 import {
 	identifyMilestone,
-	ScoreMilestone,
 	selectMilestoneArea,
 	selectMilestoneLastKilled,
 	selectMilestoneRanking,
 	selectMilestones,
 } from "server/store/milestones";
+import { ScoreMilestone } from "server/store/milestones/milestone-utils";
 import { getSoldier } from "server/world";
 import { sounds } from "shared/assets";
 import { palette } from "shared/constants/palette";
@@ -26,6 +26,10 @@ const SCORE_REWARDS: { readonly [K in ScoreMilestone]: number } = {
 	250_000: 2_500,
 	500_000: 5_000,
 	1_000_000: 10_000,
+	1_500_000: 15_000,
+	2_000_000: 20_000,
+	2_500_000: 25_000,
+	2_800_000: 28_000,
 };
 
 const RANK_REWARDS: { readonly [ranking: number]: number | undefined } = {
@@ -59,11 +63,12 @@ function observeMilestone(id: string) {
 
 	// When the player hits a new area milestone they haven't hit
 	// during their current life, grant them a reward
-	const unsubscribeArea = store.subscribe(selectMilestoneArea(id), (area) => {
-		const reward = area && SCORE_REWARDS[area];
+	const unsubscribeArea = store.subscribe(selectMilestoneArea(id), (milestoneArea) => {
+		const reward = milestoneArea && SCORE_REWARDS[milestoneArea];
 
 		if (reward !== undefined && shouldGrantReward()) {
-			grantMoneyReward(id, reward, `hitting a area of <font color="#fff">${area}</font>`);
+			print(`${id} milestoneArea=${milestoneArea} rewarded`);
+			grantMoneyReward(id, reward, `hitting a area of <font color="#fff">${milestoneArea}</font> studs²`);
 		}
 	});
 

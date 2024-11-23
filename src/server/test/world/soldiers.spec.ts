@@ -10,7 +10,7 @@ export = () => {
 		expect(getSoldier("__test__")?.boost).to.equal(true);
 	});
 
-	itFOCUS("should step soldier physics", () => {
+	it("should step soldier physics", () => {
 		store.addSoldier("__test__");
 
 		store.moveSoldier("__test__", new Vector2(100, 100));

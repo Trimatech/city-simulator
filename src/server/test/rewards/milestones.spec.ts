@@ -2,7 +2,8 @@
 
 import { Players } from "@rbxts/services";
 import { store } from "server/store";
-import { SCORE_MILESTONES, selectMilestone } from "server/store/milestones";
+import { selectMilestone } from "server/store/milestones";
+import { SCORE_MILESTONES } from "server/store/milestones/milestone-utils";
 
 export = () => {
 	const player = Players.FindFirstChildWhichIsA("Player");

@@ -39,7 +39,7 @@ export async function initCandyService() {
 	);
 
 	store.observe(selectAliveSoldiersById, identifySoldier, ({ id }) => {
-		// while boosting, decrement the soldier's score and create candy
+		// while boosting, decrement the soldier's orbs and create candy
 		// on the soldier's tail
 		const disconnect = dropCandyWhileBoosting(id);
 

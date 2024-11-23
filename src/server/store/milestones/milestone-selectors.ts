@@ -1,5 +1,5 @@
 import { RootState } from "..";
-import { MilestoneEntity } from "./milestone-slice";
+import { MilestoneEntity } from "./milestone-utils";
 
 export const identifyMilestone = (milestone: MilestoneEntity, index: string) => {
 	return index;
