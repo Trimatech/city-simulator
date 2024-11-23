@@ -22,7 +22,7 @@ function AreaWallsComponent({
 	color = palette.white,
 	transparency = 0,
 	isCrumbling = false,
-	offset = 2,
+	offset = 1,
 }: Props) {
 	if (!points || points.size() === 0) {
 		warn("No points found in polygon");
@@ -64,6 +64,7 @@ function AreaWallsComponent({
 						transparency={transparency}
 						height={5.5}
 						isCrumbling={isCrumbling}
+						skinId={skinId}
 					/>
 				);
 			})}

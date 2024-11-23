@@ -8,8 +8,8 @@ export const SPIN_FORCE = 90;
 export const PIECE_SIZE = 1; // Each debris piece is 1x1x1 studs
 export const FADE_DELAY = 5; // Seconds to wait before starting fade
 export const FADE_DURATION = 1; // Duration of fade animation
-export const MIN_PIECE_SIZE = 1;
-export const MAX_PIECE_SIZE = 3;
+export const MIN_PIECE_SIZE = 2;
+export const MAX_PIECE_SIZE = 5;
 
 const BATCH_SIZE = 5; // How many pieces to process per frame
 const GRAVITY = new Vector3(0, -30, 0);
