@@ -4,7 +4,7 @@ import { waitForPrimaryPart } from "@rbxts/wait-for";
 import { store } from "server/store";
 import { SOLDIER_TICK_PHASE } from "server/world/constants";
 import { getSafePointInWorld, killSoldier, playerIsSpawned } from "server/world/utils";
-import { SOLDIER_BOOST_SPEED, SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
+import { SOLDIER_BOOST_SPEED, SOLDIER_MIN_AREA, SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
 import {
 	calculatePolygonOperation,
 	pointsToVectors,
@@ -129,6 +129,13 @@ export async function initSoldierService() {
 							const updatedPolygon = pointsToVectors(differenceResult.regions[0] as Point[]);
 							const updatedArea = calculatePolygonArea(updatedPolygon);
 							store.setSoldierPolygon(soldierId, updatedPolygon, updatedArea);
+
+							if (updatedArea < SOLDIER_MIN_AREA) {
+								print(`Soldier ${soldierId} is too small, killing`);
+								killSoldier(soldierId);
+								store.playerKilledSoldier(id, soldierId);
+								store.incrementSoldierEliminations(soldierId);
+							}
 						}
 					}
 				});
