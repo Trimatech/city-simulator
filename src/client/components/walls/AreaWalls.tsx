@@ -1,5 +1,6 @@
 import React, { memo } from "@rbxts/react";
 import { palette } from "shared/constants/palette";
+import { createParallelPolygon } from "shared/polygon.utils";
 
 import { Wall } from "./Wall";
 
@@ -12,22 +13,33 @@ interface Props {
 	height?: number;
 	position?: Vector3;
 	isCrumbling?: boolean;
+	offset?: number;
 }
 
-function AreaWallsComponent({ skinId, points, color = palette.white, transparency = 0, isCrumbling = false }: Props) {
+function AreaWallsComponent({
+	skinId,
+	points,
+	color = palette.white,
+	transparency = 0,
+	isCrumbling = false,
+	offset = 2,
+}: Props) {
 	if (!points || points.size() === 0) {
 		warn("No points found in polygon");
 		return undefined;
 	}
 
+	const innerPoints = createParallelPolygon(points, offset);
+
 	return (
 		<>
+			{/* Outer walls */}
 			{points.map((point, index) => {
 				const nextPoint = points[index + 1] || points[0];
 				return (
 					<Wall
-						key={`wall-${index}`}
-						name={`wall_${point.X}_${point.Y}_${nextPoint.X}_${nextPoint.Y}`}
+						key={`outer-wall-${index}`}
+						name={`outer_wall_${point.X}_${point.Y}_${nextPoint.X}_${nextPoint.Y}`}
 						startPoint={point}
 						endPoint={nextPoint}
 						color={color}
@@ -35,6 +47,23 @@ function AreaWallsComponent({ skinId, points, color = palette.white, transparenc
 						height={5.1}
 						isCrumbling={isCrumbling}
 						skinId={skinId}
+					/>
+				);
+			})}
+
+			{/* Inner walls */}
+			{innerPoints.map((point, index) => {
+				const nextPoint = innerPoints[index + 1] || innerPoints[0];
+				return (
+					<Wall
+						key={`inner-wall-${index}`}
+						name={`inner_wall_${point.X}_${point.Y}_${nextPoint.X}_${nextPoint.Y}`}
+						startPoint={point}
+						endPoint={nextPoint}
+						color={color}
+						transparency={transparency}
+						height={5.5}
+						isCrumbling={isCrumbling}
 					/>
 				);
 			})}
