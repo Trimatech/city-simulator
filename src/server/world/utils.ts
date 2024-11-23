@@ -17,20 +17,27 @@ export function getCandy(candyId: string) {
 	return store.getState(selectCandyById(candyId));
 }
 
-export function killSoldier(soldierId: string) {
-	store.setSoldierIsDead(soldierId);
-
-	const player = Players.GetPlayers().find((player) => player.Name === soldierId);
+export function getPlayerHumanoidByName(name: string) {
+	const player = Players.GetPlayers().find((player) => player.Name === name);
 	if (player) {
 		const humanoid = player.Character?.FindFirstChildOfClass("Humanoid");
 		if (humanoid) {
-			humanoid.TakeDamage(10000);
+			return humanoid;
 		} else {
-			print(`No humanoid found for player ${soldierId}`);
-			player.Destroy();
+			warn(`No humanoid found for player ${name}`);
 		}
 	} else {
-		warn(`No player found for soldier ${soldierId}`);
+		warn(`No player found for name ${name}`);
+	}
+	return undefined;
+}
+
+export function killSoldier(soldierId: string) {
+	store.setSoldierIsDead(soldierId);
+
+	const humanoid = getPlayerHumanoidByName(soldierId);
+	if (humanoid) {
+		humanoid.TakeDamage(10000);
 	}
 
 	setTimeout(() => {

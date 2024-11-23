@@ -3,7 +3,7 @@ import { getCandy } from "server/world/utils";
 import { selectSoldiersById } from "shared/store/soldiers";
 import { SOLDIER_RADIUS_BASE } from "shared/store/soldiers";
 
-import { candyGrid, eatCandy } from "./candy-helpers";
+import { candyGrid, eatCandy } from "./candy-utils";
 
 export function onCandyTick() {
 	const soldiers = store.getState(selectSoldiersById);

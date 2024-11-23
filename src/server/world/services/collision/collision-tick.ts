@@ -69,9 +69,9 @@ export function onCollisionTick() {
 		const enemy = isCollidingWithSoldier(soldier);
 
 		if (enemy) {
-			print(`Collided with enemy, kill soldier ${soldier.id}`);
-			killSoldier(soldier.id);
-			store.playerKilledSoldier(enemy.id, soldier.id);
+			print(`Collided with enemy, kill soldier ${enemy.id}`);
+			killSoldier(enemy.id);
+			store.playerKilledSoldier(soldier.id, enemy.id);
 			store.incrementSoldierEliminations(enemy.id);
 		}
 

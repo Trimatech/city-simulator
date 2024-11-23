@@ -4,7 +4,7 @@ import { waitForPrimaryPart } from "@rbxts/wait-for";
 import { store } from "server/store";
 import { SOLDIER_TICK_PHASE } from "server/world/constants";
 import { getSafePointInWorld, killSoldier, playerIsSpawned } from "server/world/utils";
-import { WORLD_TICK } from "shared/constants/core";
+import { SOLDIER_BOOST_SPEED, SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
 import {
 	calculatePolygonOperation,
 	pointsToVectors,
@@ -15,11 +15,17 @@ import { Point, pointsToPolygon } from "shared/polybool/polybool";
 import { calculatePolygonArea } from "shared/polygon-extra.utils";
 import { remotes } from "shared/remotes";
 import { defaultPlayerSave, RANDOM_SKIN, selectPlayerSave } from "shared/store/saves";
-import { selectIsInsideBySoldierById, selectSoldiersById } from "shared/store/soldiers";
+import {
+	selectAliveSoldiersById,
+	selectIsInsideBySoldierById,
+	selectSoldierIsBoosting,
+	selectSoldiersById,
+} from "shared/store/soldiers";
 import { identifySoldier } from "shared/store/soldiers";
 import { createScheduler } from "shared/utils/scheduler";
 
 import { deleteSoldierInput, onSoldierTick, registerSoldierInput } from "./soldier-tick";
+import { setSoldierSpeed } from "./soldiers.utils";
 
 export async function initSoldierService() {
 	createScheduler({
@@ -89,6 +95,8 @@ export async function initSoldierService() {
 		killSoldier(player.Name);
 	});
 
+	// TODO: should only check if spawned
+
 	store.observe(selectIsInsideBySoldierById, identifySoldier, ({ id, polygon, tracers }) => {
 		const resultPolygon = pointsToPolygon(vectorsToPoints(polygon as Vector2[]));
 		const points = vectorsToPoints(tracers as Vector2[]);
@@ -102,7 +110,7 @@ export async function initSoldierService() {
 				const resultPolygon = pointsToVectors(result.regions[0] as Point[]);
 				const polygonAreaSize = calculatePolygonArea(resultPolygon);
 
-				store.setSoldierPolygon(id, resultPolygon, polygonAreaSize);
+				store.setSoldierPolygon(id, resultPolygon, polygonAreaSize, true);
 
 				const state = store.getState();
 				const allSoldiers = Object.values(selectSoldiersById(state));
@@ -135,6 +143,27 @@ export async function initSoldierService() {
 
 		return () => {
 			print(`Soldier ${id} is no longer inside--------------------`);
+		};
+	});
+
+	store.observe(selectAliveSoldiersById, identifySoldier, ({ id }) => {
+		print(`Soldier ${id} is alive in saga`);
+		setSoldierSpeed(id, SOLDIER_SPEED);
+		const disconnect = store.observeWhile(selectSoldierIsBoosting(id), () => {
+			print(`Soldier ${id} is boosting in saga`);
+			setSoldierSpeed(id, SOLDIER_BOOST_SPEED);
+			return () => {
+				print(`Soldier ${id} is no longer boosting in saga`);
+				setSoldierSpeed(id, SOLDIER_SPEED);
+			};
+		});
+
+		// when the soldier dies, create candy on the soldier's tracers
+		return () => {
+			disconnect();
+			setSoldierSpeed(id, SOLDIER_SPEED);
+			// HERE WE DIE AND DROP STUFF
+			print(`Soldier ${id} died in saga`);
 		};
 	});
 }

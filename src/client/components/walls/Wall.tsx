@@ -6,7 +6,7 @@ import { getSoldierSkin, getSoldierSkinForTracer } from "shared/constants/skins"
 import { calculateWallTransform, createWallPieces, startCrumbling, startFadeOut } from "./Walls.utils";
 
 interface Props {
-	name: string;
+	folderName: string;
 	startPoint: Vector2;
 	endPoint: Vector2;
 	color?: Color3;
@@ -19,7 +19,7 @@ interface Props {
 }
 
 function WallComponent({
-	name,
+	folderName,
 	startPoint,
 	endPoint,
 	color = palette.white,
@@ -64,9 +64,17 @@ function WallComponent({
 
 		const { width, center, rotation, startPosition } = calculateWallTransform([startPoint, endPoint], height);
 
+		// Ensure folder exists
+		let folder = Workspace.FindFirstChild(folderName) as Folder;
+		if (!folder) {
+			folder = new Instance("Folder");
+			folder.Name = folderName;
+			folder.Parent = Workspace;
+		}
+
 		// Create main wall part
 		const part = new Instance("Part");
-		part.Name = name;
+		part.Name = `${folderName}_wall`;
 		part.Size = new Vector3(width, height, thickness);
 		part.Color = wallProperties.color;
 		part.Transparency = wallProperties.transparency;
@@ -76,11 +84,11 @@ function WallComponent({
 		part.Anchored = true;
 		part.CanCollide = false;
 		part.CFrame = new CFrame(center).mul(rotation);
-		part.Parent = Workspace;
+		part.Parent = folder;
 
 		// Create cylinder for smooth start
 		const cylinder = new Instance("Part");
-		cylinder.Name = `${name}_cylinder`;
+		cylinder.Name = `${folderName}_cylinder`;
 		cylinder.Size = new Vector3(height, thickness, thickness);
 		cylinder.Color = wallProperties.color;
 		cylinder.Transparency = wallProperties.transparency;
@@ -94,7 +102,7 @@ function WallComponent({
 		// Position cylinder at start of wall
 		const cylinderCFrame = new CFrame(startPosition).mul(CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90))); // Rotate cylinder to stand upright
 		cylinder.CFrame = cylinderCFrame;
-		cylinder.Parent = Workspace;
+		cylinder.Parent = folder;
 
 		mainPartRef.current = part;
 		cylinderRef.current = cylinder;
@@ -148,8 +156,16 @@ function WallComponent({
 			material: wallProperties.material,
 		});
 
-		// Add pieces to workspace
-		pieces.forEach((piece) => (piece.Parent = Workspace));
+		// Ensure folder exists
+		let folder = Workspace.FindFirstChild(folderName) as Folder;
+		if (!folder) {
+			folder = new Instance("Folder");
+			folder.Name = folderName;
+			folder.Parent = Workspace;
+		}
+
+		// Add pieces to folder
+		pieces.forEach((piece) => (piece.Parent = folder));
 
 		// Start crumbling animation
 		cleanupRef.current = startCrumbling(pieces);

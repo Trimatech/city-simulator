@@ -1,5 +1,6 @@
 import React from "@rbxts/react";
 import { memo } from "@rbxts/react";
+import { TRACER_PIECE_HEIGHT } from "shared/constants/core";
 
 import { useCharacterPosition } from "../../hooks/use-character-position";
 import { Wall } from "./Wall";
@@ -18,10 +19,11 @@ function TracerLastWallComponent({ lastTracerPoint, skinId }: Props) {
 	return (
 		<Wall
 			key="player-connection-line"
-			name={`player-connection-line_${lastTracerPoint.X}_${lastTracerPoint.Y}`}
+			folderName={`tracer`}
 			startPoint={lastTracerPoint}
 			endPoint={characterPositionValue}
 			skinId={skinId}
+			height={TRACER_PIECE_HEIGHT}
 		/>
 	);
 }

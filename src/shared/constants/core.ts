@@ -7,8 +7,8 @@ export const PREMIUM_BENEFIT = 1.2;
 export const WORLD_BOUNDS = 960;
 export const WORLD_TICK = 1 / 20;
 
-export const SOLDIER_SPEED = 56;
-export const SOLDIER_BOOST_SPEED = 12;
+export const SOLDIER_SPEED = 24;
+export const SOLDIER_BOOST_SPEED = 32;
 
 export const REMOTE_TICK = 1 / 20; // Roblox limits
 
@@ -23,3 +23,4 @@ export const INITIAL_POLYGON_DIAMETER = 20;
 export const INITIAL_POLYGON_ITEMS = 40;
 
 export const TRACER_PIECE_LENGTH = 2;
+export const TRACER_PIECE_HEIGHT = 2;

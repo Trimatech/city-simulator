@@ -39,7 +39,7 @@ function AreaWallsComponent({
 				return (
 					<Wall
 						key={`outer-wall-${index}`}
-						name={`outer_wall_${point.X}_${point.Y}_${nextPoint.X}_${nextPoint.Y}`}
+						folderName={`outerWall`}
 						startPoint={point}
 						endPoint={nextPoint}
 						color={color}
@@ -57,7 +57,7 @@ function AreaWallsComponent({
 				return (
 					<Wall
 						key={`inner-wall-${index}`}
-						name={`inner_wall_${point.X}_${point.Y}_${nextPoint.X}_${nextPoint.Y}`}
+						folderName={`innerWall`}
 						startPoint={point}
 						endPoint={nextPoint}
 						color={color}

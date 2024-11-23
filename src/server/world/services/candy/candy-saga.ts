@@ -5,8 +5,8 @@ import { CandyType, selectCandyCount } from "shared/store/candy";
 import { identifySoldier, selectAliveSoldiersById } from "shared/store/soldiers";
 import { createScheduler } from "shared/utils/scheduler";
 
-import { dropCandyOnDeath, dropCandyWhileBoosting, populateCandy, removeCandyIfAtLimit } from "./candy-helpers";
 import { onCandyTick } from "./candy-tick";
+import { dropCandyOnDeath, dropCandyWhileBoosting, populateCandy, removeCandyIfAtLimit } from "./candy-utils";
 
 export async function initCandyService() {
 	createScheduler({

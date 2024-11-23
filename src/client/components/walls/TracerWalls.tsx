@@ -1,4 +1,5 @@
 import React, { memo } from "@rbxts/react";
+import { TRACER_PIECE_HEIGHT } from "shared/constants/core";
 
 import { Wall } from "./Wall";
 
@@ -25,12 +26,13 @@ function TracerWallsComponent({ tracers, skinId, isCrumbling = false }: Props) {
 			{tracerLines.map((line, index) => (
 				<Wall
 					key={`soldier-segment-${index}`}
-					name={`soldier-segment_${line[0].X}_${line[0].Y}_${line[1].X}_${line[1].Y}`}
+					folderName={`tracer`}
 					startPoint={line[0]}
 					endPoint={line[1]}
 					isCrumbling={isCrumbling}
 					skinId={skinId}
 					tracerIndex={index}
+					height={TRACER_PIECE_HEIGHT}
 				/>
 			))}
 		</>
