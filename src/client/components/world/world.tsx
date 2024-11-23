@@ -2,6 +2,7 @@ import React from "@rbxts/react";
 import { Group } from "client/components/ui/group";
 import { RemProvider } from "client/providers/rem-provider";
 
+import { Candies } from "./candies/Candies";
 import { Soldiers } from "./soldiers";
 import { WorldSounds } from "./world-sounds";
 
@@ -12,6 +13,8 @@ export function World() {
 				<Soldiers />
 
 				<WorldSounds />
+
+				<Candies />
 			</Group>
 		</RemProvider>
 	);

@@ -53,6 +53,7 @@ export function eatCandy(candyId: string, soldierId: string) {
 	const soldier = getSoldier(soldierId);
 
 	if (soldier && candy && !candy.eatenAt) {
+		print(`Candy eaten with id ${candy.id}`);
 		removeCandy(candy.id, soldier.position);
 		store.incrementSoldierscore(soldier.id, candy.size);
 	}
