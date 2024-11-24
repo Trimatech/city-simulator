@@ -13,7 +13,7 @@ export function WorldSounds() {
 	const soldier = useSelector(selectSoldierFromWorldSubject);
 	const boosting = useSelectorCreator(selectSoldierIsBoosting, soldier?.id ?? "");
 	const hasLocalSoldier = useSelector(selectHasLocalSoldier);
-	const previousScore = usePrevious(soldier?.orbs);
+	const previousOrbs = usePrevious(soldier?.orbs);
 
 	const volume = hasLocalSoldier ? 0.5 : 0.25;
 
@@ -34,7 +34,7 @@ export function WorldSounds() {
 
 	// Candy eat sound
 	useEffect(() => {
-		if ((soldier?.orbs ?? 0) > (previousScore ?? 0)) {
+		if ((soldier?.orbs ?? 0) > (previousOrbs ?? 0)) {
 			const speed = random.NextNumber(0.87, 1);
 			playSound(sounds.whoosh, { volume: 0.6 * volume, speed });
 		}

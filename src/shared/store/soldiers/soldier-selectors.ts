@@ -13,7 +13,7 @@ export const identifySoldier = (soldier: SoldierEntity) => {
 };
 
 export const cycleNextSoldier = (currentId: string) => (state: SharedState) => {
-	const soldiers = selectSoldiersSorted((a, b) => a.orbs > b.orbs)(state);
+	const soldiers = selectSoldiersSorted((a, b) => a.polygonAreaSize > b.polygonAreaSize)(state);
 	const index = soldiers.findIndex((soldier) => soldier.id === currentId);
 
 	if (index !== -1) {
@@ -96,7 +96,7 @@ export const selectTopSoldier = createSelector(selectSoldiersById, (soldiersById
 	let topSoldier: SoldierEntity | undefined;
 
 	for (const [, soldier] of pairs(soldiersById)) {
-		if (topSoldier === undefined || soldier.orbs > topSoldier.orbs) {
+		if (topSoldier === undefined || soldier.polygonAreaSize > topSoldier.polygonAreaSize) {
 			topSoldier = soldier;
 		}
 	}
@@ -158,7 +158,7 @@ export const selectSoldierIsBoosting = (id: string) => {
 
 export const selectSoldierRanking = (id: string) => {
 	const comparator = (current: SoldierEntity, existing: SoldierEntity) => {
-		return current.orbs > existing.orbs;
+		return current.polygonAreaSize > existing.polygonAreaSize;
 	};
 
 	return createSelector(selectSoldiersSorted(comparator), (soldiers) => {

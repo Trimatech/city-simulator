@@ -22,7 +22,7 @@ export async function initScoreboardService() {
 		cash.Parent = stats;
 
 		const orbs = new Instance("IntValue");
-		orbs.Name = "🔵 Orbs";
+		orbs.Name = "🔮 Orbs";
 		orbs.Parent = stats;
 
 		const isPrimary = new Instance("BoolValue");

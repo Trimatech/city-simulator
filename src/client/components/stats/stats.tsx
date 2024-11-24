@@ -73,7 +73,7 @@ export function Stats() {
 			/>
 
 			<StatsCard
-				emoji="🔵"
+				emoji="🔮"
 				label="Orbs"
 				value={`${formatInteger(orbs)}`}
 				primary={Color3.fromRGB(181, 64, 64)}

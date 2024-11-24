@@ -13,6 +13,7 @@ import { springs } from "client/constants/springs";
 import { useMotion, useRem, useStore } from "client/hooks";
 import { MenuPage, selectIsPage } from "client/store/menu";
 import { palette } from "shared/constants/palette";
+import { darken } from "shared/utils/color-utils";
 
 interface DestinationProps {
 	readonly page: MenuPage;
@@ -28,6 +29,8 @@ export function Destination({ page, label, icon, iconAlt, color, order }: Destin
 	const store = useStore();
 	const isPage = useSelectorCreator(selectIsPage, page);
 	const [transition, transitionMotion] = useMotion(0);
+
+	const bgDarker = darken(color, 0.5);
 
 	useEffect(() => {
 		transitionMotion.spring(isPage ? 1 : 0, springs.responsive);
@@ -46,12 +49,12 @@ export function Destination({ page, label, icon, iconAlt, color, order }: Destin
 				shadowPosition={rem(0.5)}
 				shadowSize={rem(4)}
 				shadowColor={color}
-				shadowTransparency={lerpBinding(transition, 1, 0.7)}
+				shadowTransparency={lerpBinding(transition, 0.9, 0.7)}
 			/>
 
 			<Frame
-				backgroundColor={color}
-				backgroundTransparency={lerpBinding(transition, 1, 0.8)}
+				backgroundColor={bgDarker}
+				backgroundTransparency={lerpBinding(transition, 1, 0.3)}
 				cornerRadius={new UDim(0, rem(1))}
 				size={new UDim2(1, 0, 1, 0)}
 			/>

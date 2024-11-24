@@ -56,6 +56,7 @@ export function MenuContainer({ page, children }: MenuContainerProps) {
 				size={new UDim2(1, 0, 1, 0)}
 				position={lerpBinding(transition, transitionFrom.current, new UDim2())}
 				clipsDescendants
+				zIndex={12}
 			>
 				{children}
 			</Transition>
