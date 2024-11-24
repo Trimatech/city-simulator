@@ -2,11 +2,11 @@ import { BadgeService } from "@rbxts/services";
 import { store } from "server/store";
 import {
 	identifyMilestone,
-	ScoreMilestone,
+	selectMilestoneArea,
 	selectMilestoneRanking,
 	selectMilestones,
-	selectMilestoneScore,
 } from "server/store/milestones";
+import { ScoreMilestone } from "server/store/milestones/milestone-utils";
 import { Badge } from "shared/assets";
 import { getPlayerByName } from "shared/utils/player-utils";
 
@@ -18,10 +18,10 @@ const RANKING_BADGES: { [K in number]?: Badge } = {
 	3: Badge.THIRD_PLACE,
 };
 
-const SCORE_BADGES: { [K in ScoreMilestone]?: Badge } = {
-	25_000: Badge.SCORE_25000,
-	50_000: Badge.SCORE_50000,
-	100_000: Badge.SCORE_100000,
+const AREA_BADGES: { [K in ScoreMilestone]?: Badge } = {
+	25_000: Badge.AREA_25000,
+	50_000: Badge.AREA_50000,
+	100_000: Badge.AREA_100000,
 };
 
 export async function initBadgeService() {
@@ -37,15 +37,15 @@ function observeMilestone(id: string) {
 		}
 	});
 
-	const unsubscribeScore = store.subscribe(selectMilestoneScore(id), (score) => {
-		if (score !== undefined && score in SCORE_BADGES) {
-			tryGrantBadge(id, SCORE_BADGES[score]!);
+	const unsubscribeArea = store.subscribe(selectMilestoneArea(id), (area) => {
+		if (area !== undefined && area in AREA_BADGES) {
+			tryGrantBadge(id, AREA_BADGES[area]!);
 		}
 	});
 
 	return () => {
 		unsubscribeRanking();
-		unsubscribeScore();
+		unsubscribeArea();
 	};
 }
 

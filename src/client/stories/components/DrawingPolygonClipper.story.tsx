@@ -4,9 +4,9 @@ import { hoarcekat } from "@rbxts/pretty-react-hooks";
 import React from "@rbxts/react";
 import { DrawingPolygonClipper } from "client/components/drawing-canvas/DrawingPolygonClipper";
 import { RootProvider } from "client/providers/root-provider";
-import { pointToPolygon } from "shared/polybool/polybool";
+import { pointsToPolygon } from "shared/polybool/polybool";
 
-const starterPolygon = pointToPolygon([
+const starterPolygon = pointsToPolygon([
 	[200, 50],
 	[600, 50],
 	[600, 150],

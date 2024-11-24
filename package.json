@@ -1,7 +1,6 @@
 {
-	"name": "slither",
-	"version": "1.4.1",
-	"license": "MIT",
+	"name": "expr-2-qonquer",
+	"version": "0.0.1",
 	"scripts": {
 		"lint": "eslint src && prettier --check src",
 		"compile": "rbxtsc --verbose",
@@ -13,11 +12,12 @@
 		"deploy:prod": "pnpm build && mantle deploy --environment production",
 		"output:dev": "mantle outputs --environment canary > mantle-output.json",
 		"output:prod": "mantle outputs --environment production > mantle-output.json",
-		"github": "./actions-runner/run.sh"
+		"github": "./actions-runner/run.sh",
+		"models": "lune run get-models"
 	},
 	"devDependencies": {
 		"@rbxts/compiler-types": "3.0.0-types.0",
-		"@rbxts/types": "^1.0.810",
+		"@rbxts/types": "^1.0.813",
 		"@typescript-eslint/eslint-plugin": "^8.8.1",
 		"@typescript-eslint/parser": "^8.8.1",
 		"cross-env": "^7.0.3",
@@ -47,6 +47,7 @@
 		"@rbxts/set-timeout": "^1.1.2",
 		"@rbxts/t": "^3.1.1",
 		"@rbxts/testez": "0.4.2-ts.0",
-		"@rbxts/validate-tree": "^2.0.2"
+		"@rbxts/validate-tree": "^2.0.2",
+		"@rbxts/wait-for": "^0.1.5"
 	}
 }

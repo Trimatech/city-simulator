@@ -1,6 +1,6 @@
 import { store } from "server/store";
 import { selectPlayerBalance } from "shared/store/saves";
-import { selectSnakeById } from "shared/store/snakes";
+import { selectSoldierById } from "shared/store/soldiers";
 import { onPlayerAdded, promisePlayerDisconnected } from "shared/utils/player-utils";
 
 export async function initScoreboardService() {
@@ -8,6 +8,10 @@ export async function initScoreboardService() {
 		const stats = new Instance("Folder");
 		stats.Name = "leaderstats";
 		stats.Parent = player;
+
+		const areaSize = new Instance("IntValue");
+		areaSize.Name = "📐 Area Size";
+		areaSize.Parent = stats;
 
 		const knockouts = new Instance("IntValue");
 		knockouts.Name = "☠️ KOs";
@@ -17,18 +21,19 @@ export async function initScoreboardService() {
 		cash.Name = "💵 Cash";
 		cash.Parent = stats;
 
-		const score = new Instance("IntValue");
-		score.Name = "💯 Score";
-		score.Parent = stats;
+		const orbs = new Instance("IntValue");
+		orbs.Name = "🔮 Orbs";
+		orbs.Parent = stats;
 
 		const isPrimary = new Instance("BoolValue");
 		isPrimary.Name = "IsPrimary";
 		isPrimary.Value = true;
-		isPrimary.Parent = score;
+		isPrimary.Parent = areaSize;
 
-		const unsubscribeFromSnake = store.subscribe(selectSnakeById(player.Name), (snake) => {
-			score.Value = snake ? snake.score : 0;
-			knockouts.Value = snake ? snake.eliminations : 0;
+		const unsubscribeFromSoldier = store.subscribe(selectSoldierById(player.Name), (soldier) => {
+			orbs.Value = soldier ? soldier.orbs : 0;
+			areaSize.Value = soldier ? soldier.polygonAreaSize : 0;
+			knockouts.Value = soldier ? soldier.eliminations : 0;
 		});
 
 		const unsubscribeFromCash = store.subscribe(selectPlayerBalance(player.Name), (balance) => {
@@ -36,7 +41,7 @@ export async function initScoreboardService() {
 		});
 
 		promisePlayerDisconnected(player).then(() => {
-			unsubscribeFromSnake();
+			unsubscribeFromSoldier();
 			unsubscribeFromCash();
 		});
 	});

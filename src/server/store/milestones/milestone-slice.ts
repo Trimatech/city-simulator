@@ -1,24 +1,9 @@
 import { createProducer } from "@rbxts/reflex";
 import { mapProperty } from "shared/utils/object-utils";
 
-export type MilestoneState = {
-	readonly [K in string]?: MilestoneEntity;
-};
-
-export interface MilestoneEntity {
-	readonly topScore?: ScoreMilestone;
-	readonly topRank: number;
-	readonly lastKilled?: string;
-}
-
-export type ScoreMilestone = (typeof SCORE_MILESTONES)[number];
-
-export const SCORE_MILESTONES = [1_000, 5_000, 10_000, 25_000, 50_000, 100_000, 250_000, 500_000, 1_000_000] as const;
-
-const SCORE_MILESTONES_REVERSE = SCORE_MILESTONES.reduce<ScoreMilestone[]>((acc, score, index) => {
-	acc[SCORE_MILESTONES.size() - index] = score;
-	return acc;
-}, []);
+import { ScoreMilestone } from "./milestone-utils";
+import { getMilestoneArea, MilestoneState, SCORE_MILESTONES_REVERSE } from "./milestone-utils";
+import { MilestoneEntity } from "./milestone-utils";
 
 const defaultEntity: MilestoneEntity = {
 	topRank: 4,
@@ -51,25 +36,28 @@ export const milestoneSlice = createProducer(initialState, {
 		}));
 	},
 
-	setMilestoneScore: (state, playerId: string, score: number) => {
+	setMilestoneArea: (state, playerId: string, currentArea: number) => {
 		return mapProperty(state, playerId, (milestone) => {
-			const nextMilestone = math.max(
-				SCORE_MILESTONES_REVERSE.find((milestone) => score >= milestone) || 0,
-				milestone.topScore || 0,
-			);
+			const currentMilestone = getMilestoneArea(currentArea);
 
-			if (nextMilestone === 0) {
+			print(`${playerId} area=${currentArea}`, milestone.topArea, currentMilestone, SCORE_MILESTONES_REVERSE);
+
+			const topMilestone = math.max(currentMilestone || 0, milestone.topArea || 0);
+
+			if (topMilestone === 0) {
 				return milestone;
 			}
 
+			warn(`${playerId} topArea=${topMilestone}`);
+
 			return {
 				...milestone,
-				topScore: nextMilestone as ScoreMilestone,
+				topArea: topMilestone as ScoreMilestone,
 			};
 		});
 	},
 
-	playerKilledSnake: (state, playerId: string, lastKilled: string) => {
+	playerKilledSoldier: (state, playerId: string, lastKilled: string) => {
 		return mapProperty(state, playerId, (milestone) => ({
 			...milestone,
 			lastKilled,

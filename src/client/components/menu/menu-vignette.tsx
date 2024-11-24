@@ -22,6 +22,7 @@ export function MenuVignette() {
 
 	return (
 		<Image
+			key={"MenuVignette"}
 			image={images.ui.vignette}
 			imageColor={palette.crust}
 			imageTransparency={lerpBinding(transition, 1, 0)}

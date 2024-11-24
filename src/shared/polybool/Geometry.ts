@@ -6,6 +6,7 @@
 //
 
 export type Point = [number, number];
+export type Line = [Point, Point];
 export type Vec6 = [number, number, number, number, number, number];
 
 export type PointShape = Point | Vec6;

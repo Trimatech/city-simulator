@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from "@rbxts/react";
 import { palette } from "shared/constants/palette";
-import { Point, pointToPolygon, Polygon } from "shared/polybool/polybool";
+import { Point, pointsToPolygon, Polygon } from "shared/polybool/polybool";
 
 import { calculateSnappedPosition } from "../polygon-clipper/PolygonCanvas.utils";
 import { PolygonShape } from "../polygon-clipper/PolygonShape";
@@ -53,7 +53,7 @@ export function DrawingCanvas({ polygon, size, snap, onDrawingComplete }: Props)
 			}}
 		>
 			<PolygonShape
-				polygon={pointToPolygon(previewPoints)}
+				polygon={pointsToPolygon(previewPoints)}
 				color={palette.red}
 				transparency={0.5}
 				thickness={4}

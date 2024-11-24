@@ -11,6 +11,19 @@ export function readVector2(buffer: BitBuffer) {
 	return new Vector2(x, y);
 }
 
+export function readVector3(buffer: BitBuffer) {
+	const x = buffer.ReadFloat32();
+	const y = buffer.ReadFloat32();
+	const z = buffer.ReadFloat32();
+	return new Vector3(x, y, z);
+}
+
+export function writeVector3(buffer: BitBuffer, vector: Vector3) {
+	buffer.WriteFloat32(vector.X);
+	buffer.WriteFloat32(vector.Y);
+	buffer.WriteFloat32(vector.Z);
+}
+
 export function writeColor3(buffer: BitBuffer, color: Color3) {
 	const hex = color.ToHex();
 	const int = tonumber(hex, 16) ?? 0;

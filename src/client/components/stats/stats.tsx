@@ -5,7 +5,12 @@ import { useDefined, useRem, useStore } from "client/hooks";
 import { formatInteger } from "client/utils/format-integer";
 import { USER_NAME } from "shared/constants/core";
 import { selectPlayerBalance } from "shared/store/saves";
-import { selectLocalEliminations, selectLocalScore, selectRankForDisplay } from "shared/store/snakes";
+import {
+	selectLocalEliminations,
+	selectLocalOrbs,
+	selectLocalPolygonAreaSize,
+	selectRankForDisplay,
+} from "shared/store/soldiers";
 
 import { StatsCard } from "./stats-card";
 
@@ -14,13 +19,14 @@ export function Stats() {
 	const store = useStore();
 
 	const currentEliminations = useSelector(selectLocalEliminations);
-	const currentScore = useSelector(selectLocalScore);
+	const currentOrbs = useSelector(selectLocalOrbs);
 	const currentRank = useSelector(selectRankForDisplay);
 	const currentBalance = useSelectorCreator(selectPlayerBalance, USER_NAME);
-
+	const currentArea = useSelector(selectLocalPolygonAreaSize);
 	// displays the previous value if any are set to undefined
 	const eliminations = useDefined<string | number>(currentEliminations, "N/A");
-	const score = useDefined<string | number>(currentScore, "N/A");
+	const area = useDefined<string | number>(currentArea, "N/A");
+	const orbs = useDefined<string | number>(currentOrbs, "N/A");
 	const rank = useDefined(currentRank, "N/A");
 	const balance = useDefined(currentBalance, 0);
 
@@ -34,6 +40,16 @@ export function Stats() {
 				VerticalAlignment="Bottom"
 				Padding={new UDim(0, rem(1))}
 				SortOrder="LayoutOrder"
+			/>
+
+			<StatsCard
+				emoji="📐"
+				label="Area"
+				value={`${formatInteger(area)} studs²`}
+				primary={Color3.fromRGB(255, 203, 80)}
+				secondary={Color3.fromRGB(255, 150, 79)}
+				enabled={currentArea !== undefined}
+				order={0}
 			/>
 
 			<StatsCard
@@ -57,18 +73,18 @@ export function Stats() {
 			/>
 
 			<StatsCard
-				emoji="💯"
-				label="Score"
-				value={`${formatInteger(score)}`}
+				emoji="🔮"
+				label="Orbs"
+				value={`${formatInteger(orbs)}`}
 				primary={Color3.fromRGB(181, 64, 64)}
 				secondary={Color3.fromRGB(150, 59, 84)}
-				enabled={currentScore !== undefined}
+				enabled={currentOrbs !== undefined}
 				order={1}
 			/>
 
 			<StatsCard
 				onClick={() => {
-					if (currentScore === undefined) {
+					if (currentBalance === undefined) {
 						// Only show the support page if the user is not playing
 						store.setMenuPage("support");
 					}

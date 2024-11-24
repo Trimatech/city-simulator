@@ -1,10 +1,10 @@
 import { useInterval } from "@rbxts/pretty-react-hooks";
 import { useState } from "@rbxts/react";
-import { getSnakeSkin, SnakeSkin } from "shared/constants/skins";
+import { getSoldierSkin, SoldierSkin } from "shared/constants/skins";
 import { darken } from "shared/utils/color-utils";
 
-export interface SnakePalette {
-	readonly skin: SnakeSkin;
+export interface SoldierPalette {
+	readonly skin: SoldierSkin;
 	readonly primary: Color3;
 	readonly secondary: Color3;
 }
@@ -12,13 +12,13 @@ export interface SnakePalette {
 export const DIRECTIONS = [-3, -2, -1, 0, 1, 2, 3];
 export const DIRECTIONS_TO_HIDE = [-3, 3];
 
-export function usePalette(id: string, shuffle?: readonly string[]): SnakePalette {
-	const [skin, setSkin] = useState(getSnakeSkin(id));
+export function usePalette(id: string, shuffle?: readonly string[]): SoldierPalette {
+	const [skin, setSkin] = useState(getSoldierSkin(id));
 
 	useInterval(() => {
 		if (shuffle && !shuffle.isEmpty()) {
 			const skinId = shuffle[math.random(0, shuffle.size() - 1)];
-			setSkin(getSnakeSkin(skinId));
+			setSkin(getSoldierSkin(skinId));
 		}
 	}, 1);
 

@@ -53,23 +53,90 @@
 			}
 		},
 		"Lighting": {
-			"$className": "Lighting",
-			"$path": "assets/lighting",
 			"$properties": {
-				"Technology": {
-					"Enum": 2
-				},
-				"GlobalShadows": false
+				"Ambient": [0.275, 0.275, 0.275],
+				"Brightness": 3,
+				"ColorShift_Bottom": [0, 0, 0],
+				"ColorShift_Top": [0, 0, 0],
+				"EnvironmentDiffuseScale": 1,
+				"EnvironmentSpecularScale": 1,
+				"GlobalShadows": true,
+				"OutdoorAmbient": [0.275, 0.275, 0.275],
+				"ShadowSoftness": 0.2,
+				"Technology": "Future",
+				"ClockTime": 14.5,
+				"GeographicLatitude": 1,
+				"TimeOfDay": "14:30:00",
+				"ExposureCompensation": 0
+			},
+			"Atmosphere": {
+				"$className": "Atmosphere",
+				"$properties": {
+					"Density": 0.3,
+					"Offset": 0.25,
+					"Color": [0.781, 0.781, 0.781],
+					"Decay": [0.416, 0.44, 0.491],
+					"Glare": 0,
+					"Haze": 0
+				}
+			},
+			"Sky": {
+				"$className": "Sky",
+				"$properties": {
+					"CelestialBodiesShown": true,
+					"MoonAngularSize": 11,
+					"MoonTextureId": "rbxassetid://6444320592",
+					"SkyboxBk": "rbxassetid://6444884337",
+					"SkyboxDn": "rbxassetid://6444884785",
+					"SkyboxFt": "rbxassetid://6444884337",
+					"SkyboxLf": "rbxassetid://6444884337",
+					"SkyboxRt": "rbxassetid://6444884337",
+					"SkyboxUp": "rbxassetid://6412503613",
+					"StarCount": 3000,
+					"SunAngularSize": 11,
+					"SunTextureId": "rbxassetid://6196665106"
+				}
+			},
+			"Bloom": {
+				"$className": "BloomEffect",
+				"$properties": {
+					"Enabled": true,
+					"Intensity": 1,
+					"Size": 24,
+					"Threshold": 2
+				}
+			},
+			"DepthOfField": {
+				"$className": "DepthOfFieldEffect",
+				"$properties": {
+					"Enabled": false,
+					"FarIntensity": 0.1,
+					"FocusDistance": 0.05,
+					"InFocusRadius": 30,
+					"NearIntensity": 0.75
+				}
+			},
+			"SunRays": {
+				"$className": "SunRaysEffect",
+				"$properties": {
+					"Intensity": 0.01,
+					"Spread": 0.1
+				}
 			}
 		},
+
 		"Workspace": {
 			"$className": "Workspace",
+			"Place": {
+				"$path": "./GamePlaceTemp.rbxmx"
+			},
 			"$properties": {
 				"SignalBehavior2": {
 					"Enum": 2
 				}
 			}
 		},
+
 		"TextChatService": {
 			"$className": "TextChatService",
 			"$properties": {

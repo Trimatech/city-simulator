@@ -16,7 +16,7 @@ interface MinimapTracerProps {
 function MinimapTracerComponent({ from, to, isPlayer, isFriend, isLeader }: MinimapTracerProps) {
 	const rem = useMinimapRem();
 	const center = from.add(to).div(2);
-	const length = from.sub(to).Magnitude;
+	const length = from.sub(to).Magnitude * 2;
 	const color = isLeader
 		? palette.yellow
 		: isFriend

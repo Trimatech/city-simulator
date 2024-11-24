@@ -1,23 +1,36 @@
+import { CollisionGroups } from "shared/constants/collision-groups";
+import { SOLDIER_SPEED } from "shared/constants/core";
 import { Character, onPlayerAdded, promiseCharacter, promisePlayerDisconnected } from "shared/utils/player-utils";
 
 export async function initCharacterService() {
 	function onSpawn(character: Character) {
-		character.HumanoidRootPart.SetNetworkOwner(undefined);
-		character.HumanoidRootPart.Anchored = true;
-		character.Humanoid.SetStateEnabled(Enum.HumanoidStateType.Dead, false);
+		warn("Spawned character");
 
-		for (const part of character.GetDescendants()) {
-			if (part.IsA("BasePart") || part.IsA("Decal")) {
-				part.Transparency = 1;
+		// Set collision group for all character parts
+		character.GetDescendants().forEach((instance) => {
+			if (instance.IsA("BasePart")) {
+				instance.CollisionGroup = CollisionGroups.PLAYER;
 			}
+		});
+
+		// Handle any new parts added to character
+		character.DescendantAdded.Connect((instance) => {
+			if (instance.IsA("BasePart")) {
+				instance.CollisionGroup = CollisionGroups.PLAYER;
+			}
+		});
+
+		const humanoid = character.FindFirstChildOfClass("Humanoid");
+		if (humanoid) {
+			humanoid.WalkSpeed = SOLDIER_SPEED;
+		} else {
+			warn(`No humanoid found for character ${character.Name}`);
 		}
 	}
 
 	onPlayerAdded((player) => {
 		const characterAdded = player.CharacterAdded.Connect((character) => {
 			promiseCharacter(character).then(onSpawn);
-
-			player.ClearCharacterAppearance();
 		});
 
 		promisePlayerDisconnected(player).then(() => {

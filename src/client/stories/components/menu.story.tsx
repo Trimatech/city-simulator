@@ -8,7 +8,7 @@ import { World } from "client/components/world";
 import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
 import { USER_NAME } from "shared/constants/core";
-import { selectSnakeById } from "shared/store/snakes";
+import { selectSoldierById } from "shared/store/soldiers";
 
 import { useMockRemotes } from "../utils/use-mock-remotes";
 
@@ -16,12 +16,12 @@ export = hoarcekat(() => {
 	useMockRemotes();
 
 	const toggle = () => {
-		const snake = store.getState(selectSnakeById(USER_NAME));
+		const soldier = store.getState(selectSoldierById(USER_NAME));
 
-		if (snake) {
-			store.removeSnake(USER_NAME);
+		if (soldier) {
+			store.removeSoldier(USER_NAME);
 		} else {
-			store.addSnake(USER_NAME);
+			store.addSoldier(USER_NAME);
 		}
 	};
 

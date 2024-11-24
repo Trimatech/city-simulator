@@ -1,31 +1,52 @@
+import { Players } from "@rbxts/services";
 import { setTimeout } from "@rbxts/set-timeout";
 import { store } from "server/store";
 import { WORLD_BOUNDS } from "shared/constants/core";
 import { selectCandyById } from "shared/store/candy";
-import { selectSnakeById } from "shared/store/snakes";
+import { selectSoldierById } from "shared/store/soldiers";
 
-import { snakeGrid } from "./services/snakes/snake-grid";
+import { soldierGrid } from "./services/soldiers/soldier-grid";
 
 const MIN_SAFE_DISTANCE = 10;
 
-export function getSnake(snakeId: string) {
-	return store.getState(selectSnakeById(snakeId));
+export function getSoldier(soldierId: string) {
+	return store.getState(selectSoldierById(soldierId));
 }
 
 export function getCandy(candyId: string) {
 	return store.getState(selectCandyById(candyId));
 }
 
-export function killSnake(snakeId: string) {
-	store.setSnakeIsDead(snakeId);
+export function getPlayerHumanoidByName(name: string) {
+	const player = Players.GetPlayers().find((player) => player.Name === name);
+	if (player) {
+		const humanoid = player.Character?.FindFirstChildOfClass("Humanoid");
+		if (humanoid) {
+			return humanoid;
+		} else {
+			warn(`No humanoid found for player ${name}`);
+		}
+	} else {
+		warn(`No player found for name ${name}`);
+	}
+	return undefined;
+}
+
+export function killSoldier(soldierId: string) {
+	store.setSoldierIsDead(soldierId);
+
+	const humanoid = getPlayerHumanoidByName(soldierId);
+	if (humanoid) {
+		humanoid.TakeDamage(10000);
+	}
 
 	setTimeout(() => {
-		store.removeSnake(snakeId);
+		store.removeSoldier(soldierId);
 	}, 2);
 }
 
 export function playerIsSpawned(player: Player) {
-	return getSnake(player.Name) !== undefined;
+	return getSoldier(player.Name) !== undefined;
 }
 
 /**
@@ -68,13 +89,13 @@ export function getRandomPointNearWorldOrigin(margin = 1, passes = 2) {
 
 /**
  * Returns a safe point in the world. This should be a point that is
- * not too close to any other snake, but not the farthest point either.
+ * not too close to any other soldier, but not the farthest point either.
  */
 export function getSafePointInWorld() {
 	const spawns: { position: Vector2; safety: number }[] = [];
 
 	const scoreSafety = (spawn: Vector2) => {
-		const nearest = snakeGrid.nearest(spawn, MIN_SAFE_DISTANCE * 2);
+		const nearest = soldierGrid.nearest(spawn, MIN_SAFE_DISTANCE * 2);
 		const distance = nearest ? nearest.position.sub(spawn).Magnitude : math.huge;
 		return distance;
 	};
@@ -87,7 +108,7 @@ export function getSafePointInWorld() {
 
 	const sorted = spawns.sort((a, b) => a.safety < b.safety);
 
-	// Find the first safe spawn that is still close to another snake
+	// Find the first safe spawn that is still close to another soldier
 	for (const spawn of sorted) {
 		if (spawn.safety > MIN_SAFE_DISTANCE) {
 			return spawn.position;

@@ -13,10 +13,10 @@ export const remotes = createRemotes({
 		start: remote<Server>(),
 	}),
 
-	snake: namespace({
+	soldier: namespace({
 		spawn: remote<Server>(),
 		kill: remote<Server>(),
-		move: remote<Server, [angle: number]>(t.numberConstrained(-math.pi, math.pi)),
+		move: remote<Server, [position: Vector2]>(t.Vector2),
 		boost: remote<Server, [boost: boolean]>(t.boolean).middleware(
 			throttleMiddleware({ throttle: WORLD_TICK, trailing: true }),
 		),

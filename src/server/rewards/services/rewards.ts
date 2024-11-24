@@ -2,23 +2,22 @@ import { setInterval } from "@rbxts/set-timeout";
 import { store } from "server/store";
 import {
 	identifyMilestone,
-	ScoreMilestone,
+	selectMilestoneArea,
 	selectMilestoneLastKilled,
 	selectMilestoneRanking,
 	selectMilestones,
-	selectMilestoneScore,
 } from "server/store/milestones";
-import { getSnake } from "server/world";
+import { ScoreMilestone } from "server/store/milestones/milestone-utils";
+import { getSoldier } from "server/world";
 import { sounds } from "shared/assets";
 import { palette } from "shared/constants/palette";
 import { remotes } from "shared/remotes";
-import { describeSnakeFromScore, selectSnakeRanking } from "shared/store/snakes";
+import { selectSoldierRanking } from "shared/store/soldiers";
 import { getPlayerByName } from "shared/utils/player-utils";
 
 import { grantMoney, shouldGrantReward } from "../utils";
 
 const SCORE_REWARDS: { readonly [K in ScoreMilestone]: number } = {
-	1_000: 20,
 	5_000: 50,
 	10_000: 100,
 	25_000: 250,
@@ -27,6 +26,10 @@ const SCORE_REWARDS: { readonly [K in ScoreMilestone]: number } = {
 	250_000: 2_500,
 	500_000: 5_000,
 	1_000_000: 10_000,
+	1_500_000: 15_000,
+	2_000_000: 20_000,
+	2_500_000: 25_000,
+	2_800_000: 28_000,
 };
 
 const RANK_REWARDS: { readonly [ranking: number]: number | undefined } = {
@@ -58,23 +61,25 @@ function observeMilestone(id: string) {
 		}
 	});
 
-	// When the player hits a new score milestone they haven't hit
+	// When the player hits a new area milestone they haven't hit
 	// during their current life, grant them a reward
-	const unsubscribeScore = store.subscribe(selectMilestoneScore(id), (score) => {
-		const reward = score && SCORE_REWARDS[score];
+	const unsubscribeArea = store.subscribe(selectMilestoneArea(id), (milestoneArea) => {
+		const reward = milestoneArea && SCORE_REWARDS[milestoneArea];
 
 		if (reward !== undefined && shouldGrantReward()) {
-			grantMoneyReward(id, reward, `hitting a score of <font color="#fff">${score}</font>`);
+			print(`${id} milestoneArea=${milestoneArea} rewarded`);
+			grantMoneyReward(id, reward, `hitting a area of <font color="#fff">${milestoneArea}</font> studs²`);
 		}
 	});
 
-	// When the player kills a snake, grant them a reward based on the
-	// length of the snake they killed
+	// When the player kills a soldier, grant them a reward based on the
+	// length of the soldier they killed
 	const unsubscribeKill = store.observeWhile(selectMilestoneLastKilled(id), (enemyId) => {
-		const enemy = getSnake(enemyId);
+		const enemy = getSoldier(enemyId);
 
 		if (enemy && shouldGrantReward()) {
-			const length = describeSnakeFromScore(enemy.score).length;
+			// TODO: Calculate from area??
+			const length = enemy.polygonAreaSize;
 			const bounty = math.ceil(length / 3);
 			grantMoneyReward(id, bounty, `eliminating <font color="#fff">${enemy.name}</font>`, true);
 		}
@@ -85,11 +90,11 @@ function observeMilestone(id: string) {
 	// While the player is in the top 3, grant them a reward every minute
 	// as long as they stay in the top 3
 	const unsubscribePassive = store.observeWhile(
-		selectSnakeRanking(id),
+		selectSoldierRanking(id),
 		(rank = 4) => rank <= 3,
 		() => {
 			return setInterval(() => {
-				const rank = store.getState(selectSnakeRanking(id)) ?? 0;
+				const rank = store.getState(selectSoldierRanking(id)) ?? 0;
 				const reward = RANK_REWARDS_PASSIVE[rank];
 
 				if (reward !== undefined && shouldGrantReward()) {
@@ -101,7 +106,7 @@ function observeMilestone(id: string) {
 
 	return () => {
 		unsubscribeRanking();
-		unsubscribeScore();
+		unsubscribeArea();
 		unsubscribeKill();
 		unsubscribePassive();
 	};

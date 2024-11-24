@@ -3,8 +3,8 @@ import React, { Element, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { CanvasGroup } from "client/components/ui/canvas-group";
 import { useDefined, useStore } from "client/hooks";
-import { selectSnakeFromWorldSubject } from "client/store/world";
-import { selectSnakesById, selectTopSnake } from "shared/store/snakes";
+import { selectSoldierFromWorldSubject } from "client/store/world";
+import { selectSoldiersById, selectTopSoldier } from "shared/store/soldiers";
 
 import { MinimapCursor } from "./minimap-cursor";
 import { MinimapTracer } from "./minimap-tracer";
@@ -12,7 +12,7 @@ import { isValidPlayer, normalizeToWorldBounds, useFriendsInServer } from "./uti
 
 export function MinimapNodes() {
 	const store = useStore();
-	const snake = useDefined(useSelector(selectSnakeFromWorldSubject));
+	const soldier = useDefined(useSelector(selectSoldierFromWorldSubject));
 	const friends = useFriendsInServer();
 
 	const [nodes, setNodes] = useState<Element[]>([]);
@@ -21,33 +21,49 @@ export function MinimapNodes() {
 		const nodes: Element[] = [];
 
 		// this doesn't need useSelector so we can avoid unneeded re-renders
-		const snakes = store.getState(selectSnakesById);
-		const topSnake = store.getState(selectTopSnake);
+		const soldiers = store.getState(selectSoldiersById);
+		const topSoldier = store.getState(selectTopSoldier);
 
-		for (const [, snake] of pairs(snakes)) {
-			const size = snake.tracers.size();
+		for (const [, soldier] of pairs(soldiers)) {
+			const size = soldier.tracers.size();
 			const step = math.floor(map(size, 0, 100, 2, 10));
-			let previous = snake.head;
 
-			const isPlayer = isValidPlayer(snake.id);
-			const isFriend = friends.includes(snake.id);
-			const isLeader = topSnake?.id === snake.id;
+			const isPlayer = isValidPlayer(soldier.id);
+			const isFriend = friends.includes(soldier.id);
+			const isLeader = topSoldier?.id === soldier.id;
 
-			for (const index of $range(0, size - 1, step)) {
-				const tracer = snake.tracers[index];
+			for (let i = 0; i < size - 1; i += step) {
+				const point = soldier.tracers[i];
+				const nextPoint = soldier.tracers[i + 1];
 
 				nodes.push(
 					<MinimapTracer
-						key={`${snake.id}-${index}`}
-						from={normalizeToWorldBounds(previous)}
-						to={normalizeToWorldBounds(tracer)}
+						key={`tracer-${soldier.id}-${i}`}
+						from={normalizeToWorldBounds(point)}
+						to={normalizeToWorldBounds(nextPoint)}
 						isPlayer={isPlayer}
 						isFriend={isFriend}
 						isLeader={isLeader}
 					/>,
 				);
+			}
 
-				previous = tracer;
+			const polygonSize = soldier.polygon.size();
+
+			for (let i = 0; i < polygonSize - 1; i += step) {
+				const point = soldier.polygon[i];
+				const nextPoint = soldier.polygon[i + 1];
+
+				nodes.push(
+					<MinimapTracer
+						key={`poly-${soldier.id}-${i}`}
+						from={normalizeToWorldBounds(point)}
+						to={normalizeToWorldBounds(nextPoint)}
+						isPlayer={isPlayer}
+						isFriend={isFriend}
+						isLeader={isLeader}
+					/>,
+				);
 			}
 		}
 
@@ -67,7 +83,7 @@ export function MinimapNodes() {
 				{nodes}
 			</CanvasGroup>
 
-			{snake && <MinimapCursor point={normalizeToWorldBounds(snake.head)} angle={snake.angle} />}
+			{soldier && <MinimapCursor point={normalizeToWorldBounds(soldier.position)} angle={soldier.angle} />}
 		</>
 	);
 }

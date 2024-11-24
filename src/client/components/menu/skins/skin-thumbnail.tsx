@@ -2,13 +2,13 @@ import React, { useEffect } from "@rbxts/react";
 import { CanvasGroup } from "client/components/ui/canvas-group";
 import { Image } from "client/components/ui/image";
 import { useMotion, useRem } from "client/hooks";
-import { SnakeSkin } from "shared/constants/skins";
+import { SoldierSkin } from "shared/constants/skins";
 import { fillArray } from "shared/utils/object-utils";
 
-import { SNAKE_ANGLE_OFFSET } from "../../world/snakes";
+import { SOLDIER_ANGLE_OFFSET } from "../../world/soldiers";
 
 interface SkinThumbnailProps {
-	readonly skin: SnakeSkin;
+	readonly skin: SoldierSkin;
 	readonly active: boolean;
 	readonly transparency: React.Binding<number>;
 }
@@ -30,7 +30,7 @@ const TRACERS = fillArray(TRACER_POINTS, (index) => {
 
 	const size = new Vector2(0, from.sub(to).Magnitude);
 	const position = from.add(to).div(2);
-	const rotation = math.deg(math.atan2(to.Y - from.Y, to.X - from.X) + SNAKE_ANGLE_OFFSET);
+	const rotation = math.deg(math.atan2(to.Y - from.Y, to.X - from.X) + SOLDIER_ANGLE_OFFSET);
 
 	return { size, position, rotation };
 });

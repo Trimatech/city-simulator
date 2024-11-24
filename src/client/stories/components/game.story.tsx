@@ -1,18 +1,17 @@
 import "client/app/react-config";
 
-import { hoarcekat, useInterval } from "@rbxts/pretty-react-hooks";
+import { hoarcekat, useInterval, useTimeout } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { Controller } from "client/components/controller";
 import { Game } from "client/components/game";
 import { World } from "client/components/world";
 import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
-import { USER_NAME, WORLD_BOUNDS, WORLD_TICK } from "shared/constants/core";
+import { USER_NAME, WORLD_BOUNDS } from "shared/constants/core";
 import { getRandomAccent } from "shared/constants/palette";
-import { getRandomBaseSnakeSkin } from "shared/constants/skins";
+import { getRandomBaseSoldierSkin } from "shared/constants/skins";
 import { CandyType } from "shared/store/candy";
 import { fillArray } from "shared/utils/object-utils";
-import { createScheduler } from "shared/utils/scheduler";
 
 import { useMockRemotes } from "../utils/use-mock-remotes";
 
@@ -23,17 +22,17 @@ export = hoarcekat(() => {
 
 	useEffect(() => {
 		for (const id of IDS) {
-			store.addSnake(id, {
+			store.addSoldier(id, {
 				name: id,
-				head:
+				position:
 					id === USER_NAME
 						? Vector2.zero
 						: new Vector2(
 								math.random(-WORLD_BOUNDS, WORLD_BOUNDS),
 								math.random(-WORLD_BOUNDS, WORLD_BOUNDS),
 							),
-				skin: getRandomBaseSnakeSkin().id,
-				score: math.random(0, 5000),
+				skin: getRandomBaseSoldierSkin().id,
+				orbs: math.random(0, 5000),
 			});
 		}
 
@@ -49,18 +48,18 @@ export = hoarcekat(() => {
 				color: getRandomAccent(),
 			})),
 		);
-
-		return createScheduler({
-			name: "world-tick",
-			tick: WORLD_TICK,
-			onTick: store.snakeTick,
-		});
 	}, []);
+
+	useTimeout(() => {
+		for (const id of IDS) {
+			store.setSoldierIsInside(id, false);
+		}
+	}, 2);
 
 	useInterval(() => {
 		for (const id of IDS) {
 			if (id !== USER_NAME) {
-				store.turnSnake(id, math.random() * 2 * math.pi);
+				//store.turnSoldier(id, math.random() * 2 * math.pi);
 			}
 		}
 	}, 1.5);

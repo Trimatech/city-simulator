@@ -1,7 +1,7 @@
 /// <reference types="@rbxts/testez/globals" />
 
 import { store } from "server/store";
-import { CANDY_LIMITS, createCandy, getSnake, onCandyTick } from "server/world";
+import { CANDY_LIMITS, createCandy, getSoldier, onCandyTick } from "server/world";
 import { CandyType, selectCandies, selectCandyById, selectCandyCount } from "shared/store/candy";
 import { fillArray } from "shared/utils/object-utils";
 
@@ -47,21 +47,21 @@ export = () => {
 		expect(countCandy()).to.equal(CANDY_LIMITS[CandyType.Default] + 10);
 	});
 
-	it("should create candy when a snake dies", () => {
-		store.addSnake("__test__");
-		store.snakeTick(0);
+	it("should create candy when a soldier dies", () => {
+		store.addSoldier("__test__");
+
 		store.flush();
-		store.setSnakeIsDead("__test__");
+		store.setSoldierIsDead("__test__");
 		store.flush();
 	});
 
-	it("should keep candy population at the max if a snake dies", () => {
+	it("should keep candy population at the max if a soldier dies", () => {
 		const initialCandy = store.getState(selectCandies);
 
-		store.addSnake("__test__");
-		store.snakeTick(0);
+		store.addSoldier("__test__");
+
 		store.flush();
-		store.setSnakeIsDead("__test__");
+		store.setSoldierIsDead("__test__");
 		store.flush();
 
 		expect(countCandy() > CANDY_LIMITS[CandyType.Default]).to.equal(true);
@@ -76,20 +76,20 @@ export = () => {
 		expect(countCandy() > CANDY_LIMITS[CandyType.Default]).to.equal(true);
 	});
 
-	it("should eat candy when a snake is close", () => {
+	it("should eat candy when a soldier is close", () => {
 		const candy = createCandy({ size: 10, position: new Vector2(1000, 1000) });
 		store.addCandy(candy);
-		store.addSnake("__test__", { head: new Vector2(1000, 1000.1) });
+		store.addSoldier("__test__", { position: new Vector2(1000, 1000.1) });
 		store.flush();
 		onCandyTick();
 		expect(didEatCandy(candy.id)).to.equal(true);
-		expect(getSnake("__test__")!.score).to.never.equal(0);
+		expect(getSoldier("__test__")!.orbs).to.never.equal(0);
 	});
 
-	it("should not eat candy if a snake is far away", () => {
+	it("should not eat candy if a soldier is far away", () => {
 		const candy = createCandy({ size: 10, position: Vector2.zero });
 		store.addCandy(candy);
-		store.addSnake("__test__", { head: new Vector2(100, 100) });
+		store.addSoldier("__test__", { position: new Vector2(100, 100) });
 		store.flush();
 		onCandyTick();
 		expect(didEatCandy(candy.id)).to.equal(false);

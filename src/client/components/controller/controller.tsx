@@ -1,53 +1,54 @@
-import { useThrottleCallback } from "@rbxts/pretty-react-hooks";
+import { useInterval, useThrottleCallback } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
+import { Players } from "@rbxts/services";
 import { useInputDevice, useStore } from "client/hooks";
-import { REMOTE_TICK, WORLD_TICK } from "shared/constants/core";
+import { WORLD_TICK } from "shared/constants/core";
 import { remotes } from "shared/remotes";
-import { selectLocalSnake } from "shared/store/snakes";
+import { selectLocalSoldier } from "shared/store/soldiers";
 
 import { Gamepad } from "./controllers/gamepad";
 import { Mouse } from "./controllers/mouse";
 import { Touch } from "./controllers/touch";
-import { useToggleTouchControls } from "./utils/use-toggle-touch-controls";
 
 export function Controller() {
 	const store = useStore();
 	const device = useInputDevice();
-	const snake = useSelector(selectLocalSnake);
+	const soldier = useSelector(selectLocalSoldier);
 
-	useToggleTouchControls(snake !== undefined);
+	const isSpawned = soldier !== undefined && !soldier.dead;
 
-	const updateAngle = useThrottleCallback(
-		(angle: number) => {
-			remotes.snake.move.fire(angle);
-			store.setWorldInputAngle(angle);
-		},
-		{ wait: REMOTE_TICK, leading: true, trailing: true },
-	);
+	useInterval(() => {
+		if (!isSpawned) return;
+		const position = Players.LocalPlayer.Character?.PrimaryPart?.Position;
+		if (position) {
+			const vector2 = new Vector2(position.X, position.Z);
+			remotes.soldier.move.fire(vector2);
+		}
+	}, WORLD_TICK);
 
 	const setBoost = useThrottleCallback(
 		(boost: boolean) => {
-			remotes.snake.boost.fire(boost);
+			remotes.soldier.boost.fire(boost);
 		},
 		{ wait: WORLD_TICK, leading: true, trailing: true },
 	);
 
 	useEffect(() => {
-		if (snake) {
+		if (soldier) {
 			store.setWorldInputAngle(0);
 		}
-	}, [!snake]);
+	}, [!soldier]);
 
-	if (!snake) {
+	if (!soldier) {
 		return <></>;
 	}
 
 	return (
 		<>
-			{device === "keyboard" && <Mouse updateAngle={updateAngle.run} setBoost={setBoost.run} />}
-			{device === "touch" && <Touch updateAngle={updateAngle.run} setBoost={setBoost.run} />}
-			{device === "gamepad" && <Gamepad updateAngle={updateAngle.run} setBoost={setBoost.run} />}
+			{device === "keyboard" && <Mouse setBoost={setBoost.run} />}
+			{device === "touch" && <Touch setBoost={setBoost.run} />}
+			{device === "gamepad" && <Gamepad setBoost={setBoost.run} />}
 		</>
 	);
 }

@@ -1,7 +1,5 @@
 import { Point, PointShape } from "shared/polybool/Geometry";
 import { Polygon } from "shared/polybool/polybool";
-import { PolygonState } from "./PolygonClipper.types";
-import { DemoPolygon } from "./demo-cases";
 
 export function snapToGrid(point: Point): Point {
 	return [math.round(point[0] / 10) * 10, math.round(point[1] / 10) * 10];
@@ -47,7 +45,7 @@ export function drawPolygon(canvas: Frame, polygon: Polygon, color: Color3, tran
 export type PolygonName = "poly1" | "poly2" | "result";
 
 export interface ClosestPointResult {
-	isPoly1: boolean;
+	polygonIndex: number;
 	regionIndex: number;
 	pointIndex: number;
 	distance: number;
@@ -57,33 +55,30 @@ export function getNormMousePos(mousePos: Vector3, framePosition: Vector2) {
 	return new Vector2(mousePos.X - framePosition.X, mousePos.Y - framePosition.Y);
 }
 
-export function findClosestPoint(mousePos: Vector2, poly1: Polygon, poly2: Polygon) {
+export function findClosestPoint(mousePos: Vector2, polygons: Polygon[], range = 100000) {
 	let closestDist = math.huge;
 	let closest: ClosestPointResult | undefined;
+
 	// warn(`checking ${polyName} r${regionIndex} p${pointIndex}=${point[0]}_${point[1]}`);
 
 	const mouseX = mousePos.X;
 	const mouseY = mousePos.Y;
 	// warn(`.... mouse x=${mouseX}, y=${mouseY}`);
 
-	const setClosestIfCloser = (point: PointShape, isPoly1: boolean, regionIndex: number, pointIndex: number) => {
+	const setClosestIfCloser = (point: PointShape, polygonIndex: number, regionIndex: number, pointIndex: number) => {
 		const dist = math.sqrt(math.pow(mouseX - point[0], 2) + math.pow(mouseY - point[1], 2));
-		if (dist < closestDist && dist < 10) {
+		if (dist < closestDist && dist < range) {
 			// 10 is hit radius
 			closestDist = dist;
-			closest = { isPoly1, regionIndex, pointIndex, distance: dist };
+			closest = { polygonIndex, regionIndex, pointIndex, distance: dist };
 		}
 	};
 
-	poly1.regions.forEach((region, regionIndex) => {
-		region.forEach((point, pointIndex) => {
-			setClosestIfCloser(point, true, regionIndex, pointIndex);
-		});
-	});
-
-	poly2.regions.forEach((region, regionIndex) => {
-		region.forEach((point, pointIndex) => {
-			setClosestIfCloser(point, false, regionIndex, pointIndex);
+	polygons.forEach((polygon, polygonIndex) => {
+		polygon.regions.forEach((region, regionIndex) => {
+			region.forEach((point, pointIndex) => {
+				setClosestIfCloser(point, polygonIndex, regionIndex, pointIndex);
+			});
 		});
 	});
 
@@ -116,7 +111,3 @@ export const updatePolygonPoint = (params: {
 	changedPolygon.regions[regionIndex][pointIndex] = snappedPos;
 	return changedPolygon;
 };
-
-export function getNextRegion(region: PointShape[], i: number) {
-	return region[(i + 1) % region.size()] as Point;
-}

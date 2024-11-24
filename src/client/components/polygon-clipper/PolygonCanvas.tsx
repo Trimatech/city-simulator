@@ -30,12 +30,15 @@ export function PolygonCanvas({ size, poly1, poly2, resultPolygon, snap, onPolyg
 			if (input.UserInputType === Enum.UserInputType.MouseButton1) {
 				warn(`Input started`);
 				const mousePos = getNormMousePos(input.Position, rbx.AbsolutePosition);
-				const closest = findClosestPoint(mousePos, poly1, poly2);
+				const closest = findClosestPoint(mousePos, [poly1, poly2], 10);
+
+				const isPoly1 = closest?.polygonIndex === 0;
 
 				if (closest) {
-					warn(`drag start for isPoly1=${closest.isPoly1} ${closest.regionIndex} ${closest.pointIndex}`);
+					warn(`drag start for isPoly1=${isPoly1} ${closest.regionIndex} ${closest.pointIndex}`);
 					dragInfo.current = {
 						isDragging: true,
+						isPoly1,
 						...closest,
 					};
 				} else {
