@@ -1,38 +1,37 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
 
 permissions:
-  contents: write
-  packages: write
+    contents: write
+    packages: write
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+    build:
+        runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9.2.0
-          run_install: true
-      - uses: Roblox/setup-foreman@v3.2.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          github-api-url: 'https://api.github.com'
-          allow-external-github-orgs: true
+        steps:
+            - uses: actions/checkout@v4
+            - uses: pnpm/action-setup@v4
+              with:
+                  run_install: true
+            - uses: Roblox/setup-foreman@v3.2.0
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  github-api-url: "https://api.github.com"
+                  allow-external-github-orgs: true
 
-      - name: Lint
-        run: |
-          pnpm eslint src
-          pnpm prettier --check src
+            - name: Lint
+              run: |
+                  pnpm eslint src
+                  pnpm prettier --check src
 
-      - name: Compile
-        run: pnpm build --verbose
+            - name: Compile
+              run: pnpm build --verbose
 
-      - name: Build project
-        run: rojo build --output place.rbxlx
+            - name: Build project
+              run: rojo build --output place.rbxlx
