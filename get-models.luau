@@ -12,6 +12,32 @@ local function safeWriteModel(path, instance)
     end
 end
 
-safeWriteModel('./GamePlaceTemp.rbxmx', gamePlace.Workspace:FindFirstChild("Place"))
+
+local function createModelsRecursively(instance)
+    if not instance:IsA("Folder") then
+        return
+    end
+
+    local targetDir = 'Models/' .. instance.Name
+    if not fs.isDir(targetDir) then
+        fs.writeDir(targetDir)
+    end
+
+    for _, child in ipairs(instance:GetChildren()) do
+        if child:IsA("Model") then
+            print("Saving model: " .. child.Name)
+            local modelPath = targetDir .. "/" .. child.Name .. '.rbxmx'
+            fs.writeFile(modelPath, roblox.serializeModel({child}, true))
+            print("Saved model: " .. modelPath)
+        elseif child:IsA("Folder") then
+            createModelsRecursively(child)
+        end
+    end
+end
+
+
+local clientModelDir = 'Models'
+print("Creating client models")
+createModelsRecursively(gamePlace.Workspace:FindFirstChild(clientModelDir))
 
 print("Model extraction complete")

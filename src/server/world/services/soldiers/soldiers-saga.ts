@@ -1,5 +1,5 @@
 import Object from "@rbxts/object-utils";
-import { Players } from "@rbxts/services";
+import { Players, Workspace } from "@rbxts/services";
 import { waitForPrimaryPart } from "@rbxts/wait-for";
 import { store } from "server/store";
 import { SOLDIER_TICK_PHASE } from "server/world/constants";
@@ -18,6 +18,7 @@ import {
 import { Point, pointsToPolygon } from "shared/polybool/polybool";
 import { calculatePolygonArea } from "shared/polygon-extra.utils";
 import { remotes } from "shared/remotes";
+import { findSharedInstanceByPath } from "shared/SharedModelManager";
 import { defaultPlayerSave, RANDOM_SKIN, selectPlayerSave } from "shared/store/saves";
 import {
 	selectAliveSoldiersById,
@@ -83,8 +84,19 @@ export async function initSoldierService() {
 		}
 	});
 
+	async function placeTower(player: Player, position: Vector2) {
+		const towerModel = await findSharedInstanceByPath<Model>("ReplicatedStorage/Models/Gameplay/Tower");
+		const tower = towerModel.Clone();
+		tower.PivotTo(new CFrame(position.X, 0, position.Y));
+		tower.Parent = Workspace;
+	}
+
 	remotes.soldier.move.connect((player, position) => {
 		registerSoldierInput(player.Name, position);
+	});
+
+	remotes.soldier.placeTower.connect((player, position) => {
+		placeTower(player, position);
 	});
 
 	remotes.soldier.boost.connect((player, boost) => {

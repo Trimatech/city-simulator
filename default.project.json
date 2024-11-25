@@ -22,6 +22,9 @@
 			},
 			"TS": {
 				"$path": "out/shared"
+			},
+			"Models": {
+				"$path": "Models"
 			}
 		},
 		"StarterPlayer": {
