@@ -81,4 +81,28 @@ export const candySlice = createProducer(initialState, {
 			return !staleIds.has(candy.id) ? candy : undefined;
 		});
 	},
+
+	removeCandiesByIds: (state, ids: string[]) => {
+		return mapProperties(state, (candy) => {
+			if (ids.includes(candy.id)) {
+				return undefined;
+			}
+			return candy;
+		});
+	},
+
+	setCandiesEatenAt: (state, updates: { id: string; position: Vector2 }[]) => {
+		const newState = { ...state };
+
+		for (const { id, position } of updates) {
+			if (newState[id]) {
+				newState[id] = {
+					...newState[id],
+					eatenAt: position,
+				};
+			}
+		}
+
+		return newState;
+	},
 });

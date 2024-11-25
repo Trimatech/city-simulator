@@ -1,7 +1,6 @@
 import { store } from "server/store";
 import { getCandy } from "server/world/utils";
-import { selectSoldiersById } from "shared/store/soldiers";
-import { SOLDIER_RADIUS_BASE } from "shared/store/soldiers";
+import { selectSoldiersById, SOLDIER_EAT_RADIUS } from "shared/store/soldiers";
 
 import { candyGrid, eatCandy } from "./candy-utils";
 
@@ -13,7 +12,7 @@ export function onCandyTick() {
 			continue;
 		}
 
-		const range = SOLDIER_RADIUS_BASE * 1.25 + 1;
+		const range = SOLDIER_EAT_RADIUS;
 
 		const nearest = candyGrid.nearest(soldier.position, range, (point) => {
 			const candy = getCandy(point.metadata.id);

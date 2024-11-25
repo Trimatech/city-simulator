@@ -4,11 +4,15 @@ import { waitForPrimaryPart } from "@rbxts/wait-for";
 import { store } from "server/store";
 import { SOLDIER_TICK_PHASE } from "server/world/constants";
 import { getSafePointInWorld, killSoldier, playerIsSpawned } from "server/world/utils";
+import { getCandy } from "server/world/utils";
 import { SOLDIER_BOOST_SPEED, SOLDIER_MIN_AREA, SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
 import {
+	calculatePolygonBoundingBox,
 	calculatePolygonOperation,
+	isPointInPolygon,
 	pointsToVectors,
 	setIntersectionPoints,
+	vector2ToPoint,
 	vectorsToPoints,
 } from "shared/polybool/poly-utils";
 import { Point, pointsToPolygon } from "shared/polybool/polybool";
@@ -24,6 +28,7 @@ import {
 import { identifySoldier } from "shared/store/soldiers";
 import { createScheduler } from "shared/utils/scheduler";
 
+import { candyGrid, eatCandies } from "../candy/candy-utils";
 import { deleteSoldierInput, onSoldierTick, registerSoldierInput } from "./soldier-tick";
 import { setSoldierSpeed } from "./soldiers.utils";
 
@@ -111,6 +116,20 @@ export async function initSoldierService() {
 				const polygonAreaSize = calculatePolygonArea(resultPolygon);
 
 				store.setSoldierPolygon(id, resultPolygon, polygonAreaSize, true);
+
+				// Calculate bounding box for the new cut polygon
+				const newCutPoints = newCutPolygon.regions[0] as Point[];
+				const boundingBox = calculatePolygonBoundingBox(newCutPoints);
+
+				// Eat all candies inside the newly claimed area
+				const candiesInNewArea = candyGrid.queryBox(boundingBox.min, boundingBox.size, (point) => {
+					const candy = getCandy(point.metadata.id);
+					if (!candy || candy.eatenAt) return false;
+
+					return isPointInPolygon(vector2ToPoint(point.position), newCutPoints);
+				});
+
+				eatCandies(candiesInNewArea, id);
 
 				const state = store.getState();
 				const allSoldiers = Object.values(selectSoldiersById(state));

@@ -1,6 +1,6 @@
 type GridCell<T> = Map<Vector3, GridPoint<T>>;
 
-interface GridPoint<T> {
+export interface GridPoint<T> {
 	readonly position: Vector2;
 	readonly metadata: T;
 }
