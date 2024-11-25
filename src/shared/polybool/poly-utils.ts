@@ -484,3 +484,29 @@ function roundCoordinate(num: number): number {
 function roundPoint(point: Point): Point {
 	return [roundCoordinate(point[0]), roundCoordinate(point[1])];
 }
+
+export interface BoundingBox {
+	min: Vector2;
+	max: Vector2;
+	size: Vector2;
+}
+
+export function calculatePolygonBoundingBox(points: Point[]): BoundingBox {
+	let minX = math.huge;
+	let minY = math.huge;
+	let maxX = -math.huge;
+	let maxY = -math.huge;
+
+	for (const point of points) {
+		minX = math.min(minX, point[0]);
+		minY = math.min(minY, point[1]);
+		maxX = math.max(maxX, point[0]);
+		maxY = math.max(maxY, point[1]);
+	}
+
+	const min = new Vector2(minX, minY);
+	const max = new Vector2(maxX, maxY);
+	const size = max.sub(min);
+
+	return { min, max, size };
+}
