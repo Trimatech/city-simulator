@@ -121,9 +121,10 @@ export function dropCandyWhileBoosting(id: string) {
 			const soldier = getSoldier(id);
 
 			if (soldier) {
-				const tail: Vector2 | undefined = soldier.tracers[soldier.tracers.size() - 1];
+				const size = soldier.tracers.size();
+				const tail: Vector2 | undefined = size >= 2 ? soldier.tracers[size - 2] : soldier.lastPosition;
 
-				if (tail && tail.sub(previousTail).Magnitude > SOLDIER_RADIUS_BASE * 2) {
+				if (tail && tail.sub(previousTail).Magnitude > SOLDIER_RADIUS_BASE * 3) {
 					previousTail = tail;
 					store.addCandy(createCandy({ position: tail, type: CandyType.Dropping }));
 				}
@@ -135,6 +136,7 @@ export function dropCandyWhileBoosting(id: string) {
 
 			if (soldier) {
 				const maxDecrease = math.clamp(math.round(3 + 0.001 * soldier.orbs), 2, 10);
+
 				store.incrementSoldierOrbs(id, random.NextInteger(-maxDecrease, -1));
 			}
 		};
