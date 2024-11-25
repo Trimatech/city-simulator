@@ -7,7 +7,7 @@ import { getSoldierSkinForTracer } from "shared/constants/skins";
 import { CandyEntity, CandyType, selectCandyById, selectCandyCount } from "shared/store/candy";
 import { SOLDIER_RADIUS_BASE } from "shared/store/soldiers";
 import { selectSoldierIsBoosting } from "shared/store/soldiers";
-import { Grid } from "shared/utils/grid";
+import { Grid, GridPoint } from "shared/utils/grid";
 import { fillArray } from "shared/utils/object-utils";
 
 const random = new Random();
@@ -57,6 +57,47 @@ export function eatCandy(candyId: string, soldierId: string) {
 		removeCandy(candy.id, soldier.position);
 		store.incrementSoldierOrbs(soldier.id, candy.size);
 	}
+}
+
+export function eatCandies(candyPoints: GridPoint<{ id: string }>[], soldierId: string) {
+	if (candyPoints.size() === 0) return;
+
+	// Collect all valid candies and their data
+	const candyUpdates = candyPoints.mapFiltered((point) => {
+		const candy = getCandy(point.metadata.id);
+		if (!candy || candy.eatenAt) return undefined;
+
+		return {
+			id: candy.id,
+			position: candy.position,
+			size: candy.size,
+		};
+	});
+
+	if (candyUpdates.size() === 0) return;
+
+	// Calculate total orbs
+	const totalOrbs = candyUpdates.reduce((sum, candy) => sum + candy.size, 0);
+
+	// Remove from grid
+	for (const candy of candyUpdates) {
+		candyGrid.remove(candy.position);
+	}
+
+	// Bulk updates to store
+	const candyIds = candyUpdates.map((c) => c.id);
+	const eatenPositions = candyUpdates.map((c) => ({
+		id: c.id,
+		position: c.position,
+	}));
+
+	store.setCandiesEatenAt(eatenPositions);
+	store.incrementSoldierOrbs(soldierId, totalOrbs);
+
+	// Schedule removal from state
+	setTimeout(() => {
+		store.removeCandiesByIds(candyIds);
+	}, 5);
 }
 
 export function populateCandy(amount: number) {

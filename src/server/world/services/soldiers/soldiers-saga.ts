@@ -28,7 +28,7 @@ import {
 import { identifySoldier } from "shared/store/soldiers";
 import { createScheduler } from "shared/utils/scheduler";
 
-import { candyGrid, eatCandy } from "../candy/candy-utils";
+import { candyGrid, eatCandies } from "../candy/candy-utils";
 import { deleteSoldierInput, onSoldierTick, registerSoldierInput } from "./soldier-tick";
 import { setSoldierSpeed } from "./soldiers.utils";
 
@@ -129,9 +129,7 @@ export async function initSoldierService() {
 					return isPointInPolygon(vector2ToPoint(point.position), newCutPoints);
 				});
 
-				for (const candyPoint of candiesInNewArea) {
-					eatCandy(candyPoint.metadata.id, id);
-				}
+				eatCandies(candiesInNewArea, id);
 
 				const state = store.getState();
 				const allSoldiers = Object.values(selectSoldiersById(state));
