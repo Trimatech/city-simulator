@@ -1,5 +1,5 @@
 import { store } from "server/store";
-import { getSoldier, killSoldier } from "server/world/utils";
+import { getSoldier, killSoldier } from "server/world/world.utils";
 import { WORLD_BOUNDS } from "shared/constants/core";
 import { isPointInPolygon, vector2ToPoint, vectorsToPoints } from "shared/polybool/poly-utils";
 import { selectSoldiersSorted, SoldierEntity } from "shared/store/soldiers";

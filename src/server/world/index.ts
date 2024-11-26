@@ -3,4 +3,4 @@ export * from "./services";
 export * from "./services/candy";
 export * from "./services/collision";
 export * from "./services/soldiers";
-export * from "./utils";
+export * from "./world.utils";
