@@ -3,8 +3,7 @@ import { Players } from "@rbxts/services";
 import { waitForPrimaryPart } from "@rbxts/wait-for";
 import { store } from "server/store";
 import { SOLDIER_TICK_PHASE } from "server/world/constants";
-import { getSafePointInWorld, killSoldier, playerIsSpawned } from "server/world/utils";
-import { getCandy } from "server/world/utils";
+import { getCandy, getSafePointInWorld, killSoldier, playerIsSpawned } from "server/world/world.utils";
 import { SOLDIER_BOOST_SPEED, SOLDIER_MIN_AREA, SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
 import {
 	calculatePolygonBoundingBox,
@@ -83,8 +82,24 @@ export async function initSoldierService() {
 		}
 	});
 
+	async function placeTower(player: Player, position: Vector2) {
+		store.placeTower({
+			id: "1",
+			position,
+			ownerId: player.Name,
+			damage: 15,
+			range: 50,
+			lastAttackTime: 0,
+			lastAttackPlayerName: undefined,
+		});
+	}
+
 	remotes.soldier.move.connect((player, position) => {
 		registerSoldierInput(player.Name, position);
+	});
+
+	remotes.soldier.placeTower.connect((player, position) => {
+		placeTower(player, position);
 	});
 
 	remotes.soldier.boost.connect((player, boost) => {

@@ -20,7 +20,7 @@ function CandyComponent({ position, color = palette.white, transparency = 0, siz
 	const sphereRef = useRef<Part>();
 	const cleanupRef = useRef<() => void>();
 
-	print("render candy", eatenAt);
+	print(`render candy, eatenAt=${eatenAt}`);
 
 	useEffect(() => {
 		// Create candy sphere

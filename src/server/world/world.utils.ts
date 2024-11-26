@@ -40,9 +40,18 @@ export function killSoldier(soldierId: string) {
 		humanoid.TakeDamage(10000);
 	}
 
+	store.removeTowersByOwnerId(soldierId);
+
 	setTimeout(() => {
 		store.removeSoldier(soldierId);
 	}, 2);
+}
+
+export function takeDamageByPlayerName(playerName: string, amount: number) {
+	const humanoid = getPlayerHumanoidByName(playerName);
+	if (humanoid) {
+		humanoid.TakeDamage(amount);
+	}
 }
 
 export function playerIsSpawned(player: Player) {

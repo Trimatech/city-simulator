@@ -55,8 +55,6 @@ jobs:
             - uses: ok-nick/setup-aftman@v0.4.2
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
-                  github-api-url: "https://api.github.com"
-                  allow-external-github-orgs: true
 
             - name: Download place artifact
               uses: actions/download-artifact@v4

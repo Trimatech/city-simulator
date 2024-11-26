@@ -1,7 +1,7 @@
 import { setInterval, setTimeout } from "@rbxts/set-timeout";
 import { store } from "server/store";
 import { CANDY_LIMITS } from "server/world/constants";
-import { getCandy, getRandomPointNearWorldOrigin, getSoldier } from "server/world/utils";
+import { getCandy, getRandomPointNearWorldOrigin, getSoldier } from "server/world/world.utils";
 import { getRandomAccent } from "shared/constants/palette";
 import { getSoldierSkinForTracer } from "shared/constants/skins";
 import { CandyEntity, CandyType, selectCandyById, selectCandyCount } from "shared/store/candy";

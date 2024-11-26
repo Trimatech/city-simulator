@@ -1,4 +1,4 @@
-import { useInterval, useThrottleCallback } from "@rbxts/pretty-react-hooks";
+import { useInterval, useKeyPress, useThrottleCallback } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { Players } from "@rbxts/services";
@@ -33,6 +33,19 @@ export function Controller() {
 		},
 		{ wait: WORLD_TICK, leading: true, trailing: true },
 	);
+
+	const keyPressed = useKeyPress(["E"]);
+
+	useEffect(() => {
+		if (!isSpawned) return;
+		const cf = Players.LocalPlayer.Character?.PrimaryPart?.CFrame;
+		if (cf && keyPressed) {
+			const forwardVector = cf.LookVector.mul(10);
+			const newPosition = cf.Position.add(forwardVector);
+			const position = new Vector2(newPosition.X, newPosition.Z);
+			remotes.soldier.placeTower.fire(position);
+		}
+	}, [keyPressed]);
 
 	useEffect(() => {
 		if (soldier) {

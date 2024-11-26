@@ -4,6 +4,7 @@ import { RemProvider } from "client/providers/rem-provider";
 
 import { Candies } from "./candies/Candies";
 import { Soldiers } from "./soldiers";
+import { Towers } from "./towers/Towers";
 import { WorldSounds } from "./world-sounds";
 
 export function World() {
@@ -15,6 +16,8 @@ export function World() {
 				<WorldSounds />
 
 				<Candies />
+
+				<Towers />
 			</Group>
 		</RemProvider>
 	);

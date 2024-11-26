@@ -1,9 +1,10 @@
+import { killSoldier } from "server/world";
 import { CollisionGroups } from "shared/constants/collision-groups";
 import { SOLDIER_SPEED } from "shared/constants/core";
 import { Character, onPlayerAdded, promiseCharacter, promisePlayerDisconnected } from "shared/utils/player-utils";
 
 export async function initCharacterService() {
-	function onSpawn(character: Character) {
+	function onSpawn(character: Character, player: Player) {
 		warn("Spawned character");
 
 		// Set collision group for all character parts
@@ -26,11 +27,17 @@ export async function initCharacterService() {
 		} else {
 			warn(`No humanoid found for character ${character.Name}`);
 		}
+
+		character.Humanoid.Died.Connect(() => {
+			print(`Player ${character.Name}'s humanoid has died`);
+
+			killSoldier(player.Name);
+		});
 	}
 
 	onPlayerAdded((player) => {
 		const characterAdded = player.CharacterAdded.Connect((character) => {
-			promiseCharacter(character).then(onSpawn);
+			promiseCharacter(character).then((character) => onSpawn(character, player));
 		});
 
 		promisePlayerDisconnected(player).then(() => {
