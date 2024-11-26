@@ -22,8 +22,8 @@ export function onTowerTick() {
 		// Check for enemies in range
 		for (const [, soldier] of Object.entries(soldiers)) {
 			if (soldier.dead || soldier.id === tower.ownerId) {
-				warn(`Skipping tower ${tower.id} because soldier ${soldier.id} is dead or is the owner`);
-				//	continue;
+				//warn(`Skipping tower ${tower.id} because soldier ${soldier.id} is dead or is the owner`);
+				continue;
 			}
 
 			const distance = tower.position.sub(soldier.position).Magnitude;
