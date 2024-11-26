@@ -90,6 +90,7 @@ export async function initSoldierService() {
 			damage: 15,
 			range: 50,
 			lastAttackTime: 0,
+			lastAttackPlayerName: undefined,
 		});
 	}
 

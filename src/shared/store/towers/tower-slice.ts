@@ -12,6 +12,7 @@ export interface TowerEntity {
 	readonly range: number;
 	readonly damage: number;
 	readonly lastAttackTime: number;
+	readonly lastAttackPlayerName: string | undefined;
 }
 
 const initialState: TowerState = {};
@@ -25,10 +26,10 @@ export const towerSlice = createProducer(initialState, {
 		return mapProperty(state, id, () => undefined);
 	},
 
-	updateTowerLastAttack: (state, id: string, lastAttackTime: number) => {
+	updateTowerLastAttack: (state, id: string, props: Partial<TowerEntity>) => {
 		return mapProperty(state, id, (tower) => ({
 			...tower,
-			lastAttackTime,
+			...props,
 		}));
 	},
 

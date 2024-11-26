@@ -3,6 +3,7 @@ import { store } from "server/store";
 import { takeDamageByPlayerName } from "server/world/world.utils";
 import { selectSoldiersById } from "shared/store/soldiers";
 import { selectTowersById } from "shared/store/towers/tower-selectors";
+import { TowerEntity } from "shared/store/towers/tower-slice";
 
 const TOWER_ATTACK_INTERVAL = 2; // 3 seconds between attacks
 
@@ -10,7 +11,7 @@ export function onTowerTick() {
 	const currentTime = tick();
 	const towers = store.getState(selectTowersById);
 	const soldiers = store.getState(selectSoldiersById);
-	const updates: { id: string; lastAttackTime: number }[] = [];
+	const updates: Partial<TowerEntity>[] = [];
 
 	for (const [, tower] of Object.entries(towers)) {
 		// Skip if tower hasn't cooled down
@@ -36,6 +37,7 @@ export function onTowerTick() {
 				updates.push({
 					id: tower.id,
 					lastAttackTime: currentTime,
+					lastAttackPlayerName: soldier.id,
 				});
 				break; // Only attack one soldier per tick
 			}
@@ -45,7 +47,9 @@ export function onTowerTick() {
 	// Batch update towers' last attack times
 	if (updates.size() > 0) {
 		for (const update of updates) {
-			store.updateTowerLastAttack(update.id, update.lastAttackTime);
+			if (update.id) {
+				store.updateTowerLastAttack(update.id, update);
+			}
 		}
 	}
 }
