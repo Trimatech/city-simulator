@@ -44,8 +44,10 @@ jobs:
         needs: build
 
         steps:
-            - name: Install GitHub CLI
+            - name: Install Homebrew and GitHub CLI
               run: |
+                  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+                  eval "$(/opt/homebrew/bin/brew shellenv)"
                   brew install gh
 
             - uses: actions/checkout@v4
