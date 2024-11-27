@@ -1,3 +1,4 @@
+import { palette } from "shared/constants/palette";
 import { getPlayerByName } from "shared/utils/player-utils";
 
 export function createRangeIndicator(range: number, position: Vector3) {
@@ -6,8 +7,8 @@ export function createRangeIndicator(range: number, position: Vector3) {
 	rangeIndicator.Shape = Enum.PartType.Cylinder;
 	rangeIndicator.Size = new Vector3(1.1, range * 2, range * 2);
 	rangeIndicator.CFrame = new CFrame(position).mul(CFrame.Angles(0, 0, math.pi / 2));
-	rangeIndicator.Transparency = 0.8;
-	rangeIndicator.BrickColor = new BrickColor("Really red");
+	rangeIndicator.Transparency = 0.9;
+	rangeIndicator.Color = palette.red;
 	rangeIndicator.CanCollide = false;
 	rangeIndicator.Anchored = true;
 
