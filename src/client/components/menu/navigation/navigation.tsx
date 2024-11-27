@@ -13,10 +13,10 @@ export function Navigation() {
 	let index = 0;
 
 	return (
-		<Group size={new UDim2(1, 0, 0, rem(7.5))}>
+		<Group size={new UDim2(1, 0, 0, rem(7.5))} name="Navigation">
 			<Indicator colors={[palette.red, palette.mauve, palette.blue]} order={["support", "home", "skins"]} />
 
-			<Group size={new UDim2(1, 0, 0, rem(5))} position={new UDim2(0, 0, 0, rem(3))}>
+			<Group size={new UDim2(1, 0, 0, rem(5))} position={new UDim2(0, 0, 0, rem(3))} name="Navigation">
 				<uilistlayout
 					SortOrder="LayoutOrder"
 					FillDirection="Horizontal"

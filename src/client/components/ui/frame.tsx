@@ -2,6 +2,7 @@ import React, { forwardRef, Ref } from "@rbxts/react";
 
 export interface FrameProps<T extends Instance = Frame> extends React.PropsWithChildren {
 	ref?: React.Ref<T>;
+	name?: string;
 	event?: React.InstanceEvent<T>;
 	change?: React.InstanceChangeEvent<T>;
 	size?: UDim2 | React.Binding<UDim2>;
@@ -22,6 +23,7 @@ export interface FrameProps<T extends Instance = Frame> extends React.PropsWithC
 export const Frame = forwardRef((props: FrameProps, ref: Ref<Frame>) => {
 	return (
 		<frame
+			key={props.name}
 			ref={ref}
 			Size={props.size}
 			Position={props.position}

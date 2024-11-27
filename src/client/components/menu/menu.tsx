@@ -17,6 +17,7 @@ const SKINS_PAGE = "skins";
 
 export function Menu() {
 	const store = useStore();
+
 	const spawned = useSelector(selectHasLocalSoldier);
 
 	const currentPage = useSelector(selectCurrentPage);

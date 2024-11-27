@@ -56,7 +56,7 @@ export function Compass() {
 	}, [subject, leader]);
 
 	return (
-		<Group>
+		<Group name="Compass">
 			<uipadding
 				PaddingTop={new UDim(0, rem(6))}
 				PaddingBottom={new UDim(0, rem(6))}

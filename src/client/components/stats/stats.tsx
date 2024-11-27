@@ -31,7 +31,7 @@ export function Stats() {
 	const balance = useDefined(currentBalance, 0);
 
 	return (
-		<Group>
+		<Group name="Stats">
 			<uipadding PaddingBottom={new UDim(0, rem(3))} PaddingLeft={new UDim(0, rem(3))} />
 
 			<uilistlayout
