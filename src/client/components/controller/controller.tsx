@@ -7,6 +7,7 @@ import { WORLD_TICK } from "shared/constants/core";
 import { remotes } from "shared/remotes";
 import { selectLocalSoldier } from "shared/store/soldiers";
 
+import { placeTowerAtPlayer } from "./controller.utils";
 import { Gamepad } from "./controllers/gamepad";
 import { Mouse } from "./controllers/mouse";
 import { Touch } from "./controllers/touch";
@@ -38,13 +39,9 @@ export function Controller() {
 
 	useEffect(() => {
 		if (!isSpawned) return;
-		const cf = Players.LocalPlayer.Character?.PrimaryPart?.CFrame;
-		if (cf && keyPressed) {
-			const forwardVector = cf.LookVector.mul(10);
-			const newPosition = cf.Position.add(forwardVector);
-			const position = new Vector2(newPosition.X, newPosition.Z);
-			remotes.soldier.placeTower.fire(position);
-		}
+		if (!keyPressed) return;
+
+		placeTowerAtPlayer();
 	}, [keyPressed]);
 
 	useEffect(() => {
