@@ -137,7 +137,7 @@ export function dropCandyWhileBoosting(id: string) {
 			if (soldier) {
 				const maxDecrease = math.clamp(math.round(3 + 0.001 * soldier.orbs), 2, 10);
 
-				store.incrementSoldierOrbs(id, random.NextInteger(-maxDecrease, -1));
+				store.decrementSoldierOrbs(id, random.NextInteger(maxDecrease, 1));
 			}
 		};
 

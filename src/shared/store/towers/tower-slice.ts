@@ -8,7 +8,7 @@ export interface TowerState {
 export interface TowerEntity {
 	readonly id: string;
 	readonly position: Vector2;
-	readonly ownerId: string; // ID of the player who placed the tower
+	readonly ownerId: string;
 	readonly range: number;
 	readonly damage: number;
 	readonly lastAttackTime: number;

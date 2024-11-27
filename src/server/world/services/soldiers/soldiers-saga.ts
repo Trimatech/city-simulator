@@ -29,6 +29,7 @@ import { createScheduler } from "shared/utils/scheduler";
 
 import { candyGrid, eatCandies } from "../candy/candy-utils";
 import { deleteSoldierInput, onSoldierTick, registerSoldierInput } from "./soldier-tick";
+import { placeTower } from "./soldiers.placeTower";
 import { setSoldierSpeed } from "./soldiers.utils";
 
 export async function initSoldierService() {
@@ -81,18 +82,6 @@ export async function initSoldierService() {
 			warn(`No PrimaryPart found for player ${player.Name}`);
 		}
 	});
-
-	async function placeTower(player: Player, position: Vector2) {
-		store.placeTower({
-			id: "1",
-			position,
-			ownerId: player.Name,
-			damage: 15,
-			range: 50,
-			lastAttackTime: 0,
-			lastAttackPlayerName: undefined,
-		});
-	}
 
 	remotes.soldier.move.connect((player, position) => {
 		registerSoldierInput(player.Name, position);

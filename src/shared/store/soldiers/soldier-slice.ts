@@ -174,7 +174,14 @@ export const soldiersSlice = createProducer(initialState, {
 	incrementSoldierOrbs: (state, id: string, amount: number) => {
 		return mapProperty(state, id, (soldier) => ({
 			...soldier,
-			orbs: math.max(soldier.orbs + amount, 0),
+			orbs: math.max(soldier.orbs + math.abs(amount), 0),
+		}));
+	},
+
+	decrementSoldierOrbs: (state, id: string, amount: number) => {
+		return mapProperty(state, id, (soldier) => ({
+			...soldier,
+			orbs: math.max(soldier.orbs - math.abs(amount), 0),
 		}));
 	},
 
