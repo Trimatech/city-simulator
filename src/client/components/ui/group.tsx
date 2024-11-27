@@ -12,6 +12,7 @@ interface GroupProps extends React.PropsWithChildren {
 	layoutOrder?: number | React.Binding<number>;
 	visible?: boolean | React.Binding<boolean>;
 	zIndex?: number | React.Binding<number>;
+	name?: string;
 }
 
 export const Group = forwardRef((props: GroupProps, ref: React.Ref<Frame>) => {
@@ -29,6 +30,7 @@ export const Group = forwardRef((props: GroupProps, ref: React.Ref<Frame>) => {
 			BackgroundTransparency={1}
 			Event={props.event}
 			Change={props.change}
+			key={props.name}
 		>
 			{props.children}
 		</frame>

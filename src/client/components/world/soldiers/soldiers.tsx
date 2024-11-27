@@ -10,7 +10,7 @@ export function Soldiers() {
 	const soldiers = useSelector(selectSoldiersById);
 
 	return (
-		<Group zIndex={2}>
+		<Group name="Soldiers" zIndex={2}>
 			{Object.values(soldiers).map((soldier) => {
 				return <Soldier key={soldier.id} soldier={soldier} />;
 			})}

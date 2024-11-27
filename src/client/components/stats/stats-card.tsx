@@ -79,7 +79,7 @@ export function StatsCard({ onClick, emoji, label, value, primary, secondary, en
 					<uigradient Color={new ColorSequence(primaryDark, secondaryDark)} />
 				</Frame>
 
-				<Group clipsDescendants size={new UDim2(0, rem(0.35), 1, 0)}>
+				<Group clipsDescendants size={new UDim2(0, rem(0.35), 1, 0)} name="StatsCardIndicator">
 					<Frame
 						backgroundColor={primary}
 						cornerRadius={new UDim(0, rem(0.5))}

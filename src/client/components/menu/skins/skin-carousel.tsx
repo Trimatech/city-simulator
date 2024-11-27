@@ -30,7 +30,7 @@ export function SkinCarousel() {
 	}, []);
 
 	return (
-		<Group size={new UDim2(1, 0, 1, -rem(3))}>
+		<Group size={new UDim2(1, 0, 1, -rem(3))} name="SkinCarousel">
 			{DIRECTIONS.map((direction) => {
 				const index = (currentIndex + direction) % SKIN_LENGTH;
 				const skin = SKIN_LIST[index] ?? RANDOM_SKIN;

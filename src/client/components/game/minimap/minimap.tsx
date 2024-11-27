@@ -21,7 +21,12 @@ export function Minimap() {
 
 	return (
 		<RemProvider minimumRem={MINIMUM_MINIMAP_REM}>
-			<Group anchorPoint={anchorPoint} size={new UDim2(0, rem(10), 0, rem(10))} position={position}>
+			<Group
+				anchorPoint={anchorPoint}
+				size={new UDim2(0, rem(10), 0, rem(10))}
+				position={position}
+				name="Minimap"
+			>
 				<Shadow
 					shadowColor={palette.black}
 					shadowSize={rem(5)}

@@ -1,5 +1,5 @@
 {
-	"name": "slither",
+	"name": "qonquer",
 	"globIgnorePaths": ["**/package.json", "**/tsconfig.json"],
 	"tree": {
 		"$className": "DataModel",

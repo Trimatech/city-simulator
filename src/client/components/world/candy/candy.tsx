@@ -50,6 +50,7 @@ export function Candy() {
 
 	return (
 		<Group
+			name="Candy"
 			position={smoothOffset.map(
 				(offset) => new UDim2(0.5, rem(offset.X * world.scale), 0.5, rem(offset.Y * world.scale)),
 			)}

@@ -10,7 +10,7 @@ import { WorldSounds } from "./world-sounds";
 export function World() {
 	return (
 		<RemProvider minimumRem={6}>
-			<Group>
+			<Group name="World">
 				<Soldiers />
 
 				<WorldSounds />
