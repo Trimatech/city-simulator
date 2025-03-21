@@ -40,4 +40,14 @@ local clientModelDir = 'Models'
 print("Creating client models")
 createModelsRecursively(gamePlace.Workspace:FindFirstChild(clientModelDir))
 
+local placeFile = gamePlace.Workspace:FindFirstChild("Place")
+if placeFile then
+    print("Saving Place model")
+    local placePath = 'GamePlaceTemp.rbxmx'
+    safeWriteModel(placePath, placeFile)
+else
+    print("Warning: Place model not found")
+end
+
+
 print("Model extraction complete")

@@ -2,6 +2,7 @@
 	"name": "expr-2-qonquer",
 	"version": "0.0.1",
 	"scripts": {
+		"dev": "concurrently \"pnpm watch\" \"pnpm serve\"",
 		"lint": "eslint src && prettier --check src",
 		"compile": "rbxtsc --verbose",
 		"watch": "rbxtsc -w",
@@ -48,7 +49,8 @@
 		"@rbxts/t": "^3.1.1",
 		"@rbxts/testez": "0.4.2-ts.0",
 		"@rbxts/validate-tree": "^2.0.2",
-		"@rbxts/wait-for": "^0.1.5"
+		"@rbxts/wait-for": "^0.1.5",
+		"concurrently": "^9.1.2"
 	},
 	"packageManager": "pnpm@9.14.2+sha512.6e2baf77d06b9362294152c851c4f278ede37ab1eba3a55fda317a4a17b209f4dbb973fb250a77abc463a341fcb1f17f17cfa24091c4eb319cda0d9b84278387"
 }
