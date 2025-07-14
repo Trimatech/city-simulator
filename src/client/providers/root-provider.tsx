@@ -2,7 +2,7 @@ import React from "@rbxts/react";
 import { ReflexProvider } from "@rbxts/react-reflex";
 import { store } from "client/store";
 
-import { RemProvider, RemProviderProps } from "./rem-provider";
+import { RemProvider, RemProviderProps } from "../rem/rem-provider";
 
 export function RootProvider({ baseRem, remOverride, children }: RemProviderProps) {
 	return (

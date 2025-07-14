@@ -4,7 +4,7 @@ import { Group } from "client/components/ui/group";
 import { Image } from "client/components/ui/image";
 import { Shadow } from "client/components/ui/shadow";
 import { useInputDevice } from "client/hooks";
-import { RemProvider } from "client/providers/rem-provider";
+import { RemProvider } from "client/rem/rem-provider";
 import { images } from "shared/assets";
 import { palette } from "shared/constants/palette";
 

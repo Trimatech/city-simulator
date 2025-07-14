@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "@rbxts/react";
-import { useRem } from "client/hooks/use-rem";
+import { useRem } from "client/rem/use-rem";
 import { calculatePolygonOperation, shapeToPolygon } from "shared/polybool/poly-utils";
 import { Polygon } from "shared/polybool/polybool";
 

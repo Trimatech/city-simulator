@@ -1,3 +1,4 @@
+export * from "../rem/use-rem";
 export * from "./use-character";
 export * from "./use-continuous-angle";
 export * from "./use-defined";
@@ -6,6 +7,5 @@ export * from "./use-motion";
 export * from "./use-orientation";
 export * from "./use-premium";
 export * from "./use-product-price";
-export * from "./use-rem";
 export * from "./use-seed";
 export * from "./use-store";

@@ -1,0 +1,9 @@
+
+# For more information, see https://github.com/rojo-rbx/rokit
+
+[tools]
+lune = "lune-org/lune@0.8.9"           # forked on arm laptop
+rojo = "rojo-rbx/rojo@7.4.4"
+tarmac = "rojo-rbx/tarmac@0.7.3"
+run-in-roblox = "rojo-rbx/run-in-roblox@0.3.0"
+mantle = "blake-mealey/mantle@0.11.17-prerelease"

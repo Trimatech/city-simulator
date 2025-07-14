@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
 import { Group } from "client/components/ui/group";
-import { RemProvider } from "client/providers/rem-provider";
+import { RemProvider } from "client/rem/rem-provider";
 
 import { Candies } from "./candies/Candies";
 import { Soldiers } from "./soldiers";
