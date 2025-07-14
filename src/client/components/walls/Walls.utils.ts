@@ -142,25 +142,25 @@ export function createWallPieces({
 	});
 }
 
-const Y_OFFSET = -2;
+const Y_OFFSET = -1;
 
 export function calculateWallTransform(line: [Vector2, Vector2], height: number) {
 	const startP = line[0];
 	const endP = line[1];
 
 	// Create points at ground level (Y = 0)
-	const startPoint = new Vector3(startP.X, Y_OFFSET, startP.Y);
-	const endPoint = new Vector3(endP.X, Y_OFFSET, endP.Y);
+	const startPoint = new Vector3(startP.X, 0, startP.Y);
+	const endPoint = new Vector3(endP.X, 0, endP.Y);
 
 	const direction = endPoint.sub(startPoint);
 	const width = direction.Magnitude;
 
 	// Calculate center position at ground level, then move up by height/2
 	const groundCenter = startPoint.add(direction.mul(0.5));
-	const center = new Vector3(groundCenter.X, height / 2, groundCenter.Z);
+	const center = new Vector3(groundCenter.X, height / 2 + Y_OFFSET, groundCenter.Z);
 
 	// Calculate start position for cylinder
-	const startPosition = new Vector3(startPoint.X, height / 2, startPoint.Z);
+	const startPosition = new Vector3(startPoint.X, height / 2 + Y_OFFSET, startPoint.Z);
 
 	const rotation = CFrame.lookAt(new Vector3(), new Vector3(direction.X, 0, direction.Z)).mul(
 		CFrame.fromEulerAnglesXYZ(0, math.rad(90), 0),

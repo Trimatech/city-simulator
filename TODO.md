@@ -8,14 +8,14 @@ A structured roadmap to build and polish _Divide and Qonquer_, a viral, competit
 
 _Goal: Build the minimum playable version to test the main loop._
 
--   [ ] Implement player movement (WASD / joystick / mobile drag)
--   [ ] Detect when player exits their conquered zone
--   [ ] Begin drawing line automatically on exit
--   [ ] Stop line when returning to territory
--   [ ] Calculate enclosed area and claim it visually
--   [ ] Add death condition if another player touches the line
--   [ ] Respawn player with no land after death
--   [ ] Create basic arena map with 1 biome (e.g. Grassland)
+-   [x] Implement player movement (WASD / joystick / mobile drag)
+-   [x] Detect when player exits their conquered zone
+-   [x] Begin drawing line automatically on exit
+-   [x] Stop line when returning to territory
+-   [x] Calculate enclosed area and claim it visually
+-   [x] Add death condition if another player touches the line
+-   [x] Respawn player after death
+-   [x] Create basic arena map with 1 biome (e.g. Grassland)
 
 ---
 
@@ -23,11 +23,11 @@ _Goal: Build the minimum playable version to test the main loop._
 
 _Goal: Real-time PvP and territory management._
 
--   [ ] Support multiple players in the same arena
+-   [x] Support multiple players in the same arena
 -   [ ] Handle safe/unsafe zones per player
 -   [ ] Add collision bounce when players meet outside their zones
--   [ ] Add player death if line is touched by another
--   [ ] Track and update territory percentage per player
+-   [x] Add player death if line is touched by another
+-   [x] Track and update territory percentage per player
 
 ---
 
