@@ -142,13 +142,15 @@ export function createWallPieces({
 	});
 }
 
+const Y_OFFSET = -2;
+
 export function calculateWallTransform(line: [Vector2, Vector2], height: number) {
 	const startP = line[0];
 	const endP = line[1];
 
 	// Create points at ground level (Y = 0)
-	const startPoint = new Vector3(startP.X, 0, startP.Y);
-	const endPoint = new Vector3(endP.X, 0, endP.Y);
+	const startPoint = new Vector3(startP.X, Y_OFFSET, startP.Y);
+	const endPoint = new Vector3(endP.X, Y_OFFSET, endP.Y);
 
 	const direction = endPoint.sub(startPoint);
 	const width = direction.Magnitude;
