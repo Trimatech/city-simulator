@@ -1,8 +1,13 @@
-name: Release Production
+name: Release Develop
 
 on:
-    release:
-        types: [released]
+    push:
+        branches:
+            - main
+        paths:
+            - 'places/**/*'
+            - mantle.yml
+            - package.json
     workflow_dispatch:
 
 permissions:
@@ -10,7 +15,7 @@ permissions:
     packages: write
 
 concurrency:
-    group: prod_environment
+    group: dev_environment
     cancel-in-progress: true
 
 jobs:
@@ -23,15 +28,15 @@ jobs:
               with:
                   lfs: true
 
-            - name: Build places (prod)
+            - name: Build places (dev)
               uses: ./.github/actions/roblox-build
               with:
-                  node_env: prod
+                  node_env: dev
 
     deploy:
         runs-on: ubuntu-latest
         # runs-on: self-hosted # This is needed for ROBLOSECURITY, it checks the region
-        environment: prod
+        environment: dev
         needs: build
 
         steps:
@@ -60,7 +65,7 @@ jobs:
             # Deploy the places
 
             - name: Deploy place
-              run: mantle deploy --allow-purchases --environment prod
+              run: mantle deploy --environment dev
               env:
                   ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
                   MANTLE_AWS_ACCESS_KEY_ID: ${{ secrets.MANTLE_AWS_ACCESS_KEY_ID }}

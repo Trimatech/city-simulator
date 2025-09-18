@@ -1,0 +1,66 @@
+name: 'Roblox Build'
+description: 'Compile and build Lobby and Game, uploading artifacts'
+inputs:
+    node_env:
+        description: 'NODE_ENV to use (dev|prod)'
+        required: true
+runs:
+    using: 'composite'
+    steps:
+        - name: Install pnpm
+          uses: pnpm/action-setup@v4
+          with:
+              version: 9.4.0
+
+        - name: Use Node.js 20
+          uses: actions/setup-node@v4
+          with:
+              node-version: 20
+              cache: 'pnpm'
+
+        - name: Install dependencies
+          shell: bash
+          run: pnpm install --prod
+
+        - name: Install roblox-ts
+          shell: bash
+          run: pnpm add roblox-ts
+
+        - name: Setup Aftman
+          uses: ok-nick/setup-aftman@e226f24209f47677da7b215bab44f6351a2c043b # v0.4.2
+          with:
+              token: ${{ github.token }}
+
+        - name: Export build metadata env vars
+          shell: bash
+          run: echo "BUILD_ISO_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
+
+        - name: Compile Lobby
+          shell: bash
+          run: NODE_ENV=${{ inputs.node_env }} pnpm compile-lobby
+
+        - name: Build Lobby Project
+          shell: bash
+          run: pnpm build-lobby
+
+        - name: Compile Game
+          shell: bash
+          run: NODE_ENV=${{ inputs.node_env }} pnpm compile-game
+
+        - name: Build Game Project
+          shell: bash
+          run: pnpm build-game
+
+        - name: Upload GameLobby place
+          uses: actions/upload-artifact@v4
+          with:
+              name: GameLobby
+              path: GameLobby.rbxl
+              if-no-files-found: error
+
+        - name: Upload Game place
+          uses: actions/upload-artifact@v4
+          with:
+              name: Game
+              path: Game.rbxl
+              if-no-files-found: error

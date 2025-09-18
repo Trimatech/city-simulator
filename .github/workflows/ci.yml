@@ -1,35 +1,92 @@
 name: CI
 
 on:
-    push:
-        branches: [main]
-    pull_request:
-        branches: [main]
+  pull_request:
+    branches:
+      - main
+      - develop
 
 permissions:
-    contents: write
-    packages: write
+  contents: write
+  packages: write
+
+env:
+  CI: true
+  HUSKY: 0
+  RUST_BACKTRACE: 1
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
+  build:
+    # runs-on: windows-latest
+    runs-on: ubuntu-latest
 
-        steps:
-            - uses: actions/checkout@v4
-            - uses: pnpm/action-setup@v4
-              with:
-                  run_install: true
-            - uses: CompeyDev/setup-rokit@v0.1.2
-              with:
-                  token: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        with:
+          lfs: true # This ensures LFS files are checked out
 
-            - name: Lint
-              run: |
-                  pnpm eslint src
-                  pnpm prettier --check src
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
 
-            - name: Compile
-              run: pnpm build --verbose
+      - name: Use Node.js 20
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4
+        with:
+          node-version: 20
+          cache: pnpm
 
-            - name: Build project
-              run: rojo build --output place.rbxlx
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Setup Aftman
+        uses: ok-nick/setup-aftman@e226f24209f47677da7b215bab44f6351a2c043b # v0.4.2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Lint
+        run: |
+          pnpm lint
+
+      - name: Compile Lobby
+        run: pnpm compile-lobby
+  
+      - name: Build Lobby Project
+        run: pnpm build-lobby
+
+      - name: Compile Game
+        run: pnpm compile-game
+
+      - name: Build Game Project
+        run: pnpm build-game
+
+
+      - name: Run tests
+        run: ./scripts/shell/test.sh default.project.json $TEST_TASK_FILE
+        env:
+          ROBLOX_API_KEY: ${{ secrets.ROBLOX_TEST_API_KEY }}
+          ROBLOX_UNIVERSE_ID: ${{ secrets.ROBLOX_TEST_UNIVERSE_ID }}
+          ROBLOX_PLACE_ID: ${{ secrets.ROBLOX_TEST_PLACE_ID }}
+          TEST_TASK_FILE: test/run-jest-tests.luau
+
+      # Not working https://github.com/rojo-rbx/run-in-roblox/issues/21
+      # - name: Install Roblox
+      #   uses: OrbitalOwen/roblox-win-installer-action@1.1
+      #   with:
+      #     cookie: ${{ secrets.ROBLOSECURITY }}
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #   timeout-minutes: 10
+
+      # # Flip flag that causes issue
+      # - name: Create fflag overrides
+      #   run: |
+      #     $flags = @{DFIntStudioUseNewLoginDataEndpointHundredthPercent=0; FFlagStudioUseNewLoginDataEndpoint=$false}
+      #     New-Item -Path 'C:/Program Files (x86)/Roblox/Versions/version-*/' -Name "ClientSettings" -ItemType "directory"
+      #     New-Item -Path 'C:/Program Files (x86)/Roblox/Versions/version-*/ClientSettings' -Name "ClientAppSettings.json"
+      #     $flags | ConvertTo-Json -depth 32| set-content -Path 'C:/Program Files (x86)/Roblox/Versions/version-*/ClientSettings/ClientAppSettings.json'
+
+      # - name: Test Game
+      #   timeout-minutes: 15
+      #   run: |
+      #     pnpm test-game 
+      #     | Tee-Object -file test-output.txt;
+      #     if($(Get-Content -Path test-output.txt -Tail 1) -match '0 failed'){ exit 0 } else { exit 1 }
