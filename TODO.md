@@ -24,7 +24,7 @@ _Goal: Build the minimum playable version to test the main loop._
 _Goal: Real-time PvP and territory management._
 
 -   [x] Support multiple players in the same arena
--   [ ] Handle safe/unsafe zones per player
+-   [x] Handle safe/unsafe zones per player
 -   [ ] Add collision bounce when players meet outside their zones
 -   [x] Add player death if line is touched by another
 -   [x] Track and update territory percentage per player
@@ -35,8 +35,8 @@ _Goal: Real-time PvP and territory management._
 
 _Goal: Add resource collection and competitive powers._
 
--   [ ] Spawn orbs randomly on the map
--   [ ] Add orb pickup logic
+-   [x] Spawn orbs randomly on the map
+-   [x] Add orb pickup logic
 -   [ ] Display and fill Orb Power Meter (UI)
 -   [ ] Play progressively deeper sound on each orb collected
 -   [ ] Unlock powers as meter fills:
