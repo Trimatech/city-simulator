@@ -12,7 +12,7 @@ state:
         key: exp2-qonquer
 
 environments:
-    - label: canary
+    - label: dev
       targetNamePrefix: environmentLabel
       targetAccess: public
       targetOverrides:
@@ -30,7 +30,7 @@ environments:
                           🤝  Send your feedback to the group wall or the linked socials!
 
                       maxPlayerCount: 50
-    - label: production
+    - label: prod
       branches: [main]
       targetAccess: public
 

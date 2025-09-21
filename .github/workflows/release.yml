@@ -29,7 +29,7 @@ jobs:
                   node_env: prod
 
     deploy:
-        runs-on: ubuntu-latest
+        runs-on: roblox-runner
         # runs-on: self-hosted # This is needed for ROBLOSECURITY, it checks the region
         environment: prod
         needs: build
@@ -40,10 +40,10 @@ jobs:
 
             - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
 
-            - name: Setup Aftman
-              uses: ok-nick/setup-aftman@e226f24209f47677da7b215bab44f6351a2c043b # v0.4.2
+            - name: Setup Rokit
+              uses: CompeyDev/setup-rokit@v0.1.2
               with:
-                  token: ${{ secrets.GITHUB_TOKEN }}
+                  token: ${{ github.token }}
 
             # Download the places artifacts
 

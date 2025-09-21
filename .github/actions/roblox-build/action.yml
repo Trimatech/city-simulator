@@ -26,8 +26,8 @@ runs:
           shell: bash
           run: pnpm add roblox-ts
 
-        - name: Setup Aftman
-          uses: ok-nick/setup-aftman@e226f24209f47677da7b215bab44f6351a2c043b # v0.4.2
+        - name: Setup Rokit
+          uses: CompeyDev/setup-rokit@v0.1.2
           with:
               token: ${{ github.token }}
 

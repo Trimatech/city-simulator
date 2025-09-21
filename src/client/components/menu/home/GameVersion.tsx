@@ -2,10 +2,13 @@ import React from "@rbxts/react";
 import { Text } from "client/components/ui/text";
 import { fonts } from "client/constants/fonts";
 import { useRem } from "client/hooks";
-import { IS_PROD } from "shared/constants/core";
+import { $env } from "rbxts-transform-env";
 import { palette } from "shared/constants/palette";
 
-const MODE = IS_PROD ? "production" : "development";
+const DIVIDER = `  <font transparency="0.75">—</font>  `;
+const VERSION = $env.string("npm_package_version", "unknown")!;
+const BUILD_ISO_DATE = $env.string("BUILD_ISO_DATE");
+
 export function GameVersion() {
 	const rem = useRem();
 	const size = new UDim2(0, rem(20), 0, rem(1.25));
@@ -17,7 +20,7 @@ export function GameVersion() {
 		<Text
 			richText
 			font={fonts.inter.medium}
-			text={`${MODE}`}
+			text={`v${VERSION} ${DIVIDER} ${BUILD_ISO_DATE}`}
 			textSize={rem(1.25)}
 			size={size}
 			textColor={palette.text}

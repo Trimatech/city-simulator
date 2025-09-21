@@ -1,6 +1,6 @@
 {
 	"name": "expr-2-qonquer",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"scripts": {
 		"dev": "concurrently \"pnpm watch\" \"pnpm serve\"",
 		"lint": "eslint src && prettier --check src",
@@ -30,6 +30,7 @@
 		"eslint-plugin-unused-imports": "^4.1.4",
 		"prettier": "^3.3.3",
 		"roblox-ts": "3.0.0",
+		"rbxts-transform-env": "^3.0.0",
 		"typescript": "^5.6.2"
 	},
 	"dependencies": {
