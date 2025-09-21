@@ -1,11 +1,11 @@
-name: 'Roblox Build'
-description: 'Compile and build Lobby and Game, uploading artifacts'
+name: "Roblox Build"
+description: "Compile and build Lobby and Game, uploading artifacts"
 inputs:
     node_env:
-        description: 'NODE_ENV to use (dev|prod)'
+        description: "NODE_ENV to use (dev|prod)"
         required: true
 runs:
-    using: 'composite'
+    using: "composite"
     steps:
         - name: Install pnpm
           uses: pnpm/action-setup@v4
@@ -16,7 +16,7 @@ runs:
           uses: actions/setup-node@v4
           with:
               node-version: 20
-              cache: 'pnpm'
+              cache: "pnpm"
 
         - name: Install dependencies
           shell: bash
@@ -35,28 +35,9 @@ runs:
           shell: bash
           run: echo "BUILD_ISO_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
 
-        - name: Compile Lobby
-          shell: bash
-          run: NODE_ENV=${{ inputs.node_env }} pnpm compile-lobby
-
-        - name: Build Lobby Project
-          shell: bash
-          run: pnpm build-lobby
-
-        - name: Compile Game
-          shell: bash
-          run: NODE_ENV=${{ inputs.node_env }} pnpm compile-game
-
         - name: Build Game Project
           shell: bash
-          run: pnpm build-game
-
-        - name: Upload GameLobby place
-          uses: actions/upload-artifact@v4
-          with:
-              name: GameLobby
-              path: GameLobby.rbxl
-              if-no-files-found: error
+          run: NODE_ENV=${{ inputs.node_env }} pnpm build
 
         - name: Upload Game place
           uses: actions/upload-artifact@v4

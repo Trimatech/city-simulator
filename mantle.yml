@@ -52,7 +52,7 @@ target:
             enabled: true
         places:
             start:
-                file: place.rbxlx
+                file: Game.rbxl
                 configuration:
                     name: Divide and Conquer ⚔️
                     description: |

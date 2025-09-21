@@ -62,9 +62,6 @@ importers:
       concurrently:
         specifier: ^9.1.2
         version: 9.1.2
-      rbxts-transform-env:
-        specifier: ^3.0.0
-        version: 3.0.0
     devDependencies:
       '@rbxts/compiler-types':
         specifier: 3.0.0-types.0
@@ -102,6 +99,9 @@ importers:
       prettier:
         specifier: ^3.3.3
         version: 3.3.3
+      rbxts-transform-env:
+        specifier: ^3.0.0
+        version: 3.0.0
       roblox-ts:
         specifier: 3.0.0
         version: 3.0.0

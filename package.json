@@ -8,7 +8,7 @@
 		"watch": "rbxtsc -w",
 		"tarmac": "tarmac sync --target roblox",
 		"serve": "rojo serve",
-		"build": "rm -rf out && pnpm compile && rojo build --output place.rbxlx",
+		"build": "rm -rf out && pnpm compile && rojo build --output Game.rbxl",
 		"deploy:dev": "pnpm build && mantle deploy --environment canary",
 		"deploy:prod": "pnpm build && mantle deploy --environment production",
 		"output:dev": "mantle outputs --environment canary > mantle-output.json",
