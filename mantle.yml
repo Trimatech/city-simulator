@@ -9,7 +9,7 @@ state:
                 name: eeur
                 endpoint: https://a8f126f6517bc4d89de7b0091a93209d.eu.r2.cloudflarestorage.com/trimateh-mantle-states
         bucket: trimateh-mantle-states
-        key: divide-and-conquer
+        key: divide-and-conquer2
 
 environments:
     - label: dev
