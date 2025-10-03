@@ -46,12 +46,6 @@ jobs:
               run: |
                   pnpm lint
 
-            - name: Compile Lobby
-              run: pnpm compile-lobby
-
-            - name: Build Lobby Project
-              run: pnpm build-lobby
-
             - name: Compile Game
               run: pnpm compile-game
 

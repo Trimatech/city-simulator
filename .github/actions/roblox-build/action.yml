@@ -37,7 +37,7 @@ runs:
 
         - name: Build Game Project
           shell: bash
-          run: NODE_ENV=${{ inputs.node_env }} pnpm build
+          run: NODE_ENV=${{ inputs.node_env }} pnpm build-game
 
         - name: Upload Game place
           uses: actions/upload-artifact@v4
