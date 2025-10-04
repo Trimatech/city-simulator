@@ -8,10 +8,10 @@
 		"tarmac": "tarmac sync --target roblox",
 		"serve": "rojo serve",
 		"compile-game": "rbxtsc --verbose",
-		"build-game": "rm -rf out && pnpm compile && rojo build --output Game.rbxl",
-		"deploy:dev": "pnpm build && mantle deploy --environment canary",
+		"build-game": "rm -rf out && pnpm compile-game && rojo build --output Game.rbxl",
+		"deploy:dev": "pnpm build && mantle deploy --environment dev",
 		"deploy:prod": "pnpm build && mantle deploy --environment production",
-		"output:dev": "mantle outputs --environment canary > mantle-output.json",
+		"output:dev": "mantle outputs --environment dev > mantle-output.json",
 		"output:prod": "mantle outputs --environment production > mantle-output.json",
 		"github": "./actions-runner/run.sh",
 		"models": "lune run get-models"
