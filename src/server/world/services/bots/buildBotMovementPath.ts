@@ -53,6 +53,19 @@ function visualizeWaypoints(botId: string, waypoints: Vector2[]) {
 	Debris.AddItem(container, 10);
 }
 
+// Helper: extend the path by one extra point continuing the last segment by a fixed distance
+function appendEndpointExtension(waypoints: Vector2[], extensionStuds = 2) {
+	if (waypoints.size() < 2) return;
+	const last = waypoints[waypoints.size() - 1];
+	const prev = waypoints[waypoints.size() - 2];
+	const delta = last.sub(prev);
+	const len = delta.Magnitude;
+	if (len <= 1e-3) return;
+	const unit = delta.div(len);
+	const extra = last.add(unit.mul(extensionStuds));
+	waypoints.push(extra);
+}
+
 /**
  * Builds a human-like movement to take blob like chunk out ot outer world polygon
  * - Randomly picks a start vertex on the current polygon edge and an moves outward direction
@@ -142,6 +155,9 @@ export function buildHumanLikePath(botId: string, fromPoint: Vector2, riskLevel 
 
 	// Final endpoint on edge
 	if (waypoints.size() === 0 || waypoints[waypoints.size() - 1] !== endOnEdge) waypoints.push(endOnEdge);
+
+	// Extend path by a small endpoint extension
+	appendEndpointExtension(waypoints, 2);
 
 	// Debug display in TEST MODE (auto-removed by Debris)
 	if (IS_TESTING_STUFF) {
