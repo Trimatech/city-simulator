@@ -160,10 +160,10 @@ export function Bot({ id, soldier }: BotProps) {
 			}
 			model.Parent = Workspace;
 
-			// Remove default Animate script to avoid it stopping/overriding our custom run track
+			// Disable default Animate script to avoid overriding our run track, but keep its Animation children
 			const animateScript = model.FindFirstChild("Animate");
 			if (animateScript && (animateScript.IsA("LocalScript") || animateScript.IsA("Script"))) {
-				animateScript.Destroy();
+				(animateScript as LocalScript | Script).Disabled = true;
 			}
 
 			// configure humanoid for CFrame-driven movement with animations
