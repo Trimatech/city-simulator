@@ -92,13 +92,20 @@ function tweenPosition(runtime: BotRuntime, target: Vector3, duration = WORLD_TI
 		runtime.model.PivotTo(new CFrame(target));
 		return;
 	}
+
+	const current = runtime.posV.Value;
+	if (current.sub(target).Magnitude <= 1e-4) return;
+
 	runtime.activeTween?.Cancel();
 	const tween = TweenService.Create(
 		runtime.posV,
-		new TweenInfo(duration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		new TweenInfo(duration, Enum.EasingStyle.Linear, Enum.EasingDirection.In),
 		{ Value: target },
 	);
 	runtime.activeTween = tween;
+	tween.Completed.Once(() => {
+		if (runtime.activeTween === tween) runtime.activeTween = undefined;
+	});
 	tween.Play();
 }
 
@@ -228,7 +235,8 @@ export function Bot({ id, soldier }: BotProps) {
 			runtime.lastLookDir = dir;
 			const curPos = runtime.posV?.Value ?? runtime.model.GetPivot().Position;
 			runtime.model.PivotTo(CFrame.lookAt(curPos, curPos.add(dir), new Vector3(0, 1, 0)));
-			tweenPosition(runtime, to);
+			// compensate network drift by tweening slightly ahead of tick to reduce visible stutter
+			tweenPosition(runtime, to, WORLD_TICK * 0.95);
 			ensureRun(runtime);
 			runtime.runTrack?.AdjustSpeed(1);
 			if (runtime.runTrack && runtime.runTrack.IsPlaying === false) runtime.runTrack.Play(0.1);
@@ -236,7 +244,8 @@ export function Bot({ id, soldier }: BotProps) {
 			const holdDir = runtime.lastLookDir ?? new Vector3(0, 0, 1);
 			const curPos = runtime.posV?.Value ?? runtime.model.GetPivot().Position;
 			runtime.model.PivotTo(CFrame.lookAt(curPos, curPos.add(holdDir), new Vector3(0, 1, 0)));
-			tweenPosition(runtime, to);
+			// use slightly shorter tween to align with next update
+			tweenPosition(runtime, to, WORLD_TICK * 0.95);
 			// keep running animation always playing
 			ensureRun(runtime);
 			runtime.runTrack?.AdjustSpeed(1);
