@@ -66,6 +66,27 @@ function appendEndpointExtension(waypoints: Vector2[], extensionStuds = 2) {
 	waypoints.push(extra);
 }
 
+// Helper: outward normal for an edge, pointing away from centroid
+function computeOutwardNormal(edgeUnit: Vector2, start: Vector2, centroid: Vector2) {
+	const normalCandidate = new Vector2(-edgeUnit.Y, edgeUnit.X);
+	const altNormal = new Vector2(edgeUnit.Y, -edgeUnit.X);
+	const toOutside = start.sub(centroid);
+	return normalCandidate.Dot(toOutside) > 0 ? normalCandidate : altNormal;
+}
+
+// Helper: choose endpoint on polygon edge a given distance along the local edge direction
+function chooseEndpointAlongEdge(polygonVectors: Vector2[], start: Vector2, edgeUnit: Vector2, distance: number) {
+	const target = start.add(edgeUnit.mul(distance));
+	const { point } = closestPointOnPolygonEdge(polygonVectors, target);
+	return point;
+}
+
+// Helper: bulge sign for arc based on chord direction vs outward
+function computeBulgeSign(chordUnit: Vector2, outwardNormal: Vector2) {
+	const chordNormal = new Vector2(-chordUnit.Y, chordUnit.X);
+	return chordNormal.Dot(outwardNormal) >= 0 ? 1 : -1;
+}
+
 // Helper: sample a point on a rotated semicircle from start (theta=pi) to end (theta=0)
 function sampleRotatedSemicirclePoint(params: {
 	center: Vector2;
@@ -126,10 +147,7 @@ export function buildHumanLikePath(botId: string, fromPoint: Vector2, riskLevel 
 	const edgeUnit = edgeVec.Magnitude > 1e-3 ? edgeVec.div(edgeVec.Magnitude) : new Vector2(1, 0);
 
 	// Outward normal (away from centroid)
-	const normalCandidate = new Vector2(-edgeUnit.Y, edgeUnit.X);
-	const altNormal = new Vector2(edgeUnit.Y, -edgeUnit.X);
-	const toOutside = startP.sub(centroid);
-	const outwardNormal = normalCandidate.Dot(toOutside) > 0 ? normalCandidate : altNormal;
+	const outwardNormal = computeOutwardNormal(edgeUnit, startP, centroid);
 
 	// RNG for randomness used in arc resolution and span
 	const random = new Random();
@@ -143,8 +161,7 @@ export function buildHumanLikePath(botId: string, fromPoint: Vector2, riskLevel 
 
 	// Choose endpoint along polygon edge ahead of start index direction
 	const alongSpan = 24 + clampedRisk * 10 + random.NextNumber() * 26; // simple span based on risk
-	const edgeGoal = startP.add(edgeUnit.mul(alongSpan));
-	const { point: endOnEdge } = closestPointOnPolygonEdge(polygonVectors, edgeGoal);
+	const endOnEdge = chooseEndpointAlongEdge(polygonVectors, startP, edgeUnit, alongSpan);
 
 	// Circle with diameter from start to end; bulge to outward side
 	const chordVec = endOnEdge.sub(current);
@@ -154,19 +171,18 @@ export function buildHumanLikePath(botId: string, fromPoint: Vector2, riskLevel 
 		return waypoints;
 	}
 	const u = chordVec.div(chordLen);
-	const phi = math.atan2(u.Y, u.X);
-	const r = chordLen / 2;
+	const orientation = math.atan2(u.Y, u.X);
+	const radius = chordLen / 2;
 	const center = current.add(endOnEdge).div(2);
 
 	// Determine bulge side using outward normal vs chord normal
-	const chordNormal = new Vector2(-u.Y, u.X);
-	const sign = chordNormal.Dot(outwardNormal) >= 0 ? 1 : -1;
+	const sign = computeBulgeSign(u, outwardNormal);
 
 	// Sample semicircle from start to end
 	const steps = 12 + math.floor(random.NextNumber() * 6);
 	for (let i = 1; i < steps; i++) {
 		const t = i / steps;
-		const p = sampleRotatedSemicirclePoint({ center, radius: r, orientation: phi, sign, t });
+		const p = sampleRotatedSemicirclePoint({ center, radius: radius, orientation: orientation, sign, t });
 		waypoints.push(p);
 		current = p;
 	}
