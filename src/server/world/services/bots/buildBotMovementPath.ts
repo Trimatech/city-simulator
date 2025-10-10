@@ -88,7 +88,8 @@ function computeBulgeSign(chordUnit: Vector2, outwardNormal: Vector2) {
 }
 
 // Helper: sample a point on a rotated semicircle from start (theta=pi) to end (theta=0)
-function sampleRotatedSemicirclePoint(params: {
+// Legacy plain semicircle sampler (kept for reference / potential reuse)
+function _sampleRotatedSemicirclePoint(params: {
 	center: Vector2;
 	radius: number;
 	orientation: number; // rotation angle phi
@@ -97,6 +98,32 @@ function sampleRotatedSemicirclePoint(params: {
 }) {
 	const { center, radius, orientation, sign, progress } = params;
 	const theta = math.pi * (1 - progress);
+	const x =
+		center.X +
+		math.cos(theta) * radius * math.cos(orientation) -
+		sign * math.sin(theta) * radius * math.sin(orientation);
+	const y =
+		center.Y +
+		math.cos(theta) * radius * math.sin(orientation) +
+		sign * math.sin(theta) * radius * math.cos(orientation);
+	return new Vector2(x, y);
+}
+
+// Helper: like sampleRotatedSemicirclePoint but with a subtle radial wobble
+function sampleWobblySemicirclePoint(params: {
+	center: Vector2;
+	baseRadius: number;
+	orientation: number;
+	sign: number;
+	progress: number;
+	wobbleAmplitude: number; // absolute studs to add/subtract from radius
+	wobbleFrequency: number; // cycles across the semicircle
+	wobblePhase: number; // radians
+}) {
+	const { center, baseRadius, orientation, sign, progress, wobbleAmplitude, wobbleFrequency, wobblePhase } = params;
+	const theta = math.pi * (1 - progress);
+	const wobble = wobbleAmplitude * math.sin(wobbleFrequency * theta + wobblePhase);
+	const radius = math.max(0, baseRadius + wobble);
 	const x =
 		center.X +
 		math.cos(theta) * radius * math.cos(orientation) -
@@ -180,14 +207,20 @@ export function buildHumanLikePath(botId: string, fromPoint: Vector2, riskLevel 
 
 	// Sample semicircle from start to end
 	const steps = 12 + math.floor(random.NextNumber() * 6);
+	const wobbleAmplitude = 1 + random.NextNumber() * (1.5 + clampedRisk * 0.2); // ~1..(1.5+)
+	const wobbleFrequency = 2 + math.floor(random.NextNumber() * 2); // 2..3 ripples
+	const wobblePhase = random.NextNumber() * 2 * math.pi;
 	for (let i = 1; i < steps; i++) {
 		const arcT = i / steps;
-		const pointOnArc = sampleRotatedSemicirclePoint({
+		const pointOnArc = sampleWobblySemicirclePoint({
 			center,
-			radius,
+			baseRadius: radius,
 			orientation,
 			sign,
 			progress: arcT,
+			wobbleAmplitude,
+			wobbleFrequency,
+			wobblePhase,
 		});
 		waypoints.push(pointOnArc);
 		current = pointOnArc;
