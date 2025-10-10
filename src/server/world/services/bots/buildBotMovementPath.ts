@@ -145,7 +145,7 @@ function sampleWobblySemicirclePoint(params: {
  * Risk level: 1..10 (1 = small excursion, 10 = large excursion)
  */
 export function buildHumanLikePath(botId: string, fromPoint: Vector2, riskLevel = 5): Vector2[] {
-	warn("buildHumanLikePath", { botId, fromPoint, riskLevel });
+	//	warn("buildHumanLikePath", { botId, fromPoint, riskLevel });
 	const clampedRisk = math.clamp(riskLevel, 1, 10);
 	const state = store.getState();
 	const soldier = state.soldiers[botId];
@@ -237,7 +237,7 @@ export function buildHumanLikePath(botId: string, fromPoint: Vector2, riskLevel 
 		visualizeWaypoints(botId, waypoints);
 	}
 
-	warn("buildHumanLikePath done", { botId, fromPoint, riskLevel, waypoints });
+	//warn("buildHumanLikePath done", { botId, fromPoint, riskLevel, waypoints });
 
 	return waypoints;
 }

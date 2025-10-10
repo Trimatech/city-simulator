@@ -1,4 +1,4 @@
-import { Players, Workspace } from "@rbxts/services";
+import { CollectionService, Players, Workspace } from "@rbxts/services";
 import { waitForPrimaryPart } from "@rbxts/wait-for";
 import { store } from "server/store";
 import { IS_TESTING_STUFF, SOLDIER_TICK_PHASE } from "server/world/constants";
@@ -21,9 +21,47 @@ interface BotController {
 	waypointIndex: number;
 	speed: number;
 	wasInside: boolean;
+	groundY: number;
+	groundUpdateTicker: number;
 }
 
 const botControllers = new Map<string, BotController>();
+
+// Sample ground every ~0.5s (low-cost)
+const GROUND_SAMPLE_INTERVAL_TICKS = math.max(1, math.floor(0.5 / WORLD_TICK));
+
+const FALLBACK_GROUND_Y = 2;
+const GROUND_TAG = "ground";
+
+function getCharacterGroundOffset(character: Model): number {
+	// Estimate distance from model pivot (usually HRP center) to feet contact point
+	const humanoid = character.FindFirstChildOfClass("Humanoid");
+	const hrp = character.FindFirstChild("HumanoidRootPart");
+	let offset = 2; // sensible default
+	if (humanoid) {
+		offset = humanoid.HipHeight;
+	}
+	if (hrp && hrp.IsA("BasePart")) {
+		offset += hrp.Size.Y * 0.5;
+	}
+	return offset;
+}
+
+function sampleGroundYAt(position: Vector2): number {
+	// Cast from high above downwards to find the ground
+	const origin = new Vector3(position.X, 2048, position.Y);
+	const direction = new Vector3(0, -8192, 0);
+	const params = new RaycastParams();
+	// Only consider parts tagged as ground
+	params.FilterType = Enum.RaycastFilterType.Include;
+	params.FilterDescendantsInstances = CollectionService.GetTagged(GROUND_TAG);
+	const result = Workspace.Raycast(origin, direction, params);
+	if (result) {
+		return result.Position.Y;
+	}
+	warn(`No ground found at ${position}`);
+	return FALLBACK_GROUND_Y; // fallback height
+}
 
 function chooseRandomPlayer(): Player | undefined {
 	const players = Players.GetPlayers();
@@ -112,6 +150,8 @@ async function spawnBotFromRandomPlayer(botId: string) {
 		waypointIndex: 0,
 		speed: SOLDIER_SPEED,
 		wasInside: true,
+		groundY: sampleGroundYAt(spawnPoint),
+		groundUpdateTicker: 0,
 	});
 	botStopped.Fire(botId);
 	warn(`Bot ${botId} spawned`);
@@ -148,7 +188,15 @@ function advanceBot(bot: BotController) {
 
 	const character = Workspace.FindFirstChild(bot.id);
 	if (character && character.IsA("Model")) {
-		character.PivotTo(new CFrame(bot.position.X, 10, bot.position.Y));
+		// lazily resample ground height every ~0.5s to keep on ground
+		bot.groundUpdateTicker += 1;
+		if (bot.groundUpdateTicker >= GROUND_SAMPLE_INTERVAL_TICKS) {
+			bot.groundY = sampleGroundYAt(bot.position);
+			bot.groundUpdateTicker = 0;
+		}
+
+		const verticalOffset = getCharacterGroundOffset(character);
+		character.PivotTo(new CFrame(bot.position.X, bot.groundY + verticalOffset, bot.position.Y));
 	}
 }
 
