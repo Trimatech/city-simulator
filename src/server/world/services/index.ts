@@ -1,5 +1,6 @@
 import { runOnce } from "shared/utils/run-once";
 
+import { initBotService } from "./bots/bot-saga";
 import { initCandyService } from "./candy";
 import { initCollisionService } from "./collision";
 import { initSoldierService } from "./soldiers";
@@ -10,4 +11,5 @@ export const initWorldServices = runOnce(async () => {
 	initCollisionService();
 	initSoldierService();
 	initTowerService();
+	initBotService();
 });

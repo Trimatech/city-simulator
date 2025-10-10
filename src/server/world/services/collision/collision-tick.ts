@@ -6,6 +6,7 @@ import { selectSoldiersSorted, SoldierEntity } from "shared/store/soldiers";
 import { SOLDIER_RADIUS_BASE } from "shared/store/soldiers/soldier-utils";
 
 import { soldierGrid } from "../soldiers";
+import { soldierIsInsideChanged } from "../soldiers/soldier-events";
 
 function doLinesIntersect(p1: Vector2, p2: Vector2, q1: Vector2, q2: Vector2): boolean {
 	const det = (p2.X - p1.X) * (q2.Y - q1.Y) - (p2.Y - p1.Y) * (q2.X - q1.X);
@@ -64,6 +65,7 @@ export function onCollisionTick() {
 		const hasChanged = soldier.isInside !== isInside;
 		if (hasChanged) {
 			store.setSoldierIsInside(soldier.id, isInside);
+			soldierIsInsideChanged.Fire(soldier.id, isInside);
 		}
 
 		const enemy = isCollidingWithSoldier(soldier);

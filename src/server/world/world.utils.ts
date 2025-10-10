@@ -5,6 +5,7 @@ import { WORLD_BOUNDS } from "shared/constants/core";
 import { selectCandyById } from "shared/store/candy";
 import { selectSoldierById } from "shared/store/soldiers";
 
+import { getBotHumanoid } from "./services/bots/bot-registry";
 import { soldierGrid } from "./services/soldiers/soldier-grid";
 
 const MIN_SAFE_DISTANCE = 10;
@@ -27,7 +28,12 @@ export function getPlayerHumanoidByName(name: string) {
 			warn(`No humanoid found for player ${name}`);
 		}
 	} else {
-		warn(`No player found for name ${name}`);
+		// Check if this name belongs to a registered bot
+		const botHumanoid = getBotHumanoid(name);
+		if (botHumanoid) {
+			return botHumanoid;
+		}
+		warn(`No player or bot found for name ${name}`);
 	}
 	return undefined;
 }
