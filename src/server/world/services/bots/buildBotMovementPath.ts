@@ -93,10 +93,10 @@ function sampleRotatedSemicirclePoint(params: {
 	radius: number;
 	orientation: number; // rotation angle phi
 	sign: number; // +1 or -1 to pick bulge side relative to orientation
-	t: number; // 0..1 along the arc
+	progress: number; // 0..1 along the arc
 }) {
-	const { center, radius, orientation, sign, t } = params;
-	const theta = math.pi * (1 - t);
+	const { center, radius, orientation, sign, progress } = params;
+	const theta = math.pi * (1 - progress);
 	const x =
 		center.X +
 		math.cos(theta) * radius * math.cos(orientation) -
@@ -170,21 +170,27 @@ export function buildHumanLikePath(botId: string, fromPoint: Vector2, riskLevel 
 		waypoints.push(endOnEdge);
 		return waypoints;
 	}
-	const u = chordVec.div(chordLen);
-	const orientation = math.atan2(u.Y, u.X);
+	const chordUnit = chordVec.div(chordLen);
+	const orientation = math.atan2(chordUnit.Y, chordUnit.X);
 	const radius = chordLen / 2;
 	const center = current.add(endOnEdge).div(2);
 
 	// Determine bulge side using outward normal vs chord normal
-	const sign = computeBulgeSign(u, outwardNormal);
+	const sign = computeBulgeSign(chordUnit, outwardNormal);
 
 	// Sample semicircle from start to end
 	const steps = 12 + math.floor(random.NextNumber() * 6);
 	for (let i = 1; i < steps; i++) {
-		const t = i / steps;
-		const p = sampleRotatedSemicirclePoint({ center, radius: radius, orientation: orientation, sign, t });
-		waypoints.push(p);
-		current = p;
+		const arcT = i / steps;
+		const pointOnArc = sampleRotatedSemicirclePoint({
+			center,
+			radius,
+			orientation,
+			sign,
+			progress: arcT,
+		});
+		waypoints.push(pointOnArc);
+		current = pointOnArc;
 	}
 
 	// Final endpoint on edge
