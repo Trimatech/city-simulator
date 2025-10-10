@@ -66,6 +66,27 @@ function appendEndpointExtension(waypoints: Vector2[], extensionStuds = 2) {
 	waypoints.push(extra);
 }
 
+// Helper: sample a point on a rotated semicircle from start (theta=pi) to end (theta=0)
+function sampleRotatedSemicirclePoint(params: {
+	center: Vector2;
+	radius: number;
+	orientation: number; // rotation angle phi
+	sign: number; // +1 or -1 to pick bulge side relative to orientation
+	t: number; // 0..1 along the arc
+}) {
+	const { center, radius, orientation, sign, t } = params;
+	const theta = math.pi * (1 - t);
+	const x =
+		center.X +
+		math.cos(theta) * radius * math.cos(orientation) -
+		sign * math.sin(theta) * radius * math.sin(orientation);
+	const y =
+		center.Y +
+		math.cos(theta) * radius * math.sin(orientation) +
+		sign * math.sin(theta) * radius * math.cos(orientation);
+	return new Vector2(x, y);
+}
+
 /**
  * Builds a human-like movement to take blob like chunk out ot outer world polygon
  * - Randomly picks a start vertex on the current polygon edge and an moves outward direction
@@ -145,10 +166,7 @@ export function buildHumanLikePath(botId: string, fromPoint: Vector2, riskLevel 
 	const steps = 12 + math.floor(random.NextNumber() * 6);
 	for (let i = 1; i < steps; i++) {
 		const t = i / steps;
-		const theta = math.pi * (1 - t); // pi -> 0
-		const x = center.X + math.cos(theta) * r * math.cos(phi) - sign * math.sin(theta) * r * math.sin(phi);
-		const y = center.Y + math.cos(theta) * r * math.sin(phi) + sign * math.sin(theta) * r * math.cos(phi);
-		const p = new Vector2(x, y);
+		const p = sampleRotatedSemicirclePoint({ center, radius: r, orientation: phi, sign, t });
 		waypoints.push(p);
 		current = p;
 	}
