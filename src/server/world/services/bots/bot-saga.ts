@@ -23,6 +23,9 @@ interface BotController {
 	wasInside: boolean;
 	groundY: number;
 	groundUpdateTicker: number;
+	animator?: Animator;
+	runTrack?: AnimationTrack;
+	lastDirection: Vector2;
 }
 
 const botControllers = new Map<string, BotController>();
@@ -45,6 +48,39 @@ function getCharacterGroundOffset(character: Model): number {
 		offset += hrp.Size.Y * 0.5;
 	}
 	return offset;
+}
+
+function findRunAnimation(character: Model): Animation | undefined {
+	// Prefer any Animation descendant with name that includes "run"
+	let candidate: Animation | undefined = undefined;
+	character.GetDescendants().forEach((inst) => {
+		if (inst.IsA("Animation")) {
+			const name = string.lower(inst.Name);
+			if (string.find(name, "run")[0] !== undefined) {
+				candidate = inst;
+			}
+		}
+	});
+	return candidate;
+}
+
+function ensureRunTrack(controller: BotController, character: Model): AnimationTrack | undefined {
+	if (controller.runTrack && controller.animator) {
+		return controller.runTrack;
+	}
+	const humanoid = character.FindFirstChildOfClass("Humanoid");
+	if (!humanoid) return undefined;
+	let animator = humanoid.FindFirstChildOfClass("Animator");
+	if (!animator) {
+		animator = new Instance("Animator");
+		animator.Parent = humanoid;
+	}
+	const runAnim = findRunAnimation(character);
+	if (!runAnim) return undefined;
+	const track = animator.LoadAnimation(runAnim);
+	controller.animator = animator;
+	controller.runTrack = track;
+	return track;
 }
 
 function sampleGroundYAt(position: Vector2): number {
@@ -152,6 +188,9 @@ async function spawnBotFromRandomPlayer(botId: string) {
 		wasInside: true,
 		groundY: sampleGroundYAt(spawnPoint),
 		groundUpdateTicker: 0,
+		animator: undefined,
+		runTrack: undefined,
+		lastDirection: new Vector2(0, 1),
 	});
 	botStopped.Fire(botId);
 	warn(`Bot ${botId} spawned`);
@@ -181,6 +220,9 @@ function advanceBot(bot: BotController) {
 	} else {
 		const direction = distance > 0 ? delta.div(distance) : new Vector2();
 		bot.position = bot.position.add(direction.mul(step));
+		if (direction.Magnitude > 0.0001) {
+			bot.lastDirection = direction;
+		}
 	}
 
 	// drive soldier movement + model
@@ -196,7 +238,24 @@ function advanceBot(bot: BotController) {
 		}
 
 		const verticalOffset = getCharacterGroundOffset(character);
-		character.PivotTo(new CFrame(bot.position.X, bot.groundY + verticalOffset, bot.position.Y));
+		const from = new Vector3(bot.position.X, bot.groundY + verticalOffset, bot.position.Y);
+		const dir = bot.lastDirection.Magnitude > 0.0001 ? bot.lastDirection : new Vector2(0, 1);
+		const lookAt = from.add(new Vector3(dir.X, 0, dir.Y));
+		character.PivotTo(CFrame.lookAt(from, lookAt));
+
+		// play/stop run animation depending on velocity
+		const moving = distance > 0.1;
+		const runTrack = ensureRunTrack(bot, character);
+		if (runTrack) {
+			if (moving) {
+				if (runTrack.IsPlaying === false) runTrack.Play(0.1);
+				// Adjust speed to match walk speed (tracks default speed is 1)
+				// Use a simple mapping: speed/16 as baseline
+				runTrack.AdjustSpeed(math.max(bot.speed / 16, 0.1));
+			} else {
+				if (runTrack.IsPlaying) runTrack.Stop(0.2);
+			}
+		}
 	}
 }
 
