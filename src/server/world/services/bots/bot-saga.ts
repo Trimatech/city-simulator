@@ -228,35 +228,7 @@ function advanceBot(bot: BotController) {
 	// drive soldier movement + model
 	registerSoldierInput(bot.id, bot.position);
 
-	const character = Workspace.FindFirstChild(bot.id);
-	if (character && character.IsA("Model")) {
-		// lazily resample ground height every ~0.5s to keep on ground
-		bot.groundUpdateTicker += 1;
-		if (bot.groundUpdateTicker >= GROUND_SAMPLE_INTERVAL_TICKS) {
-			bot.groundY = sampleGroundYAt(bot.position);
-			bot.groundUpdateTicker = 0;
-		}
-
-		const verticalOffset = getCharacterGroundOffset(character);
-		const from = new Vector3(bot.position.X, bot.groundY + verticalOffset, bot.position.Y);
-		const dir = bot.lastDirection.Magnitude > 0.0001 ? bot.lastDirection : new Vector2(0, 1);
-		const lookAt = from.add(new Vector3(dir.X, 0, dir.Y));
-		character.PivotTo(CFrame.lookAt(from, lookAt));
-
-		// play/stop run animation depending on velocity
-		const moving = distance > 0.1;
-		const runTrack = ensureRunTrack(bot, character);
-		if (runTrack) {
-			if (moving) {
-				if (runTrack.IsPlaying === false) runTrack.Play(0.1);
-				// Adjust speed to match walk speed (tracks default speed is 1)
-				// Use a simple mapping: speed/16 as baseline
-				runTrack.AdjustSpeed(math.max(bot.speed / 16, 0.1));
-			} else {
-				if (runTrack.IsPlaying) runTrack.Stop(0.2);
-			}
-		}
-	}
+	// Client handles model movement, rotation, and animation for bots via tweens
 }
 
 function cleanupBot(botId: string) {

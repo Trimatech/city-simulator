@@ -234,7 +234,7 @@ export function buildHumanLikePath(botId: string, fromPoint: Vector2, riskLevel 
 
 	// Debug display in TEST MODE (auto-removed by Debris)
 	if (IS_TESTING_STUFF) {
-		visualizeWaypoints(botId, waypoints);
+		//visualizeWaypoints(botId, waypoints);
 	}
 
 	//warn("buildHumanLikePath done", { botId, fromPoint, riskLevel, waypoints });
