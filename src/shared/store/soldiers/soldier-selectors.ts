@@ -6,7 +6,6 @@ import { mapProperties } from "shared/utils/object-utils";
 import { getPlayerByName } from "shared/utils/player-utils";
 
 import { SoldierEntity } from "./soldier-slice";
-import { soldierIsBoosting } from "./soldier-utils";
 
 export const identifySoldier = (soldier: SoldierEntity) => {
 	return soldier.id;
@@ -146,13 +145,6 @@ export const selectSoldierIsDead = (id: string) => {
 	return (state: SharedState) => {
 		const soldier = state.soldiers[id];
 		return soldier ? soldier.dead : true;
-	};
-};
-
-export const selectSoldierIsBoosting = (id: string) => {
-	return (state: SharedState) => {
-		const soldier = state.soldiers[id];
-		return soldier ? soldierIsBoosting(soldier) : false;
 	};
 };
 

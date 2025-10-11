@@ -12,10 +12,6 @@ export function useMockRemotes() {
 				store.moveSoldier(USER_NAME, position);
 			}),
 
-			remotes.soldier.boost.test.onFire((boost) => {
-				store.boostSoldier(USER_NAME, boost);
-			}),
-
 			remotes.soldier.spawn.test.onFire(() => {
 				store.addSoldier(USER_NAME);
 			}),

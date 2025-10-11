@@ -4,12 +4,6 @@ import { store } from "server/store";
 import { getSoldier, onSoldierTick } from "server/world";
 
 export = () => {
-	it("should update soldier boost", () => {
-		store.addSoldier("__test__");
-		store.boostSoldier("__test__", true);
-		expect(getSoldier("__test__")?.boost).to.equal(true);
-	});
-
 	it("should step soldier physics", () => {
 		store.addSoldier("__test__");
 

@@ -4,7 +4,7 @@ import { waitForPrimaryPart } from "@rbxts/wait-for";
 import { store } from "server/store";
 import { DEFAULT_ORBS, SOLDIER_TICK_PHASE } from "server/world/constants";
 import { getCandy, getSafePointInWorld, killSoldier, playerIsSpawned } from "server/world/world.utils";
-import { SOLDIER_BOOST_SPEED, SOLDIER_MIN_AREA, SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
+import { SOLDIER_MIN_AREA, SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
 import {
 	calculatePolygonBoundingBox,
 	calculatePolygonOperation,
@@ -22,7 +22,6 @@ import {
 	identifySoldier,
 	selectAliveSoldiersById,
 	selectIsInsideBySoldierById,
-	selectSoldierIsBoosting,
 	selectSoldiersById,
 } from "shared/store/soldiers";
 import { createScheduler } from "shared/utils/scheduler";
@@ -89,10 +88,6 @@ export async function initSoldierService() {
 
 	remotes.soldier.placeTower.connect((player, position) => {
 		placeTower(player, position);
-	});
-
-	remotes.soldier.boost.connect((player, boost) => {
-		store.boostSoldier(player.Name, boost);
 	});
 
 	remotes.soldier.kill.connect((player) => {
@@ -179,18 +174,9 @@ export async function initSoldierService() {
 	store.observe(selectAliveSoldiersById, identifySoldier, ({ id }) => {
 		print(`Soldier ${id} is alive in saga`);
 		setSoldierSpeed(id, SOLDIER_SPEED);
-		const disconnect = store.observeWhile(selectSoldierIsBoosting(id), () => {
-			print(`Soldier ${id} is boosting in saga`);
-			setSoldierSpeed(id, SOLDIER_BOOST_SPEED);
-			return () => {
-				print(`Soldier ${id} is no longer boosting in saga`);
-				setSoldierSpeed(id, SOLDIER_SPEED);
-			};
-		});
 
 		// when the soldier dies, create candy on the soldier's tracers
 		return () => {
-			disconnect();
 			setSoldierSpeed(id, SOLDIER_SPEED);
 			// HERE WE DIE AND DROP STUFF
 			print(`Soldier ${id} died in saga`);

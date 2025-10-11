@@ -17,7 +17,6 @@ export function serializeSoldiers(state: SoldiersState): string {
 		buffer.WriteFloat32(soldier.angle);
 		buffer.WriteFloat32(soldier.desiredAngle);
 		buffer.WriteUInt(32, soldier.orbs);
-		buffer.WriteBool(soldier.boost);
 		writeArray(buffer, soldier.tracers, writeVector2);
 		writeArray(buffer, soldier.polygon, writeVector2);
 		buffer.WriteString(soldier.skin);
@@ -46,7 +45,6 @@ export function deserializeSoldiers(data: string): SoldiersState {
 			angle: buffer.ReadFloat32(),
 			desiredAngle: buffer.ReadFloat32(),
 			orbs: buffer.ReadUInt(32),
-			boost: buffer.ReadBool(),
 			tracers: readArray(buffer, readVector2),
 			polygon: readArray(buffer, readVector2),
 			skin: buffer.ReadString(),

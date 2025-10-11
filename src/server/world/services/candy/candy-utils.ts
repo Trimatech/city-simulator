@@ -1,4 +1,4 @@
-import { setInterval, setTimeout } from "@rbxts/set-timeout";
+import { setTimeout } from "@rbxts/set-timeout";
 import { store } from "server/store";
 import { CANDY_LIMITS } from "server/world/constants";
 import { getCandy, getRandomPointNearWorldOrigin, getSoldier } from "server/world/world.utils";
@@ -6,7 +6,6 @@ import { getRandomAccent } from "shared/constants/palette";
 import { getSoldierSkinForTracer } from "shared/constants/skins";
 import { CandyEntity, CandyType, selectCandyById, selectCandyCount } from "shared/store/candy";
 import { SOLDIER_RADIUS_BASE } from "shared/store/soldiers";
-import { selectSoldierIsBoosting } from "shared/store/soldiers";
 import { Grid, GridPoint } from "shared/utils/grid";
 import { fillArray } from "shared/utils/object-utils";
 
@@ -111,43 +110,6 @@ export function removeCandyIfAtLimit(candyType: CandyType) {
 	if (count > max) {
 		store.bulkRemoveStaleCandy(candyType, count - max);
 	}
-}
-
-export function dropCandyWhileBoosting(id: string) {
-	return store.observeWhile(selectSoldierIsBoosting(id), () => {
-		let previousTail = Vector2.zero;
-
-		const dropCandy = () => {
-			const soldier = getSoldier(id);
-
-			if (soldier) {
-				const size = soldier.tracers.size();
-				const tail: Vector2 | undefined = size >= 2 ? soldier.tracers[size - 2] : soldier.lastPosition;
-
-				if (tail && tail.sub(previousTail).Magnitude > SOLDIER_RADIUS_BASE * 3) {
-					previousTail = tail;
-					store.addCandy(createCandy({ position: tail, type: CandyType.Dropping }));
-				}
-			}
-		};
-
-		const decrementOrbs = () => {
-			const soldier = getSoldier(id);
-
-			if (soldier) {
-				const maxDecrease = math.clamp(math.round(3 + 0.001 * soldier.orbs), 2, 10);
-
-				store.decrementSoldierOrbs(id, random.NextInteger(maxDecrease, 1));
-			}
-		};
-
-		decrementOrbs();
-
-		return setInterval(() => {
-			decrementOrbs();
-			dropCandy();
-		}, 0.15);
-	});
 }
 
 export function dropCandyOnDeath(id: string): void {

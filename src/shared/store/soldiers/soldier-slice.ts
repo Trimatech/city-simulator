@@ -17,7 +17,6 @@ export interface SoldierEntity {
 	readonly angle: number;
 	readonly desiredAngle: number;
 	readonly orbs: number;
-	readonly boost: boolean;
 	readonly tracers: readonly Vector2[];
 	readonly skin: string;
 	readonly dead: boolean;
@@ -35,7 +34,6 @@ const defaultEntity: SoldierEntity = {
 	angle: 0,
 	desiredAngle: 0,
 	orbs: 0,
-	boost: false,
 	tracers: [],
 	skin: "",
 	dead: false,
@@ -145,13 +143,6 @@ export const soldiersSlice = createProducer(initialState, {
 			...soldier,
 			position,
 			lastPosition: soldier.position,
-		}));
-	},
-
-	boostSoldier: (state, id: string, boost: boolean) => {
-		return mapProperty(state, id, (soldier) => ({
-			...soldier,
-			boost,
 		}));
 	},
 
