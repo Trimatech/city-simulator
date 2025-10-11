@@ -1,7 +1,7 @@
 import { Players } from "@rbxts/services";
 import { waitForPrimaryPart } from "@rbxts/wait-for";
 import { store } from "server/store";
-import { IS_TESTING_STUFF, SOLDIER_TICK_PHASE } from "server/world/constants";
+import { DEFAULT_ORBS, IS_TESTING_STUFF, SOLDIER_TICK_PHASE } from "server/world/constants";
 import { getSafePointInWorld } from "server/world/world.utils";
 import { SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
 import { createScheduler } from "shared/utils/scheduler";
@@ -65,7 +65,7 @@ async function spawnBot(botId: string) {
 		name: `Bot ${botId}`,
 		position: spawnPoint,
 		lastPosition: spawnPoint,
-		orbs: 10,
+		orbs: DEFAULT_ORBS,
 	});
 	// ensure walk speed matches soldiers
 	setSoldierSpeed(botId, SOLDIER_SPEED);

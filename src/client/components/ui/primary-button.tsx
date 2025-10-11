@@ -1,5 +1,4 @@
-import { blend, lerpBinding } from "@rbxts/pretty-react-hooks";
-import { composeBindings } from "@rbxts/pretty-react-hooks";
+import { blend, composeBindings, lerpBinding } from "@rbxts/pretty-react-hooks";
 import React from "@rbxts/react";
 import { images } from "shared/assets";
 import { palette } from "shared/constants/palette";
@@ -14,6 +13,7 @@ import { Shadow } from "./shadow";
 interface PrimaryButtonProps extends React.PropsWithChildren {
 	readonly onClick?: () => void;
 	readonly onHover?: (hovered: boolean) => void;
+	readonly enabled?: boolean;
 	readonly size?: UDim2 | React.Binding<UDim2>;
 	readonly position?: UDim2 | React.Binding<UDim2>;
 	readonly anchorPoint?: Vector2 | React.Binding<Vector2>;
@@ -26,6 +26,7 @@ interface PrimaryButtonProps extends React.PropsWithChildren {
 export function PrimaryButton({
 	onClick,
 	onHover,
+	enabled = true,
 	size,
 	position,
 	anchorPoint,
@@ -46,6 +47,7 @@ export function PrimaryButton({
 				onHover?.(hovered);
 			}}
 			backgroundTransparency={1}
+			enabled={enabled}
 			anchorPoint={anchorPoint}
 			size={size}
 			position={position}

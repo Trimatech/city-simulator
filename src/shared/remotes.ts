@@ -31,4 +31,8 @@ export const remotes = createRemotes({
 	client: namespace({
 		alert: remote<Client, [params: Partial<Alert>]>(),
 	}),
+
+	powerups: namespace({
+		use: remote<Server, [id: string]>(t.string),
+	}),
 });

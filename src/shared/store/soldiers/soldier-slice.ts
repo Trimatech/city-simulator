@@ -1,10 +1,8 @@
 import { createProducer } from "@rbxts/reflex";
-import { TRACER_PIECE_LENGTH } from "shared/constants/core";
-import { INITIAL_POLYGON_DIAMETER, INITIAL_POLYGON_ITEMS } from "shared/constants/core";
+import { INITIAL_POLYGON_DIAMETER, INITIAL_POLYGON_ITEMS, TRACER_PIECE_LENGTH } from "shared/constants/core";
 import { connectLineToPolygon, pointsToVectors, vector2ToPoint, vectorsToPoints } from "shared/polybool/poly-utils";
 import { pointsToPolygon } from "shared/polybool/polybool";
-import { calculatePolygonArea } from "shared/polygon-extra.utils";
-import { createPolygonAroundPosition } from "shared/polygon-extra.utils";
+import { calculatePolygonArea, createPolygonAroundPosition } from "shared/polygon-extra.utils";
 import { mapProperties, mapProperty } from "shared/utils/object-utils";
 
 export interface SoldiersState {
@@ -36,7 +34,7 @@ const defaultEntity: SoldierEntity = {
 	lastPosition: new Vector2(),
 	angle: 0,
 	desiredAngle: 0,
-	orbs: 10,
+	orbs: 0,
 	boost: false,
 	tracers: [],
 	skin: "",

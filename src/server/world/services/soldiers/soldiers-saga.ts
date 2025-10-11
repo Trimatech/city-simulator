@@ -2,7 +2,7 @@ import Object from "@rbxts/object-utils";
 import { Players } from "@rbxts/services";
 import { waitForPrimaryPart } from "@rbxts/wait-for";
 import { store } from "server/store";
-import { SOLDIER_TICK_PHASE } from "server/world/constants";
+import { DEFAULT_ORBS, SOLDIER_TICK_PHASE } from "server/world/constants";
 import { getCandy, getSafePointInWorld, killSoldier, playerIsSpawned } from "server/world/world.utils";
 import { SOLDIER_BOOST_SPEED, SOLDIER_MIN_AREA, SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
 import {
@@ -19,12 +19,12 @@ import { calculatePolygonArea } from "shared/polygon-extra.utils";
 import { remotes } from "shared/remotes";
 import { defaultPlayerSave, RANDOM_SKIN, selectPlayerSave } from "shared/store/saves";
 import {
+	identifySoldier,
 	selectAliveSoldiersById,
 	selectIsInsideBySoldierById,
 	selectSoldierIsBoosting,
 	selectSoldiersById,
 } from "shared/store/soldiers";
-import { identifySoldier } from "shared/store/soldiers";
 import { createScheduler } from "shared/utils/scheduler";
 
 import { candyGrid, eatCandies } from "../candy/candy-utils";
@@ -76,7 +76,7 @@ export async function initSoldierService() {
 				lastPosition: undefined,
 				position: safePoint ? new Vector2(safePoint.X, safePoint.Y) : undefined,
 				skin: currentSkin !== RANDOM_SKIN ? currentSkin : randomSkin,
-				orbs: 10,
+				orbs: DEFAULT_ORBS,
 			});
 		} else {
 			warn(`No PrimaryPart found for player ${player.Name}`);
