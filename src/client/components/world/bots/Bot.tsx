@@ -57,13 +57,28 @@ function pickDefaultRunAnimationId(humanoid: Humanoid): string {
 	return humanoid.RigType === Enum.HumanoidRigType.R15 ? DEFAULT_RUN_R15 : DEFAULT_RUN_R6;
 }
 
+function chooseRandomPlayer(): Player | undefined {
+	const players = Players.GetPlayers();
+	if (players.size() === 0) {
+		return undefined;
+	}
+	const random = new Random();
+	return players[random.NextInteger(1, players.size()) - 1];
+}
+
 function tryCloneRandomPlayerCharacter(): Model | undefined {
-	const all = Players.GetPlayers();
-	const candidates = all.filter((p) => p !== Players.LocalPlayer && p.Character !== undefined);
-	if (candidates.size() === 0) return undefined;
-	const chosen = candidates[math.random(1, candidates.size()) - 1];
+	const chosen = chooseRandomPlayer();
+
+	if (!chosen) {
+		warn("No player found");
+		return undefined;
+	}
 	const source = chosen.Character as Model;
-	if (!source) return undefined;
+	if (!source) {
+		warn("No character found");
+		return undefined;
+	}
+
 	const prev = source.Archivable;
 	source.Archivable = true;
 	const clone = source.Clone();

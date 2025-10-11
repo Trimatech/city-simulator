@@ -1,9 +1,8 @@
-import { CollectionService, Players, Workspace } from "@rbxts/services";
+import { Players } from "@rbxts/services";
 import { waitForPrimaryPart } from "@rbxts/wait-for";
 import { store } from "server/store";
 import { IS_TESTING_STUFF, SOLDIER_TICK_PHASE } from "server/world/constants";
 import { getSafePointInWorld } from "server/world/world.utils";
-import { CollisionGroups } from "shared/constants/collision-groups";
 import { SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
 import { createScheduler } from "shared/utils/scheduler";
 
@@ -11,7 +10,6 @@ import { soldierIsInsideChanged } from "../soldiers/soldier-events";
 import { registerSoldierInput } from "../soldiers/soldier-tick";
 import { setSoldierSpeed } from "../soldiers/soldiers.utils";
 import { botStopped } from "./bot-events";
-import { registerBotCharacter, unregisterBot } from "./bot-registry";
 import { buildBotMovementPath } from "./buildBotMovementPath";
 
 interface BotController {
@@ -21,83 +19,10 @@ interface BotController {
 	waypointIndex: number;
 	speed: number;
 	wasInside: boolean;
-	groundY: number;
-	groundUpdateTicker: number;
-	animator?: Animator;
-	runTrack?: AnimationTrack;
 	lastDirection: Vector2;
 }
 
 const botControllers = new Map<string, BotController>();
-
-// Sample ground every ~0.5s (low-cost)
-const GROUND_SAMPLE_INTERVAL_TICKS = math.max(1, math.floor(0.5 / WORLD_TICK));
-
-const FALLBACK_GROUND_Y = 2;
-const GROUND_TAG = "ground";
-
-function getCharacterGroundOffset(character: Model): number {
-	// Estimate distance from model pivot (usually HRP center) to feet contact point
-	const humanoid = character.FindFirstChildOfClass("Humanoid");
-	const hrp = character.FindFirstChild("HumanoidRootPart");
-	let offset = 2; // sensible default
-	if (humanoid) {
-		offset = humanoid.HipHeight;
-	}
-	if (hrp && hrp.IsA("BasePart")) {
-		offset += hrp.Size.Y * 0.5;
-	}
-	return offset;
-}
-
-function findRunAnimation(character: Model): Animation | undefined {
-	// Prefer any Animation descendant with name that includes "run"
-	let candidate: Animation | undefined = undefined;
-	character.GetDescendants().forEach((inst) => {
-		if (inst.IsA("Animation")) {
-			const name = string.lower(inst.Name);
-			if (string.find(name, "run")[0] !== undefined) {
-				candidate = inst;
-			}
-		}
-	});
-	return candidate;
-}
-
-function ensureRunTrack(controller: BotController, character: Model): AnimationTrack | undefined {
-	if (controller.runTrack && controller.animator) {
-		return controller.runTrack;
-	}
-	const humanoid = character.FindFirstChildOfClass("Humanoid");
-	if (!humanoid) return undefined;
-	let animator = humanoid.FindFirstChildOfClass("Animator");
-	if (!animator) {
-		animator = new Instance("Animator");
-		animator.Parent = humanoid;
-	}
-	const runAnim = findRunAnimation(character);
-	if (!runAnim) return undefined;
-	const track = animator.LoadAnimation(runAnim);
-	controller.animator = animator;
-	controller.runTrack = track;
-	return track;
-}
-
-function sampleGroundYAt(position: Vector2): number {
-	// Cast from high above downwards to find the ground
-	const origin = new Vector3(position.X, 2048, position.Y);
-	const direction = new Vector3(0, -8192, 0);
-	const params = new RaycastParams();
-	// Only consider parts tagged as ground
-	params.FilterType = Enum.RaycastFilterType.Include;
-	params.FilterDescendantsInstances = CollectionService.GetTagged(GROUND_TAG);
-	const result = Workspace.Raycast(origin, direction, params);
-	if (result) {
-		return result.Position.Y;
-	}
-	warn(`No ground found at ${position}`);
-	return FALLBACK_GROUND_Y; // fallback height
-}
 
 function chooseRandomPlayer(): Player | undefined {
 	const players = Players.GetPlayers();
@@ -108,48 +33,18 @@ function chooseRandomPlayer(): Player | undefined {
 	return players[random.NextInteger(1, players.size()) - 1];
 }
 
-function setModelCollisionGroup(model: Model, groupName: string) {
-	model.GetDescendants().forEach((instance) => {
-		if (instance.IsA("BasePart")) {
-			instance.CollisionGroup = groupName;
-		}
-	});
-}
-
-async function spawnBotFromRandomPlayer(botId: string) {
-	warn(`Spawning bot ${botId} from random player`);
-	const sourcePlayer = chooseRandomPlayer();
-	if (!sourcePlayer || !sourcePlayer.Character) {
-		warn(`No source player or character found for bot ${botId}`);
-		return;
-	}
-
-	const sourceCharacter = sourcePlayer.Character;
-	const prevArchivable = sourceCharacter.Archivable;
-	sourceCharacter.Archivable = true;
-	const characterClone = sourceCharacter.Clone();
-	sourceCharacter.Archivable = prevArchivable;
-	if (!characterClone) {
-		warn(`No character clone found for bot ${botId}`);
-		return;
-	}
-	characterClone.Name = botId;
-	characterClone.Parent = Workspace;
-
-	// ensure primary part exists
-	const primaryPart = await waitForPrimaryPart(characterClone);
-	if (!primaryPart) {
-		characterClone.Destroy();
-		warn(`No primary part found for bot ${botId}`);
-		return;
-	}
-
-	// register bot character for damage/speed utilities
-	registerBotCharacter(botId, characterClone);
-
-	// position at a safe spawn
+async function spawnBot(botId: string) {
 	let spawnPoint = getSafePointInWorld();
+
 	if (IS_TESTING_STUFF) {
+		const sourcePlayer = chooseRandomPlayer();
+		if (!sourcePlayer || !sourcePlayer.Character) {
+			warn(`No source player or character found for bot ${botId}`);
+			return;
+		}
+
+		const sourceCharacter = sourcePlayer.Character;
+
 		const primaryPart2 = await waitForPrimaryPart(sourceCharacter);
 		const pos = primaryPart2?.Position;
 		if (!pos) {
@@ -164,7 +59,6 @@ async function spawnBotFromRandomPlayer(botId: string) {
 		//characterClone.PivotTo(new CFrame(spawnPoint.X, 10, spawnPoint.Y));
 		warn(`Bot ${botId} pivoted to spawn point`);
 	}
-	setModelCollisionGroup(characterClone, CollisionGroups.PLAYER);
 
 	// create soldier entity in store
 	store.addSoldier(botId, {
@@ -173,11 +67,8 @@ async function spawnBotFromRandomPlayer(botId: string) {
 		lastPosition: spawnPoint,
 		orbs: 10,
 	});
-	warn(`Bot ${botId} added to store`);
-
 	// ensure walk speed matches soldiers
 	setSoldierSpeed(botId, SOLDIER_SPEED);
-	warn(`Bot ${botId} set speed`);
 	// initialize controller via events
 	botControllers.set(botId, {
 		id: botId,
@@ -186,14 +77,9 @@ async function spawnBotFromRandomPlayer(botId: string) {
 		waypointIndex: 0,
 		speed: SOLDIER_SPEED,
 		wasInside: true,
-		groundY: sampleGroundYAt(spawnPoint),
-		groundUpdateTicker: 0,
-		animator: undefined,
-		runTrack: undefined,
 		lastDirection: new Vector2(0, 1),
 	});
 	botStopped.Fire(botId);
-	warn(`Bot ${botId} spawned`);
 }
 
 function advanceBot(bot: BotController) {
@@ -232,11 +118,6 @@ function advanceBot(bot: BotController) {
 }
 
 function cleanupBot(botId: string) {
-	unregisterBot(botId);
-	const character = Workspace.FindFirstChild(botId);
-	if (character && character.IsA("Model")) {
-		character.Destroy();
-	}
 	botControllers.delete(botId);
 }
 
@@ -263,7 +144,7 @@ export async function initBotService() {
 	});
 
 	task.delay(5, () => {
-		spawnBotFromRandomPlayer("BOT_1");
+		spawnBot("BOT_1");
 	});
 
 	// tick bot logic alongside soldiers
