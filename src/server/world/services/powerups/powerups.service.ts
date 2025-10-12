@@ -8,7 +8,7 @@ import {
 	removeForceFieldFromPlayerName,
 } from "server/world/world.utils";
 import { sounds } from "shared/assets";
-import { SOLDIER_SPEED } from "shared/constants/core";
+import { SOLDIER_MIN_AREA, SOLDIER_SPEED } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
 import {
 	POWERUP_DURATIONS,
@@ -17,9 +17,13 @@ import {
 	POWERUP_TURBO_SPEEDS,
 	PowerupId,
 } from "shared/constants/powerups";
+import { calculatePolygonOperation, pointsToVectors, vectorsToPoints } from "shared/polybool/poly-utils";
+import { Point, pointsToPolygon } from "shared/polybool/polybool";
+import { calculatePolygonArea } from "shared/polygon-extra.utils";
 import { remotes } from "shared/remotes";
 import { selectSoldierById, selectSoldierOrbs, selectSoldiersById } from "shared/store/soldiers";
 import { selectTowersById } from "shared/store/towers/tower-selectors";
+import { findCharacterPrimaryPart } from "shared/utils/player-utils";
 
 import { placeTower } from "../soldiers/soldiers.placeTower";
 
@@ -42,7 +46,7 @@ function alert(player: Player, message: string, color = palette.blue) {
 	});
 }
 
-function useTurbo(player: Player, id: PowerupId) {
+function triggerTurbo(player: Player, id: PowerupId) {
 	const playerName = player.Name;
 	const speed = id === "turbo2x" ? POWERUP_TURBO_SPEEDS.turbo2x : POWERUP_TURBO_SPEEDS.turbo;
 	const duration = id === "turbo2x" ? POWERUP_DURATIONS.turbo2x : POWERUP_DURATIONS.turbo;
@@ -61,7 +65,7 @@ function useTurbo(player: Player, id: PowerupId) {
 	alert(player, id === "turbo2x" ? "Turbo 2x activated!" : "Turbo activated!", palette.green);
 }
 
-function useShield(player: Player) {
+function triggerShield(player: Player) {
 	const playerName = player.Name;
 	if (!trySpendOrbs(playerName, POWERUP_PRICES.shield)) {
 		alert(player, "Not enough orbs!", palette.red);
@@ -82,7 +86,7 @@ function useShield(player: Player) {
 	alert(player, "Shield activated!", palette.green);
 }
 
-function useBuildTower(player: Player) {
+function triggeBruildTower(player: Player) {
 	// Reuse existing purchase/price logic in soldiers.placeTower – do not double charge
 	const soldier = store.getState(selectSoldierById(player.Name));
 	if (!soldier) return;
@@ -102,10 +106,165 @@ function pushHumanoidAway(h: Humanoid, from3D: Vector3, strength: number) {
 	root.AssemblyLinearVelocity = unit.mul(strength);
 }
 
-function useExplosion(player: Player, kind: "explosion" | "megaExplosion") {
+function isPointInRectangle(point: Vector2, center: Vector2, length: number, width: number, angle: number) {
+	// Rotate point to align with rectangle
+	const cos = math.cos(-angle);
+	const sin = math.sin(-angle);
+	const dx = point.X - center.X;
+	const dy = point.Y - center.Y;
+	const rotatedX = dx * cos - dy * sin;
+	const rotatedY = dx * sin + dy * cos;
+
+	// Check if point is within rectangle bounds
+	return math.abs(rotatedX) <= length / 2 && math.abs(rotatedY) <= width / 2;
+}
+
+function createRectanglePolygon(center: Vector2, length: number, width: number, angle: number): Vector2[] {
+	const halfLength = length / 2;
+	const halfWidth = width / 2;
+
+	// Create rectangle corners in local space
+	const corners = [
+		new Vector2(-halfLength, -halfWidth),
+		new Vector2(halfLength, -halfWidth),
+		new Vector2(halfLength, halfWidth),
+		new Vector2(-halfLength, halfWidth),
+	];
+
+	// Rotate and translate corners
+	const cos = math.cos(angle);
+	const sin = math.sin(angle);
+
+	return corners.map((corner) => {
+		const rotatedX = corner.X * cos - corner.Y * sin;
+		const rotatedY = corner.X * sin + corner.Y * cos;
+		return new Vector2(rotatedX + center.X, rotatedY + center.Y);
+	});
+}
+
+function createCirclePolygon(center: Vector2, radius: number, segments = 16): Vector2[] {
+	const points: Vector2[] = [];
+	const angleStep = (2 * math.pi) / segments;
+
+	for (let i = 0; i < segments; i++) {
+		const angle = i * angleStep;
+		const x = center.X + radius * math.cos(angle);
+		const y = center.Y + radius * math.sin(angle);
+		points.push(new Vector2(x, y));
+	}
+
+	return points;
+}
+
+function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], excludePlayerName?: string) {
+	const soldiers = store.getState(selectSoldiersById);
+	const damagePolygonObj = pointsToPolygon(vectorsToPoints(damagePolygon));
+
+	for (const [soldierId, soldier] of Object.entries(soldiers)) {
+		if (!soldier || soldier.dead || soldierId === excludePlayerName) continue;
+
+		const soldierPolygon = pointsToPolygon(vectorsToPoints(soldier.polygon));
+		const differenceResult = calculatePolygonOperation(soldierPolygon, damagePolygonObj, "Difference");
+
+		if (differenceResult.regions.size() > 0 && differenceResult.regions[0].size() > 2) {
+			const updatedPolygon = pointsToVectors(differenceResult.regions[0] as Point[]);
+			const updatedArea = calculatePolygonArea(updatedPolygon);
+
+			store.setSoldierPolygon(soldierId as string, updatedPolygon, updatedArea);
+
+			// Kill soldier if area becomes too small
+			if (updatedArea < SOLDIER_MIN_AREA) {
+				killSoldier(soldierId as string);
+				store.playerKilledSoldier(excludePlayerName || "system", soldierId as string);
+				if (excludePlayerName && excludePlayerName !== "") {
+					store.incrementSoldierEliminations(excludePlayerName);
+				}
+			}
+		}
+	}
+}
+
+function triggerCarpetBomb(player: Player) {
 	const playerName = player.Name;
-	const cfg = POWERUP_EXPLOSIONS[kind];
-	const cost = POWERUP_PRICES[kind];
+	const cfg = POWERUP_EXPLOSIONS.carpetBomb;
+	const cost = POWERUP_PRICES.carpetBomb;
+	if (!trySpendOrbs(playerName, cost)) {
+		alert(player, "Not enough orbs!", palette.red);
+		return;
+	}
+
+	const centerSoldier = store.getState(selectSoldierById(playerName));
+	if (!centerSoldier) {
+		warn(`triggerCarpetBomb: centerSoldier not found for player ${playerName}`);
+		return;
+	}
+
+	// Get player's character to determine facing direction
+	const character = player.Character as Model;
+	const primaryPart = findCharacterPrimaryPart(character);
+
+	if (!primaryPart) {
+		warn(`triggerCarpetBomb: primaryPart not found for player ${playerName}`);
+		return;
+	}
+
+	// Calculate the center of the carpet bomb area (in front of player)
+	const lookVector = primaryPart.CFrame.LookVector;
+	const forwardOffset = lookVector.mul(cfg.length / 2);
+	const bombCenter = primaryPart.Position.add(forwardOffset);
+	const bombCenter2D = new Vector2(bombCenter.X, bombCenter.Z);
+
+	// Calculate angle for the rectangle (player's facing direction)
+	const angle = math.atan2(lookVector.Z, lookVector.X);
+
+	// Affect enemy soldiers in the rectangular area
+	const soldiers = store.getState(selectSoldiersById);
+	for (const [, s] of Object.entries(soldiers)) {
+		if (!s || s.dead || s.id === playerName) continue;
+		if (isPointInRectangle(s.position, bombCenter2D, cfg.length, cfg.width, angle)) {
+			// Push and damage
+			const h = getPlayerHumanoidByName(s.id);
+			if (h) {
+				pushHumanoidAway(h, new Vector3(bombCenter2D.X, 0, bombCenter2D.Y), 80);
+			}
+
+			const h2 = getPlayerHumanoidByName(s.id);
+			if (h2) {
+				h2.TakeDamage(cfg.damage);
+			}
+		}
+	}
+
+	// Affect enemy towers in the rectangular area
+	const towers = store.getState(selectTowersById);
+	for (const [id, t] of Object.entries(towers)) {
+		if (!t || t.ownerId === playerName) continue;
+		if (isPointInRectangle(t.position, bombCenter2D, cfg.length, cfg.width, angle)) {
+			const towerId = `${id}`;
+			store.removeTower(towerId);
+		}
+	}
+
+	// Cut damage area from all soldier polygons (including the player who fired it)
+	const damagePolygon = createRectanglePolygon(bombCenter2D, cfg.length, cfg.width, angle);
+	cutDamageAreaFromSoldiers(damagePolygon, playerName);
+
+	// Send visual effect to all clients
+	remotes.client.powerupExplosion.fireAll({
+		explosionType: "carpetBomb",
+		center: bombCenter2D,
+		length: cfg.length,
+		width: cfg.width,
+		angle: angle,
+	});
+
+	alert(player, "Carpet Bomb deployed!", palette.green);
+}
+
+function triggerMegaExplosion(player: Player) {
+	const playerName = player.Name;
+	const cfg = POWERUP_EXPLOSIONS.megaExplosion;
+	const cost = POWERUP_PRICES.megaExplosion;
 	if (!trySpendOrbs(playerName, cost)) {
 		alert(player, "Not enough orbs!", palette.red);
 		return;
@@ -114,20 +273,12 @@ function useExplosion(player: Player, kind: "explosion" | "megaExplosion") {
 	if (!centerSoldier) return;
 	const center = centerSoldier.position;
 
-	// Affect enemy soldiers
+	// Affect enemy soldiers - mega explosion kills everything
 	const soldiers = store.getState(selectSoldiersById);
 	for (const [, s] of Object.entries(soldiers)) {
 		if (!s || s.dead || s.id === playerName) continue;
 		if (magnitude2D(s.position, center) <= cfg.radius) {
-			if (kind === "megaExplosion") {
-				killSoldier(s.id);
-			} else {
-				// push and damage
-				const h = getPlayerHumanoidByName(s.id);
-				if (h) pushHumanoidAway(h, new Vector3(center.X, 0, center.Y), 60);
-				const h2 = getPlayerHumanoidByName(s.id);
-				if (h2) h2.TakeDamage(cfg.damage);
-			}
+			killSoldier(s.id);
 		}
 	}
 
@@ -141,7 +292,18 @@ function useExplosion(player: Player, kind: "explosion" | "megaExplosion") {
 		}
 	}
 
-	alert(player, kind === "megaExplosion" ? "Mega Explosion triggered!" : "Explosion triggered!", palette.green);
+	// Cut damage area from all soldier polygons (including the player who fired it)
+	const damagePolygon = createCirclePolygon(center, cfg.radius);
+	cutDamageAreaFromSoldiers(damagePolygon, playerName);
+
+	// Send visual effect to all clients
+	remotes.client.powerupExplosion.fireAll({
+		explosionType: "nuclear",
+		center: center,
+		radius: cfg.radius,
+	});
+
+	alert(player, "Nuclear Bomb detonated!", palette.green);
 }
 
 export async function initPowerupService() {
@@ -150,22 +312,22 @@ export async function initPowerupService() {
 		if (!soldier || soldier.dead) return;
 		switch (id as PowerupId) {
 			case "turbo":
-				useTurbo(player, "turbo");
+				triggerTurbo(player, "turbo");
 				break;
 			case "turbo2x":
-				useTurbo(player, "turbo2x");
+				triggerTurbo(player, "turbo2x");
 				break;
 			case "shield":
-				useShield(player);
+				triggerShield(player);
 				break;
 			case "tower":
-				useBuildTower(player);
+				triggeBruildTower(player);
 				break;
-			case "explosion":
-				useExplosion(player, "explosion");
+			case "carpetBomb":
+				triggerCarpetBomb(player);
 				break;
 			case "megaExplosion":
-				useExplosion(player, "megaExplosion");
+				triggerMegaExplosion(player);
 				break;
 			default:
 				warn(`Unknown powerup id ${id}`);

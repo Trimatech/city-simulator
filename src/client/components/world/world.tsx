@@ -4,6 +4,7 @@ import { RemProvider } from "client/rem/rem-provider";
 
 import { Bots } from "./bots/Bots";
 import { Candies } from "./candies/Candies";
+import { ExplosionEffects } from "./explosions/ExplosionEffects";
 import { Soldiers } from "./soldiers";
 import { Towers } from "./towers/Towers";
 import { WorldSounds } from "./world-sounds";
@@ -21,6 +22,8 @@ export function World() {
 				<Candies />
 
 				<Towers />
+
+				<ExplosionEffects />
 			</Group>
 		</RemProvider>
 	);

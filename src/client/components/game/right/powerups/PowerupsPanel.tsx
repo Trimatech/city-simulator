@@ -63,17 +63,17 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 				enabled={orbs >= POWERUP_PRICES.tower}
 			/>
 			<BuyButton
-				id="explosion"
-				label="Explosion"
-				emoji="💥"
+				id="carpetBomb"
+				label="Carpet Bomb"
+				emoji="💣"
 				anchorPoint={new Vector2(0.5, 0.5)}
 				position={new UDim2(0.5, 0, 0, rem(32))}
-				price={POWERUP_PRICES.explosion}
-				enabled={orbs >= POWERUP_PRICES.explosion}
+				price={POWERUP_PRICES.carpetBomb}
+				enabled={orbs >= POWERUP_PRICES.carpetBomb}
 			/>
 			<BuyButton
 				id="megaExplosion"
-				label="Mega Explosion"
+				label="Nuclear Bomb"
 				emoji="☢️"
 				anchorPoint={new Vector2(0.5, 0.5)}
 				position={new UDim2(0.5, 0, 0, rem(40))}

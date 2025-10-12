@@ -3,7 +3,7 @@ export interface PowerupPrices {
 	readonly turbo2x: number;
 	readonly shield: number;
 	readonly tower: number;
-	readonly explosion: number;
+	readonly carpetBomb: number;
 	readonly megaExplosion: number;
 }
 
@@ -14,7 +14,7 @@ export const POWERUP_PRICES: PowerupPrices = {
 	turbo2x: 80,
 	shield: 120,
 	tower: 100,
-	explosion: 150,
+	carpetBomb: 200,
 	megaExplosion: 300,
 };
 
@@ -31,13 +31,13 @@ export const POWERUP_DURATIONS: PowerupDurations = {
 };
 
 export interface ExplosionConfig {
-	readonly explosion: { radius: number; damage: number };
+	readonly carpetBomb: { length: number; width: number; damage: number };
 	readonly megaExplosion: { radius: number; damage: number };
 }
 
 export const POWERUP_EXPLOSIONS: ExplosionConfig = {
-	explosion: { radius: 60, damage: 35 },
-	megaExplosion: { radius: 110, damage: 1000 },
+	carpetBomb: { length: 60, width: 10, damage: 50 },
+	megaExplosion: { radius: 50, damage: 1000 },
 };
 
 export interface TurboSpeeds {
