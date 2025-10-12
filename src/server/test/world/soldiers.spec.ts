@@ -18,6 +18,19 @@ export = () => {
 		expect(soldier.tracers.size()).to.never.equal(0);
 	});
 
+	it("should toggle shieldActive state", () => {
+		const id = "__shield__";
+		store.addSoldier(id);
+		let s = getSoldier(id)!;
+		expect(s.shieldActive).to.equal(false);
+		store.setSoldierShieldActive(id, true);
+		s = getSoldier(id)!;
+		expect(s.shieldActive).to.equal(true);
+		store.setSoldierShieldActive(id, false);
+		s = getSoldier(id)!;
+		expect(s.shieldActive).to.equal(false);
+	});
+
 	it("should not move dead soldiers", () => {
 		store.addSoldier("__test__", { dead: true });
 		onSoldierTick();

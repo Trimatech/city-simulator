@@ -1,7 +1,12 @@
 import Object from "@rbxts/object-utils";
 import { setTimeout } from "@rbxts/set-timeout";
 import { store } from "server/store";
-import { getPlayerHumanoidByName, killSoldier } from "server/world/world.utils";
+import {
+	ensureForceFieldOnPlayerName,
+	getPlayerHumanoidByName,
+	killSoldier,
+	removeForceFieldFromPlayerName,
+} from "server/world/world.utils";
 import { sounds } from "shared/assets";
 import { SOLDIER_SPEED } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
@@ -18,12 +23,7 @@ import { selectTowersById } from "shared/store/towers/tower-selectors";
 
 import { placeTower } from "../soldiers/soldiers.placeTower";
 
-const shieldUntilBySoldier = new Map<string, number>();
-
-export function hasShield(soldierId: string) {
-	const expiresAt = shieldUntilBySoldier.get(soldierId);
-	return expiresAt !== undefined && expiresAt > tick();
-}
+// shield state is now tracked in Reflex store per soldier
 
 function trySpendOrbs(playerName: string, cost: number) {
 	const orbs = store.getState(selectSoldierOrbs(playerName)) ?? 0;
@@ -67,15 +67,19 @@ function useShield(player: Player) {
 		alert(player, "Not enough orbs!", palette.red);
 		return;
 	}
-	const expiresAt = tick() + POWERUP_DURATIONS.shield;
-	shieldUntilBySoldier.set(playerName, expiresAt);
+	// enable shield in state
+	store.setSoldierShieldActive(playerName, true);
+
+	// create a ForceField on the character for the duration
+	ensureForceFieldOnPlayerName(playerName, true);
+
 	setTimeout(() => {
-		const current = shieldUntilBySoldier.get(playerName);
-		if (current && current <= tick()) {
-			shieldUntilBySoldier.delete(playerName);
-		}
+		// disable shield in state and remove forcefield if present
+		store.setSoldierShieldActive(playerName, false);
+		removeForceFieldFromPlayerName(playerName);
 	}, POWERUP_DURATIONS.shield);
-	alert(player, "Shield Dome activated!", palette.green);
+
+	alert(player, "Shield activated!", palette.green);
 }
 
 function useBuildTower(player: Player) {

@@ -316,3 +316,13 @@ export function startCrumbling(pieces: Part[]) {
 		pieces.forEach(cleanupPhysics);
 	};
 }
+
+export function createWallHighlight(part: Part, color = Color3.fromRGB(255, 255, 255)) {
+	const highlight = new Instance("Highlight");
+	highlight.Adornee = part;
+	highlight.FillTransparency = 1;
+	highlight.OutlineTransparency = 0;
+	highlight.OutlineColor = color;
+	highlight.Parent = part;
+	return highlight;
+}

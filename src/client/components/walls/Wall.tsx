@@ -3,7 +3,13 @@ import { Workspace } from "@rbxts/services";
 import { palette } from "shared/constants/palette";
 import { getSoldierSkin, getSoldierSkinForTracer } from "shared/constants/skins";
 
-import { calculateWallTransform, createWallPieces, startCrumbling, startFadeOut } from "./Walls.utils";
+import {
+	calculateWallTransform,
+	createWallHighlight,
+	createWallPieces,
+	startCrumbling,
+	startFadeOut,
+} from "./Walls.utils";
 
 interface Props {
 	folderName: string;
@@ -16,6 +22,7 @@ interface Props {
 	isCrumbling?: boolean;
 	skinId?: string;
 	tracerIndex?: number;
+	outline?: boolean;
 }
 
 function WallComponent({
@@ -29,6 +36,7 @@ function WallComponent({
 	isCrumbling = false,
 	skinId,
 	tracerIndex,
+	outline = false,
 }: Props) {
 	const mainPartRef = useRef<Part>();
 	const cylinderRef = useRef<Part>();
@@ -86,6 +94,11 @@ function WallComponent({
 		part.CFrame = new CFrame(center).mul(rotation);
 		part.Parent = folder;
 
+		// Optional outline via Highlight (client-side visual)
+		if (outline) {
+			createWallHighlight(part);
+		}
+
 		// Create cylinder for smooth start
 		const cylinder = new Instance("Part");
 		cylinder.Name = `${folderName}_cylinder`;
@@ -103,6 +116,8 @@ function WallComponent({
 		const cylinderCFrame = new CFrame(startPosition).mul(CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90))); // Rotate cylinder to stand upright
 		cylinder.CFrame = cylinderCFrame;
 		cylinder.Parent = folder;
+
+		if (outline && part) createWallHighlight(part);
 
 		mainPartRef.current = part;
 		cylinderRef.current = cylinder;

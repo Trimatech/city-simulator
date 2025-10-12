@@ -27,7 +27,7 @@ export interface PowerupDurations {
 export const POWERUP_DURATIONS: PowerupDurations = {
 	turbo: 5,
 	turbo2x: 5,
-	shield: 6,
+	shield: 10,
 };
 
 export interface ExplosionConfig {

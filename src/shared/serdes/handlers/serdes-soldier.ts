@@ -24,6 +24,7 @@ export function serializeSoldiers(state: SoldiersState): string {
 		buffer.WriteUInt(16, soldier.eliminations);
 		buffer.WriteBool(soldier.isInside);
 		buffer.WriteFloat32(soldier.polygonAreaSize);
+		buffer.WriteBool(soldier.shieldActive);
 	}
 
 	return buffer.ToString();
@@ -52,6 +53,7 @@ export function deserializeSoldiers(data: string): SoldiersState {
 			eliminations: buffer.ReadUInt(16),
 			isInside: buffer.ReadBool(),
 			polygonAreaSize: buffer.ReadFloat32(),
+			shieldActive: buffer.ReadBool(),
 		};
 	}
 

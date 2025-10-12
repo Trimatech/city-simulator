@@ -7,9 +7,10 @@ interface Props {
 	skinId?: string;
 	tracers: Vector2[];
 	isCrumbling?: boolean;
+	outline?: boolean;
 }
 
-function TracerWallsComponent({ tracers, skinId, isCrumbling = false }: Props) {
+function TracerWallsComponent({ tracers, skinId, isCrumbling = false, outline = false }: Props) {
 	//	warn("rendering tracer walls");
 	// Convert segments to array of line segments
 	const tracerLines = tracers
@@ -33,6 +34,7 @@ function TracerWallsComponent({ tracers, skinId, isCrumbling = false }: Props) {
 					skinId={skinId}
 					tracerIndex={index}
 					height={TRACER_PIECE_HEIGHT}
+					outline={outline}
 				/>
 			))}
 		</>

@@ -24,6 +24,7 @@ export interface SoldierEntity {
 	readonly polygon: readonly Vector2[];
 	readonly polygonAreaSize: number;
 	readonly isInside: boolean;
+	readonly shieldActive: boolean;
 }
 
 const defaultEntity: SoldierEntity = {
@@ -41,6 +42,7 @@ const defaultEntity: SoldierEntity = {
 	polygon: [],
 	polygonAreaSize: 0,
 	isInside: true,
+	shieldActive: false,
 };
 
 const initialState: SoldiersState = {};
@@ -150,6 +152,13 @@ export const soldiersSlice = createProducer(initialState, {
 		return mapProperty(state, id, (soldier) => ({
 			...soldier,
 			dead: true,
+		}));
+	},
+
+	setSoldierShieldActive: (state, id: string, active: boolean) => {
+		return mapProperty(state, id, (soldier) => ({
+			...soldier,
+			shieldActive: active,
 		}));
 	},
 

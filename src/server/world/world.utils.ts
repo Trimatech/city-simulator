@@ -38,12 +38,45 @@ export function getPlayerHumanoidByName(name: string) {
 	return undefined;
 }
 
+export function ensureForceFieldOnHumanoid(humanoid: Humanoid, visible = true) {
+	const character = humanoid.Parent as Model | undefined;
+	if (!character) return;
+	let ff = character.FindFirstChildOfClass("ForceField");
+	if (!ff) {
+		ff = new Instance("ForceField");
+		ff.Visible = visible;
+		ff.Parent = character;
+	}
+	return ff;
+}
+
+export function removeForceFieldFromHumanoid(humanoid: Humanoid) {
+	const character = humanoid.Parent as Model | undefined;
+	if (!character) return;
+	const ff = character.FindFirstChildOfClass("ForceField");
+	if (ff) ff.Destroy();
+}
+
+export function ensureForceFieldOnPlayerName(playerName: string, visible = true) {
+	const humanoid = getPlayerHumanoidByName(playerName);
+	if (humanoid) return ensureForceFieldOnHumanoid(humanoid, visible);
+}
+
+export function removeForceFieldFromPlayerName(playerName: string) {
+	const humanoid = getPlayerHumanoidByName(playerName);
+	if (humanoid) removeForceFieldFromHumanoid(humanoid);
+}
+
 export function killSoldier(soldierId: string) {
 	store.setSoldierIsDead(soldierId);
 
 	const humanoid = getPlayerHumanoidByName(soldierId);
 	if (humanoid) {
-		humanoid.TakeDamage(10000);
+		// Remove any active ForceField to ensure death goes through
+		removeForceFieldFromHumanoid(humanoid);
+		// Force kill regardless of damage immunity
+		humanoid.Health = 0;
+		humanoid.TakeDamage(1000000);
 	}
 
 	store.removeTowersByOwnerId(soldierId);

@@ -24,6 +24,7 @@ export = () => {
 			polygon: fillArray(10, () => new Vector2(math.random(), math.random())),
 			polygonAreaSize: 0,
 			isInside: true,
+			shieldActive: math.random() > 0.5,
 		};
 	}
 

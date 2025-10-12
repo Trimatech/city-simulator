@@ -25,7 +25,7 @@ export function Soldier({ soldier, color = palette.white, transparency = 0 }: Pr
 	return (
 		<>
 			{/* Tracer lines */}
-			<TracerWalls tracers={soldier.tracers as Vector2[]} skinId={soldier.skin} />
+			<TracerWalls tracers={soldier.tracers as Vector2[]} skinId={soldier.skin} outline={soldier.shieldActive} />
 
 			{/* Home polygon */}
 			<AreaWalls
