@@ -157,6 +157,8 @@ export function createCarpetBombExplosion(center: Vector2, length: number, width
 	return effects;
 }
 
+const VISUAL_HEIGHT = 10;
+
 export function createCarpetBombExplosionWithCFrame(
 	center: Vector2,
 	length: number,
@@ -172,7 +174,7 @@ export function createCarpetBombExplosionWithCFrame(
 	// Create main explosion part using the provided CFrame
 	const explosion = new Instance("Part");
 	explosion.Name = "CarpetBombExplosion";
-	explosion.Size = new Vector3(length, 1, width);
+	explosion.Size = new Vector3(length, VISUAL_HEIGHT, width);
 	explosion.CFrame = cframe;
 	explosion.Color = palette.red;
 	explosion.Material = Enum.Material.Neon;
@@ -260,7 +262,7 @@ export function createNuclearExplosion(center: Vector2, radius: number): Part[] 
 	// Create main explosion part
 	const explosion = createBasePart(
 		"NuclearExplosion",
-		new Vector3(0.2, radius * 2, radius * 2),
+		new Vector3(0.2, VISUAL_HEIGHT, radius * 2),
 		new Vector3(center.X, 0.1, center.Y),
 		new Vector3(0, 0, 90),
 		palette.yellow,
@@ -274,7 +276,7 @@ export function createNuclearExplosion(center: Vector2, radius: number): Part[] 
 	// Create expanding ring effect
 	const ring = createBasePart(
 		"NuclearRing",
-		new Vector3(radius * 2, 0.1, radius * 2),
+		new Vector3(radius * 2, VISUAL_HEIGHT, radius * 2),
 		new Vector3(center.X, 0.15, center.Y),
 		new Vector3(0, 0, 90),
 		palette.white,
@@ -286,7 +288,7 @@ export function createNuclearExplosion(center: Vector2, radius: number): Part[] 
 		ring,
 		new TweenInfo(EXPLOSION_DURATION, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
 		{
-			Size: new Vector3(radius * 3, 0.1, radius * 3),
+			Size: new Vector3(radius * 3, VISUAL_HEIGHT, radius * 3),
 			Transparency: 1,
 		},
 	);
