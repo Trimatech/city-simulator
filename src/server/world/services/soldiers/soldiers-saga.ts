@@ -1,6 +1,5 @@
 import Object from "@rbxts/object-utils";
 import { Players } from "@rbxts/services";
-import { waitForPrimaryPart } from "@rbxts/wait-for";
 import { store } from "server/store";
 import { DEFAULT_ORBS, SOLDIER_TICK_PHASE } from "server/world/constants";
 import { getCandy, getSafePointInWorld, killSoldier, playerIsSpawned } from "server/world/world.utils";
@@ -24,6 +23,7 @@ import {
 	selectIsInsideBySoldierById,
 	selectSoldiersById,
 } from "shared/store/soldiers";
+import { findCharacterPrimaryPart, reloadCharacterAsync } from "shared/utils/player-utils";
 import { createScheduler } from "shared/utils/scheduler";
 
 import { candyGrid, eatCandies } from "../candy/candy-utils";
@@ -54,29 +54,27 @@ export async function initSoldierService() {
 
 		const safePoint = getSafePointInWorld();
 
-		if (
-			!player.Character ||
-			!player.Character.FindFirstChild("Humanoid") ||
-			(player.Character.FindFirstChild("Humanoid") as Humanoid).Health <= 0
-		) {
-			warn(`Cannot spawn soldier for ${player.Name} because the player is dead`);
-			player.CharacterAdded.Wait();
-		}
+		await reloadCharacterAsync(player);
+
+		print("Character loaded, adding soldier");
+		// Add soldier to state now that character is present
+		store.addSoldier(player.Name, {
+			name: player.DisplayName,
+			lastPosition: undefined,
+			position: safePoint ? new Vector2(safePoint.X, safePoint.Y) : undefined,
+			skin: currentSkin !== RANDOM_SKIN ? currentSkin : randomSkin,
+			orbs: DEFAULT_ORBS,
+		});
 
 		const character = player.Character as Model;
-		const primaryPart = await waitForPrimaryPart(character);
+
+		const primaryPart = findCharacterPrimaryPart(character);
 
 		if (primaryPart) {
 			print("PrimaryPart found for", player.Name);
+			// Move character to spawn
 			character.PivotTo(new CFrame(safePoint.X, 10, safePoint.Y));
 			print("Move soldier to point", player.Name, safePoint);
-			store.addSoldier(player.Name, {
-				name: player.DisplayName,
-				lastPosition: undefined,
-				position: safePoint ? new Vector2(safePoint.X, safePoint.Y) : undefined,
-				skin: currentSkin !== RANDOM_SKIN ? currentSkin : randomSkin,
-				orbs: DEFAULT_ORBS,
-			});
 		} else {
 			warn(`No PrimaryPart found for player ${player.Name}`);
 		}

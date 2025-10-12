@@ -1,9 +1,11 @@
+import Object from "@rbxts/object-utils";
 import { Players } from "@rbxts/services";
 import { waitForPrimaryPart } from "@rbxts/wait-for";
 import { store } from "server/store";
 import { DEFAULT_ORBS, IS_TESTING_STUFF, SOLDIER_TICK_PHASE } from "server/world/constants";
 import { getSafePointInWorld } from "server/world/world.utils";
 import { SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
+import { selectAliveSoldiersById } from "shared/store/soldiers";
 import { createScheduler } from "shared/utils/scheduler";
 
 import { soldierIsInsideChanged } from "../soldiers/soldier-events";
@@ -121,6 +123,54 @@ function cleanupBot(botId: string) {
 	botControllers.delete(botId);
 }
 
+function getAliveBotIds(): string[] {
+	const aliveById = store.getState(selectAliveSoldiersById);
+	const ids: string[] = [];
+	for (const rawId of Object.keys(aliveById as unknown as { [id: string]: unknown })) {
+		const id = tostring(rawId);
+		if (string.sub(id, 1, 4) === "BOT_") ids.push(id);
+	}
+	ids.sort((a, b) => tonumber(string.sub(a, 5))! < tonumber(string.sub(b, 5))!);
+	return ids;
+}
+
+function getAliveNonBotCount(): number {
+	const aliveById = store.getState(selectAliveSoldiersById);
+	let count = 0;
+	for (const rawId of Object.keys(aliveById as unknown as { [id: string]: unknown })) {
+		const id = tostring(rawId);
+		if (string.sub(id, 1, 4) !== "BOT_") count += 1;
+	}
+	return count;
+}
+
+function nextBotId(existing: ReadonlyArray<string>): string {
+	let index = existing.size() > 0 ? tonumber(string.sub(existing[existing.size() - 1], 5))! + 1 : 1;
+	let id = `BOT_${index}`;
+	while (existing.includes(id)) {
+		index += 1;
+		id = `BOT_${index}`;
+	}
+	return id;
+}
+
+async function spawnBots(amount: number) {
+	let remaining = amount;
+	while (remaining > 0) {
+		const existing = getAliveBotIds();
+		const id = nextBotId(existing);
+		await spawnBot(id);
+		remaining -= 1;
+	}
+}
+
+function removeBots(ids: ReadonlyArray<string>) {
+	for (const id of ids) {
+		cleanupBot(id);
+		store.removeSoldier(id);
+	}
+}
+
 export async function initBotService() {
 	// React to inside-state changes
 	soldierIsInsideChanged.Connect((id, isInside) => {
@@ -143,9 +193,33 @@ export async function initBotService() {
 		}
 	});
 
-	task.delay(5, () => {
-		spawnBot("BOT_1");
-	});
+	// Maintain 5 bots only when there is at least one alive non-bot soldier
+	store.subscribe(
+		selectAliveSoldiersById,
+		() => true,
+		(_aliveById) => {
+			const aliveBotIds = getAliveBotIds();
+			const aliveBots = aliveBotIds.size();
+			const aliveNonBots = getAliveNonBotCount();
+
+			if (aliveNonBots <= 0 && aliveBots > 0) {
+				removeBots(aliveBotIds);
+				return;
+			}
+
+			if (aliveNonBots > 0 && aliveBots < 5) {
+				spawnBots(5 - aliveBots);
+				return;
+			}
+
+			if (aliveNonBots > 0 && aliveBots > 5) {
+				const extras = aliveBots - 5;
+				const start = aliveBotIds.size() - extras;
+				const toRemove = aliveBotIds.move(start, aliveBotIds.size() - 1, 0, [] as string[]);
+				removeBots(toRemove);
+			}
+		},
+	);
 
 	// tick bot logic alongside soldiers
 	createScheduler({

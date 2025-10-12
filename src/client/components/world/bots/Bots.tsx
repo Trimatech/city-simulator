@@ -11,7 +11,7 @@ export function Bots() {
 		const ids: string[] = [];
 		for (const rawId of Object.keys(soldiersById as unknown as { [id: string]: unknown })) {
 			const id = tostring(rawId);
-			if (string.sub(id, 1, 4) === "BOT_") ids.push(id);
+			if (string.sub(id, 1, 4) === "BOT_" && soldiersById[id] && !soldiersById[id]!.dead) ids.push(id);
 		}
 		return ids;
 	}, [soldiersById]);

@@ -46,3 +46,37 @@ export function onPlayerAdded(callback: (player: Player) => void) {
 
 	return () => connection.Disconnect();
 }
+
+export function findCharacterPrimaryPart(character: Model, timeoutSeconds = 10): BasePart | undefined {
+	const hrp = character.FindFirstChild("HumanoidRootPart");
+	if (hrp && hrp.IsA("BasePart")) {
+		return hrp as BasePart;
+	}
+
+	print("HumanoidRootPart not found, waiting for it");
+
+	const waited = character.WaitForChild("HumanoidRootPart", timeoutSeconds) as Instance | undefined;
+	if (waited && waited.IsA("BasePart")) {
+		print("HumanoidRootPart found after waiting");
+		return waited as BasePart;
+	}
+
+	const first = character.FindFirstChildWhichIsA("BasePart");
+	if (first) {
+		print("HumanoidRootPart found in FindFirstChildWhichIsA");
+		return first;
+	}
+
+	return undefined;
+}
+
+export function reloadCharacterAsync(player: Player): Promise<Model> {
+	return new Promise((resolve) => {
+		player.CharacterAdded.Once((char) => {
+			char.WaitForChild("Humanoid");
+			print("Character loaded");
+			resolve(char);
+		});
+		player.LoadCharacter();
+	});
+}

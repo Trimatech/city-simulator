@@ -2,7 +2,7 @@ import { WORLD_TICK } from "shared/constants/core";
 import { CandyType } from "shared/store/candy";
 
 // Variable to enable/disable testing stuff, to shorten the work cycle
-export const IS_TESTING_STUFF = true;
+export const IS_TESTING_STUFF = false;
 
 // The world updates every world tick, which is less than the server's
 // heartbeat rate. This means that we can schedule different cycles to run

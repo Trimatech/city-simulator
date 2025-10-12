@@ -44,6 +44,13 @@
 				}
 			}
 		},
+
+		"Players": {
+			"$className": "Players",
+			"$properties": {
+				"CharacterAutoLoads": false
+			}
+		},
 		"StarterGui": {
 			"$className": "StarterGui",
 			"$properties": {
