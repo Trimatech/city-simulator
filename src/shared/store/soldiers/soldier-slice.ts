@@ -117,7 +117,7 @@ export const soldiersSlice = createProducer(initialState, {
 	},
 
 	setSoldierPolygon: (state, id: string, polygon: Vector2[], polygonAreaSize: number, resetTracers = false) => {
-		print(`setSoldierPolygon ${id}`, { polygon, polygonAreaSize });
+		// print(`setSoldierPolygon ${id}`, { polygon, polygonAreaSize });
 		return mapProperty(state, id, (soldier) => ({
 			...soldier,
 			polygon,
