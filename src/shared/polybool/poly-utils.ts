@@ -435,7 +435,7 @@ export function setIntersectionPoints(polygon: Polygon, drawPointsTemp: Point[])
 		return undefined;
 	}
 
-	warn("setIntersectionPoints......", drawPoints);
+	//warn("setIntersectionPoints......", drawPoints);
 
 	const clonedPolygon = Object.deepCopy(polygon);
 

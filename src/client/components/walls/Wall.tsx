@@ -5,7 +5,9 @@ import { getSoldierSkin, getSoldierSkinForTracer } from "shared/constants/skins"
 
 import {
 	calculateWallTransform,
+	createCylinder,
 	createWallHighlight,
+	createWallPart,
 	createWallPieces,
 	startCrumbling,
 	startFadeOut,
@@ -17,7 +19,7 @@ interface Props {
 	endPoint: Vector2;
 	color?: Color3;
 	transparency?: number;
-	height?: number;
+	height: number;
 	thickness?: number;
 	isCrumbling?: boolean;
 	skinId?: string;
@@ -31,7 +33,7 @@ function WallComponent({
 	endPoint,
 	color = palette.white,
 	transparency = 0,
-	height = 5,
+	height,
 	thickness = 1,
 	isCrumbling = false,
 	skinId,
@@ -45,7 +47,9 @@ function WallComponent({
 
 	// Get skin properties
 	const wallProperties = (() => {
+		// eslint-disable-next-line roblox-ts/lua-truthiness
 		if (skinId) {
+			// eslint-disable-next-line roblox-ts/lua-truthiness
 			if (tracerIndex !== undefined) {
 				const tracerSkin = getSoldierSkinForTracer(skinId, tracerIndex);
 				return {
@@ -81,17 +85,17 @@ function WallComponent({
 		}
 
 		// Create main wall part
-		const part = new Instance("Part");
-		part.Name = `${folderName}_wall`;
-		part.Size = new Vector3(width, height, thickness);
-		part.Color = wallProperties.color;
-		part.Transparency = wallProperties.transparency;
-		part.Material = wallProperties.material;
-		part.TopSurface = Enum.SurfaceType.Smooth;
-		part.BottomSurface = Enum.SurfaceType.Smooth;
-		part.Anchored = true;
-		part.CanCollide = false;
-		part.CFrame = new CFrame(center).mul(rotation);
+		const part = createWallPart({
+			folderName,
+			width,
+			height,
+			thickness,
+			center,
+			rotation,
+			color: wallProperties.color,
+			transparency: wallProperties.transparency,
+			material: wallProperties.material,
+		});
 		part.Parent = folder;
 
 		// Optional outline via Highlight (client-side visual)
@@ -100,21 +104,15 @@ function WallComponent({
 		}
 
 		// Create cylinder for smooth start
-		const cylinder = new Instance("Part");
-		cylinder.Name = `${folderName}_cylinder`;
-		cylinder.Size = new Vector3(height, thickness, thickness);
-		cylinder.Color = wallProperties.color;
-		cylinder.Transparency = wallProperties.transparency;
-		cylinder.Material = wallProperties.material;
-		cylinder.TopSurface = Enum.SurfaceType.Smooth;
-		cylinder.BottomSurface = Enum.SurfaceType.Smooth;
-		cylinder.Shape = Enum.PartType.Cylinder;
-		cylinder.Anchored = true;
-		cylinder.CanCollide = false;
-
-		// Position cylinder at start of wall
-		const cylinderCFrame = new CFrame(startPosition).mul(CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90))); // Rotate cylinder to stand upright
-		cylinder.CFrame = cylinderCFrame;
+		const cylinder = createCylinder({
+			folderName,
+			height,
+			thickness,
+			startPosition,
+			color: wallProperties.color,
+			transparency: wallProperties.transparency,
+			material: wallProperties.material,
+		});
 		cylinder.Parent = folder;
 
 		if (outline && part) createWallHighlight(part);

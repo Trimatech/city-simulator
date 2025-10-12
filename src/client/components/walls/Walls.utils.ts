@@ -326,3 +326,78 @@ export function createWallHighlight(part: Part, color = Color3.fromRGB(255, 255,
 	highlight.Parent = part;
 	return highlight;
 }
+
+interface WallPartOptions {
+	folderName: string;
+	width: number;
+	height: number;
+	thickness: number;
+	center: Vector3;
+	rotation: CFrame;
+	color: Color3;
+	transparency: number;
+	material: Enum.Material;
+}
+
+export function createWallPart({
+	folderName,
+	width,
+	height,
+	thickness,
+	center,
+	rotation,
+	color,
+	transparency,
+	material,
+}: WallPartOptions) {
+	const part = new Instance("Part");
+	part.Name = `${folderName}_wall`;
+	part.Size = new Vector3(width, height, thickness);
+	part.Color = color;
+	part.Transparency = transparency;
+	part.Material = material;
+	part.TopSurface = Enum.SurfaceType.Smooth;
+	part.BottomSurface = Enum.SurfaceType.Smooth;
+	part.Anchored = true;
+	part.CanCollide = false;
+	part.CFrame = new CFrame(center).mul(rotation);
+	return part;
+}
+
+interface CylinderOptions {
+	folderName: string;
+	height: number;
+	thickness: number;
+	startPosition: Vector3;
+	color: Color3;
+	transparency: number;
+	material: Enum.Material;
+}
+
+export function createCylinder({
+	folderName,
+	height,
+	thickness,
+	startPosition,
+	color,
+	transparency,
+	material,
+}: CylinderOptions) {
+	const cylinder = new Instance("Part");
+	cylinder.Name = `${folderName}_cylinder`;
+	cylinder.Size = new Vector3(height, thickness, thickness);
+	cylinder.Color = color;
+	cylinder.Transparency = transparency;
+	cylinder.Material = material;
+	cylinder.TopSurface = Enum.SurfaceType.Smooth;
+	cylinder.BottomSurface = Enum.SurfaceType.Smooth;
+	cylinder.Shape = Enum.PartType.Cylinder;
+	cylinder.Anchored = true;
+	cylinder.CanCollide = false;
+
+	// Position cylinder at start of wall
+	const cylinderCFrame = new CFrame(startPosition).mul(CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90))); // Rotate cylinder to stand upright
+	cylinder.CFrame = cylinderCFrame;
+
+	return cylinder;
+}

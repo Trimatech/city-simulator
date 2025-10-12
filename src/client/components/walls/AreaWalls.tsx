@@ -1,4 +1,5 @@
 import React, { memo } from "@rbxts/react";
+import { WALL_HEIGHT } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
 import { createParallelPolygon } from "shared/polygon.utils";
 
@@ -44,7 +45,7 @@ function AreaWallsComponent({
 						endPoint={nextPoint}
 						color={color}
 						transparency={transparency}
-						height={5.1}
+						height={WALL_HEIGHT}
 						isCrumbling={isCrumbling}
 						skinId={skinId}
 					/>

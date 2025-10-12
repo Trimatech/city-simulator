@@ -2,7 +2,7 @@ import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { useRem } from "client/hooks";
 import { POWERUP_PRICES } from "shared/constants/powerups";
-import { selectLocalSoldier } from "shared/store/soldiers";
+import { selectLocalOrbs } from "shared/store/soldiers";
 
 import { BuyButton } from "./BuyButton";
 
@@ -14,8 +14,7 @@ interface Props {
 export function PowerupsPanel({ anchorPoint, position }: Props) {
 	const rem = useRem();
 	const size = new UDim2(0, rem(10), 0, rem(20));
-	const soldier = useSelector(selectLocalSoldier);
-	const orbs = soldier?.orbs ?? 0;
+	const orbs = useSelector(selectLocalOrbs) ?? 0;
 
 	print("orbs.....", orbs, POWERUP_PRICES.turbo);
 

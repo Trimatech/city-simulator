@@ -105,7 +105,7 @@ export async function initSoldierService() {
 		const newCutPolygon = setIntersectionPoints(resultPolygon, points);
 
 		if (newCutPolygon) {
-			print(`newCutPolygon ${id}`, tracers);
+			//	print(`newCutPolygon ${id}`, tracers);
 			const result = calculatePolygonOperation(resultPolygon, newCutPolygon, "Union");
 
 			if (result.regions.size() > 0 && result.regions[0].size() > 2) {
