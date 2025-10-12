@@ -32,9 +32,8 @@ export const remotes = createRemotes({
 				params: {
 					explosionType: "carpetBomb" | "nuclear";
 					center: Vector2;
-					length?: number;
-					width?: number;
-					angle?: number;
+					cframe?: CFrame;
+					size?: Vector2;
 					radius?: number;
 				},
 			]

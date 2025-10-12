@@ -106,17 +106,15 @@ function pushHumanoidAway(h: Humanoid, from3D: Vector3, strength: number) {
 	root.AssemblyLinearVelocity = unit.mul(strength);
 }
 
-function isPointInRectangle(point: Vector2, center: Vector2, length: number, width: number, angle: number) {
-	// Rotate point to align with rectangle
-	const cos = math.cos(-angle);
-	const sin = math.sin(-angle);
-	const dx = point.X - center.X;
-	const dy = point.Y - center.Y;
-	const rotatedX = dx * cos - dy * sin;
-	const rotatedY = dx * sin + dy * cos;
+function isPointInRectangleWithCFrame(point: Vector2, cframe: CFrame, size: Vector2) {
+	// Convert 2D point to 3D point
+	const point3D = new Vector3(point.X, 0, point.Y);
 
-	// Check if point is within rectangle bounds
-	return math.abs(rotatedX) <= length / 2 && math.abs(rotatedY) <= width / 2;
+	// Transform point to local space of the rectangle
+	const localPoint = cframe.Inverse().mul(point3D);
+
+	// Check if point is within rectangle bounds (length along X, width along Z)
+	return math.abs(localPoint.X) <= size.X / 2 && math.abs(localPoint.Z) <= size.Y / 2;
 }
 
 function createRectanglePolygon(center: Vector2, length: number, width: number, angle: number): Vector2[] {
@@ -160,26 +158,53 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], excludePlayerName?:
 	const soldiers = store.getState(selectSoldiersById);
 	const damagePolygonObj = pointsToPolygon(vectorsToPoints(damagePolygon));
 
+	print(`[DEBUG] cutDamageAreaFromSoldiers: damagePolygon has ${damagePolygon.size()} points`);
+	print(`[DEBUG] cutDamageAreaFromSoldiers: damagePolygonObj has ${damagePolygonObj.regions.size()} regions`);
+	print(`[DEBUG] cutDamageAreaFromSoldiers: processing ${Object.keys(soldiers).size()} soldiers`);
+
 	for (const [soldierId, soldier] of Object.entries(soldiers)) {
 		if (!soldier || soldier.dead || soldierId === excludePlayerName) continue;
 
+		print(`[DEBUG] Processing soldier ${soldierId} with polygon of ${soldier.polygon.size()} points`);
+
 		const soldierPolygon = pointsToPolygon(vectorsToPoints(soldier.polygon));
-		const differenceResult = calculatePolygonOperation(soldierPolygon, damagePolygonObj, "Difference");
 
-		if (differenceResult.regions.size() > 0 && differenceResult.regions[0].size() > 2) {
-			const updatedPolygon = pointsToVectors(differenceResult.regions[0] as Point[]);
-			const updatedArea = calculatePolygonArea(updatedPolygon);
+		// First check if there's any intersection
+		const intersectionResult = calculatePolygonOperation(soldierPolygon, damagePolygonObj, "Intersect");
+		print(`[DEBUG] Intersection result for ${soldierId}: ${intersectionResult.regions.size()} regions`);
+		if (intersectionResult.regions.size() > 0) {
+			print(`[DEBUG] Intersection found, proceeding with difference operation`);
+			const differenceResult = calculatePolygonOperation(soldierPolygon, damagePolygonObj, "Difference");
 
-			store.setSoldierPolygon(soldierId as string, updatedPolygon, updatedArea);
-
-			// Kill soldier if area becomes too small
-			if (updatedArea < SOLDIER_MIN_AREA) {
-				killSoldier(soldierId as string);
-				store.playerKilledSoldier(excludePlayerName || "system", soldierId as string);
-				if (excludePlayerName && excludePlayerName !== "") {
-					store.incrementSoldierEliminations(excludePlayerName);
-				}
+			print(`[DEBUG] Difference result for ${soldierId}: ${differenceResult.regions.size()} regions`);
+			if (differenceResult.regions.size() > 0) {
+				print(`[DEBUG] First region has ${differenceResult.regions[0].size()} points`);
 			}
+
+			if (differenceResult.regions.size() > 0 && differenceResult.regions[0].size() > 2) {
+				const updatedPolygon = pointsToVectors(differenceResult.regions[0] as Point[]);
+				const updatedArea = calculatePolygonArea(updatedPolygon);
+
+				print(
+					`[DEBUG] Updating soldier ${soldierId} polygon: old area ${soldier.polygonAreaSize}, new area ${updatedArea}`,
+				);
+
+				store.setSoldierPolygon(soldierId as string, updatedPolygon, updatedArea);
+
+				// Kill soldier if area becomes too small
+				if (updatedArea < SOLDIER_MIN_AREA) {
+					print(`[DEBUG] Soldier ${soldierId} area too small, killing`);
+					killSoldier(soldierId as string);
+					store.playerKilledSoldier(excludePlayerName ?? "system", soldierId as string);
+					if (excludePlayerName !== undefined && excludePlayerName !== "") {
+						store.incrementSoldierEliminations(excludePlayerName);
+					}
+				}
+			} else {
+				print(`[DEBUG] No valid difference result for soldier ${soldierId}`);
+			}
+		} else {
+			print(`[DEBUG] No intersection found for soldier ${soldierId}, skipping difference operation`);
 		}
 	}
 }
@@ -215,13 +240,19 @@ function triggerCarpetBomb(player: Player) {
 	const bombCenter2D = new Vector2(bombCenter.X, bombCenter.Z);
 
 	// Calculate angle for the rectangle (player's facing direction)
+	// The rectangle's length should align with player's forward direction
 	const angle = math.atan2(lookVector.Z, lookVector.X);
+	print(`[DEBUG] Player lookVector: ${lookVector}, angle: ${angle} (${math.deg(angle)} degrees)`);
+
+	// Create CFrame and size for consistent rectangle checking
+	const cframe = new CFrame(bombCenter2D.X, 0, bombCenter2D.Y).mul(CFrame.Angles(0, angle - math.pi / 2, 0));
+	const size = new Vector2(cfg.length, cfg.width);
 
 	// Affect enemy soldiers in the rectangular area
 	const soldiers = store.getState(selectSoldiersById);
 	for (const [, s] of Object.entries(soldiers)) {
 		if (!s || s.dead || s.id === playerName) continue;
-		if (isPointInRectangle(s.position, bombCenter2D, cfg.length, cfg.width, angle)) {
+		if (isPointInRectangleWithCFrame(s.position, cframe, size)) {
 			// Push and damage
 			const h = getPlayerHumanoidByName(s.id);
 			if (h) {
@@ -239,7 +270,7 @@ function triggerCarpetBomb(player: Player) {
 	const towers = store.getState(selectTowersById);
 	for (const [id, t] of Object.entries(towers)) {
 		if (!t || t.ownerId === playerName) continue;
-		if (isPointInRectangle(t.position, bombCenter2D, cfg.length, cfg.width, angle)) {
+		if (isPointInRectangleWithCFrame(t.position, cframe, size)) {
 			const towerId = `${id}`;
 			store.removeTower(towerId);
 		}
@@ -247,15 +278,20 @@ function triggerCarpetBomb(player: Player) {
 
 	// Cut damage area from all soldier polygons (including the player who fired it)
 	const damagePolygon = createRectanglePolygon(bombCenter2D, cfg.length, cfg.width, angle);
+	print(
+		`[DEBUG] Carpet bomb damage polygon: center=${bombCenter2D}, length=${cfg.length}, width=${cfg.width}, angle=${angle}`,
+	);
+	print(`[DEBUG] Carpet bomb damage polygon points: ${damagePolygon.map((p) => `(${p.X}, ${p.Y})`).join(", ")}`);
 	cutDamageAreaFromSoldiers(damagePolygon, playerName);
 
 	// Send visual effect to all clients
+	print(`[DEBUG] Created CFrame: ${cframe}, LookVector: ${cframe.LookVector}, RightVector: ${cframe.RightVector}`);
+
 	remotes.client.powerupExplosion.fireAll({
 		explosionType: "carpetBomb",
 		center: bombCenter2D,
-		length: cfg.length,
-		width: cfg.width,
-		angle: angle,
+		cframe: cframe,
+		size: size,
 	});
 
 	alert(player, "Carpet Bomb deployed!", palette.green);
@@ -294,6 +330,8 @@ function triggerMegaExplosion(player: Player) {
 
 	// Cut damage area from all soldier polygons (including the player who fired it)
 	const damagePolygon = createCirclePolygon(center, cfg.radius);
+	print(`[DEBUG] Nuclear damage polygon: center=${center}, radius=${cfg.radius}`);
+	print(`[DEBUG] Nuclear damage polygon points: ${damagePolygon.map((p) => `(${p.X}, ${p.Y})`).join(", ")}`);
 	cutDamageAreaFromSoldiers(damagePolygon, playerName);
 
 	// Send visual effect to all clients

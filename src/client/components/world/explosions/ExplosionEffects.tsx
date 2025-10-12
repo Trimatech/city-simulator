@@ -2,25 +2,26 @@ import React, { useEffect, useRef } from "@rbxts/react";
 import { TweenService } from "@rbxts/services";
 import { remotes } from "shared/remotes";
 
-import { cleanupEffects, createCarpetBombExplosion, createNuclearExplosion } from "./ExplosionUtils";
+import { cleanupEffects, createCarpetBombExplosionWithCFrame, createNuclearExplosion } from "./ExplosionUtils";
 
 interface ExplosionEffectProps {
 	explosionType: "carpetBomb" | "nuclear";
 	center: Vector2;
-	length?: number;
-	width?: number;
-	angle?: number;
+	cframe?: CFrame;
+	size?: Vector2;
 	radius?: number;
 }
 
 const EXPLOSION_DURATION = 2;
 const FADE_DURATION = 1.5;
 
-function createExplosionEffect({ explosionType, center, length, width, angle, radius }: ExplosionEffectProps) {
+function createExplosionEffect({ explosionType, center, cframe, size, radius }: ExplosionEffectProps) {
 	let effects: Part[] = [];
 
-	if (explosionType === "carpetBomb" && length && width && angle !== undefined) {
-		effects = createCarpetBombExplosion(center, length, width, angle);
+	if (explosionType === "carpetBomb" && size !== undefined && cframe !== undefined) {
+		print(`[DEBUG] Creating carpet bomb explosion: center=${center}, size=${size}, cframe=${cframe}`);
+		effects = createCarpetBombExplosionWithCFrame(center, size.X, size.Y, cframe);
+		print(`[DEBUG] Created ${effects.size()} explosion effects`);
 	} else if (explosionType === "nuclear" && radius) {
 		effects = createNuclearExplosion(center, radius);
 	}
