@@ -1,7 +1,124 @@
 import { TweenService, Workspace } from "@rbxts/services";
 import { palette } from "shared/constants/palette";
 
+interface Edge {
+	start: Vector3;
+	end: Vector3;
+}
+
+interface Face {
+	points: Vector3[];
+	normal: Vector3;
+	direction: Vector3;
+	surface: string;
+}
+
+interface Geometry {
+	vertices: Vector3[];
+	edges: Edge[];
+	faces: Face[];
+}
+
 const EXPLOSION_DURATION = 2;
+
+export function convertPartToGeometry(part: BasePart): Geometry {
+	const cf = part.CFrame;
+	const pos = cf.Position;
+
+	const sx = part.Size.X / 2;
+	const sy = part.Size.Y / 2;
+	const sz = part.Size.Z / 2;
+
+	const xvec = cf.RightVector;
+	const yvec = cf.UpVector;
+	const zvec = cf.LookVector.mul(-1);
+
+	const verts: Vector3[] = [];
+	const edges: Edge[] = [];
+	const faces: Face[] = [];
+
+	const top1 = pos.add(xvec.mul(sx)).add(yvec.mul(sy)).add(zvec.mul(sz));
+	const top2 = pos.add(xvec.mul(sx)).add(yvec.mul(sy)).add(zvec.mul(-sz));
+	const top3 = pos.add(xvec.mul(-sx)).add(yvec.mul(sy)).add(zvec.mul(-sz));
+	const top4 = pos.add(xvec.mul(-sx)).add(yvec.mul(sy)).add(zvec.mul(sz));
+	//
+	const bottom5 = pos.add(xvec.mul(sx)).add(yvec.mul(-sy)).add(zvec.mul(sz));
+	const bottom6 = pos.add(xvec.mul(sx)).add(yvec.mul(-sy)).add(zvec.mul(-sz));
+	const bottom7 = pos.add(xvec.mul(-sx)).add(yvec.mul(-sy)).add(zvec.mul(-sz));
+	const bottom8 = pos.add(xvec.mul(-sx)).add(yvec.mul(-sy)).add(zvec.mul(sz));
+
+	verts.push(top1, top2, top3, top4, bottom5, bottom6, bottom7, bottom8);
+
+	// 6 faces
+	/*
+
+	{verts[1],  xvec, 'RightSurface',  zvec, {verts[5], verts[6], verts[2], verts[1]}}, --right
+	{verts[3], -xvec, 'LeftSurface',   zvec, {verts[3], verts[4], verts[8], verts[7]}}, --left
+	{verts[1],  yvec, 'TopSurface',    xvec, {verts[1], verts[2], verts[4], verts[3]}}, --top
+	{verts[5], -yvec, 'BottomSurface', xvec, {verts[7], verts[8], verts[6], verts[5]}}, --bottom
+	{verts[1],  zvec, 'BackSurface',   xvec, {verts[1], verts[3], verts[7], verts[5]}}, --back
+	{verts[2], -zvec, 'FrontSurface',  xvec, {verts[6], verts[8], verts[4], verts[2]}}, --front
+
+			*/
+	faces.push(
+		{
+			points: [top1, top2, bottom6, bottom5],
+			normal: xvec.mul(-1), // Flipped normal
+			direction: yvec, // Up direction for vertical faces
+			surface: "RightSurface",
+		}, // right
+		{
+			points: [top4, top3, bottom7, bottom8],
+			normal: xvec, // Flipped normal
+			direction: yvec, // Up direction for vertical faces
+			surface: "LeftSurface",
+		}, // left
+		{
+			points: [top1, top2, top3, top4],
+			normal: yvec.mul(-1), // Flipped normal
+			direction: zvec, // Forward direction for horizontal faces
+			surface: "TopSurface",
+		}, // top
+		{
+			points: [bottom5, bottom6, bottom7, bottom8],
+			normal: yvec, // Flipped normal
+			direction: zvec, // Forward direction for horizontal faces
+			surface: "BottomSurface",
+		}, // bottom
+		{
+			points: [top2, top3, bottom7, bottom6],
+			normal: zvec, // Flipped normal
+			direction: yvec, // Up direction for vertical faces
+			surface: "BackSurface",
+		}, // back
+		{
+			points: [top1, top4, bottom8, bottom5],
+			normal: zvec.mul(-1), // Flipped normal
+			direction: yvec, // Up direction for vertical faces
+			surface: "FrontSurface",
+		}, // front
+	);
+
+	return {
+		vertices: verts,
+		edges,
+		faces,
+	};
+}
+
+export function getPart2DFootprint(part: BasePart): Vector2[] {
+	const geometry = convertPartToGeometry(part);
+
+	// Find the bottom face (Y-normal pointing up)
+	const bottomFace = geometry.faces.find((face) => face.surface === "BottomSurface");
+	if (!bottomFace) {
+		warn("Could not find bottom face for part footprint");
+		return [];
+	}
+
+	// Convert 3D points to 2D (X, Z coordinates)
+	return bottomFace.points.map((point) => new Vector2(point.X, point.Z));
+}
 
 export function createBasePart(
 	name: string,

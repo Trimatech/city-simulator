@@ -1,4 +1,5 @@
 import Object from "@rbxts/object-utils";
+import { Workspace } from "@rbxts/services";
 import { setTimeout } from "@rbxts/set-timeout";
 import { store } from "server/store";
 import {
@@ -28,6 +29,112 @@ import { findCharacterPrimaryPart } from "shared/utils/player-utils";
 import { placeTower } from "../soldiers/soldiers.placeTower";
 
 // shield state is now tracked in Reflex store per soldier
+
+interface Edge {
+	start: Vector3;
+	end: Vector3;
+}
+
+interface Face {
+	points: Vector3[];
+	normal: Vector3;
+	direction: Vector3;
+	surface: string;
+}
+
+interface Geometry {
+	vertices: Vector3[];
+	edges: Edge[];
+	faces: Face[];
+}
+
+function convertPartToGeometry(part: BasePart): Geometry {
+	const cf = part.CFrame;
+	const pos = cf.Position;
+
+	const sx = part.Size.X / 2;
+	const sy = part.Size.Y / 2;
+	const sz = part.Size.Z / 2;
+
+	const xvec = cf.RightVector;
+	const yvec = cf.UpVector;
+	const zvec = cf.LookVector.mul(-1);
+
+	const verts: Vector3[] = [];
+	const edges: Edge[] = [];
+	const faces: Face[] = [];
+
+	const top1 = pos.add(xvec.mul(sx)).add(yvec.mul(sy)).add(zvec.mul(sz));
+	const top2 = pos.add(xvec.mul(sx)).add(yvec.mul(sy)).add(zvec.mul(-sz));
+	const top3 = pos.add(xvec.mul(-sx)).add(yvec.mul(sy)).add(zvec.mul(-sz));
+	const top4 = pos.add(xvec.mul(-sx)).add(yvec.mul(sy)).add(zvec.mul(sz));
+	//
+	const bottom5 = pos.add(xvec.mul(sx)).add(yvec.mul(-sy)).add(zvec.mul(sz));
+	const bottom6 = pos.add(xvec.mul(sx)).add(yvec.mul(-sy)).add(zvec.mul(-sz));
+	const bottom7 = pos.add(xvec.mul(-sx)).add(yvec.mul(-sy)).add(zvec.mul(-sz));
+	const bottom8 = pos.add(xvec.mul(-sx)).add(yvec.mul(-sy)).add(zvec.mul(sz));
+
+	verts.push(top1, top2, top3, top4, bottom5, bottom6, bottom7, bottom8);
+
+	faces.push(
+		{
+			points: [top1, top2, bottom6, bottom5],
+			normal: xvec.mul(-1),
+			direction: yvec,
+			surface: "RightSurface",
+		},
+		{
+			points: [top4, top3, bottom7, bottom8],
+			normal: xvec,
+			direction: yvec,
+			surface: "LeftSurface",
+		},
+		{
+			points: [top1, top2, top3, top4],
+			normal: yvec.mul(-1),
+			direction: zvec,
+			surface: "TopSurface",
+		},
+		{
+			points: [bottom5, bottom6, bottom7, bottom8],
+			normal: yvec,
+			direction: zvec,
+			surface: "BottomSurface",
+		},
+		{
+			points: [top2, top3, bottom7, bottom6],
+			normal: zvec,
+			direction: yvec,
+			surface: "BackSurface",
+		},
+		{
+			points: [top1, top4, bottom8, bottom5],
+			normal: zvec.mul(-1),
+			direction: yvec,
+			surface: "FrontSurface",
+		},
+	);
+
+	return {
+		vertices: verts,
+		edges,
+		faces,
+	};
+}
+
+function getPart2DFootprint(part: BasePart): Vector2[] {
+	const geometry = convertPartToGeometry(part);
+
+	// Find the bottom face (Y-normal pointing up)
+	const bottomFace = geometry.faces.find((face) => face.surface === "BottomSurface");
+	if (!bottomFace) {
+		warn("Could not find bottom face for part footprint");
+		return [];
+	}
+
+	// Convert 3D points to 2D (X, Z coordinates)
+	return bottomFace.points.map((point) => new Vector2(point.X, point.Z));
+}
 
 function trySpendOrbs(playerName: string, cost: number) {
 	const orbs = store.getState(selectSoldierOrbs(playerName)) ?? 0;
@@ -117,30 +224,121 @@ function isPointInRectangleWithCFrame(point: Vector2, cframe: CFrame, size: Vect
 	return math.abs(localPoint.X) <= size.X / 2 && math.abs(localPoint.Z) <= size.Y / 2;
 }
 
-function createRectanglePolygon(center: Vector2, length: number, width: number, angle: number): Vector2[] {
+function _createRectanglePolygon(center: Vector2, length: number, width: number, angle: number): Vector2[] {
 	const halfLength = length / 2;
 	const halfWidth = width / 2;
 
-	// Create rectangle corners in local space
+	// Create rectangle corners in local space (counterclockwise winding order for polybool)
 	const corners = [
 		new Vector2(-halfLength, -halfWidth),
-		new Vector2(halfLength, -halfWidth),
-		new Vector2(halfLength, halfWidth),
 		new Vector2(-halfLength, halfWidth),
+		new Vector2(halfLength, halfWidth),
+		new Vector2(halfLength, -halfWidth),
 	];
 
 	// Rotate and translate corners
 	const cos = math.cos(angle);
 	const sin = math.sin(angle);
 
-	return corners.map((corner) => {
+	const result = corners.map((corner) => {
 		const rotatedX = corner.X * cos - corner.Y * sin;
 		const rotatedY = corner.X * sin + corner.Y * cos;
 		return new Vector2(rotatedX + center.X, rotatedY + center.Y);
 	});
+
+	print(`[DEBUG] createRectanglePolygon: created ${result.size()} points`);
+	print(`[DEBUG] Rectangle points: ${result.map((p) => `(${p.X}, ${p.Y})`).join(", ")}`);
+
+	return result;
 }
 
-function createCirclePolygon(center: Vector2, radius: number, segments = 16): Vector2[] {
+function createExplosionPart(center: Vector2, length: number, width: number, angle: number): Part {
+	const cframe = new CFrame(center.X, 0.5, center.Y).mul(CFrame.Angles(0, angle, 0));
+	const explosion = new Instance("Part");
+	explosion.Name = "ExplosionPart";
+	explosion.Size = new Vector3(length, 1, width);
+	explosion.CFrame = cframe;
+	explosion.Anchored = true;
+	explosion.CanCollide = false;
+	explosion.CastShadow = false;
+	explosion.Parent = Workspace;
+	return explosion;
+}
+
+function interpolateRectangleEdges(corners: Vector2[], segmentsPerEdge = 8): Vector2[] {
+	const interpolatedPoints: Vector2[] = [];
+
+	for (let i = 0; i < corners.size(); i++) {
+		const current = corners[i];
+		const nextCorner = corners[(i + 1) % corners.size()];
+
+		// Add the current corner
+		interpolatedPoints.push(current);
+
+		// Interpolate along the edge
+		for (let j = 1; j < segmentsPerEdge; j++) {
+			const t = j / segmentsPerEdge;
+			const interpolatedX = current.X + (nextCorner.X - current.X) * t;
+			const interpolatedY = current.Y + (nextCorner.Y - current.Y) * t;
+			interpolatedPoints.push(new Vector2(interpolatedX, interpolatedY));
+		}
+	}
+
+	return interpolatedPoints;
+}
+
+function createExplosionPolygonFromPart(center: Vector2, length: number, width: number, angle: number): Vector2[] {
+	// For rectangular explosions, we can use the direct geometry approach
+	// and then interpolate along the edges for smoother polygons
+	const tempPart = createExplosionPart(center, length, width, angle);
+	const footprint = getPart2DFootprint(tempPart);
+
+	// Clean up the temporary part
+	tempPart.Destroy();
+
+	// Interpolate along the edges for a smoother polygon
+	const interpolatedFootprint = interpolateRectangleEdges(footprint, 4); // 4 segments per edge
+
+	print(`[DEBUG] createExplosionPolygonFromPart: created ${interpolatedFootprint.size()} interpolated points`);
+	print(`[DEBUG] Explosion polygon points: ${interpolatedFootprint.map((p) => `(${p.X}, ${p.Y})`).join(", ")}`);
+
+	return interpolatedFootprint;
+}
+
+function createCircularExplosionPart(center: Vector2, radius: number): Part {
+	const explosion = new Instance("Part");
+	explosion.Name = "CircularExplosionPart";
+	explosion.Size = new Vector3(radius * 2, 1, radius * 2);
+	explosion.CFrame = new CFrame(center.X, 0.5, center.Y);
+	explosion.Shape = Enum.PartType.Cylinder;
+	explosion.Anchored = true;
+	explosion.CanCollide = false;
+	explosion.CastShadow = false;
+	explosion.Parent = Workspace;
+	return explosion;
+}
+
+function createCircularExplosionPolygonFromPart(center: Vector2, radius: number): Vector2[] {
+	// For circular explosions, we need to create an interpolated circle
+	// since the geometry approach only gives us the bounding box corners
+	const segments = 32; // More segments for smoother circle
+	const points: Vector2[] = [];
+	const angleStep = (2 * math.pi) / segments;
+
+	for (let i = 0; i < segments; i++) {
+		const angle = i * angleStep;
+		const x = center.X + radius * math.cos(angle);
+		const y = center.Y + radius * math.sin(angle);
+		points.push(new Vector2(x, y));
+	}
+
+	print(`[DEBUG] createCircularExplosionPolygonFromPart: created ${points.size()} interpolated points`);
+	print(`[DEBUG] Circular explosion polygon points: ${points.map((p) => `(${p.X}, ${p.Y})`).join(", ")}`);
+
+	return points;
+}
+
+function _createCirclePolygon(center: Vector2, radius: number, segments = 16): Vector2[] {
 	const points: Vector2[] = [];
 	const angleStep = (2 * math.pi) / segments;
 
@@ -154,7 +352,7 @@ function createCirclePolygon(center: Vector2, radius: number, segments = 16): Ve
 	return points;
 }
 
-function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], excludePlayerName?: string) {
+function cutDamageAreaFromSoldiers(damagePolygon: Vector2[]) {
 	const soldiers = store.getState(selectSoldiersById);
 	const damagePolygonObj = pointsToPolygon(vectorsToPoints(damagePolygon));
 
@@ -162,10 +360,16 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], excludePlayerName?:
 	print(`[DEBUG] cutDamageAreaFromSoldiers: damagePolygonObj has ${damagePolygonObj.regions.size()} regions`);
 	print(`[DEBUG] cutDamageAreaFromSoldiers: processing ${Object.keys(soldiers).size()} soldiers`);
 
+	// Debug the damage polygon
+	print(`[DEBUG] Damage polygon points: ${damagePolygon.map((p) => `(${p.X}, ${p.Y})`).join(", ")}`);
+
 	for (const [soldierId, soldier] of Object.entries(soldiers)) {
-		if (!soldier || soldier.dead || soldierId === excludePlayerName) continue;
+		if (!soldier || soldier.dead) continue;
 
 		print(`[DEBUG] Processing soldier ${soldierId} with polygon of ${soldier.polygon.size()} points`);
+		print(
+			`[DEBUG] Soldier ${soldierId} polygon points: ${soldier.polygon.map((p) => `(${p.X}, ${p.Y})`).join(", ")}`,
+		);
 
 		const soldierPolygon = pointsToPolygon(vectorsToPoints(soldier.polygon));
 
@@ -195,10 +399,7 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], excludePlayerName?:
 				if (updatedArea < SOLDIER_MIN_AREA) {
 					print(`[DEBUG] Soldier ${soldierId} area too small, killing`);
 					killSoldier(soldierId as string);
-					store.playerKilledSoldier(excludePlayerName ?? "system", soldierId as string);
-					if (excludePlayerName !== undefined && excludePlayerName !== "") {
-						store.incrementSoldierEliminations(excludePlayerName);
-					}
+					store.playerKilledSoldier("system", soldierId as string);
 				}
 			} else {
 				print(`[DEBUG] No valid difference result for soldier ${soldierId}`);
@@ -277,12 +478,13 @@ function triggerCarpetBomb(player: Player) {
 	}
 
 	// Cut damage area from all soldier polygons (including the player who fired it)
-	const damagePolygon = createRectanglePolygon(bombCenter2D, cfg.length, cfg.width, angle);
+	// Try the new geometry-based approach first
+	const damagePolygon = createExplosionPolygonFromPart(bombCenter2D, cfg.length, cfg.width, angle);
 	print(
-		`[DEBUG] Carpet bomb damage polygon: center=${bombCenter2D}, length=${cfg.length}, width=${cfg.width}, angle=${angle}`,
+		`[DEBUG] Carpet bomb damage polygon (geometry-based): center=${bombCenter2D}, length=${cfg.length}, width=${cfg.width}, angle=${angle}`,
 	);
 	print(`[DEBUG] Carpet bomb damage polygon points: ${damagePolygon.map((p) => `(${p.X}, ${p.Y})`).join(", ")}`);
-	cutDamageAreaFromSoldiers(damagePolygon, playerName);
+	cutDamageAreaFromSoldiers(damagePolygon);
 
 	// Send visual effect to all clients
 	print(`[DEBUG] Created CFrame: ${cframe}, LookVector: ${cframe.LookVector}, RightVector: ${cframe.RightVector}`);
@@ -329,10 +531,11 @@ function triggerMegaExplosion(player: Player) {
 	}
 
 	// Cut damage area from all soldier polygons (including the player who fired it)
-	const damagePolygon = createCirclePolygon(center, cfg.radius);
-	print(`[DEBUG] Nuclear damage polygon: center=${center}, radius=${cfg.radius}`);
+	// Try the new geometry-based approach first
+	const damagePolygon = createCircularExplosionPolygonFromPart(center, cfg.radius);
+	print(`[DEBUG] Nuclear damage polygon (geometry-based): center=${center}, radius=${cfg.radius}`);
 	print(`[DEBUG] Nuclear damage polygon points: ${damagePolygon.map((p) => `(${p.X}, ${p.Y})`).join(", ")}`);
-	cutDamageAreaFromSoldiers(damagePolygon, playerName);
+	cutDamageAreaFromSoldiers(damagePolygon);
 
 	// Send visual effect to all clients
 	remotes.client.powerupExplosion.fireAll({
