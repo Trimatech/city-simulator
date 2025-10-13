@@ -28,8 +28,6 @@ import { findCharacterPrimaryPart } from "shared/utils/player-utils";
 
 import { placeTower } from "../soldiers/soldiers.placeTower";
 
-// shield state is now tracked in Reflex store per soldier
-
 interface Edge {
 	start: Vector3;
 	end: Vector3;
@@ -224,34 +222,6 @@ function isPointInRectangleWithCFrame(point: Vector2, cframe: CFrame, size: Vect
 	return math.abs(localPoint.X) <= size.X / 2 && math.abs(localPoint.Z) <= size.Z / 2;
 }
 
-function _createRectanglePolygon(center: Vector2, length: number, width: number, angle: number): Vector2[] {
-	const halfLength = length / 2;
-	const halfWidth = width / 2;
-
-	// Create rectangle corners in local space (counterclockwise winding order for polybool)
-	const corners = [
-		new Vector2(-halfLength, -halfWidth),
-		new Vector2(-halfLength, halfWidth),
-		new Vector2(halfLength, halfWidth),
-		new Vector2(halfLength, -halfWidth),
-	];
-
-	// Rotate and translate corners
-	const cos = math.cos(angle);
-	const sin = math.sin(angle);
-
-	const result = corners.map((corner) => {
-		const rotatedX = corner.X * cos - corner.Y * sin;
-		const rotatedY = corner.X * sin + corner.Y * cos;
-		return new Vector2(rotatedX + center.X, rotatedY + center.Y);
-	});
-
-	print(`[DEBUG] createRectanglePolygon: created ${result.size()} points`);
-	print(`[DEBUG] Rectangle points: ${result.map((p) => `(${p.X}, ${p.Y})`).join(", ")}`);
-
-	return result;
-}
-
 function createExplosionPart(center: Vector2, length: number, width: number, cframe2: CFrame): Part {
 	// cframe2 is expected to be an absolute CFrame positioned at the desired center
 	const explosion = new Instance("Part");
@@ -306,19 +276,6 @@ function createExplosionPolygonFromPart(center: Vector2, length: number, width: 
 	return interpolatedFootprint;
 }
 
-function _createCircularExplosionPart(center: Vector2, radius: number): Part {
-	const explosion = new Instance("Part");
-	explosion.Name = "CircularExplosionPart";
-	explosion.Size = new Vector3(radius * 2, 1, radius * 2);
-	explosion.CFrame = new CFrame(center.X, 0.5, center.Y);
-	explosion.Shape = Enum.PartType.Cylinder;
-	explosion.Anchored = true;
-	explosion.CanCollide = false;
-	explosion.CastShadow = false;
-	explosion.Parent = Workspace;
-	return explosion;
-}
-
 function createCircularExplosionPolygonFromPart(center: Vector2, radius: number): Vector2[] {
 	// For circular explosions, we need to create an interpolated circle
 	// since the geometry approach only gives us the bounding box corners
@@ -335,20 +292,6 @@ function createCircularExplosionPolygonFromPart(center: Vector2, radius: number)
 
 	print(`[DEBUG] createCircularExplosionPolygonFromPart: created ${points.size()} interpolated points`);
 	print(`[DEBUG] Circular explosion polygon points: ${points.map((p) => `(${p.X}, ${p.Y})`).join(", ")}`);
-
-	return points;
-}
-
-function _createCirclePolygon(center: Vector2, radius: number, segments = 16): Vector2[] {
-	const points: Vector2[] = [];
-	const angleStep = (2 * math.pi) / segments;
-
-	for (let i = 0; i < segments; i++) {
-		const angle = i * angleStep;
-		const x = center.X + radius * math.cos(angle);
-		const y = center.Y + radius * math.sin(angle);
-		points.push(new Vector2(x, y));
-	}
 
 	return points;
 }
