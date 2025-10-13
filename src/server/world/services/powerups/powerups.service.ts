@@ -213,7 +213,7 @@ function pushHumanoidAway(h: Humanoid, from3D: Vector3, strength: number) {
 	root.AssemblyLinearVelocity = unit.mul(strength);
 }
 
-function isPointInRectangleWithCFrame(point: Vector2, cframe: CFrame, size: Vector2) {
+function isPointInRectangleWithCFrame(point: Vector2, cframe: CFrame, size: Vector3) {
 	// Convert 2D point to 3D point
 	const point3D = new Vector3(point.X, 0, point.Y);
 
@@ -221,7 +221,7 @@ function isPointInRectangleWithCFrame(point: Vector2, cframe: CFrame, size: Vect
 	const localPoint = cframe.Inverse().mul(point3D);
 
 	// Check if point is within rectangle bounds (length along X, width along Z)
-	return math.abs(localPoint.X) <= size.X / 2 && math.abs(localPoint.Z) <= size.Y / 2;
+	return math.abs(localPoint.X) <= size.X / 2 && math.abs(localPoint.Z) <= size.Z / 2;
 }
 
 function _createRectanglePolygon(center: Vector2, length: number, width: number, angle: number): Vector2[] {
@@ -252,12 +252,13 @@ function _createRectanglePolygon(center: Vector2, length: number, width: number,
 	return result;
 }
 
-function createExplosionPart(center: Vector2, length: number, width: number, angle: number): Part {
-	const cframe = new CFrame(center.X, 0.5, center.Y).mul(CFrame.Angles(0, angle, 0));
+function createExplosionPart(center: Vector2, length: number, width: number, cframe2: CFrame): Part {
+	// cframe2 is expected to be an absolute CFrame positioned at the desired center
 	const explosion = new Instance("Part");
 	explosion.Name = "ExplosionPart";
-	explosion.Size = new Vector3(length, 1, width);
-	explosion.CFrame = cframe;
+	// Map width to X (RightVector), length to Z (LookVector)
+	explosion.Size = new Vector3(width, 1, length);
+	explosion.CFrame = cframe2;
 	explosion.Anchored = true;
 	explosion.CanCollide = false;
 	explosion.CastShadow = false;
@@ -287,10 +288,10 @@ function interpolateRectangleEdges(corners: Vector2[], segmentsPerEdge = 8): Vec
 	return interpolatedPoints;
 }
 
-function createExplosionPolygonFromPart(center: Vector2, length: number, width: number, angle: number): Vector2[] {
+function createExplosionPolygonFromPart(center: Vector2, length: number, width: number, cframe: CFrame): Vector2[] {
 	// For rectangular explosions, we can use the direct geometry approach
 	// and then interpolate along the edges for smoother polygons
-	const tempPart = createExplosionPart(center, length, width, angle);
+	const tempPart = createExplosionPart(center, length, width, cframe);
 	const footprint = getPart2DFootprint(tempPart);
 
 	// Clean up the temporary part
@@ -305,7 +306,7 @@ function createExplosionPolygonFromPart(center: Vector2, length: number, width: 
 	return interpolatedFootprint;
 }
 
-function createCircularExplosionPart(center: Vector2, radius: number): Part {
+function _createCircularExplosionPart(center: Vector2, radius: number): Part {
 	const explosion = new Instance("Part");
 	explosion.Name = "CircularExplosionPart";
 	explosion.Size = new Vector3(radius * 2, 1, radius * 2);
@@ -442,12 +443,18 @@ function triggerCarpetBomb(player: Player) {
 
 	// Calculate angle for the rectangle (player's facing direction)
 	// The rectangle's length should align with player's forward direction
-	const angle = math.atan2(lookVector.Z, lookVector.X);
-	print(`[DEBUG] Player lookVector: ${lookVector}, angle: ${angle} (${math.deg(angle)} degrees)`);
 
-	// Create CFrame and size for consistent rectangle checking
-	const cframe = new CFrame(bombCenter2D.X, 0, bombCenter2D.Y).mul(CFrame.Angles(0, angle - math.pi / 2, 0));
-	const size = new Vector2(cfg.length, cfg.width);
+	print(`[DEBUG] Player lookVector: ${lookVector},`);
+
+	// Build an absolute CFrame at the bomb center, oriented along player's forward
+	const forwardFlat = new Vector3(lookVector.X, 0, lookVector.Z);
+	const forwardUnit = forwardFlat.Magnitude > 0 ? forwardFlat.Unit : new Vector3(0, 0, 1);
+	const cframe = CFrame.lookAt(
+		new Vector3(bombCenter2D.X, 0.5, bombCenter2D.Y),
+		new Vector3(bombCenter2D.X, 0.5, bombCenter2D.Y).add(forwardUnit),
+	);
+	// For hit detection, X corresponds to width (RightVector), Z corresponds to length (LookVector)
+	const size = new Vector3(cfg.width, 5, cfg.length);
 
 	// Affect enemy soldiers in the rectangular area
 	const soldiers = store.getState(selectSoldiersById);
@@ -479,9 +486,9 @@ function triggerCarpetBomb(player: Player) {
 
 	// Cut damage area from all soldier polygons (including the player who fired it)
 	// Try the new geometry-based approach first
-	const damagePolygon = createExplosionPolygonFromPart(bombCenter2D, cfg.length, cfg.width, angle);
+	const damagePolygon = createExplosionPolygonFromPart(bombCenter2D, cfg.length, cfg.width, cframe);
 	print(
-		`[DEBUG] Carpet bomb damage polygon (geometry-based): center=${bombCenter2D}, length=${cfg.length}, width=${cfg.width}, angle=${angle}`,
+		`[DEBUG] Carpet bomb damage polygon (geometry-based): center=${bombCenter2D}, length=${cfg.length}, width=${cfg.width}`,
 	);
 	print(`[DEBUG] Carpet bomb damage polygon points: ${damagePolygon.map((p) => `(${p.X}, ${p.Y})`).join(", ")}`);
 	cutDamageAreaFromSoldiers(damagePolygon);
@@ -489,12 +496,7 @@ function triggerCarpetBomb(player: Player) {
 	// Send visual effect to all clients
 	print(`[DEBUG] Created CFrame: ${cframe}, LookVector: ${cframe.LookVector}, RightVector: ${cframe.RightVector}`);
 
-	remotes.client.powerupExplosion.fireAll({
-		explosionType: "carpetBomb",
-		center: bombCenter2D,
-		cframe: cframe,
-		size: size,
-	});
+	remotes.client.powerupCarpet.fireAll(cframe, size);
 
 	alert(player, "Carpet Bomb deployed!", palette.green);
 }
@@ -530,19 +532,14 @@ function triggerMegaExplosion(player: Player) {
 		}
 	}
 
-	// Cut damage area from all soldier polygons (including the player who fired it)
-	// Try the new geometry-based approach first
 	const damagePolygon = createCircularExplosionPolygonFromPart(center, cfg.radius);
 	print(`[DEBUG] Nuclear damage polygon (geometry-based): center=${center}, radius=${cfg.radius}`);
-	print(`[DEBUG] Nuclear damage polygon points: ${damagePolygon.map((p) => `(${p.X}, ${p.Y})`).join(", ")}`);
+
 	cutDamageAreaFromSoldiers(damagePolygon);
 
-	// Send visual effect to all clients
-	remotes.client.powerupExplosion.fireAll({
-		explosionType: "nuclear",
-		center: center,
-		radius: cfg.radius,
-	});
+	const nuclearCFrame = new CFrame(center.X, 0.5, center.Y);
+	const size = new Vector3(5, cfg.radius * 2, cfg.radius * 2);
+	remotes.client.powerupNuclear.fireAll(nuclearCFrame, size);
 
 	alert(player, "Nuclear Bomb detonated!", palette.green);
 }

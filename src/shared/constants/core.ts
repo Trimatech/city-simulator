@@ -20,7 +20,7 @@ export const IS_EDIT = RunService.IsStudio() && !RunService.IsRunning();
 export const USER_ID = Players.LocalPlayer ? Players.LocalPlayer.UserId : 0;
 export const USER_NAME = Players.LocalPlayer ? Players.LocalPlayer.Name : "(server)";
 
-export const INITIAL_POLYGON_DIAMETER = 20;
+export const INITIAL_POLYGON_DIAMETER = 100;
 export const INITIAL_POLYGON_ITEMS = 40;
 
 export const WALL_HEIGHT = 7.1;

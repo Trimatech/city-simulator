@@ -26,18 +26,8 @@ export const remotes = createRemotes({
 
 	client: namespace({
 		alert: remote<Client, [params: Partial<Alert>]>(),
-		powerupExplosion: remote<
-			Client,
-			[
-				params: {
-					explosionType: "carpetBomb" | "nuclear";
-					center: Vector2;
-					cframe?: CFrame;
-					size?: Vector2;
-					radius?: number;
-				},
-			]
-		>(),
+		powerupCarpet: remote<Client, [cframe: CFrame, size: Vector3]>(t.CFrame, t.Vector3),
+		powerupNuclear: remote<Client, [cframe: CFrame, size: Vector3]>(t.CFrame, t.Vector3),
 	}),
 
 	powerups: namespace({

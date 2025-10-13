@@ -4,67 +4,54 @@ import { remotes } from "shared/remotes";
 
 import { cleanupEffects, createCarpetBombExplosionWithCFrame, createNuclearExplosion } from "./ExplosionUtils";
 
-interface ExplosionEffectProps {
-	explosionType: "carpetBomb" | "nuclear";
-	center: Vector2;
-	cframe?: CFrame;
-	size?: Vector2;
-	radius?: number;
-}
-
 const EXPLOSION_DURATION = 2;
 const FADE_DURATION = 1.5;
-
-function createExplosionEffect({ explosionType, center, cframe, size, radius }: ExplosionEffectProps) {
-	let effects: Part[] = [];
-
-	if (explosionType === "carpetBomb" && size !== undefined && cframe !== undefined) {
-		print(`[DEBUG] Creating carpet bomb explosion: center=${center}, size=${size}, cframe=${cframe}`);
-		effects = createCarpetBombExplosionWithCFrame(center, size.X, size.Y, cframe);
-		print(`[DEBUG] Created ${effects.size()} explosion effects`);
-	} else if (explosionType === "nuclear" && radius) {
-		effects = createNuclearExplosion(center, radius);
-	}
-
-	// Fade out main effect
-	if (effects[0]) {
-		const fadeTween = TweenService.Create(
-			effects[0],
-			new TweenInfo(FADE_DURATION, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
-			{ Transparency: 1 },
-		);
-		fadeTween.Play();
-	}
-
-	// Cleanup after animation
-	cleanupEffects(effects, EXPLOSION_DURATION + FADE_DURATION);
-
-	return effects;
-}
 
 export function ExplosionEffects() {
 	const effectsRef = useRef<Part[]>([]);
 
 	useEffect(() => {
-		const cleanup = remotes.client.powerupExplosion.connect((params) => {
-			// Clean up previous effects
+		const cleanupCarpet = remotes.client.powerupCarpet.connect((cframe, size) => {
 			effectsRef.current.forEach((effect) => {
-				if (effect && effect.IsDescendantOf(game)) {
-					effect.Destroy();
-				}
+				if (effect && effect.IsDescendantOf(game)) effect.Destroy();
 			});
+			const center = new Vector2(cframe.Position.X, cframe.Position.Z);
+			const effects = createCarpetBombExplosionWithCFrame(center, size, cframe);
+			if (effects[0]) {
+				const fadeTween = TweenService.Create(
+					effects[0],
+					new TweenInfo(FADE_DURATION, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+					{ Transparency: 1 },
+				);
+				fadeTween.Play();
+			}
+			cleanupEffects(effects, EXPLOSION_DURATION + FADE_DURATION);
+			effectsRef.current = effects;
+		});
 
-			// Create new explosion effect
-			const newEffects = createExplosionEffect(params);
-			effectsRef.current = newEffects;
+		const cleanupNuclear = remotes.client.powerupNuclear.connect((cframe, size) => {
+			effectsRef.current.forEach((effect) => {
+				if (effect && effect.IsDescendantOf(game)) effect.Destroy();
+			});
+			const center = new Vector2(cframe.Position.X, cframe.Position.Z);
+			const effects = createNuclearExplosion(center, size);
+			if (effects[0]) {
+				const fadeTween = TweenService.Create(
+					effects[0],
+					new TweenInfo(FADE_DURATION, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+					{ Transparency: 1 },
+				);
+				fadeTween.Play();
+			}
+			cleanupEffects(effects, EXPLOSION_DURATION + FADE_DURATION);
+			effectsRef.current = effects;
 		});
 
 		return () => {
-			cleanup();
+			cleanupCarpet();
+			cleanupNuclear();
 			effectsRef.current.forEach((effect) => {
-				if (effect && effect.IsDescendantOf(game)) {
-					effect.Destroy();
-				}
+				if (effect && effect.IsDescendantOf(game)) effect.Destroy();
 			});
 		};
 	}, []);

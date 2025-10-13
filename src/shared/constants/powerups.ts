@@ -36,8 +36,8 @@ export interface ExplosionConfig {
 }
 
 export const POWERUP_EXPLOSIONS: ExplosionConfig = {
-	carpetBomb: { length: 60, width: 10, damage: 50 },
-	megaExplosion: { radius: 50, damage: 1000 },
+	carpetBomb: { length: 100, width: 5, damage: 50 },
+	megaExplosion: { radius: 200, damage: 1000 },
 };
 
 export interface TurboSpeeds {

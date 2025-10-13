@@ -1,6 +1,5 @@
 import Object from "@rbxts/object-utils";
 import { Players } from "@rbxts/services";
-import { waitForPrimaryPart } from "@rbxts/wait-for";
 import { store } from "server/store";
 import { DEFAULT_ORBS, IS_TESTING_STUFF, SOLDIER_TICK_PHASE } from "server/world/constants";
 import { getSafePointInWorld } from "server/world/world.utils";
@@ -36,27 +35,24 @@ function chooseRandomPlayer(): Player | undefined {
 }
 
 async function spawnBot(botId: string) {
-	let spawnPoint = getSafePointInWorld();
+	const spawnPoint = getSafePointInWorld();
 
 	if (IS_TESTING_STUFF) {
-		const sourcePlayer = chooseRandomPlayer();
-		if (!sourcePlayer || !sourcePlayer.Character) {
-			warn(`No source player or character found for bot ${botId}`);
-			return;
-		}
-
-		const sourceCharacter = sourcePlayer.Character;
-
-		const primaryPart2 = await waitForPrimaryPart(sourceCharacter);
-		const pos = primaryPart2?.Position;
-		if (!pos) {
-			warn(`No position found for bot ${botId}`);
-			return;
-		}
-		spawnPoint = new Vector2(pos.X, pos.Z);
-
-		//characterClone.PivotTo(new CFrame(pos.X, 10, pos.Z));
-		warn(`Bot ${botId} pivoted to primary part position`, pos);
+		// const sourcePlayer = chooseRandomPlayer();
+		// if (!sourcePlayer || !sourcePlayer.Character) {
+		// 	warn(`No source player or character found for bot ${botId}`);
+		// 	return;
+		// }
+		// const sourceCharacter = sourcePlayer.Character;
+		// const primaryPart2 = await waitForPrimaryPart(sourceCharacter);
+		// const pos = primaryPart2?.Position;
+		// if (!pos) {
+		// 	warn(`No position found for bot ${botId}`);
+		// 	return;
+		// }
+		// spawnPoint = new Vector2(pos.X, pos.Z);
+		// //characterClone.PivotTo(new CFrame(pos.X, 10, pos.Z));
+		// warn(`Bot ${botId} pivoted to primary part position`, pos);
 	} else {
 		//characterClone.PivotTo(new CFrame(spawnPoint.X, 10, spawnPoint.Y));
 		warn(`Bot ${botId} pivoted to spawn point`);
@@ -194,32 +190,32 @@ export async function initBotService() {
 	});
 
 	// Maintain 5 bots only when there is at least one alive non-bot soldier
-	store.subscribe(
-		selectAliveSoldiersById,
-		() => true,
-		(_aliveById) => {
-			const aliveBotIds = getAliveBotIds();
-			const aliveBots = aliveBotIds.size();
-			const aliveNonBots = getAliveNonBotCount();
+	// store.subscribe(
+	// 	selectAliveSoldiersById,
+	// 	() => true,
+	// 	(_aliveById) => {
+	// 		const aliveBotIds = getAliveBotIds();
+	// 		const aliveBots = aliveBotIds.size();
+	// 		const aliveNonBots = getAliveNonBotCount();
 
-			if (aliveNonBots <= 0 && aliveBots > 0) {
-				removeBots(aliveBotIds);
-				return;
-			}
+	// 		if (aliveNonBots <= 0 && aliveBots > 0) {
+	// 			removeBots(aliveBotIds);
+	// 			return;
+	// 		}
 
-			if (aliveNonBots > 0 && aliveBots < 5) {
-				spawnBots(5 - aliveBots);
-				return;
-			}
+	// 		if (aliveNonBots > 0 && aliveBots < 5) {
+	// 			spawnBots(5 - aliveBots);
+	// 			return;
+	// 		}
 
-			if (aliveNonBots > 0 && aliveBots > 5) {
-				const extras = aliveBots - 5;
-				const start = aliveBotIds.size() - extras;
-				const toRemove = aliveBotIds.move(start, aliveBotIds.size() - 1, 0, [] as string[]);
-				removeBots(toRemove);
-			}
-		},
-	);
+	// 		if (aliveNonBots > 0 && aliveBots > 5) {
+	// 			const extras = aliveBots - 5;
+	// 			const start = aliveBotIds.size() - extras;
+	// 			const toRemove = aliveBotIds.move(start, aliveBotIds.size() - 1, 0, [] as string[]);
+	// 			removeBots(toRemove);
+	// 		}
+	// 	},
+	// );
 
 	// tick bot logic alongside soldiers
 	createScheduler({
