@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 
 import { Alerts } from "../components/alerts";
-import { BirdCamera } from "../components/camera/bird-camera";
+import { BirdCamera } from "../components/camera/BirdCamera";
 import { Controller } from "../components/controller";
 import { ErrorHandler } from "../components/error-handler";
 import { Game } from "../components/game";

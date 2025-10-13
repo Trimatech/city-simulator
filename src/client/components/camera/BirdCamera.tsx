@@ -1,7 +1,7 @@
 import { useCamera, useEventListener } from "@rbxts/pretty-react-hooks";
 import React, { useEffect, useMemo, useRef } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { RunService } from "@rbxts/services";
+import { Players, RunService } from "@rbxts/services";
 import { WORLD_BOUNDS } from "shared/constants/core";
 import { selectLocalSoldier } from "shared/store/soldiers";
 import { clampToCircle } from "shared/utils/world-bounds";
@@ -77,13 +77,28 @@ export function BirdCamera() {
 	}, []);
 
 	useEffect(() => {
-		// Toggle camera control based on spawn state
-		if (!isSpawnedAlive) {
-			camera.CameraType = Enum.CameraType.Scriptable;
-			return () => {
+		if (isSpawnedAlive) {
+			// Reset camera to follow the local humanoid when player (re)spawns
+			const resetToCharacter = () => {
+				const character = Players.LocalPlayer.Character;
+				const humanoid = character?.FindFirstChildOfClass("Humanoid");
+				if (!humanoid) return;
+				camera.CameraSubject = humanoid;
 				camera.CameraType = Enum.CameraType.Custom;
 			};
+
+			resetToCharacter();
+			// ensure after replication settles
+			//	Promise.delay(0).then(resetToCharacter);
+			return;
 		}
+
+		// Entering spectate: clear subject and take script control
+		camera.CameraSubject = undefined;
+		camera.CameraType = Enum.CameraType.Scriptable;
+		return () => {
+			camera.CameraType = Enum.CameraType.Custom;
+		};
 	}, [isSpawnedAlive]);
 
 	useEventListener(RunService.RenderStepped, (dt) => {

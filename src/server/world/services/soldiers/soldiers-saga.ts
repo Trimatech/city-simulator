@@ -73,7 +73,7 @@ export async function initSoldierService() {
 		if (primaryPart) {
 			print("PrimaryPart found for", player.Name);
 			// Move character to spawn
-			character.PivotTo(new CFrame(safePoint.X, 10, safePoint.Y));
+			character.PivotTo(new CFrame(safePoint.X, 100, safePoint.Y));
 			print("Move soldier to point", player.Name, safePoint);
 		} else {
 			warn(`No PrimaryPart found for player ${player.Name}`);
@@ -170,7 +170,7 @@ export async function initSoldierService() {
 	});
 
 	store.observe(selectAliveSoldiersById, identifySoldier, ({ id }) => {
-		print(`Soldier ${id} is alive in saga`);
+		print(`Soldier ${id} is alive in saga, setting speed to ${SOLDIER_SPEED}`);
 		setSoldierSpeed(id, SOLDIER_SPEED);
 
 		// when the soldier dies, create candy on the soldier's tracers

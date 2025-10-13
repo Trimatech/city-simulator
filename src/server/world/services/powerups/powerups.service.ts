@@ -346,7 +346,13 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[]) {
 					store.playerKilledSoldier("system", soldierId as string);
 				}
 			} else {
-				print(`[DEBUG] No valid difference result for soldier ${soldierId}`);
+				print(
+					`[DEBUG] No valid difference result for soldier ${soldierId} - fully covered, killing and clearing area`,
+				);
+				// Fully covered by damage area: clear polygon immediately, then kill
+				store.setSoldierPolygon(soldierId as string, [], 0, true);
+				killSoldier(soldierId as string);
+				store.playerKilledSoldier("system", soldierId as string);
 			}
 		} else {
 			print(`[DEBUG] No intersection found for soldier ${soldierId}, skipping difference operation`);
