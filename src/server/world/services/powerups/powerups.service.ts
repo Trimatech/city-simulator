@@ -411,10 +411,10 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[]) {
 	}
 }
 
-function triggerCarpetBomb(player: Player) {
+function triggerLaserBeam(player: Player) {
 	const playerName = player.Name;
-	const cfg = POWERUP_EXPLOSIONS.carpetBomb;
-	const cost = POWERUP_PRICES.carpetBomb;
+	const cfg = POWERUP_EXPLOSIONS.laserBeam;
+	const cost = POWERUP_PRICES.laserBeam;
 	if (!trySpendOrbs(playerName, cost)) {
 		alert(player, "Not enough orbs!", palette.red);
 		return;
@@ -422,7 +422,7 @@ function triggerCarpetBomb(player: Player) {
 
 	const centerSoldier = store.getState(selectSoldierById(playerName));
 	if (!centerSoldier) {
-		warn(`triggerCarpetBomb: centerSoldier not found for player ${playerName}`);
+		warn(`triggerLaserBeam: centerSoldier not found for player ${playerName}`);
 		return;
 	}
 
@@ -431,7 +431,7 @@ function triggerCarpetBomb(player: Player) {
 	const primaryPart = findCharacterPrimaryPart(character);
 
 	if (!primaryPart) {
-		warn(`triggerCarpetBomb: primaryPart not found for player ${playerName}`);
+		warn(`triggerLaserBeam: primaryPart not found for player ${playerName}`);
 		return;
 	}
 
@@ -488,9 +488,9 @@ function triggerCarpetBomb(player: Player) {
 	// Try the new geometry-based approach first
 	const damagePolygon = createExplosionPolygonFromPart(bombCenter2D, cfg.length, cfg.width, cframe);
 	print(
-		`[DEBUG] Carpet bomb damage polygon (geometry-based): center=${bombCenter2D}, length=${cfg.length}, width=${cfg.width}`,
+		`[DEBUG] LaserBeam damage polygon (geometry-based): center=${bombCenter2D}, length=${cfg.length}, width=${cfg.width}`,
 	);
-	print(`[DEBUG] Carpet bomb damage polygon points: ${damagePolygon.map((p) => `(${p.X}, ${p.Y})`).join(", ")}`);
+	print(`[DEBUG] LaserBeam damage polygon points: ${damagePolygon.map((p) => `(${p.X}, ${p.Y})`).join(", ")}`);
 	cutDamageAreaFromSoldiers(damagePolygon);
 
 	// Send visual effect to all clients
@@ -498,13 +498,13 @@ function triggerCarpetBomb(player: Player) {
 
 	remotes.client.powerupCarpet.fireAll(cframe, size);
 
-	alert(player, "Carpet Bomb deployed!", palette.green);
+	alert(player, "Laser Beam deployed!", palette.green);
 }
 
-function triggerMegaExplosion(player: Player) {
+function triggerNuclearExplosion(player: Player) {
 	const playerName = player.Name;
-	const cfg = POWERUP_EXPLOSIONS.megaExplosion;
-	const cost = POWERUP_PRICES.megaExplosion;
+	const cfg = POWERUP_EXPLOSIONS.nuclearExplosion;
+	const cost = POWERUP_PRICES.nuclearExplosion;
 	if (!trySpendOrbs(playerName, cost)) {
 		alert(player, "Not enough orbs!", palette.red);
 		return;
@@ -541,7 +541,7 @@ function triggerMegaExplosion(player: Player) {
 	const size = new Vector3(5, cfg.radius * 2, cfg.radius * 2);
 	remotes.client.powerupNuclear.fireAll(nuclearCFrame, size);
 
-	alert(player, "Nuclear Bomb detonated!", palette.green);
+	alert(player, "Nuclear Explosion detonated!", palette.green);
 }
 
 export async function initPowerupService() {
@@ -561,11 +561,11 @@ export async function initPowerupService() {
 			case "tower":
 				triggeBruildTower(player);
 				break;
-			case "carpetBomb":
-				triggerCarpetBomb(player);
+			case "laserBeam":
+				triggerLaserBeam(player);
 				break;
-			case "megaExplosion":
-				triggerMegaExplosion(player);
+			case "nuclearExplosion":
+				triggerNuclearExplosion(player);
 				break;
 			default:
 				warn(`Unknown powerup id ${id}`);

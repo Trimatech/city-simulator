@@ -3,8 +3,8 @@ export interface PowerupPrices {
 	readonly turbo2x: number;
 	readonly shield: number;
 	readonly tower: number;
-	readonly carpetBomb: number;
-	readonly megaExplosion: number;
+	readonly laserBeam: number;
+	readonly nuclearExplosion: number;
 }
 
 export type PowerupId = keyof PowerupPrices;
@@ -14,8 +14,8 @@ export const POWERUP_PRICES: PowerupPrices = {
 	turbo2x: 80,
 	shield: 120,
 	tower: 100,
-	carpetBomb: 200,
-	megaExplosion: 300,
+	laserBeam: 200,
+	nuclearExplosion: 300,
 };
 
 export interface PowerupDurations {
@@ -31,13 +31,13 @@ export const POWERUP_DURATIONS: PowerupDurations = {
 };
 
 export interface ExplosionConfig {
-	readonly carpetBomb: { length: number; width: number; damage: number };
-	readonly megaExplosion: { radius: number; damage: number };
+	readonly laserBeam: { length: number; width: number; damage: number };
+	readonly nuclearExplosion: { radius: number; damage: number };
 }
 
 export const POWERUP_EXPLOSIONS: ExplosionConfig = {
-	carpetBomb: { length: 100, width: 5, damage: 50 },
-	megaExplosion: { radius: 200, damage: 1000 },
+	laserBeam: { length: 100, width: 5, damage: 50 },
+	nuclearExplosion: { radius: 200, damage: 1000 },
 };
 
 export interface TurboSpeeds {
