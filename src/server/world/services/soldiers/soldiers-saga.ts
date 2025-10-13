@@ -9,6 +9,7 @@ import {
 	calculatePolygonOperation,
 	isPointInPolygon,
 	pointsToVectors,
+	selectLargestRegionByArea,
 	setIntersectionPoints,
 	vector2ToPoint,
 	vectorsToPoints,
@@ -108,53 +109,59 @@ export async function initSoldierService() {
 			//	print(`newCutPolygon ${id}`, tracers);
 			const result = calculatePolygonOperation(resultPolygon, newCutPolygon, "Union");
 
-			if (result.regions.size() > 0 && result.regions[0].size() > 2) {
-				const resultPolygon = pointsToVectors(result.regions[0] as Point[]);
-				const polygonAreaSize = calculatePolygonArea(resultPolygon);
+			if (result.regions.size() > 0) {
+				const bestRegion = selectLargestRegionByArea(result.regions);
 
-				store.setSoldierPolygon(id, resultPolygon, polygonAreaSize, true);
+				if (bestRegion !== undefined) {
+					const resultPolygon = pointsToVectors(bestRegion);
+					const polygonAreaSize = calculatePolygonArea(resultPolygon);
 
-				// Calculate bounding box for the new cut polygon
-				const newCutPoints = newCutPolygon.regions[0] as Point[];
-				const boundingBox = calculatePolygonBoundingBox(newCutPoints);
+					store.setSoldierPolygon(id, resultPolygon, polygonAreaSize, true);
 
-				// Eat all candies inside the newly claimed area
-				const candiesInNewArea = candyGrid.queryBox(boundingBox.min, boundingBox.size, (point) => {
-					const candy = getCandy(point.metadata.id);
-					if (!candy || candy.eatenAt) return false;
+					// Calculate bounding box for the new cut polygon
+					const newCutPoints = newCutPolygon.regions[0] as Point[];
+					const boundingBox = calculatePolygonBoundingBox(newCutPoints);
 
-					return isPointInPolygon(vector2ToPoint(point.position), newCutPoints);
-				});
+					// Eat all candies inside the newly claimed area
+					const candiesInNewArea = candyGrid.queryBox(boundingBox.min, boundingBox.size, (point) => {
+						const candy = getCandy(point.metadata.id);
+						if (!candy || candy.eatenAt) return false;
 
-				eatCandies(candiesInNewArea, id);
+						return isPointInPolygon(vector2ToPoint(point.position), newCutPoints);
+					});
 
-				const state = store.getState();
-				const allSoldiers = Object.values(selectSoldiersById(state));
+					eatCandies(candiesInNewArea, id);
 
-				allSoldiers.forEach((soldier) => {
-					const soldierId = soldier.id;
-					if (soldierId !== id && soldier.polygon) {
-						const otherSoldierPolygon = pointsToPolygon(vectorsToPoints(soldier.polygon));
-						const differenceResult = calculatePolygonOperation(
-							otherSoldierPolygon,
-							newCutPolygon,
-							"Difference",
-						);
+					const state = store.getState();
+					const allSoldiers = Object.values(selectSoldiersById(state));
 
-						if (differenceResult.regions.size() > 0 && differenceResult.regions[0].size() > 2) {
-							const updatedPolygon = pointsToVectors(differenceResult.regions[0] as Point[]);
-							const updatedArea = calculatePolygonArea(updatedPolygon);
-							store.setSoldierPolygon(soldierId, updatedPolygon, updatedArea);
+					allSoldiers.forEach((soldier) => {
+						const soldierId = soldier.id;
+						if (soldierId !== id && soldier.polygon) {
+							const otherSoldierPolygon = pointsToPolygon(vectorsToPoints(soldier.polygon));
+							const differenceResult = calculatePolygonOperation(
+								otherSoldierPolygon,
+								newCutPolygon,
+								"Difference",
+							);
 
-							if (updatedArea < SOLDIER_MIN_AREA) {
-								print(`Soldier ${soldierId} is too small, killing`);
-								killSoldier(soldierId);
-								store.playerKilledSoldier(id, soldierId);
-								store.incrementSoldierEliminations(soldierId);
+							if (differenceResult.regions.size() > 0) {
+								const bestRegion = selectLargestRegionByArea(differenceResult.regions);
+								if (bestRegion !== undefined) {
+									const updatedPolygon = pointsToVectors(bestRegion);
+									const updatedArea = calculatePolygonArea(updatedPolygon);
+									store.setSoldierPolygon(soldierId, updatedPolygon, updatedArea);
+									if (updatedArea < SOLDIER_MIN_AREA) {
+										print(`Soldier ${soldierId} is too small, killing`);
+										killSoldier(soldierId);
+										store.playerKilledSoldier(id, soldierId);
+										store.incrementSoldierEliminations(soldierId);
+									}
+								}
 							}
 						}
-					}
-				});
+					});
+				}
 			} else {
 				warn("No valid REGIONS found", { result, points, newCutPolygon });
 			}

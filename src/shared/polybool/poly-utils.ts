@@ -1,5 +1,6 @@
 import Object from "@rbxts/object-utils";
-import { PolygonOperation } from "client/components/polygon-clipper/PolygonClipper.types";
+// Keep types local to shared to avoid client import from shared layer
+export type PolygonOperation = "Intersect" | "Union" | "Difference" | "DifferenceRev" | "Xor";
 
 import polybool, { Line, Point, PointShape, pointsToPolygon, Polygon } from "./polybool";
 
@@ -509,4 +510,30 @@ export function calculatePolygonBoundingBox(points: Point[]): BoundingBox {
 	const size = max.sub(min);
 
 	return { min, max, size };
+}
+
+// Select the largest region by polygon area from a PolyBool result
+export function selectLargestRegionByArea(regions: Array<Array<PointShape>>): Point[] | undefined {
+	let bestRegion: Point[] | undefined = undefined;
+	let bestArea = -1;
+	for (const region of regions) {
+		const pts = region.filter((p) => p.size() === 2) as unknown as Point[];
+		if (pts.size() <= 2) continue;
+		const poly = pointsToVectors(pts);
+		// local import to avoid circular deps: calculatePolygonArea lives in polygon-extra.utils
+		// we inline a tiny area computation to avoid coupling
+		let area = 0;
+		const length = poly.size();
+		for (let i = 0; i < length; i++) {
+			const j = (i + 1) % length;
+			area += poly[i].X * poly[j].Y;
+			area -= poly[j].X * poly[i].Y;
+		}
+		const absArea = math.abs(area) / 2;
+		if (absArea > bestArea) {
+			bestArea = absArea;
+			bestRegion = pts;
+		}
+	}
+	return bestRegion;
 }

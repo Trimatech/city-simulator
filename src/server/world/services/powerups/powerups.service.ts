@@ -18,8 +18,13 @@ import {
 	POWERUP_TURBO_SPEEDS,
 	PowerupId,
 } from "shared/constants/powerups";
-import { calculatePolygonOperation, pointsToVectors, vectorsToPoints } from "shared/polybool/poly-utils";
-import { Point, pointsToPolygon } from "shared/polybool/polybool";
+import {
+	calculatePolygonOperation,
+	pointsToVectors,
+	selectLargestRegionByArea,
+	vectorsToPoints,
+} from "shared/polybool/poly-utils";
+import { pointsToPolygon } from "shared/polybool/polybool";
 import { calculatePolygonArea } from "shared/polygon-extra.utils";
 import { remotes } from "shared/remotes";
 import { selectSoldierById, selectSoldierOrbs, selectSoldiersById } from "shared/store/soldiers";
@@ -326,22 +331,33 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[]) {
 
 			print(`[DEBUG] Difference result for ${soldierId}: ${differenceResult.regions.size()} regions`);
 			if (differenceResult.regions.size() > 0) {
-				print(`[DEBUG] First region has ${differenceResult.regions[0].size()} points`);
+				print(`[DEBUG] Regions returned: ${differenceResult.regions.size()}`);
 			}
 
-			if (differenceResult.regions.size() > 0 && differenceResult.regions[0].size() > 2) {
-				const updatedPolygon = pointsToVectors(differenceResult.regions[0] as Point[]);
-				const updatedArea = calculatePolygonArea(updatedPolygon);
+			if (differenceResult.regions.size() > 0) {
+				const bestRegion = selectLargestRegionByArea(differenceResult.regions);
 
-				print(
-					`[DEBUG] Updating soldier ${soldierId} polygon: old area ${soldier.polygonAreaSize}, new area ${updatedArea}`,
-				);
+				if (bestRegion !== undefined) {
+					const updatedPolygon = pointsToVectors(bestRegion);
+					const updatedArea = calculatePolygonArea(updatedPolygon);
 
-				store.setSoldierPolygon(soldierId as string, updatedPolygon, updatedArea);
+					print(
+						`[DEBUG] Updating soldier ${soldierId} polygon: old area ${soldier.polygonAreaSize}, new area ${updatedArea}`,
+					);
 
-				// Kill soldier if area becomes too small
-				if (updatedArea < SOLDIER_MIN_AREA) {
-					print(`[DEBUG] Soldier ${soldierId} area too small, killing`);
+					store.setSoldierPolygon(soldierId as string, updatedPolygon, updatedArea);
+
+					// Kill soldier if area becomes too small
+					if (updatedArea < SOLDIER_MIN_AREA) {
+						print(`[DEBUG] Soldier ${soldierId} area too small, killing`);
+						killSoldier(soldierId as string);
+						store.playerKilledSoldier("system", soldierId as string);
+					}
+				} else {
+					print(
+						`[DEBUG] No valid difference region for soldier ${soldierId} - fully covered, killing and clearing area`,
+					);
+					store.setSoldierPolygon(soldierId as string, [], 0, true);
 					killSoldier(soldierId as string);
 					store.playerKilledSoldier("system", soldierId as string);
 				}
