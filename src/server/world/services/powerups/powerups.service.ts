@@ -11,13 +11,7 @@ import {
 import { sounds } from "shared/assets";
 import { SOLDIER_MIN_AREA, SOLDIER_SPEED } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
-import {
-	POWERUP_DURATIONS,
-	POWERUP_EXPLOSIONS,
-	POWERUP_PRICES,
-	POWERUP_TURBO_SPEEDS,
-	PowerupId,
-} from "shared/constants/powerups";
+import { POWERUP_DURATIONS, POWERUP_EXPLOSIONS, POWERUP_PRICES, POWERUP_TURBO_SPEED } from "shared/constants/powerups";
 import {
 	calculatePolygonOperation,
 	pointsToVectors,
@@ -156,11 +150,11 @@ function alert(player: Player, message: string, color = palette.blue) {
 	});
 }
 
-function triggerTurbo(player: Player, id: PowerupId) {
+function triggerTurbo(player: Player) {
 	const playerName = player.Name;
-	const speed = id === "turbo2x" ? POWERUP_TURBO_SPEEDS.turbo2x : POWERUP_TURBO_SPEEDS.turbo;
-	const duration = id === "turbo2x" ? POWERUP_DURATIONS.turbo2x : POWERUP_DURATIONS.turbo;
-	if (!trySpendOrbs(playerName, POWERUP_PRICES[id])) {
+	const speed = POWERUP_TURBO_SPEED;
+	const duration = POWERUP_DURATIONS.turbo;
+	if (!trySpendOrbs(playerName, POWERUP_PRICES.turbo)) {
 		alert(player, "Not enough orbs!", palette.red);
 		return;
 	}
@@ -172,7 +166,7 @@ function triggerTurbo(player: Player, id: PowerupId) {
 			if (again) again.WalkSpeed = SOLDIER_SPEED;
 		}, duration);
 	}
-	alert(player, id === "turbo2x" ? "Turbo 2x activated!" : "Turbo activated!", palette.green);
+	alert(player, "Turbo activated!", palette.green);
 }
 
 function triggerShield(player: Player) {
@@ -513,13 +507,11 @@ export async function initPowerupService() {
 	remotes.powerups.use.connect((player, id) => {
 		const soldier = store.getState(selectSoldierById(player.Name));
 		if (!soldier || soldier.dead) return;
-		switch (id as PowerupId) {
+		switch (id) {
 			case "turbo":
-				triggerTurbo(player, "turbo");
+				triggerTurbo(player);
 				break;
-			case "turbo2x":
-				triggerTurbo(player, "turbo2x");
-				break;
+
 			case "shield":
 				triggerShield(player);
 				break;
