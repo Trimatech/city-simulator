@@ -190,32 +190,32 @@ export async function initBotService() {
 	});
 
 	// Maintain 5 bots only when there is at least one alive non-bot soldier
-	// store.subscribe(
-	// 	selectAliveSoldiersById,
-	// 	() => true,
-	// 	(_aliveById) => {
-	// 		const aliveBotIds = getAliveBotIds();
-	// 		const aliveBots = aliveBotIds.size();
-	// 		const aliveNonBots = getAliveNonBotCount();
+	store.subscribe(
+		selectAliveSoldiersById,
+		() => true,
+		(_aliveById) => {
+			const aliveBotIds = getAliveBotIds();
+			const aliveBots = aliveBotIds.size();
+			const aliveNonBots = getAliveNonBotCount();
 
-	// 		if (aliveNonBots <= 0 && aliveBots > 0) {
-	// 			removeBots(aliveBotIds);
-	// 			return;
-	// 		}
+			if (aliveNonBots <= 0 && aliveBots > 0) {
+				removeBots(aliveBotIds);
+				return;
+			}
 
-	// 		if (aliveNonBots > 0 && aliveBots < 5) {
-	// 			spawnBots(5 - aliveBots);
-	// 			return;
-	// 		}
+			if (aliveNonBots > 0 && aliveBots < 5) {
+				spawnBots(5 - aliveBots);
+				return;
+			}
 
-	// 		if (aliveNonBots > 0 && aliveBots > 5) {
-	// 			const extras = aliveBots - 5;
-	// 			const start = aliveBotIds.size() - extras;
-	// 			const toRemove = aliveBotIds.move(start, aliveBotIds.size() - 1, 0, [] as string[]);
-	// 			removeBots(toRemove);
-	// 		}
-	// 	},
-	// );
+			if (aliveNonBots > 0 && aliveBots > 5) {
+				const extras = aliveBots - 5;
+				const start = aliveBotIds.size() - extras;
+				const toRemove = aliveBotIds.move(start, aliveBotIds.size() - 1, 0, [] as string[]);
+				removeBots(toRemove);
+			}
+		},
+	);
 
 	// tick bot logic alongside soldiers
 	createScheduler({
