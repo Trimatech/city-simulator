@@ -1,0 +1,57 @@
+---
+description: 
+globs: *.tsx,*.ts
+alwaysApply: false
+---
+# TypeScript Patterns
+
+Guidelines for TypeScript-specific patterns in this codebase.
+
+## Type Definitions
+
+- Define interfaces for Roblox instances with additional properties:
+
+    ```typescript
+    interface EnhancedTextChatService extends TextChatService {
+    	TextChannels: Folder & {
+    		RBXGeneral: TextChannel;
+    		RBXSystem: TextChannel;
+    	};
+    }
+    ```
+
+- Use `@rbxts/validate-tree` for runtime validation of expected instance structures:
+    ```typescript
+    const characterSchema = {
+    	$className: 'Model',
+    	HumanoidRootPart: 'BasePart',
+    	Humanoid: {
+    		$className: 'Humanoid',
+    		Animator: 'Animator',
+    	},
+    } as const;
+    ```
+
+## Instance Creation
+
+- Use the new Instance pattern rather than Instance.new:
+
+    ```typescript
+    // Preferred
+    const part = new Instance('Part');
+
+    // Avoid
+    const part = Instance.new('Part');
+    ```
+
+## Roblox Service Access
+
+- Always import services from '@rbxts/services':
+    ```typescript
+    import { Workspace, Players, RunService } from '@rbxts/services';
+    ```
+- Never use GetService directly:
+    ```typescript
+    // Avoid
+    const players = game.GetService('Players');
+    ```

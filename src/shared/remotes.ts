@@ -1,9 +1,8 @@
 import { BroadcastAction } from "@rbxts/reflex";
-import { Client, createRemotes, namespace, remote, Server, throttleMiddleware } from "@rbxts/remo";
+import { Client, createRemotes, namespace, remote, Server } from "@rbxts/remo";
 import { t } from "@rbxts/t";
 import type { Alert } from "client/store/alert";
 
-import { WORLD_TICK } from "./constants/core";
 import { SharedStateSerialized } from "./serdes";
 
 export const remotes = createRemotes({
@@ -18,9 +17,6 @@ export const remotes = createRemotes({
 		kill: remote<Server>(),
 		move: remote<Server, [position: Vector2]>(t.Vector2),
 		placeTower: remote<Server, [position: Vector2]>(t.Vector2),
-		boost: remote<Server, [boost: boolean]>(t.boolean).middleware(
-			throttleMiddleware({ throttle: WORLD_TICK, trailing: true }),
-		),
 	}),
 
 	save: namespace({
@@ -30,5 +26,11 @@ export const remotes = createRemotes({
 
 	client: namespace({
 		alert: remote<Client, [params: Partial<Alert>]>(),
+		powerupCarpet: remote<Client, [cframe: CFrame, size: Vector3]>(t.CFrame, t.Vector3),
+		powerupNuclear: remote<Client, [cframe: CFrame, size: Vector3]>(t.CFrame, t.Vector3),
+	}),
+
+	powerups: namespace({
+		use: remote<Server, [id: string]>(t.string),
 	}),
 });

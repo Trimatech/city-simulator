@@ -1,0 +1,46 @@
+---
+description: 
+globs: *.tsx,*.ts
+alwaysApply: false
+---
+
+# Roblox-TS Rules
+
+This codebase uses [roblox-ts](mdc:https:/roblox-ts.com), a TypeScript-to-Luau compiler for Roblox development.
+
+## General Guidelines
+
+-   All Roblox game code should be written in TypeScript following the roblox-ts patterns
+-   Use the official Roblox services via the `@rbxts/services` package
+-   Follow TypeScript best practices for type safety
+
+## Imports
+
+-   Use the roblox-ts standard import format: `import { Service } from "@rbxts/services";`
+-   For project files, use relative imports: `import { MyClass } from "./MyClass";`
+
+-   Dont import Vector3 from `import { Vector3 } from "@rbxts/rbx-types";`. It is global
+
+## Type Safety
+
+-   Leverage TypeScript's static type system for all code
+-   Avoid using `any` type when possible
+-   Use interfaces and type aliases to create reusable type definitions
+
+## Roblox-specific Patterns
+
+-   Use roblox-ts event connection syntax:
+    ```typescript
+    part.Touched.Connect((otherPart) => {
+    	// Handle touch event
+    });
+    ```
+-   When working with Roblox instances, check types with `.IsA()` before operations
+
+-   use array .size() instead of.length
+
+## Identifier reserved for compiler internal usage.
+
+Don't use as variable names:
+
+-   type

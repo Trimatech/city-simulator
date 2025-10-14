@@ -1,3 +1,4 @@
+import { Players } from "@rbxts/services";
 import { runOnce } from "shared/utils/run-once";
 
 import { initCharacterService } from "./character";
@@ -6,6 +7,8 @@ import { initSaveService } from "./save";
 import { initScoreboardService } from "./scoreboard";
 
 export const initPlayerServices = runOnce(async () => {
+	// Gate character spawning behind the Start button
+	Players.CharacterAutoLoads = false;
 	initCharacterService();
 	initRemoteService();
 	initSaveService();

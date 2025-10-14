@@ -29,11 +29,12 @@
 		"eslint-plugin-simple-import-sort": "^12.1.1",
 		"eslint-plugin-unused-imports": "^4.1.4",
 		"prettier": "^3.3.3",
-		"roblox-ts": "3.0.0",
 		"rbxts-transform-env": "^3.0.0",
+		"roblox-ts": "3.0.0",
 		"typescript": "^5.6.2"
 	},
 	"dependencies": {
+		"@rbxts/beacon": "^2.1.1",
 		"@rbxts/bitbuffer2": "1.0.0-ts.0",
 		"@rbxts/flipper": "^2.0.1",
 		"@rbxts/lapis": "^0.3.6",
@@ -49,6 +50,7 @@
 		"@rbxts/set-timeout": "^1.1.2",
 		"@rbxts/t": "^3.1.1",
 		"@rbxts/testez": "0.4.2-ts.0",
+		"@rbxts/ui-labs": "2.4.1",
 		"@rbxts/validate-tree": "^2.0.2",
 		"@rbxts/wait-for": "^0.1.5",
 		"concurrently": "^9.1.2"

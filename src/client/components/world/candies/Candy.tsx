@@ -37,6 +37,7 @@ function CandyComponent({ position, color = palette.white, transparency = 0, siz
 		sphere.Anchored = true;
 		sphere.CanCollide = false;
 		sphere.Parent = Workspace;
+		sphere.CastShadow = false;
 
 		sphereRef.current = sphere;
 

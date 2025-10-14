@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@rbxts/beacon':
+        specifier: ^2.1.1
+        version: 2.1.1
       '@rbxts/bitbuffer2':
         specifier: 1.0.0-ts.0
         version: 1.0.0-ts.0
@@ -53,6 +56,9 @@ importers:
       '@rbxts/testez':
         specifier: 0.4.2-ts.0
         version: 0.4.2-ts.0
+      '@rbxts/ui-labs':
+        specifier: 2.4.1
+        version: 2.4.1
       '@rbxts/validate-tree':
         specifier: ^2.0.2
         version: 2.0.2
@@ -158,6 +164,9 @@ packages:
     resolution: {integrity: sha512-cq8o4cWH0ibXh9VGi5P20Tu9XF/0fFXl9EUinr9QfTM7a7p0oTA4iJRCQWppXR1Pg8dSM0UCItCkPwsk9qWWYA==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
+  '@rbxts/beacon@2.1.1':
+    resolution: {integrity: sha512-QeFMSGj+Iijp+tHcV9eyqVyeKZ/9zp7GqRJ/hecKiHmoTu4yFcyGnUQAaX7OdQKBCgLvWMJ9wK/FXMECjFA2Kg==}
+
   '@rbxts/bitbuffer2@1.0.0-ts.0':
     resolution: {integrity: sha512-Ly4y6gO5oVUubCFQLJZe9bc8u9jRGPKFoR0R4KSH689PxFQcKf5M5XMQG90DsAbhMk0KXZ2jKYiZuXb6ONBNuQ==}
 
@@ -216,6 +225,9 @@ packages:
 
   '@rbxts/types@1.0.813':
     resolution: {integrity: sha512-Qpsmqnl+TNdl5AYqKFkYHyUrv652r30qK6A3GObOyDz+cvn8i+HE61mO021oq0nu1FcA4pMHbYqLSbv2CMF9Ig==}
+
+  '@rbxts/ui-labs@2.4.1':
+    resolution: {integrity: sha512-CoXsH3WVZij1Uiq0SlIrqFZ8UDW0fDSSUJu1bOSBPOiBDORON3V6qYWLjjSsFrX5q+WHkVOTcKCPb6AhV/Q0/A==}
 
   '@rbxts/validate-tree@2.0.2':
     resolution: {integrity: sha512-OA0E9ZjEeOpPa3XeV5/oC51aro2QFcL5dItufbagYZW8TOsX8C+FDXLx+A/ulMwcF42WcFNcQybxzcWSS/QSrA==}
@@ -1050,6 +1062,8 @@ snapshots:
 
   '@pkgr/core@0.1.1': {}
 
+  '@rbxts/beacon@2.1.1': {}
+
   '@rbxts/bitbuffer2@1.0.0-ts.0': {}
 
   '@rbxts/compiler-types@3.0.0-types.0': {}
@@ -1103,6 +1117,8 @@ snapshots:
   '@rbxts/testez@0.4.2-ts.0': {}
 
   '@rbxts/types@1.0.813': {}
+
+  '@rbxts/ui-labs@2.4.1': {}
 
   '@rbxts/validate-tree@2.0.2': {}
 

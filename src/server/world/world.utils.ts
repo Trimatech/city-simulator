@@ -5,6 +5,7 @@ import { WORLD_BOUNDS } from "shared/constants/core";
 import { selectCandyById } from "shared/store/candy";
 import { selectSoldierById } from "shared/store/soldiers";
 
+import { getBotHumanoid } from "./services/bots/bot-registry";
 import { soldierGrid } from "./services/soldiers/soldier-grid";
 
 const MIN_SAFE_DISTANCE = 10;
@@ -27,9 +28,43 @@ export function getPlayerHumanoidByName(name: string) {
 			warn(`No humanoid found for player ${name}`);
 		}
 	} else {
-		warn(`No player found for name ${name}`);
+		// Check if this name belongs to a registered bot
+		const botHumanoid = getBotHumanoid(name);
+		if (botHumanoid) {
+			return botHumanoid;
+		}
+		warn(`No player or bot found for name ${name}`);
 	}
 	return undefined;
+}
+
+export function ensureForceFieldOnHumanoid(humanoid: Humanoid, visible = true) {
+	const character = humanoid.Parent as Model | undefined;
+	if (!character) return;
+	let ff = character.FindFirstChildOfClass("ForceField");
+	if (!ff) {
+		ff = new Instance("ForceField");
+		ff.Visible = visible;
+		ff.Parent = character;
+	}
+	return ff;
+}
+
+export function removeForceFieldFromHumanoid(humanoid: Humanoid) {
+	const character = humanoid.Parent as Model | undefined;
+	if (!character) return;
+	const ff = character.FindFirstChildOfClass("ForceField");
+	if (ff) ff.Destroy();
+}
+
+export function ensureForceFieldOnPlayerName(playerName: string, visible = true) {
+	const humanoid = getPlayerHumanoidByName(playerName);
+	if (humanoid) return ensureForceFieldOnHumanoid(humanoid, visible);
+}
+
+export function removeForceFieldFromPlayerName(playerName: string) {
+	const humanoid = getPlayerHumanoidByName(playerName);
+	if (humanoid) removeForceFieldFromHumanoid(humanoid);
 }
 
 export function killSoldier(soldierId: string) {
@@ -37,7 +72,11 @@ export function killSoldier(soldierId: string) {
 
 	const humanoid = getPlayerHumanoidByName(soldierId);
 	if (humanoid) {
-		humanoid.TakeDamage(10000);
+		// Remove any active ForceField to ensure death goes through
+		removeForceFieldFromHumanoid(humanoid);
+		// Force kill regardless of damage immunity
+		humanoid.Health = 0;
+		humanoid.TakeDamage(1000000);
 	}
 
 	store.removeTowersByOwnerId(soldierId);

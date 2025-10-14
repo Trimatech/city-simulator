@@ -40,10 +40,11 @@ _Goal: Add resource collection and competitive powers._
 -   [ ] Display and fill Orb Power Meter (UI)
 -   [ ] Play progressively deeper sound on each orb collected
 -   [ ] Unlock powers as meter fills:
-    -   [ ] Turbo
-    -   [ ] Turbo 2x
+    -   [x] Turbo
+    -   [x] Turbo 2x (perhaps we will remove this)
     -   [ ] Build Tower
-    -   [ ] Explosion
+    -   [x] Shield
+    -   [x] Explosion
     -   [ ] Mega Explosion
 -   [ ] Add visual + sound effects for each ability
 

@@ -6,7 +6,7 @@ import { identifySoldier, selectAliveSoldiersById } from "shared/store/soldiers"
 import { createScheduler } from "shared/utils/scheduler";
 
 import { onCandyTick } from "./candy-tick";
-import { dropCandyOnDeath, dropCandyWhileBoosting, populateCandy, removeCandyIfAtLimit } from "./candy-utils";
+import { dropCandyOnDeath, populateCandy, removeCandyIfAtLimit } from "./candy-utils";
 
 export async function initCandyService() {
 	createScheduler({
@@ -39,14 +39,8 @@ export async function initCandyService() {
 	);
 
 	store.observe(selectAliveSoldiersById, identifySoldier, ({ id }) => {
-		// while boosting, decrement the soldier's orbs and create candy
-		// on the soldier's tail
-		const disconnect = dropCandyWhileBoosting(id);
-
 		// when the soldier dies, create candy on the soldier's tracers
 		return () => {
-			disconnect();
-
 			// HERE WE DIE AND DROP STUFF
 			dropCandyOnDeath(id);
 		};

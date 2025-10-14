@@ -1,9 +1,9 @@
-import { useDebounceEffect, usePrevious } from "@rbxts/pretty-react-hooks";
+import { usePrevious } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
-import { useSelector, useSelectorCreator } from "@rbxts/react-reflex";
+import { useSelector } from "@rbxts/react-reflex";
 import { selectSoldierFromWorldSubject } from "client/store/world";
 import { playSound, sounds } from "shared/assets";
-import { selectHasLocalSoldier, selectSoldierIsBoosting } from "shared/store/soldiers";
+import { selectHasLocalSoldier } from "shared/store/soldiers";
 
 const ERROR_SOUNDS = [sounds.error_1, sounds.error_2, sounds.error_3];
 
@@ -11,7 +11,6 @@ const random = new Random();
 
 export function WorldSounds() {
 	const soldier = useSelector(selectSoldierFromWorldSubject);
-	const boosting = useSelectorCreator(selectSoldierIsBoosting, soldier?.id ?? "");
 	const hasLocalSoldier = useSelector(selectHasLocalSoldier);
 	const previousOrbs = usePrevious(soldier?.orbs);
 
@@ -39,17 +38,6 @@ export function WorldSounds() {
 			playSound(sounds.whoosh, { volume: 0.6 * volume, speed });
 		}
 	}, [soldier?.orbs]);
-
-	// Boost sound
-	useDebounceEffect(
-		() => {
-			if (soldier) {
-				playSound(boosting ? sounds.boost_start : sounds.boost_stop, { volume });
-			}
-		},
-		[boosting],
-		{ wait: 0.25, leading: true },
-	);
 
 	return <></>;
 }

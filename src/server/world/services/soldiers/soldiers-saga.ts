@@ -1,15 +1,15 @@
 import Object from "@rbxts/object-utils";
 import { Players } from "@rbxts/services";
-import { waitForPrimaryPart } from "@rbxts/wait-for";
 import { store } from "server/store";
-import { SOLDIER_TICK_PHASE } from "server/world/constants";
+import { DEFAULT_ORBS, SOLDIER_TICK_PHASE } from "server/world/constants";
 import { getCandy, getSafePointInWorld, killSoldier, playerIsSpawned } from "server/world/world.utils";
-import { SOLDIER_BOOST_SPEED, SOLDIER_MIN_AREA, SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
+import { SOLDIER_MIN_AREA, SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
 import {
 	calculatePolygonBoundingBox,
 	calculatePolygonOperation,
 	isPointInPolygon,
 	pointsToVectors,
+	selectLargestRegionByArea,
 	setIntersectionPoints,
 	vector2ToPoint,
 	vectorsToPoints,
@@ -19,12 +19,12 @@ import { calculatePolygonArea } from "shared/polygon-extra.utils";
 import { remotes } from "shared/remotes";
 import { defaultPlayerSave, RANDOM_SKIN, selectPlayerSave } from "shared/store/saves";
 import {
+	identifySoldier,
 	selectAliveSoldiersById,
 	selectIsInsideBySoldierById,
-	selectSoldierIsBoosting,
 	selectSoldiersById,
 } from "shared/store/soldiers";
-import { identifySoldier } from "shared/store/soldiers";
+import { findCharacterPrimaryPart, reloadCharacterAsync } from "shared/utils/player-utils";
 import { createScheduler } from "shared/utils/scheduler";
 
 import { candyGrid, eatCandies } from "../candy/candy-utils";
@@ -55,29 +55,27 @@ export async function initSoldierService() {
 
 		const safePoint = getSafePointInWorld();
 
-		if (
-			!player.Character ||
-			!player.Character.FindFirstChild("Humanoid") ||
-			(player.Character.FindFirstChild("Humanoid") as Humanoid).Health <= 0
-		) {
-			warn(`Cannot spawn soldier for ${player.Name} because the player is dead`);
-			player.CharacterAdded.Wait();
-		}
+		await reloadCharacterAsync(player);
+
+		print("Character loaded, adding soldier");
+		// Add soldier to state now that character is present
+		store.addSoldier(player.Name, {
+			name: player.DisplayName,
+			lastPosition: undefined,
+			position: safePoint ? new Vector2(safePoint.X, safePoint.Y) : undefined,
+			skin: currentSkin !== RANDOM_SKIN ? currentSkin : randomSkin,
+			orbs: DEFAULT_ORBS,
+		});
 
 		const character = player.Character as Model;
-		const primaryPart = await waitForPrimaryPart(character);
+
+		const primaryPart = findCharacterPrimaryPart(character);
 
 		if (primaryPart) {
 			print("PrimaryPart found for", player.Name);
-			character.PivotTo(new CFrame(safePoint.X, 10, safePoint.Y));
+			// Move character to spawn
+			character.PivotTo(new CFrame(safePoint.X, 100, safePoint.Y));
 			print("Move soldier to point", player.Name, safePoint);
-			store.addSoldier(player.Name, {
-				name: player.DisplayName,
-				lastPosition: undefined,
-				position: safePoint ? new Vector2(safePoint.X, safePoint.Y) : undefined,
-				skin: currentSkin !== RANDOM_SKIN ? currentSkin : randomSkin,
-				orbs: 10,
-			});
 		} else {
 			warn(`No PrimaryPart found for player ${player.Name}`);
 		}
@@ -89,10 +87,6 @@ export async function initSoldierService() {
 
 	remotes.soldier.placeTower.connect((player, position) => {
 		placeTower(player, position);
-	});
-
-	remotes.soldier.boost.connect((player, boost) => {
-		store.boostSoldier(player.Name, boost);
 	});
 
 	remotes.soldier.kill.connect((player) => {
@@ -112,56 +106,62 @@ export async function initSoldierService() {
 		const newCutPolygon = setIntersectionPoints(resultPolygon, points);
 
 		if (newCutPolygon) {
-			print(`newCutPolygon ${id}`, tracers);
+			//	print(`newCutPolygon ${id}`, tracers);
 			const result = calculatePolygonOperation(resultPolygon, newCutPolygon, "Union");
 
-			if (result.regions.size() > 0 && result.regions[0].size() > 2) {
-				const resultPolygon = pointsToVectors(result.regions[0] as Point[]);
-				const polygonAreaSize = calculatePolygonArea(resultPolygon);
+			if (result.regions.size() > 0) {
+				const bestRegion = selectLargestRegionByArea(result.regions);
 
-				store.setSoldierPolygon(id, resultPolygon, polygonAreaSize, true);
+				if (bestRegion !== undefined) {
+					const resultPolygon = pointsToVectors(bestRegion);
+					const polygonAreaSize = calculatePolygonArea(resultPolygon);
 
-				// Calculate bounding box for the new cut polygon
-				const newCutPoints = newCutPolygon.regions[0] as Point[];
-				const boundingBox = calculatePolygonBoundingBox(newCutPoints);
+					store.setSoldierPolygon(id, resultPolygon, polygonAreaSize, true);
 
-				// Eat all candies inside the newly claimed area
-				const candiesInNewArea = candyGrid.queryBox(boundingBox.min, boundingBox.size, (point) => {
-					const candy = getCandy(point.metadata.id);
-					if (!candy || candy.eatenAt) return false;
+					// Calculate bounding box for the new cut polygon
+					const newCutPoints = newCutPolygon.regions[0] as Point[];
+					const boundingBox = calculatePolygonBoundingBox(newCutPoints);
 
-					return isPointInPolygon(vector2ToPoint(point.position), newCutPoints);
-				});
+					// Eat all candies inside the newly claimed area
+					const candiesInNewArea = candyGrid.queryBox(boundingBox.min, boundingBox.size, (point) => {
+						const candy = getCandy(point.metadata.id);
+						if (!candy || candy.eatenAt) return false;
 
-				eatCandies(candiesInNewArea, id);
+						return isPointInPolygon(vector2ToPoint(point.position), newCutPoints);
+					});
 
-				const state = store.getState();
-				const allSoldiers = Object.values(selectSoldiersById(state));
+					eatCandies(candiesInNewArea, id);
 
-				allSoldiers.forEach((soldier) => {
-					const soldierId = soldier.id;
-					if (soldierId !== id && soldier.polygon) {
-						const otherSoldierPolygon = pointsToPolygon(vectorsToPoints(soldier.polygon));
-						const differenceResult = calculatePolygonOperation(
-							otherSoldierPolygon,
-							newCutPolygon,
-							"Difference",
-						);
+					const state = store.getState();
+					const allSoldiers = Object.values(selectSoldiersById(state));
 
-						if (differenceResult.regions.size() > 0 && differenceResult.regions[0].size() > 2) {
-							const updatedPolygon = pointsToVectors(differenceResult.regions[0] as Point[]);
-							const updatedArea = calculatePolygonArea(updatedPolygon);
-							store.setSoldierPolygon(soldierId, updatedPolygon, updatedArea);
+					allSoldiers.forEach((soldier) => {
+						const soldierId = soldier.id;
+						if (soldierId !== id && soldier.polygon) {
+							const otherSoldierPolygon = pointsToPolygon(vectorsToPoints(soldier.polygon));
+							const differenceResult = calculatePolygonOperation(
+								otherSoldierPolygon,
+								newCutPolygon,
+								"Difference",
+							);
 
-							if (updatedArea < SOLDIER_MIN_AREA) {
-								print(`Soldier ${soldierId} is too small, killing`);
-								killSoldier(soldierId);
-								store.playerKilledSoldier(id, soldierId);
-								store.incrementSoldierEliminations(soldierId);
+							if (differenceResult.regions.size() > 0) {
+								const bestRegion = selectLargestRegionByArea(differenceResult.regions);
+								if (bestRegion !== undefined) {
+									const updatedPolygon = pointsToVectors(bestRegion);
+									const updatedArea = calculatePolygonArea(updatedPolygon);
+									store.setSoldierPolygon(soldierId, updatedPolygon, updatedArea);
+									if (updatedArea < SOLDIER_MIN_AREA) {
+										print(`Soldier ${soldierId} is too small, killing`);
+										killSoldier(soldierId);
+										store.playerKilledSoldier(id, soldierId);
+										store.incrementSoldierEliminations(soldierId);
+									}
+								}
 							}
 						}
-					}
-				});
+					});
+				}
 			} else {
 				warn("No valid REGIONS found", { result, points, newCutPolygon });
 			}
@@ -177,20 +177,11 @@ export async function initSoldierService() {
 	});
 
 	store.observe(selectAliveSoldiersById, identifySoldier, ({ id }) => {
-		print(`Soldier ${id} is alive in saga`);
+		print(`Soldier ${id} is alive in saga, setting speed to ${SOLDIER_SPEED}`);
 		setSoldierSpeed(id, SOLDIER_SPEED);
-		const disconnect = store.observeWhile(selectSoldierIsBoosting(id), () => {
-			print(`Soldier ${id} is boosting in saga`);
-			setSoldierSpeed(id, SOLDIER_BOOST_SPEED);
-			return () => {
-				print(`Soldier ${id} is no longer boosting in saga`);
-				setSoldierSpeed(id, SOLDIER_SPEED);
-			};
-		});
 
 		// when the soldier dies, create candy on the soldier's tracers
 		return () => {
-			disconnect();
 			setSoldierSpeed(id, SOLDIER_SPEED);
 			// HERE WE DIE AND DROP STUFF
 			print(`Soldier ${id} died in saga`);

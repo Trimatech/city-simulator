@@ -2,10 +2,11 @@ import { store } from "server/store";
 import { getSoldier, killSoldier } from "server/world/world.utils";
 import { WORLD_BOUNDS } from "shared/constants/core";
 import { isPointInPolygon, vector2ToPoint, vectorsToPoints } from "shared/polybool/poly-utils";
-import { selectSoldiersSorted, SoldierEntity } from "shared/store/soldiers";
+import { selectSoldiersById, selectSoldiersSorted, SoldierEntity } from "shared/store/soldiers";
 import { SOLDIER_RADIUS_BASE } from "shared/store/soldiers/soldier-utils";
 
 import { soldierGrid } from "../soldiers";
+import { soldierIsInsideChanged } from "../soldiers/soldier-events";
 
 function doLinesIntersect(p1: Vector2, p2: Vector2, q1: Vector2, q2: Vector2): boolean {
 	const det = (p2.X - p1.X) * (q2.Y - q1.Y) - (p2.Y - p1.Y) * (q2.X - q1.X);
@@ -18,6 +19,7 @@ function doLinesIntersect(p1: Vector2, p2: Vector2, q1: Vector2, q2: Vector2): b
 }
 
 function checkCollisionWithTracers(soldier: SoldierEntity): boolean {
+	if (soldier.tracers.size() < 2) return false;
 	const headPosition = soldier.position;
 	const lastPoint = soldier.tracers[soldier.tracers.size() - 1];
 	const secondLastPoint = soldier.tracers[soldier.tracers.size() - 2];
@@ -44,6 +46,26 @@ function checkCollisionWithTracers(soldier: SoldierEntity): boolean {
 	return false;
 }
 
+function checkCollisionWithEnemyTracers(soldier: SoldierEntity): string | undefined {
+	const moveStart = soldier.lastPosition;
+	const moveEnd = soldier.position;
+
+	const soldiersById = store.getState(selectSoldiersById);
+	for (const [ownerId, enemy] of pairs(soldiersById)) {
+		if (!enemy || enemy.dead || ownerId === soldier.id) continue;
+		const tracers = enemy.tracers;
+		if (tracers.size() < 2) continue;
+		for (let i = 0; i < tracers.size() - 1; i++) {
+			const startPoint = tracers[i];
+			const endPoint = tracers[i + 1];
+			if (doLinesIntersect(moveStart, moveEnd, startPoint, endPoint)) {
+				return ownerId as string;
+			}
+		}
+	}
+	return undefined;
+}
+
 export function onCollisionTick() {
 	// in a head-on collision, the soldier with the lowest area is killed
 	const soldiers = store.getState(selectSoldiersSorted((a, b) => a.polygonAreaSize < b.polygonAreaSize));
@@ -64,23 +86,41 @@ export function onCollisionTick() {
 		const hasChanged = soldier.isInside !== isInside;
 		if (hasChanged) {
 			store.setSoldierIsInside(soldier.id, isInside);
+			soldierIsInsideChanged.Fire(soldier.id, isInside);
 		}
 
-		const enemy = isCollidingWithSoldier(soldier);
+		// Check collision with enemy tracers first; give precedence over head-on
+		const ownerId = checkCollisionWithEnemyTracers(soldier);
+		if (ownerId) {
+			const owner = store.getState(selectSoldiersById)[ownerId];
+			if (owner && owner.shieldActive) {
+				print(`Collided with enemy tracer while owner shielded, kill collider ${soldier.id}`);
+				killSoldier(soldier.id);
+				store.playerKilledSoldier(ownerId, soldier.id);
+				store.incrementSoldierEliminations(ownerId);
+			} else {
+				print(`Collided with enemy tracer, kill owner ${ownerId}`);
+				killSoldier(ownerId);
+				store.playerKilledSoldier(soldier.id, ownerId);
+				store.incrementSoldierEliminations(soldier.id);
+			}
+			continue;
+		}
 
+		// Check for collision with own tracers
+		if (checkCollisionWithTracers(soldier)) {
+			print(`Collided with own tracer, kill soldier ${soldier.id}`);
+			killSoldier(soldier.id);
+			continue;
+		}
+
+		// Finally, check head-on collision
+		const enemy = isCollidingWithSoldier(soldier);
 		if (enemy) {
 			print(`Collided with enemy, kill soldier ${enemy.id}`);
 			killSoldier(enemy.id);
 			store.playerKilledSoldier(soldier.id, enemy.id);
-			store.incrementSoldierEliminations(enemy.id);
-		}
-
-		// New check for collision with own tracers
-		if (checkCollisionWithTracers(soldier)) {
-			// Handle collision with own tracers
-			print(`Collided with own tracer, kill soldier ${soldier.id}`);
-			// Implement collision response logic here
-			killSoldier(soldier.id);
+			store.incrementSoldierEliminations(soldier.id);
 		}
 	}
 }

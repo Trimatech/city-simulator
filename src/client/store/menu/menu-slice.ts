@@ -21,7 +21,7 @@ export type MenuPage = "support" | "home" | "skins";
 const initialState: MenuState = {
 	page: "home",
 	open: true,
-	music: true,
+	music: false,
 	transition: {
 		direction: "left",
 		counter: 0,

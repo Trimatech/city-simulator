@@ -1,10 +1,8 @@
 import { createProducer } from "@rbxts/reflex";
-import { TRACER_PIECE_LENGTH } from "shared/constants/core";
-import { INITIAL_POLYGON_DIAMETER, INITIAL_POLYGON_ITEMS } from "shared/constants/core";
+import { INITIAL_POLYGON_DIAMETER, INITIAL_POLYGON_ITEMS, TRACER_PIECE_LENGTH } from "shared/constants/core";
 import { connectLineToPolygon, pointsToVectors, vector2ToPoint, vectorsToPoints } from "shared/polybool/poly-utils";
 import { pointsToPolygon } from "shared/polybool/polybool";
-import { calculatePolygonArea } from "shared/polygon-extra.utils";
-import { createPolygonAroundPosition } from "shared/polygon-extra.utils";
+import { calculatePolygonArea, createPolygonAroundPosition } from "shared/polygon-extra.utils";
 import { mapProperties, mapProperty } from "shared/utils/object-utils";
 
 export interface SoldiersState {
@@ -19,7 +17,6 @@ export interface SoldierEntity {
 	readonly angle: number;
 	readonly desiredAngle: number;
 	readonly orbs: number;
-	readonly boost: boolean;
 	readonly tracers: readonly Vector2[];
 	readonly skin: string;
 	readonly dead: boolean;
@@ -27,6 +24,7 @@ export interface SoldierEntity {
 	readonly polygon: readonly Vector2[];
 	readonly polygonAreaSize: number;
 	readonly isInside: boolean;
+	readonly shieldActive: boolean;
 }
 
 const defaultEntity: SoldierEntity = {
@@ -36,8 +34,7 @@ const defaultEntity: SoldierEntity = {
 	lastPosition: new Vector2(),
 	angle: 0,
 	desiredAngle: 0,
-	orbs: 10,
-	boost: false,
+	orbs: 0,
 	tracers: [],
 	skin: "",
 	dead: false,
@@ -45,6 +42,7 @@ const defaultEntity: SoldierEntity = {
 	polygon: [],
 	polygonAreaSize: 0,
 	isInside: true,
+	shieldActive: false,
 };
 
 const initialState: SoldiersState = {};
@@ -119,7 +117,7 @@ export const soldiersSlice = createProducer(initialState, {
 	},
 
 	setSoldierPolygon: (state, id: string, polygon: Vector2[], polygonAreaSize: number, resetTracers = false) => {
-		print(`setSoldierPolygon ${id}`, { polygon, polygonAreaSize });
+		// print(`setSoldierPolygon ${id}`, { polygon, polygonAreaSize });
 		return mapProperty(state, id, (soldier) => ({
 			...soldier,
 			polygon,
@@ -150,17 +148,17 @@ export const soldiersSlice = createProducer(initialState, {
 		}));
 	},
 
-	boostSoldier: (state, id: string, boost: boolean) => {
-		return mapProperty(state, id, (soldier) => ({
-			...soldier,
-			boost,
-		}));
-	},
-
 	setSoldierIsDead: (state, id: string) => {
 		return mapProperty(state, id, (soldier) => ({
 			...soldier,
 			dead: true,
+		}));
+	},
+
+	setSoldierShieldActive: (state, id: string, active: boolean) => {
+		return mapProperty(state, id, (soldier) => ({
+			...soldier,
+			shieldActive: active,
 		}));
 	},
 

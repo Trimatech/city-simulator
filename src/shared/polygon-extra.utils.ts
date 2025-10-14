@@ -2,9 +2,10 @@ import { fillArray } from "./utils/object-utils";
 
 export const createPolygonAroundPosition = (position: Vector2, diameter: number, items: number) => {
 	print("Create polygon to head:", position);
+	const radius = diameter / 2;
 	return fillArray(items, (index) => {
 		const angle = (index / items) * (2 * math.pi);
-		return position.add(new Vector2(math.cos(angle) * diameter, math.sin(angle) * diameter));
+		return position.add(new Vector2(math.cos(angle) * radius, math.sin(angle) * radius));
 	});
 };
 

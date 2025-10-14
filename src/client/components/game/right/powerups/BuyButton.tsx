@@ -7,38 +7,44 @@ import { Text } from "client/components/ui/text";
 import { fonts } from "client/constants/fonts";
 import { useMotion, useRem } from "client/hooks";
 import { palette } from "shared/constants/palette";
+import { PowerupId } from "shared/constants/powerups";
+import { remotes } from "shared/remotes";
 
-import { placeTowerAtPlayer } from "../../controller/controller.utils";
-import { gradient } from "../../menu/home/utils";
-
-interface BuyTowerButtonProps {
-	readonly anchorPoint: Vector2;
-
-	readonly position: UDim2;
-}
-
-const TOWER_COST = 100;
-
-export function BuyTowerButton({ anchorPoint, position }: BuyTowerButtonProps) {
+export function BuyButton({
+	id,
+	label,
+	emoji,
+	anchorPoint,
+	position,
+	price,
+	enabled,
+}: {
+	id: PowerupId;
+	label: string;
+	emoji: string;
+	anchorPoint: Vector2;
+	position: UDim2;
+	price: number;
+	enabled?: boolean;
+}) {
 	const rem = useRem();
 	const timer = useTimer();
 	const [hover, hoverMotion] = useMotion(0);
 
-	const gradientSpin = timer.value.map((t) => {
-		return 30 * t;
-	});
+	const gradientSpin = timer.value.map((t) => 30 * t);
 
-	const onClick = () => {
-		placeTowerAtPlayer();
-	};
+	const onClick = () => remotes.powerups.use.fire(id);
 
 	const size = new UDim2(0, rem(7), 0, rem(7));
 
 	return (
 		<PrimaryButton
+			enabled={enabled}
 			onClick={onClick}
-			onHover={(hovered) => hoverMotion.spring(hovered ? 1 : 0)}
-			overlayGradient={new ColorSequence(palette.mauve, palette.blue)}
+			onHover={(h) => hoverMotion.spring(h ? 1 : 0)}
+			overlayGradient={
+				enabled ? new ColorSequence(palette.mauve, palette.blue) : new ColorSequence(palette.mauve, palette.red)
+			}
 			anchorPoint={anchorPoint}
 			size={size}
 			position={position}
@@ -50,26 +56,32 @@ export function BuyTowerButton({ anchorPoint, position }: BuyTowerButtonProps) {
 				shadowPosition={rem(0.25)}
 				zIndex={0}
 			>
-				<uigradient Color={gradient} Rotation={gradientSpin} />
+				<uigradient Rotation={gradientSpin} />
 			</Shadow>
-
-			<Text text="🗼" textSize={rem(3)} size={new UDim2(1, 0, 0.6, 0)} textYAlignment="Center" />
-
+			<Text
+				text={emoji}
+				textSize={rem(3)}
+				size={new UDim2(1, 0, 0.6, 0)}
+				textYAlignment="Center"
+				textTransparency={enabled ? 0 : 0.5}
+			/>
 			<Text
 				font={fonts.inter.medium}
-				text="Buy Tower"
+				text={label}
 				textColor={palette.mantle}
-				textSize={rem(1.5)}
+				textSize={rem(1.25)}
 				size={new UDim2(1, 0, 0.2, 0)}
 				position={new UDim2(0, 0, 0.6, 0)}
 				textYAlignment="Center"
+				textTransparency={enabled ? 0 : 0.5}
 			/>
 			<Text
-				text={`🔮 ${TOWER_COST}`}
+				text={`🔮 ${price}`}
 				textSize={rem(1)}
 				size={new UDim2(1, 0, 0.2, 0)}
 				position={new UDim2(0, 0, 0.8, 0)}
 				textYAlignment="Center"
+				textTransparency={enabled ? 0 : 0.5}
 			/>
 			<Outline cornerRadius={new UDim(0, rem(1))} innerTransparency={0} />
 		</PrimaryButton>

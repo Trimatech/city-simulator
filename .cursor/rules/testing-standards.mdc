@@ -1,0 +1,30 @@
+---
+description: 
+globs: *.spec.ts
+alwaysApply: false
+---
+# Testing Standards
+
+Guidelines for writing and organizing tests in this codebase.
+
+## Test Framework
+
+- Use Jest Lua as the primary testing framework
+- Store tests in a `__tests__` directory adjacent to the code being tested
+
+## Test Structure
+
+- Name test files with the `.spec.ts` suffix
+- Organize tests using the describe/it pattern:
+    ```typescript
+    describe('MyClass', () => {
+    	it('should perform a specific action', () => {
+    		// Test code
+    	});
+    });
+    ```
+
+## Mocking
+
+- Use Jest's mocking capabilities for services and dependencies
+- Create mock implementations in a `__mocks__` directory
