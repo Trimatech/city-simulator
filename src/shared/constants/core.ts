@@ -10,6 +10,7 @@ export const WORLD_TICK = 1 / 20;
 export const SOLDIER_MIN_AREA = 100;
 export const SOLDIER_SPEED = 24;
 export const SOLDIER_BOOST_SPEED = 34;
+export const SOLDIER_MAX_ORBS = 300;
 
 export const REMOTE_TICK = 1 / 20; // Roblox limits
 
