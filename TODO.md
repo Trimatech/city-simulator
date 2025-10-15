@@ -45,7 +45,7 @@ _Goal: Add resource collection and competitive powers._
     -   [ ] Build Tower
     -   [x] Shield
     -   [x] Explosion
-    -   [ ] Mega Explosion
+    -   [x] Mega Explosion
 -   [ ] Add visual + sound effects for each ability
 
 ---

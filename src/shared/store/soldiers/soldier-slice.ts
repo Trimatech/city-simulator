@@ -1,5 +1,10 @@
 import { createProducer } from "@rbxts/reflex";
-import { INITIAL_POLYGON_DIAMETER, INITIAL_POLYGON_ITEMS, TRACER_PIECE_LENGTH } from "shared/constants/core";
+import {
+	INITIAL_POLYGON_DIAMETER,
+	INITIAL_POLYGON_ITEMS,
+	SOLDIER_MAX_ORBS,
+	TRACER_PIECE_LENGTH,
+} from "shared/constants/core";
 import { connectLineToPolygon, pointsToVectors, vector2ToPoint, vectorsToPoints } from "shared/polybool/poly-utils";
 import { pointsToPolygon } from "shared/polybool/polybool";
 import { calculatePolygonArea, createPolygonAroundPosition } from "shared/polygon-extra.utils";
@@ -59,7 +64,15 @@ export const soldiersSlice = createProducer(initialState, {
 
 		return {
 			...state,
-			[id]: { ...defaultEntity, id, name: id, polygon, polygonAreaSize, ...patch },
+			[id]: {
+				...defaultEntity,
+				id,
+				name: id,
+				polygon,
+				polygonAreaSize,
+				...patch,
+				orbs: math.min(patch?.orbs ?? 0, SOLDIER_MAX_ORBS),
+			},
 		};
 	},
 
@@ -166,13 +179,17 @@ export const soldiersSlice = createProducer(initialState, {
 		return mapProperty(state, id, (soldier) => ({
 			...soldier,
 			...intersection,
+			orbs:
+				intersection.orbs !== undefined
+					? math.min(math.max(intersection.orbs, 0), SOLDIER_MAX_ORBS)
+					: soldier.orbs,
 		}));
 	},
 
 	incrementSoldierOrbs: (state, id: string, amount: number) => {
 		return mapProperty(state, id, (soldier) => ({
 			...soldier,
-			orbs: math.max(soldier.orbs + math.abs(amount), 0),
+			orbs: math.min(math.max(soldier.orbs + math.abs(amount), 0), SOLDIER_MAX_ORBS),
 		}));
 	},
 

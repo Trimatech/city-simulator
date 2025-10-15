@@ -16,8 +16,6 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 	const size = new UDim2(0, rem(10), 0, rem(20));
 	const orbs = useSelector(selectLocalOrbs) ?? 0;
 
-	print("orbs.....", orbs, POWERUP_PRICES.turbo);
-
 	return (
 		<frame BackgroundTransparency={1} AnchorPoint={anchorPoint} Size={size} Position={position}>
 			<uilistlayout
@@ -35,18 +33,10 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 				price={POWERUP_PRICES.turbo}
 				enabled={orbs >= POWERUP_PRICES.turbo}
 			/>
-			<BuyButton
-				id="turbo2x"
-				label="Turbo 2x"
-				emoji="⚡⚡"
-				anchorPoint={new Vector2(0.5, 0.5)}
-				position={new UDim2(0.5, 0, 0, rem(8))}
-				price={POWERUP_PRICES.turbo2x}
-				enabled={orbs >= POWERUP_PRICES.turbo2x}
-			/>
+
 			<BuyButton
 				id="shield"
-				label="Shield Dome"
+				label="Shield"
 				emoji="🛡️"
 				anchorPoint={new Vector2(0.5, 0.5)}
 				position={new UDim2(0.5, 0, 0, rem(16))}
@@ -55,7 +45,7 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 			/>
 			<BuyButton
 				id="tower"
-				label="Build Tower"
+				label="Tower"
 				emoji="🗼"
 				anchorPoint={new Vector2(0.5, 0.5)}
 				position={new UDim2(0.5, 0, 0, rem(24))}
@@ -64,7 +54,7 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 			/>
 			<BuyButton
 				id="laserBeam"
-				label="Laser Beam"
+				label="Laser"
 				emoji="🔆"
 				anchorPoint={new Vector2(0.5, 0.5)}
 				position={new UDim2(0.5, 0, 0, rem(32))}
@@ -73,7 +63,7 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 			/>
 			<BuyButton
 				id="nuclearExplosion"
-				label="Nuclear Explosion"
+				label="Nuclear"
 				emoji="☢️"
 				anchorPoint={new Vector2(0.5, 0.5)}
 				position={new UDim2(0.5, 0, 0, rem(40))}

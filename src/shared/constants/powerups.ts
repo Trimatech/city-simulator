@@ -1,34 +1,17 @@
-export interface PowerupPrices {
-	readonly turbo: number;
-	readonly turbo2x: number;
-	readonly shield: number;
-	readonly tower: number;
-	readonly laserBeam: number;
-	readonly nuclearExplosion: number;
-}
-
-export type PowerupId = keyof PowerupPrices;
-
-export const POWERUP_PRICES: PowerupPrices = {
+export const POWERUP_PRICES = {
 	turbo: 40,
-	turbo2x: 80,
 	shield: 120,
 	tower: 100,
 	laserBeam: 200,
 	nuclearExplosion: 300,
-};
+} as const;
 
-export interface PowerupDurations {
-	readonly turbo: number;
-	readonly turbo2x: number;
-	readonly shield: number;
-}
+export type PowerupId = keyof typeof POWERUP_PRICES;
 
-export const POWERUP_DURATIONS: PowerupDurations = {
-	turbo: 5,
-	turbo2x: 5,
+export const POWERUP_DURATIONS = {
+	turbo: 7,
 	shield: 10,
-};
+} as const;
 
 export interface ExplosionConfig {
 	readonly laserBeam: { length: number; width: number; damage: number };
@@ -37,15 +20,7 @@ export interface ExplosionConfig {
 
 export const POWERUP_EXPLOSIONS: ExplosionConfig = {
 	laserBeam: { length: 100, width: 5, damage: 50 },
-	nuclearExplosion: { radius: 200, damage: 1000 },
+	nuclearExplosion: { radius: 80, damage: 1000 },
 };
 
-export interface TurboSpeeds {
-	readonly turbo: number;
-	readonly turbo2x: number;
-}
-
-export const POWERUP_TURBO_SPEEDS: TurboSpeeds = {
-	turbo: 34,
-	turbo2x: 48,
-};
+export const POWERUP_TURBO_SPEED = 40;
