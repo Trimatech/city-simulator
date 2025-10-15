@@ -1,12 +1,11 @@
-import { lerpBinding, useViewport } from "@rbxts/pretty-react-hooks";
-import { composeBindings } from "@rbxts/pretty-react-hooks";
+import { composeBindings, lerpBinding, useViewport } from "@rbxts/pretty-react-hooks";
 import React, { useEffect, useMemo } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { Group } from "client/components/ui/group";
-import { Image } from "client/components/ui/image";
-import { Text } from "client/components/ui/text";
 import { useMotion, useRem } from "client/hooks";
 import { selectSoldierFromWorldSubject } from "client/store/world";
+import { Image } from "client/ui/image";
+import { Group } from "client/ui/layout/group";
+import { Text } from "client/ui/text";
 import { images } from "shared/assets";
 
 import { useLeader } from "./utils";

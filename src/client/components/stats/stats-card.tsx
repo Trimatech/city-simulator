@@ -1,15 +1,15 @@
 import React, { useEffect, useMemo } from "@rbxts/react";
-import { Frame } from "client/components/ui/frame";
-import { Group } from "client/components/ui/group";
-import { ReactiveButton } from "client/components/ui/reactive-button";
-import { Shadow } from "client/components/ui/shadow";
-import { Text } from "client/components/ui/text";
 import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
 import { useMotion, useRem } from "client/hooks";
+import { Frame } from "client/ui/layout/frame";
+import { Group } from "client/ui/layout/group";
+import { ReactiveButton } from "client/ui/reactive-button";
+import { Shadow } from "client/ui/shadow";
+import { Text } from "client/ui/text";
 import { palette } from "shared/constants/palette";
 
-import { Transition } from "../ui/transition";
+import { Transition } from "../../ui/transition";
 
 interface StatsCardProps {
 	readonly onClick?: () => void;

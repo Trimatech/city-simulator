@@ -1,8 +1,8 @@
 import React, { useEffect } from "@rbxts/react";
 import { useSelectorCreator } from "@rbxts/react-reflex";
-import { Image } from "client/components/ui/image";
 import { springs } from "client/constants/springs";
 import { useMotion, useRem } from "client/hooks";
+import { Image } from "client/ui/image";
 import { images } from "shared/assets";
 import { USER_NAME } from "shared/constants/core";
 import { palette } from "shared/constants/palette";

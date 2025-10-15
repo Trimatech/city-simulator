@@ -2,8 +2,8 @@ import { lerpBinding } from "@rbxts/pretty-react-hooks";
 import React, { useMemo } from "@rbxts/react";
 import { palette } from "shared/constants/palette";
 
-import { useMotion, useRem } from "../../hooks";
-import { Frame } from "./frame";
+import { useMotion, useRem } from "../hooks";
+import { Frame } from "./layout/frame";
 import { Outline } from "./outline";
 import { ReactiveButton } from "./reactive-button";
 import { Shadow } from "./shadow";

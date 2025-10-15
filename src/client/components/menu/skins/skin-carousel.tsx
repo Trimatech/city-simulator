@@ -1,8 +1,8 @@
 import React, { useEffect } from "@rbxts/react";
 import { useSelector, useSelectorCreator } from "@rbxts/react-reflex";
-import { Group } from "client/components/ui/group";
 import { useRem, useStore } from "client/hooks";
 import { selectMenuCurrentSkin } from "client/store/menu";
+import { Group } from "client/ui/layout/group";
 import { USER_NAME } from "shared/constants/core";
 import { soldierskins } from "shared/constants/skins";
 import { RANDOM_SKIN, selectCurrentPlayerSkin, selectPlayerSkins } from "shared/store/saves";

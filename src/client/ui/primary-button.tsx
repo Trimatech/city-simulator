@@ -3,9 +3,9 @@ import React from "@rbxts/react";
 import { images } from "shared/assets";
 import { palette } from "shared/constants/palette";
 
-import { useMotion, useRem } from "../../hooks";
-import { Frame } from "./frame";
+import { useMotion, useRem } from "../hooks";
 import { Image } from "./image";
+import { Frame } from "./layout/frame";
 import { Outline } from "./outline";
 import { ReactiveButton } from "./reactive-button";
 import { Shadow } from "./shadow";

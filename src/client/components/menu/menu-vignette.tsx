@@ -1,10 +1,10 @@
 import { lerpBinding } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { Image } from "client/components/ui/image";
 import { springs } from "client/constants/springs";
 import { useMotion } from "client/hooks";
 import { selectIsMenuOpen } from "client/store/menu";
+import { Image } from "client/ui/image";
 import { images } from "shared/assets";
 import { palette } from "shared/constants/palette";
 

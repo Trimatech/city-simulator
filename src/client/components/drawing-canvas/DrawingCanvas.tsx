@@ -2,9 +2,9 @@ import React, { useCallback, useRef, useState } from "@rbxts/react";
 import { palette } from "shared/constants/palette";
 import { Point, pointsToPolygon, Polygon } from "shared/polybool/polybool";
 
+import { Frame } from "../../ui/layout/frame";
 import { calculateSnappedPosition } from "../polygon-clipper/PolygonCanvas.utils";
 import { PolygonShape } from "../polygon-clipper/PolygonShape";
-import { Frame } from "../ui/frame";
 
 interface Props {
 	polygon: Polygon;

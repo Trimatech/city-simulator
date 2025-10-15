@@ -1,6 +1,6 @@
 import React, { useEffect } from "@rbxts/react";
-import { Image } from "client/components/ui/image";
 import { useContinuousAngle, useMotion } from "client/hooks";
+import { Image } from "client/ui/image";
 import { images } from "shared/assets";
 import { palette } from "shared/constants/palette";
 

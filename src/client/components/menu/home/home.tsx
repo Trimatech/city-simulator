@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
-import { Group } from "client/components/ui/group";
 import { useRem } from "client/hooks";
+import { Group } from "client/ui/layout/group";
 
 import { GameVersion } from "./GameVersion";
 import { MuteButton } from "./mute-button";

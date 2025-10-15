@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "@rbxts/react";
 
-import { fonts } from "../../constants/fonts";
-import { Group } from "./group";
+import { fonts } from "../constants/fonts";
+import { Group } from "./layout/group";
 import { TextProps } from "./text";
 
 interface TextFieldProps extends TextProps<TextBox> {

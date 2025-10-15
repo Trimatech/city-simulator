@@ -1,17 +1,17 @@
 import { lerpBinding } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { useSelectorCreator } from "@rbxts/react-reflex";
-import { Frame } from "client/components/ui/frame";
-import { Group } from "client/components/ui/group";
-import { Image } from "client/components/ui/image";
-import { Outline } from "client/components/ui/outline";
-import { ReactiveButton } from "client/components/ui/reactive-button";
-import { Shadow } from "client/components/ui/shadow";
-import { Text } from "client/components/ui/text";
 import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
 import { useMotion, useRem, useStore } from "client/hooks";
 import { MenuPage, selectIsPage } from "client/store/menu";
+import { Image } from "client/ui/image";
+import { Frame } from "client/ui/layout/frame";
+import { Group } from "client/ui/layout/group";
+import { Outline } from "client/ui/outline";
+import { ReactiveButton } from "client/ui/reactive-button";
+import { Shadow } from "client/ui/shadow";
+import { Text } from "client/ui/text";
 import { palette } from "shared/constants/palette";
 import { darken } from "shared/utils/color-utils";
 

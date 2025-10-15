@@ -1,11 +1,10 @@
-import { blend, lerpBinding, useUpdateEffect } from "@rbxts/pretty-react-hooks";
-import { composeBindings } from "@rbxts/pretty-react-hooks";
+import { blend, composeBindings, lerpBinding, useUpdateEffect } from "@rbxts/pretty-react-hooks";
 import React from "@rbxts/react";
 import { useMotion, useRem } from "client/hooks";
 import { ButtonSoundVariant, playButtonDown, playButtonUp } from "shared/assets";
 
-import { Button } from "../button";
-import { Frame } from "../frame";
+import { Button } from "../buttons/button";
+import { Frame } from "../layout/frame";
 import { useButtonAnimation } from "./use-button-animation";
 import { useButtonState } from "./use-button-state";
 

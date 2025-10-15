@@ -3,7 +3,7 @@ import React, { useState } from "@rbxts/react";
 import { UserInputService } from "@rbxts/services";
 import { IS_EDIT } from "shared/constants/core";
 
-import { Group } from "./group";
+import { Group } from "./layout/group";
 
 interface InputCaptureProps {
 	readonly onInputBegan?: (rbx: Frame, input: InputObject) => void;

@@ -1,9 +1,9 @@
 import { blend } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
-import { Image } from "client/components/ui/image";
-import { ReactiveButton } from "client/components/ui/reactive-button";
-import { Shadow } from "client/components/ui/shadow";
 import { useMotion, useRem } from "client/hooks";
+import { Image } from "client/ui/image";
+import { ReactiveButton } from "client/ui/reactive-button";
+import { Shadow } from "client/ui/shadow";
 import { images, playSound, sounds } from "shared/assets";
 
 import { SkinIndicator } from "./skin-indicator";

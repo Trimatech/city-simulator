@@ -5,9 +5,9 @@ import React from "@rbxts/react";
 import { sendAlert } from "client/alerts";
 import { Alerts } from "client/components/alerts";
 import { Menu } from "client/components/menu";
-import { InputCapture } from "client/components/ui/input-capture";
 import { Backdrop } from "client/components/world/backdrop";
 import { RootProvider } from "client/providers/root-provider";
+import { InputCapture } from "client/ui/input-capture";
 import { palette } from "shared/constants/palette";
 
 export = hoarcekat(() => {

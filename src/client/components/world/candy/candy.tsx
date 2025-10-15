@@ -1,9 +1,9 @@
 import React, { useBinding, useEffect, useMemo } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { Group } from "client/components/ui/group";
 import { springs } from "client/constants/springs";
 import { useMotion, useRem } from "client/hooks";
 import { selectWorldCamera } from "client/store/world";
+import { Group } from "client/ui/layout/group";
 
 import { CandyItem } from "./candy-item";
 import { useCandyOnScreen } from "./use-candy-on-screen";

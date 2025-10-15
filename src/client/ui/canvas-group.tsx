@@ -1,6 +1,6 @@
 import React, { forwardRef, Ref } from "@rbxts/react";
 
-import { FrameProps } from "./frame";
+import { FrameProps } from "./layout/frame";
 
 export interface CanvasGroupProps extends FrameProps<CanvasGroup> {
 	groupColor?: Color3 | React.Binding<Color3>;

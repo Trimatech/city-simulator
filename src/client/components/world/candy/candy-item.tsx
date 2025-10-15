@@ -1,10 +1,9 @@
-import { blend, lerp, map, useTimer } from "@rbxts/pretty-react-hooks";
-import { composeBindings } from "@rbxts/pretty-react-hooks";
+import { blend, composeBindings, lerp, map, useTimer } from "@rbxts/pretty-react-hooks";
 import React, { memo, useEffect, useMemo } from "@rbxts/react";
-import { Image } from "client/components/ui/image";
-import { Shadow } from "client/components/ui/shadow";
 import { springs } from "client/constants/springs";
 import { useMotion, useRem, useSeed } from "client/hooks";
+import { Image } from "client/ui/image";
+import { Shadow } from "client/ui/shadow";
 import { images } from "shared/assets";
 import { CandyType } from "shared/store/candy";
 import { brighten } from "shared/utils/color-utils";

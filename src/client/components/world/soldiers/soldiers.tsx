@@ -1,7 +1,7 @@
 import Object from "@rbxts/object-utils";
 import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { Group } from "client/components/ui/group";
+import { Group } from "client/ui/layout/group";
 import { selectSoldiersById } from "shared/store/soldiers";
 
 import { Soldier } from "./soldier";

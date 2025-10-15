@@ -1,9 +1,9 @@
 import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { Frame } from "client/components/ui/frame";
-import { Outline } from "client/components/ui/outline";
-import { Shadow } from "client/components/ui/shadow";
 import { useRem } from "client/hooks";
+import { Frame } from "client/ui/layout/frame";
+import { Outline } from "client/ui/outline";
+import { Shadow } from "client/ui/shadow";
 import { SOLDIER_MAX_ORBS } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
 import { selectLocalOrbs } from "shared/store/soldiers";

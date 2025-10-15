@@ -1,9 +1,9 @@
 import { map, useInterval } from "@rbxts/pretty-react-hooks";
 import React, { Element, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { CanvasGroup } from "client/components/ui/canvas-group";
 import { useDefined, useStore } from "client/hooks";
 import { selectSoldierFromWorldSubject } from "client/store/world";
+import { CanvasGroup } from "client/ui/canvas-group";
 import { selectSoldiersById, selectTopSoldier } from "shared/store/soldiers";
 
 import { MinimapCursor } from "./minimap-cursor";
