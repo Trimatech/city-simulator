@@ -47,6 +47,7 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 					SortOrder={Enum.SortOrder.LayoutOrder}
 				/>
 				<BuyPowerup
+					id="nuclearExplosion"
 					label="Nuclear"
 					emoji="☢️"
 					primaryColor={palette.flamingo}
@@ -56,6 +57,7 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 				/>
 
 				<BuyPowerup
+					id="laserBeam"
 					label="Laser"
 					emoji="🔆"
 					primaryColor={palette.flamingo}
@@ -64,6 +66,7 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 					price={POWERUP_PRICES.laserBeam}
 				/>
 				<BuyPowerup
+					id="shield"
 					label="Shield"
 					emoji="🛡️"
 					primaryColor={palette.flamingo}
@@ -73,6 +76,7 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 				/>
 
 				<BuyPowerup
+					id="tower"
 					label="Tower"
 					emoji="🗼"
 					primaryColor={palette.flamingo}
@@ -82,6 +86,7 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 				/>
 
 				<BuyPowerup
+					id="turbo"
 					emoji="⚡"
 					label="Turbo"
 					primaryColor={palette.flamingo}

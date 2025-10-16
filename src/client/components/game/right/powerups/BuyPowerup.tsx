@@ -9,9 +9,10 @@ import { ReactiveButton } from "client/ui/reactive-button";
 import { Text } from "client/ui/text";
 import { Transition } from "client/ui/transition";
 import { palette } from "shared/constants/palette";
+import { remotes } from "shared/remotes";
 
 interface Props {
-	readonly onClick?: () => void;
+	readonly id: string;
 	readonly emoji: string;
 	readonly label: string;
 	readonly primaryColor: Color3;
@@ -28,7 +29,7 @@ const MARGIN_Y = 0;
 const INTERNAL_PADDING = 1;
 
 export function BuyPowerup({
-	onClick,
+	id,
 	emoji,
 	label,
 	primaryColor,
@@ -75,7 +76,7 @@ export function BuyPowerup({
 
 	return (
 		<ReactiveButton
-			onClick={onClick}
+			onClick={() => remotes.powerups.use.fire(id)}
 			enabled={enabled}
 			backgroundTransparency={1}
 			size={size}

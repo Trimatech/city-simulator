@@ -60,7 +60,12 @@ export function PrimaryButton({
 				shadowPosition={rem(0.5)}
 			/>
 
-			<Frame backgroundColor={palette.white} cornerRadius={new UDim(0, rem(1))} size={new UDim2(1, 0, 1, 0)}>
+			<Frame
+				backgroundColor={palette.white}
+				cornerRadius={new UDim(0, rem(1))}
+				size={new UDim2(1, 0, 1, 0)}
+				backgroundTransparency={0}
+			>
 				<uigradient
 					Offset={lerpBinding(hover, new Vector2(), new Vector2(0, 1))}
 					Rotation={90}
