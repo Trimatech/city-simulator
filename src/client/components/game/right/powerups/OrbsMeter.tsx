@@ -18,7 +18,7 @@ export function OrbsMeter({ position = new UDim2(0, 0, 0, 0), heightRem = 48 }: 
 	const rem = useRem();
 	const orbs = useSelector(selectLocalOrbs) ?? 0;
 
-	const progress = math.clamp(orbs / SOLDIER_MAX_ORBS, 0, 1);
+	const progress = math.clamp(math.max(orbs, 15) / SOLDIER_MAX_ORBS, 0, 1);
 
 	const width = rem(1.5);
 	const height = rem(heightRem);
@@ -45,12 +45,14 @@ export function OrbsMeter({ position = new UDim2(0, 0, 0, 0), heightRem = 48 }: 
 			</Frame>
 
 			<Frame
+				name="orbs-meter-progress"
 				backgroundColor={palette.red}
 				backgroundTransparency={0}
 				anchorPoint={new Vector2(0, 1)}
 				cornerRadius={cornerRadius}
 				size={new UDim2(1, 0, progress, 0)}
 				position={new UDim2(0, 0, 1, 0)}
+				clipsDescendants={true}
 			>
 				<uigradient Color={new ColorSequence(palette.mauve, palette.blue)} Rotation={90} />
 			</Frame>

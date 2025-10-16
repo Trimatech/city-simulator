@@ -9,12 +9,21 @@ export interface StackProps extends FrameProps {
 	horizontalAlignment?: Enum.HorizontalAlignment;
 	verticalAlignment?: Enum.VerticalAlignment;
 	name?: string;
+	wraps?: boolean;
 }
 
 export function HStack(props: StackProps) {
-	const { children, spacing = 0, padding = 0, horizontalAlignment, verticalAlignment, name } = props;
+	const { children, spacing = 0, padding = 0, horizontalAlignment, verticalAlignment, name, wraps } = props;
 
-	const rest = omit(props, ["children", "spacing", "padding", "horizontalAlignment", "verticalAlignment", "name"]);
+	const rest = omit(props, [
+		"children",
+		"spacing",
+		"padding",
+		"horizontalAlignment",
+		"verticalAlignment",
+		"name",
+		"wraps",
+	]);
 
 	return (
 		<Frame key={name ?? "hstack-list"} size={new UDim2(1, 0, 1, 0)} backgroundTransparency={1} {...rest}>
@@ -25,6 +34,7 @@ export function HStack(props: StackProps) {
 				VerticalAlignment={verticalAlignment ?? Enum.VerticalAlignment.Center}
 				Padding={new UDim(0, spacing)}
 				SortOrder={Enum.SortOrder.LayoutOrder}
+				Wraps={wraps}
 			/>
 			{padding > 0 && (
 				<uipadding
