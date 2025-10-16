@@ -82,6 +82,7 @@ export function BuyPowerup({
 			layoutOrder={order}
 			onMouseEnter={() => setShowTooltip(true)}
 			onMouseLeave={() => setShowTooltip(false)}
+			anchorPoint={new Vector2(1, 0.5)}
 		>
 			<Transition
 				groupTransparency={transparency}
@@ -98,7 +99,24 @@ export function BuyPowerup({
 					position={new UDim2(0.5, 0, 0.5, 0)}
 				/>
 
-				<HStack clipsDescendants={false}>
+				<HStack clipsDescendants={false} horizontalAlignment={Enum.HorizontalAlignment.Right}>
+					{showTooltip ? (
+						<HStack spacing={rem(INTERNAL_PADDING)} size={new UDim2(0, TOOLTIP_WIDTH, 0, HEIGHT)} wraps>
+							<uipadding PaddingLeft={new UDim(0, rem(1.5))} />
+							<Text
+								text={label}
+								size={new UDim2(1, 0, 0, rem(1))}
+								font={fonts.inter.bold}
+								textColor={palette.crust}
+								textSize={rem(1.5)}
+								textXAlignment="Center"
+								textYAlignment="Center"
+								richText
+							/>
+
+							<Text size={new UDim2(1, 0, 0, rem(1))} text={`🔮 ${price}`} textSize={rem(1)} />
+						</HStack>
+					) : undefined}
 					{/* Emoji */}
 
 					<Frame size={new UDim2(0, rem(CIRCLE_SIZE), 0, rem(CIRCLE_SIZE))}>
@@ -121,24 +139,6 @@ export function BuyPowerup({
 							position={new UDim2(0.5, 0, 0.5, 0)}
 						/>
 					</Frame>
-
-					{showTooltip ? (
-						<HStack spacing={rem(INTERNAL_PADDING)} size={new UDim2(0, TOOLTIP_WIDTH, 0, HEIGHT)} wraps>
-							<uipadding PaddingRight={new UDim(0, rem(1.5))} />
-							<Text
-								text={label}
-								size={new UDim2(1, 0, 0, rem(1))}
-								font={fonts.inter.bold}
-								textColor={palette.crust}
-								textSize={rem(1.5)}
-								textXAlignment="Center"
-								textYAlignment="Center"
-								richText
-							/>
-
-							<Text size={new UDim2(1, 0, 0, rem(1))} text={`🔮 ${price}`} textSize={rem(1)} />
-						</HStack>
-					) : undefined}
 				</HStack>
 			</Transition>
 		</ReactiveButton>

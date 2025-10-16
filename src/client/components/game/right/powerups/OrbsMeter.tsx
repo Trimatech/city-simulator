@@ -14,16 +14,15 @@ interface Props {
 	readonly heightRem?: number;
 }
 
-export function OrbsMeter({ position = new UDim2(0, 0, 0, 0), heightRem = 48 }: Props) {
+export function OrbsMeter({ position = new UDim2(0, 0, 0, 0) }: Props) {
 	const rem = useRem();
 	const orbs = useSelector(selectLocalOrbs) ?? 0;
 
 	const progress = math.clamp(math.max(orbs, 15) / SOLDIER_MAX_ORBS, 0, 1);
 
 	const width = rem(1.5);
-	const height = rem(heightRem);
 
-	const meterSize = new UDim2(0, width, 0, height);
+	const meterSize = new UDim2(0, width, 1, 0);
 
 	const cornerRadius = new UDim(0, rem(0.75));
 

@@ -17,26 +17,68 @@ interface Props {
 
 export function PowerupsPanel({ anchorPoint, position }: Props) {
 	const rem = useRem();
-	const size = new UDim2(1, 0, 1, 0);
+	const height = rem(36);
+	const width = rem(20);
+	const size = new UDim2(0, width, 0, height);
 	const orbs = useSelector(selectLocalOrbs) ?? 0;
 
 	return (
 		<HStack
 			name="powerups-panel"
-			anchorPoint={anchorPoint}
+			anchorPoint={new Vector2(1, 0.5)}
+			position={new UDim2(1, 0, 0.5, 0)}
 			size={size}
-			position={position}
 			verticalAlignment={Enum.VerticalAlignment.Top}
 			spacing={rem(1)}
 		>
-			<OrbsMeter anchorPoint={new Vector2(0, 0)} position={new UDim2(0, 0, 0, 0)} heightRem={36} />
-			<VStack name="powerups-panel2" size={new UDim2(0, rem(12), 1, 0)} spacing={rem(1)}>
+			<VStack
+				name="buy-powerups-stack"
+				size={new UDim2(0, rem(12), 1, 0)}
+				spacing={rem(1)}
+				anchorPoint={new Vector2(1, 0.5)}
+				horizontalAlignment={Enum.HorizontalAlignment.Right}
+			>
 				<uigridlayout
 					CellPadding={new UDim2(0, rem(1), 0, rem(1))}
 					CellSize={new UDim2(0, rem(6), 0, rem(6))}
 					FillDirectionMaxCells={2}
-					HorizontalAlignment="Center"
+					HorizontalAlignment="Right"
 					VerticalAlignment="Center"
+					SortOrder={Enum.SortOrder.LayoutOrder}
+				/>
+				<BuyPowerup
+					label="Nuclear"
+					emoji="☢️"
+					primaryColor={palette.flamingo}
+					enabled={orbs >= POWERUP_PRICES.nuclearExplosion}
+					order={1}
+					price={POWERUP_PRICES.nuclearExplosion}
+				/>
+
+				<BuyPowerup
+					label="Laser"
+					emoji="🔆"
+					primaryColor={palette.flamingo}
+					enabled={orbs >= POWERUP_PRICES.laserBeam}
+					order={2}
+					price={POWERUP_PRICES.laserBeam}
+				/>
+				<BuyPowerup
+					label="Shield"
+					emoji="🛡️"
+					primaryColor={palette.flamingo}
+					enabled={orbs >= POWERUP_PRICES.shield}
+					order={3}
+					price={POWERUP_PRICES.shield}
+				/>
+
+				<BuyPowerup
+					label="Tower"
+					emoji="🗼"
+					primaryColor={palette.flamingo}
+					enabled={orbs >= POWERUP_PRICES.tower}
+					order={4}
+					price={POWERUP_PRICES.tower}
 				/>
 
 				<BuyPowerup
@@ -44,44 +86,11 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 					label="Turbo"
 					primaryColor={palette.flamingo}
 					enabled={orbs >= POWERUP_PRICES.turbo}
-					order={0}
+					order={5}
 					price={POWERUP_PRICES.turbo}
 				/>
-
-				<BuyPowerup
-					label="Shield"
-					emoji="🛡️"
-					primaryColor={palette.flamingo}
-					enabled={orbs >= POWERUP_PRICES.shield}
-					order={1}
-					price={POWERUP_PRICES.shield}
-				/>
-				<BuyPowerup
-					label="Tower"
-					emoji="🗼"
-					primaryColor={palette.flamingo}
-					enabled={orbs >= POWERUP_PRICES.tower}
-					order={2}
-					price={POWERUP_PRICES.tower}
-				/>
-				<BuyPowerup
-					label="Laser"
-					emoji="🔆"
-					primaryColor={palette.flamingo}
-					enabled={orbs >= POWERUP_PRICES.laserBeam}
-					order={3}
-					price={POWERUP_PRICES.laserBeam}
-				/>
-
-				<BuyPowerup
-					label="Nuclear"
-					emoji="☢️"
-					primaryColor={palette.flamingo}
-					enabled={orbs >= POWERUP_PRICES.nuclearExplosion}
-					order={4}
-					price={POWERUP_PRICES.nuclearExplosion}
-				/>
 			</VStack>
+			<OrbsMeter anchorPoint={new Vector2(0, 0)} position={new UDim2(0, 0, 0, 0)} />
 		</HStack>
 	);
 }
