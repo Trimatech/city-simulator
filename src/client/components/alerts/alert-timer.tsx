@@ -1,9 +1,9 @@
 import { lerpBinding, useEventListener } from "@rbxts/pretty-react-hooks";
 import React, { useBinding } from "@rbxts/react";
 import { RunService } from "@rbxts/services";
-import { CanvasGroup } from "client/components/ui/canvas-group";
-import { Frame } from "client/components/ui/frame";
 import { useRem } from "client/hooks";
+import { CanvasGroup } from "client/ui/canvas-group";
+import { Frame } from "client/ui/layout/frame";
 import { palette } from "shared/constants/palette";
 import { darken } from "shared/utils/color-utils";
 

@@ -1,7 +1,7 @@
 import React, { useEffect } from "@rbxts/react";
-import { CanvasGroup } from "client/components/ui/canvas-group";
-import { Image } from "client/components/ui/image";
 import { useMotion, useRem } from "client/hooks";
+import { CanvasGroup } from "client/ui/canvas-group";
+import { Image } from "client/ui/image";
 import { SoldierSkin } from "shared/constants/skins";
 import { fillArray } from "shared/utils/object-utils";
 

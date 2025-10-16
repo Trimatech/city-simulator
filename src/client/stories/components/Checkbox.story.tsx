@@ -1,6 +1,6 @@
 import { hoarcekat } from "@rbxts/pretty-react-hooks";
 import React, { useState } from "@rbxts/react";
-import { Checkbox } from "client/components/ui/Checkbox";
+import { Checkbox } from "client/ui/Checkbox";
 
 export = hoarcekat(() => {
 	const [checked1, setChecked1] = useState(false);

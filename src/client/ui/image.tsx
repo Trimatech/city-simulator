@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
 
-import { FrameProps } from "./frame";
+import { FrameProps } from "./layout/frame";
 
 export interface ImageProps extends FrameProps<ImageLabel> {
 	image: string;

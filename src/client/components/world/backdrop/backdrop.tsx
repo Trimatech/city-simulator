@@ -1,5 +1,5 @@
 import React from "@rbxts/react";
-import { Image } from "client/components/ui/image";
+import { Image } from "client/ui/image";
 import { images } from "shared/assets";
 import { fillArray } from "shared/utils/object-utils";
 

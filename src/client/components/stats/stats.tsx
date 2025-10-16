@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 import { useSelector, useSelectorCreator } from "@rbxts/react-reflex";
-import { Group } from "client/components/ui/group";
 import { useDefined, useRem, useStore } from "client/hooks";
+import { Group } from "client/ui/layout/group";
 import { formatInteger } from "client/utils/format-integer";
 import { USER_NAME } from "shared/constants/core";
 import { selectPlayerBalance } from "shared/store/saves";

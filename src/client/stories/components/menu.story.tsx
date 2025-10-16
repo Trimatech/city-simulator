@@ -3,10 +3,10 @@ import "client/app/react-config";
 import { hoarcekat } from "@rbxts/pretty-react-hooks";
 import React from "@rbxts/react";
 import { Menu } from "client/components/menu";
-import { InputCapture } from "client/components/ui/input-capture";
 import { World } from "client/components/world";
 import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
+import { InputCapture } from "client/ui/input-capture";
 import { USER_NAME } from "shared/constants/core";
 import { selectSoldierById } from "shared/store/soldiers";
 

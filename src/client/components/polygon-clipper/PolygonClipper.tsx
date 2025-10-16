@@ -3,9 +3,9 @@ import { useRem } from "client/rem/use-rem";
 import { calculatePolygonOperation, shapeToPolygon } from "shared/polybool/poly-utils";
 import { Polygon } from "shared/polybool/polybool";
 
-import { Checkbox } from "../ui/Checkbox";
-import { Frame } from "../ui/frame";
-import { Text } from "../ui/text";
+import { Checkbox } from "../../ui/Checkbox";
+import { Frame } from "../../ui/layout/frame";
+import { Text } from "../../ui/text";
 import { CanvasButton } from "./CanvasButton";
 import { DemoPolygon, demoPolygons } from "./demo-cases";
 import { PolygonCanvas } from "./PolygonCanvas";

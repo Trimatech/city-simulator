@@ -9,9 +9,9 @@ import { Menu } from "../components/menu";
 import { Music } from "../components/music";
 import { Preloader } from "../components/preloader";
 import { Stats } from "../components/stats";
-import { Layer } from "../components/ui/layer";
 import { Voice } from "../components/voice";
 import { World } from "../components/world";
+import { Layer } from "../ui/layout/layer";
 
 export function App() {
 	return (

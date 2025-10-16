@@ -3,9 +3,9 @@ import React from "@rbxts/react";
 import { images } from "shared/assets";
 import { palette } from "shared/constants/palette";
 
-import { useMotion, useRem } from "../../hooks";
-import { Frame } from "./frame";
+import { useMotion, useRem } from "../hooks";
 import { Image } from "./image";
+import { Frame } from "./layout/frame";
 import { Outline } from "./outline";
 import { ReactiveButton } from "./reactive-button";
 import { Shadow } from "./shadow";
@@ -60,7 +60,12 @@ export function PrimaryButton({
 				shadowPosition={rem(0.5)}
 			/>
 
-			<Frame backgroundColor={palette.white} cornerRadius={new UDim(0, rem(1))} size={new UDim2(1, 0, 1, 0)}>
+			<Frame
+				backgroundColor={palette.white}
+				cornerRadius={new UDim(0, rem(1))}
+				size={new UDim2(1, 0, 1, 0)}
+				backgroundTransparency={0}
+			>
 				<uigradient
 					Offset={lerpBinding(hover, new Vector2(), new Vector2(0, 1))}
 					Rotation={90}

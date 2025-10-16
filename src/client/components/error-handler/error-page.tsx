@@ -1,13 +1,13 @@
 import React, { useEffect } from "@rbxts/react";
 import { TeleportService } from "@rbxts/services";
-import { Frame } from "client/components/ui/frame";
-import { Group } from "client/components/ui/group";
-import { Layer } from "client/components/ui/layer";
-import { PrimaryButton } from "client/components/ui/primary-button";
-import { Text } from "client/components/ui/text";
-import { TextField } from "client/components/ui/text-field";
 import { fonts } from "client/constants/fonts";
 import { useRem } from "client/hooks";
+import { Frame } from "client/ui/layout/frame";
+import { Group } from "client/ui/layout/group";
+import { Layer } from "client/ui/layout/layer";
+import { PrimaryButton } from "client/ui/primary-button";
+import { Text } from "client/ui/text";
+import { TextField } from "client/ui/text-field";
 import { playSound, sounds } from "shared/assets";
 import { palette } from "shared/constants/palette";
 

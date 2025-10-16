@@ -2,10 +2,10 @@ import { useEventListener } from "@rbxts/pretty-react-hooks";
 import React, { useBinding, useEffect, useMemo } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { RunService } from "@rbxts/services";
-import { Frame } from "client/components/ui/frame";
-import { Shadow } from "client/components/ui/shadow";
 import { useMotion, useRem } from "client/hooks";
 import { MenuPage, selectCurrentPage } from "client/store/menu";
+import { Frame } from "client/ui/layout/frame";
+import { Shadow } from "client/ui/shadow";
 import { map } from "shared/utils/math-utils";
 
 interface IndicatorProps {

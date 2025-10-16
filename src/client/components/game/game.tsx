@@ -5,7 +5,7 @@ import { useMotion } from "client/hooks";
 import { selectWorldSubject } from "client/store/world";
 import { selectHasLocalSoldier } from "shared/store/soldiers";
 
-import { Transition } from "../ui/transition";
+import { Transition } from "../../ui/transition";
 import { Compass } from "./compass";
 import { Minimap } from "./minimap";
 import { RightSide } from "./right/RightSide";

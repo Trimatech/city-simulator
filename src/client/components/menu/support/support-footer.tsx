@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
-import { Text } from "client/components/ui/text";
 import { fonts } from "client/constants/fonts";
 import { useRem } from "client/hooks";
+import { Text } from "client/ui/text";
 import { palette } from "shared/constants/palette";
 
 const colorize = (text: string, color: Color3) => {

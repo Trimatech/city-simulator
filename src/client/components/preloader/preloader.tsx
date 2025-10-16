@@ -4,7 +4,7 @@ import { ContentProvider } from "@rbxts/services";
 import { images, sounds } from "shared/assets";
 
 import { useRem } from "../../hooks";
-import { Text } from "../ui/text";
+import { Text } from "../../ui/text";
 
 interface Assets {
 	[key: string]: string | Assets;

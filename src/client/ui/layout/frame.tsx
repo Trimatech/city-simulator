@@ -16,8 +16,8 @@ export interface FrameProps<T extends Instance = Frame> extends React.PropsWithC
 	zIndex?: number | React.Binding<number>;
 	layoutOrder?: number | React.Binding<number>;
 	cornerRadius?: UDim | React.Binding<UDim>;
-	borderSize?: number | React.Binding<number>;
-	borderColor?: Color3 | React.Binding<Color3>;
+	active?: boolean | React.Binding<boolean>;
+	automaticSize?: Enum.AutomaticSize | React.Binding<Enum.AutomaticSize>;
 }
 
 export const Frame = forwardRef((props: FrameProps, ref: Ref<Frame>) => {
@@ -30,15 +30,16 @@ export const Frame = forwardRef((props: FrameProps, ref: Ref<Frame>) => {
 			AnchorPoint={props.anchorPoint}
 			Rotation={props.rotation}
 			BackgroundColor3={props.backgroundColor}
-			BackgroundTransparency={props.backgroundTransparency}
+			BackgroundTransparency={props.backgroundTransparency ?? 1}
 			ClipsDescendants={props.clipsDescendants}
 			Visible={props.visible}
 			ZIndex={props.zIndex}
 			LayoutOrder={props.layoutOrder}
-			BorderSizePixel={props.borderSize ?? 0}
-			BorderColor3={props.borderColor}
+			BorderSizePixel={0}
 			Event={props.event}
 			Change={props.change}
+			Active={props.active}
+			AutomaticSize={props.automaticSize}
 		>
 			{props.children}
 			{props.cornerRadius && <uicorner CornerRadius={props.cornerRadius} />}

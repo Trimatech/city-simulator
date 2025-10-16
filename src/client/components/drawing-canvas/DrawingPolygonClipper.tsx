@@ -3,9 +3,9 @@ import { useRem } from "client/rem/use-rem";
 import { calculatePolygonOperation, pointToVector2, setIntersectionPoints } from "shared/polybool/poly-utils";
 import { pointsToPolygon, Polygon } from "shared/polybool/polybool";
 
+import { Checkbox } from "../../ui/Checkbox";
+import { Frame } from "../../ui/layout/frame";
 import { findClosestPoint } from "../polygon-clipper/PolygonCanvas.utils";
-import { Checkbox } from "../ui/Checkbox";
-import { Frame } from "../ui/frame";
 import { DrawingCanvas } from "./DrawingCanvas";
 
 interface Props {

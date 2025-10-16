@@ -1,12 +1,12 @@
 import { lerpBinding } from "@rbxts/pretty-react-hooks";
 import React, { useEffect, useMemo, useRef } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { DelayRender } from "client/components/ui/delay-render";
 import { springs } from "client/constants/springs";
 import { useMotion, useRem } from "client/hooks";
 import { MenuPage, selectCurrentPage, selectIsMenuOpen, selectMenuTransition } from "client/store/menu";
+import { DelayRender } from "client/ui/delay-render";
 
-import { Transition } from "../ui/transition";
+import { Transition } from "../../ui/transition";
 
 interface MenuContainerProps extends React.PropsWithChildren {
 	readonly page?: MenuPage;
