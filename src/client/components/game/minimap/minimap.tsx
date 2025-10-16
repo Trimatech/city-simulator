@@ -34,7 +34,12 @@ export function Minimap() {
 					shadowTransparency={0}
 				/>
 
-				<Frame backgroundColor={palette.white} cornerRadius={new UDim(1, 0)} size={new UDim2(1, 0, 1, 0)}>
+				<Frame
+					backgroundColor={palette.white}
+					cornerRadius={new UDim(1, 0)}
+					size={new UDim2(1, 0, 1, 0)}
+					backgroundTransparency={0}
+				>
 					<uigradient
 						Color={new ColorSequence(palette.crust, palette.mantle)}
 						Transparency={new NumberSequence(0.3, 0.1)}
