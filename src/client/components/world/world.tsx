@@ -8,11 +8,13 @@ import { ExplosionEffects } from "./explosions/ExplosionEffects";
 import { Soldiers } from "./soldiers";
 import { Towers } from "./towers/Towers";
 import { WorldSounds } from "./world-sounds";
+import { WorldSubject } from "./world-subject";
 
 export function World() {
 	return (
 		<RemProvider minimumRem={6}>
 			<Group name="World">
+				<WorldSubject />
 				<Soldiers />
 
 				<Bots />

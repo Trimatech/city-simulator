@@ -18,4 +18,7 @@ export const sounds = {
 	navigate: "rbxgameasset://Audio/navigate",
 	start_game: "rbxgameasset://Audio/start_game",
 	whoosh: "rbxgameasset://Audio/whoosh",
+	explosionCrunch_003: "rbxgameasset://Audio/explosionCrunch_003",
+	laser3: "rbxgameasset://Audio/laser3",
+	thum_sound: "rbxgameasset://Audio/thum_sound",
 };
