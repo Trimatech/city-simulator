@@ -8,7 +8,7 @@ import { selectSoldierOrbs } from "shared/store/soldiers";
 const TOWER_PRICE = POWERUP_PRICES.tower;
 let id = 0;
 
-export async function placeTower(player: Player, _clientPosition: Vector2) {
+export async function placeTower(player: Player) {
 	const soldierId = player.Name;
 	const orbCount = store.getState(selectSoldierOrbs(soldierId)) ?? 0;
 

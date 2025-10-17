@@ -20,9 +20,9 @@ export function createScheduler({ name, tick, phase, onTick, onRender }: Schedul
 
 		while (timer >= tick) {
 			timer -= tick;
-			debug.profilebegin(name);
+			//	debug.profilebegin(name);
 			onTick?.(tick);
-			debug.profileend();
+			//	debug.profileend();
 		}
 
 		onRender?.(frameTime, timer / tick);

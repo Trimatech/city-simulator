@@ -20,5 +20,7 @@ export const sounds = {
 	whoosh: "rbxgameasset://Audio/whoosh",
 	explosionCrunch_003: "rbxgameasset://Audio/explosionCrunch_003",
 	laser3: "rbxgameasset://Audio/laser3",
-	thum_sound: "rbxgameasset://Audio/thum_sound",
+	thump_sound: "rbxgameasset://Audio/thump_sound",
+	POL_organic_thud_02: "rbxgameasset://Audio/POL_organic_thud_02",
+	nuclear_sound_cartoon: "rbxgameasset://Audio/nuclear_sound_cartoon",
 };

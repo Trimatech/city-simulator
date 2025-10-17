@@ -1,6 +1,5 @@
 import { combineProducers, InferState } from "@rbxts/reflex";
 import { slices } from "shared/store";
-import { profilerMiddleware } from "shared/store/middleware/profiler";
 
 import { alertSlice } from "./alert";
 import { menuSlice } from "./menu";
@@ -19,7 +18,7 @@ export function createStore() {
 		world: worldSlice,
 	});
 
-	store.applyMiddleware(profilerMiddleware, receiverMiddleware());
+	store.applyMiddleware(receiverMiddleware());
 
 	return store;
 }

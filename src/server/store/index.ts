@@ -1,6 +1,5 @@
 import { combineProducers, InferState } from "@rbxts/reflex";
 import { slices } from "shared/store";
-import { profilerMiddleware } from "shared/store/middleware/profiler";
 
 import { broadcasterMiddleware } from "./middleware/broadcaster";
 import { milestoneSlice } from "./milestones";
@@ -13,7 +12,7 @@ export function createStore() {
 		milestones: milestoneSlice,
 	});
 
-	store.applyMiddleware(profilerMiddleware, broadcasterMiddleware());
+	store.applyMiddleware(broadcasterMiddleware());
 
 	return store;
 }
