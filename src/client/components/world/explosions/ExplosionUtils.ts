@@ -186,6 +186,47 @@ export function createAnimatedParticle(
 	return particle;
 }
 
+interface GroundAppearance {
+	color: Color3;
+	material: Enum.Material;
+}
+
+function getGroundAppearanceAt(position: Vector3): GroundAppearance {
+	const origin = position.add(new Vector3(0, 100, 0));
+	const direction = new Vector3(0, -200, 0);
+	const result = Workspace.Raycast(origin, direction);
+	if (result) {
+		const inst = result.Instance;
+		if (inst.IsA("BasePart")) {
+			return { color: inst.Color, material: inst.Material };
+		}
+	}
+	return { color: palette.white, material: Enum.Material.Plastic };
+}
+
+function createDebrisCube(color: Color3, material: Enum.Material, position: Vector3, sizeScale: number): Part {
+	const cube = new Instance("Part");
+	cube.Name = "NuclearDebris";
+	cube.Size = new Vector3(1, 1, 1).mul(sizeScale);
+	cube.Position = position;
+	cube.Color = color;
+	cube.Material = material;
+	cube.Anchored = false;
+	cube.CanCollide = true;
+	cube.CastShadow = false;
+	cube.Parent = Workspace;
+	return cube;
+}
+
+function launchDebris(part: BasePart, direction: Vector3, radialSpeed: number, upwardSpeed: number) {
+	const speedScale = 0.6 + math.random() * 0.8; // 0.6x .. 1.4x
+	const upwardScale = 0.8 + math.random() * 0.6; // 0.8x .. 1.4x
+	const lateral = direction.Unit.mul(radialSpeed * speedScale);
+	const vertical = new Vector3(0, upwardSpeed * upwardScale, 0);
+	part.AssemblyLinearVelocity = lateral.add(vertical);
+	part.AssemblyAngularVelocity = new Vector3(math.random(-3, 3), math.random(-3, 3), math.random(-3, 3));
+}
+
 export function createCarpetBombExplosion(center: Vector2, length: number, width: number, angle: number): Part[] {
 	const effects: Part[] = [];
 
@@ -388,25 +429,26 @@ export function createNuclearExplosion(center: Vector2, size: Vector3): Part[] {
 	ring2Tween.Play();
 	effects.push(ring2);
 
-	// Outward streaks
-	const numStreaks = 28;
-	const streakDistance = maxDiameter * 0.9;
-	for (let i = 0; i < numStreaks; i++) {
-		const t = i / numStreaks;
-		const angle = t * math.pi * 2 + (math.random() - 0.5) * 0.1;
-		const dir = new Vector3(math.cos(angle), 0, math.sin(angle));
-		const startPos = new Vector3(center.X, 0.08, center.Y);
-		const endPos = startPos.add(dir.mul(streakDistance));
-		const particle = createAnimatedParticle(
-			"NuclearStreak",
-			new Vector3(0.8, 0.2, 0.8),
-			startPos,
-			palette.yellow,
-			0.2,
-			endPos,
-			EXPLOSION_DURATION,
-		);
-		effects.push(particle);
+	// Debris cubes: simulate ground breaking and flying out
+	const ground = getGroundAppearanceAt(center3);
+	const radialSpeedBase = math.max(55, maxDiameter * 0.7);
+	const upwardSpeedBase = math.max(45, maxDiameter * 0.8);
+	const numSectors = 24; // ensure coverage in all directions
+	const sectorWidth = (2 * math.pi) / numSectors;
+	for (let s = 0; s < numSectors; s++) {
+		const baseAngle = s * sectorWidth;
+		const piecesInSector = 3 + math.floor(math.random() * 4); // 3..6 per sector
+		for (let j = 0; j < piecesInSector; j++) {
+			const jitter = (math.random() - 0.5) * sectorWidth * 0.95;
+			const angle = baseAngle + jitter;
+			const dir = new Vector3(math.cos(angle), 0, math.sin(angle));
+			const sizeScale = 0.7 + math.random() * 0.8; // 0.7 .. 1.5
+			const spawnOffset = dir.mul(0.8 * math.random()).add(new Vector3(0, 1.8 + math.random() * 0.8, 0));
+			const spawnPos = center3.add(spawnOffset);
+			const cube = createDebrisCube(ground.color, ground.material, spawnPos, sizeScale);
+			launchDebris(cube, dir, radialSpeedBase, upwardSpeedBase);
+			effects.push(cube);
+		}
 	}
 
 	return effects;
