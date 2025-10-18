@@ -84,7 +84,7 @@ export function Alert({ alert, index }: AlertProps) {
 	}, [visibleIndex]);
 
 	useMountEffect(() => {
-		playSound(alert.sound ?? sounds.alert_neutral);
+		playSound(alert.sound ?? sounds.bong_001);
 	});
 
 	return (

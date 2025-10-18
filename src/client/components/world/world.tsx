@@ -4,7 +4,6 @@ import { Group } from "client/ui/layout/group";
 
 import { Bots } from "./bots/Bots";
 import { Candies } from "./candies/Candies";
-import { ExplosionEffects } from "./explosions/ExplosionEffects";
 import { Soldiers } from "./soldiers";
 import { Towers } from "./towers/Towers";
 import { WorldSounds } from "./world-sounds";
@@ -24,8 +23,6 @@ export function World() {
 				<Candies />
 
 				<Towers />
-
-				<ExplosionEffects />
 			</Group>
 		</RemProvider>
 	);

@@ -3,7 +3,7 @@ import { Players, RunService } from "@rbxts/services";
 
 export function useCharacterPosition() {
 	const localPlayer = Players.LocalPlayer;
-	const character = localPlayer.Character;
+	const character = localPlayer?.Character;
 	const [position, setPosition] = useBinding<Vector2 | undefined>(undefined);
 
 	useEffect(() => {

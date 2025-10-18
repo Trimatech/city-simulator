@@ -15,9 +15,9 @@ interface Props {
 export function Soldier({ soldier, color = palette.white, transparency = 0 }: Props) {
 	const isDead = soldier.dead;
 	const localPlayer = Players.LocalPlayer;
-	const character = localPlayer.Character;
+	const character = localPlayer?.Character;
 
-	const isClient = localPlayer.Name === soldier.name;
+	const isClient = localPlayer?.Name === soldier.name;
 
 	// Get the last tracer point
 	const lastTracerPoint = soldier.tracers[soldier.tracers.size() - 1];

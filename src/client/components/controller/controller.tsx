@@ -15,7 +15,7 @@ export function Controller() {
 
 	useInterval(() => {
 		if (!isSpawned) return;
-		const position = Players.LocalPlayer.Character?.PrimaryPart?.Position;
+		const position = Players.LocalPlayer?.Character?.PrimaryPart?.Position;
 		if (position) {
 			const vector2 = new Vector2(position.X, position.Z);
 			remotes.soldier.move.fire(vector2);

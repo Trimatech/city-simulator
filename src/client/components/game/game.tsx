@@ -7,6 +7,7 @@ import { selectHasLocalSoldier } from "shared/store/soldiers";
 
 import { Transition } from "../../ui/transition";
 import { Compass } from "./compass";
+import { HealthView } from "./health/HealthView";
 import { Minimap } from "./minimap";
 import { RightSide } from "./right/RightSide";
 
@@ -28,6 +29,7 @@ export function Game() {
 			<Minimap />
 			<Compass />
 			<RightSide />
+			<HealthView />
 		</Transition>
 	);
 }

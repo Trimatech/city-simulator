@@ -8,7 +8,6 @@ import {
 	killSoldier,
 	removeForceFieldFromPlayerName,
 } from "server/world/world.utils";
-import { sounds } from "shared/assets";
 import { SOLDIER_MIN_AREA, SOLDIER_SPEED } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
 import { POWERUP_DURATIONS, POWERUP_EXPLOSIONS, POWERUP_PRICES, POWERUP_TURBO_SPEED } from "shared/constants/powerups";
@@ -25,7 +24,7 @@ import { selectSoldierById, selectSoldierOrbs, selectSoldiersById } from "shared
 import { selectTowersById } from "shared/store/towers/tower-selectors";
 import { findCharacterPrimaryPart } from "shared/utils/player-utils";
 
-import { placeTower } from "../soldiers/soldiers.placeTower";
+import { placeTower } from "./placeTower";
 
 interface Edge {
 	start: Vector3;
@@ -140,13 +139,12 @@ function trySpendOrbs(playerName: string, cost: number) {
 	return true;
 }
 
-function alert(player: Player, message: string, color = palette.blue) {
+function alertMessage(player: Player, message: string, color = palette.blue) {
 	remotes.client.alert.fire(player, {
 		scope: "money",
 		emoji: "🔮",
 		message,
 		color,
-		sound: sounds.alert_money,
 	});
 }
 
@@ -155,7 +153,7 @@ function triggerTurbo(player: Player) {
 	const speed = POWERUP_TURBO_SPEED;
 	const duration = POWERUP_DURATIONS.turbo;
 	if (!trySpendOrbs(playerName, POWERUP_PRICES.turbo)) {
-		alert(player, "Not enough orbs!", palette.red);
+		alertMessage(player, "Not enough orbs!", palette.red);
 		return;
 	}
 	const humanoid = getPlayerHumanoidByName(playerName);
@@ -166,13 +164,14 @@ function triggerTurbo(player: Player) {
 			if (again) again.WalkSpeed = SOLDIER_SPEED;
 		}, duration);
 	}
-	alert(player, "Turbo activated!", palette.green);
+
+	alertMessage(player, "Turbo activated!", palette.green);
 }
 
 function triggerShield(player: Player) {
 	const playerName = player.Name;
 	if (!trySpendOrbs(playerName, POWERUP_PRICES.shield)) {
-		alert(player, "Not enough orbs!", palette.red);
+		alertMessage(player, "Not enough orbs!", palette.red);
 		return;
 	}
 	// enable shield in state
@@ -187,7 +186,7 @@ function triggerShield(player: Player) {
 		removeForceFieldFromPlayerName(playerName);
 	}, POWERUP_DURATIONS.shield);
 
-	alert(player, "Shield activated!", palette.green);
+	alertMessage(player, "Shield activated!", palette.green);
 }
 
 function magnitude2D(a: Vector2, b: Vector2) {
@@ -368,7 +367,7 @@ function triggerLaserBeam(player: Player) {
 	const cfg = POWERUP_EXPLOSIONS.laserBeam;
 	const cost = POWERUP_PRICES.laserBeam;
 	if (!trySpendOrbs(playerName, cost)) {
-		alert(player, "Not enough orbs!", palette.red);
+		alertMessage(player, "Not enough orbs!", palette.red);
 		return;
 	}
 
@@ -450,7 +449,7 @@ function triggerLaserBeam(player: Player) {
 
 	remotes.client.powerupCarpet.fireAll(cframe, size);
 
-	alert(player, "Laser Beam deployed!", palette.green);
+	alertMessage(player, "Laser Beam deployed!", palette.green);
 }
 
 function triggerNuclearExplosion(player: Player) {
@@ -458,7 +457,7 @@ function triggerNuclearExplosion(player: Player) {
 	const cfg = POWERUP_EXPLOSIONS.nuclearExplosion;
 	const cost = POWERUP_PRICES.nuclearExplosion;
 	if (!trySpendOrbs(playerName, cost)) {
-		alert(player, "Not enough orbs!", palette.red);
+		alertMessage(player, "Not enough orbs!", palette.red);
 		return;
 	}
 	const centerSoldier = store.getState(selectSoldierById(playerName));
@@ -493,7 +492,7 @@ function triggerNuclearExplosion(player: Player) {
 	const size = new Vector3(5, cfg.radius * 2, cfg.radius * 2);
 	remotes.client.powerupNuclear.fireAll(nuclearCFrame, size);
 
-	alert(player, "Nuclear Explosion detonated!", palette.green);
+	alertMessage(player, "Nuclear Explosion detonated!", palette.green);
 }
 
 export async function initPowerupService() {
