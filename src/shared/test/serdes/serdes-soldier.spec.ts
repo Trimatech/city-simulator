@@ -25,6 +25,8 @@ export = () => {
 			polygonAreaSize: 0,
 			isInside: true,
 			shieldActive: math.random() > 0.5,
+			health: 100,
+			maxHealth: 100,
 		};
 	}
 

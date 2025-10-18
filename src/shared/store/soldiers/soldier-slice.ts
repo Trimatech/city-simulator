@@ -30,6 +30,8 @@ export interface SoldierEntity {
 	readonly polygonAreaSize: number;
 	readonly isInside: boolean;
 	readonly shieldActive: boolean;
+	readonly health: number;
+	readonly maxHealth: number;
 }
 
 const defaultEntity: SoldierEntity = {
@@ -48,6 +50,8 @@ const defaultEntity: SoldierEntity = {
 	polygonAreaSize: 0,
 	isInside: true,
 	shieldActive: false,
+	health: 100,
+	maxHealth: 100,
 };
 
 const initialState: SoldiersState = {};
@@ -72,6 +76,11 @@ export const soldiersSlice = createProducer(initialState, {
 				polygonAreaSize,
 				...patch,
 				orbs: math.min(patch?.orbs ?? 0, SOLDIER_MAX_ORBS),
+				health:
+					patch?.health !== undefined
+						? math.clamp(patch.health, 0, patch.maxHealth ?? defaultEntity.maxHealth)
+						: defaultEntity.health,
+				maxHealth: patch?.maxHealth !== undefined ? patch.maxHealth : defaultEntity.maxHealth,
 			},
 		};
 	},
@@ -172,6 +181,20 @@ export const soldiersSlice = createProducer(initialState, {
 		return mapProperty(state, id, (soldier) => ({
 			...soldier,
 			shieldActive: active,
+		}));
+	},
+
+	setSoldierHealth: (state, id: string, value: number) => {
+		return mapProperty(state, id, (soldier) => ({
+			...soldier,
+			health: math.clamp(value, 0, soldier.maxHealth),
+		}));
+	},
+
+	decrementSoldierHealth: (state, id: string, amount: number) => {
+		return mapProperty(state, id, (soldier) => ({
+			...soldier,
+			health: math.max(soldier.health - math.abs(amount), 0),
 		}));
 	},
 

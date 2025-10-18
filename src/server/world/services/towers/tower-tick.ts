@@ -1,55 +1,52 @@
 import Object from "@rbxts/object-utils";
 import { store } from "server/store";
-import { takeDamageByPlayerName } from "server/world/world.utils";
+import { killSoldier } from "server/world/world.utils";
 import { selectSoldiersById } from "shared/store/soldiers";
 import { selectTowersById } from "shared/store/towers/tower-selectors";
-import { TowerEntity } from "shared/store/towers/tower-slice";
 
-const TOWER_ATTACK_INTERVAL = 2; // 3 seconds between attacks
-
-export function onTowerTick() {
+export function onTowerTick(dt: number) {
 	const currentTime = tick();
 	const towers = store.getState(selectTowersById);
 	const soldiers = store.getState(selectSoldiersById);
-	const updates: Partial<TowerEntity>[] = [];
 
 	for (const [, tower] of Object.entries(towers)) {
-		// Skip if tower hasn't cooled down
-		if (currentTime - tower.lastAttackTime < TOWER_ATTACK_INTERVAL) {
+		let nearestId: string | undefined = undefined;
+		let nearestDist = math.huge;
+
+		for (const [, soldier] of Object.entries(soldiers)) {
+			if (!soldier || soldier.dead || soldier.id === tower.ownerId) continue;
+
+			const distance = tower.position.sub(soldier.position).Magnitude;
+			if (distance <= tower.range && distance < nearestDist) {
+				nearestDist = distance;
+				nearestId = soldier.id;
+			}
+		}
+
+		if (nearestId === undefined) {
+			if (tower.currentTargetId !== undefined || tower.hasEnemyInRange !== false) {
+				store.updateTowerTarget(tower.id, { hasEnemyInRange: false });
+			}
 			continue;
 		}
 
-		// Check for enemies in range
-		for (const [, soldier] of Object.entries(soldiers)) {
-			if (soldier.dead || soldier.id === tower.ownerId) {
-				//warn(`Skipping tower ${tower.id} because soldier ${soldier.id} is dead or is the owner`);
-				continue;
-			}
+		// Apply DPS and update target flags
+		store.updateTowerTarget(tower.id, {
+			currentTargetId: nearestId,
+			hasEnemyInRange: true,
+			lastAttackTime: currentTime,
+			lastAttackPlayerName: nearestId,
+		});
 
-			const distance = tower.position.sub(soldier.position).Magnitude;
-			if (distance <= tower.range) {
-				print(`Tower ${tower.id} attacking soldier ${soldier.id}`);
+		const target = soldiers[nearestId];
+		if (!target || target.dead) continue;
 
-				// Deal damage to the soldier
-				takeDamageByPlayerName(soldier.id, tower.damage);
+		const damage = tower.damage * dt;
+		store.decrementSoldierHealth(nearestId, damage);
 
-				// Update tower's last attack time
-				updates.push({
-					id: tower.id,
-					lastAttackTime: currentTime,
-					lastAttackPlayerName: soldier.id,
-				});
-				break; // Only attack one soldier per tick
-			}
-		}
-	}
-
-	// Batch update towers' last attack times
-	if (updates.size() > 0) {
-		for (const update of updates) {
-			if (update.id) {
-				store.updateTowerLastAttack(update.id, update);
-			}
+		const updated = store.getState(selectSoldiersById)[nearestId];
+		if (updated && updated.health <= 0 && !updated.dead) {
+			killSoldier(nearestId);
 		}
 	}
 }

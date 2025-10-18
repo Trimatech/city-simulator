@@ -25,7 +25,7 @@ _Goal: Real-time PvP and territory management._
 
 -   [x] Support multiple players in the same arena
 -   [x] Handle safe/unsafe zones per player
--   [ ] Add collision bounce when players meet outside their zones
+-   [-] Add collision bounce when players meet outside their zones
 -   [x] Add player death if line is touched by another
 -   [x] Track and update territory percentage per player
 
@@ -37,8 +37,8 @@ _Goal: Add resource collection and competitive powers._
 
 -   [x] Spawn orbs randomly on the map
 -   [x] Add orb pickup logic
--   [ ] Display and fill Orb Power Meter (UI)
--   [ ] Play progressively deeper sound on each orb collected
+-   [x] Display and fill Orb Power Meter (UI)
+-   [x] Play progressively deeper sound on each orb collected
 -   [ ] Unlock powers as meter fills:
     -   [x] Turbo
     -   [x] Turbo 2x (perhaps we will remove this)

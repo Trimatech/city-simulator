@@ -190,13 +190,6 @@ function triggerShield(player: Player) {
 	alert(player, "Shield activated!", palette.green);
 }
 
-function triggeBruildTower(player: Player) {
-	// Reuse existing purchase/price logic in soldiers.placeTower – do not double charge
-	const soldier = store.getState(selectSoldierById(player.Name));
-	if (!soldier) return;
-	placeTower(player, soldier.position);
-}
-
 function magnitude2D(a: Vector2, b: Vector2) {
 	return a.sub(b).Magnitude;
 }
@@ -516,7 +509,7 @@ export async function initPowerupService() {
 				triggerShield(player);
 				break;
 			case "tower":
-				triggeBruildTower(player);
+				placeTower(player);
 				break;
 			case "laserBeam":
 				triggerLaserBeam(player);

@@ -44,3 +44,4 @@ This codebase uses [roblox-ts](mdc:https:/roblox-ts.com), a TypeScript-to-Luau c
 Don't use as variable names:
 
 -   type
+-   next

@@ -1,3 +1,6 @@
+import { Workspace } from "@rbxts/services";
+import { sounds } from "shared/assets";
+import { playSound } from "shared/assets/sounds/play-sound";
 import { palette } from "shared/constants/palette";
 import { getPlayerByName } from "shared/utils/player-utils";
 
@@ -5,8 +8,9 @@ export function createRangeIndicator(range: number, position: Vector3) {
 	const rangeIndicator = new Instance("Part");
 	rangeIndicator.Name = "RangeIndicator";
 	rangeIndicator.Shape = Enum.PartType.Cylinder;
-	rangeIndicator.Size = new Vector3(1.1, range * 2, range * 2);
-	rangeIndicator.CFrame = new CFrame(position).mul(CFrame.Angles(0, 0, math.pi / 2));
+	// Default cylinder axis is Y (vertical). Use small Y for thickness and X/Z as diameter.
+	rangeIndicator.Size = new Vector3(4, range * 2, range * 2);
+	rangeIndicator.CFrame = new CFrame(position).mul(CFrame.Angles(0, 0, math.rad(90)));
 	rangeIndicator.Transparency = 0.9;
 	rangeIndicator.Color = palette.red;
 	rangeIndicator.CanCollide = false;
@@ -15,7 +19,7 @@ export function createRangeIndicator(range: number, position: Vector3) {
 	return rangeIndicator;
 }
 
-export function createAttackBeam(model: Model, playerName: string) {
+export function createAttackBeam(model: Model, targetId: string) {
 	// Find the Orb part in the tower model
 	const orbPart = model.FindFirstChild("Orb") as BasePart;
 	if (!orbPart) {
@@ -23,17 +27,28 @@ export function createAttackBeam(model: Model, playerName: string) {
 		return;
 	}
 
-	// Find the target player's character
-	const player = getPlayerByName(playerName);
-	if (!player?.Character) {
-		warn("Player character not found for beam target");
-		return;
+	// Resolve target (player or bot model in Workspace)
+	let targetPart: BasePart | undefined;
+	const player = getPlayerByName(targetId);
+	if (player && player.Character) {
+		const hrp = player.Character.FindFirstChild("HumanoidRootPart");
+		if (hrp && hrp.IsA("BasePart")) {
+			targetPart = hrp as BasePart;
+		}
 	}
 
-	// Get the humanoid root part as the target
-	const humanoidRootPart = player.Character.FindFirstChild("HumanoidRootPart") as BasePart;
-	if (!humanoidRootPart) {
-		warn("HumanoidRootPart not found for beam target");
+	if (!targetPart) {
+		const targetModel = Workspace.FindFirstChild(targetId);
+		if (targetModel && targetModel.IsA("Model")) {
+			const primary =
+				(targetModel.PrimaryPart as BasePart | undefined) ??
+				(targetModel.FindFirstChildWhichIsA("BasePart") as BasePart | undefined);
+			if (primary) targetPart = primary;
+		}
+	}
+
+	if (!targetPart) {
+		warn(`No target part found for ${targetId}`);
 		return;
 	}
 
@@ -42,7 +57,7 @@ export function createAttackBeam(model: Model, playerName: string) {
 	attachment0.Parent = orbPart;
 
 	const attachment1 = new Instance("Attachment");
-	attachment1.Parent = humanoidRootPart;
+	attachment1.Parent = targetPart;
 
 	// Create the beam
 	const beam = new Instance("Beam");
@@ -58,10 +73,44 @@ export function createAttackBeam(model: Model, playerName: string) {
 	]);
 	beam.Parent = model;
 
-	// Clean up attachments when beam is destroyed
+	// Optional: looped laser sound attached to the orb part
+	const sound = playSound(sounds.laser_beam, { parent: orbPart, looped: true, volume: 0.35, pitchOctave: 0.5 });
+
+	// Auto-destroy beam if the target goes away or leaves Workspace
+	const connections: RBXScriptConnection[] = [];
+	connections.push(
+		targetPart.Destroying.Connect(() => {
+			if (beam && beam.Parent) beam.Destroy();
+		}),
+	);
+	connections.push(
+		targetPart.AncestryChanged.Connect(() => {
+			if (!targetPart.IsDescendantOf(Workspace)) {
+				if (beam && beam.Parent) beam.Destroy();
+			}
+		}),
+	);
+
+	// If target is a Player's character, remove beam when their character is removed
+	if (player) {
+		connections.push(
+			player.CharacterRemoving.Connect(() => {
+				if (beam && beam.Parent) beam.Destroy();
+			}),
+		);
+	}
+
+	// Clean up attachments, sound, and event connections when beam is destroyed
 	beam.Destroying.Connect(() => {
 		attachment0.Destroy();
 		attachment1.Destroy();
+		if (sound) {
+			sound.Stop();
+			sound.Destroy();
+		}
+		for (const connection of connections) {
+			connection.Disconnect();
+		}
 	});
 
 	return beam;
