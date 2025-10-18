@@ -41,8 +41,7 @@ _Goal: Add resource collection and competitive powers._
 -   [x] Play progressively deeper sound on each orb collected
 -   [ ] Unlock powers as meter fills:
     -   [x] Turbo
-    -   [x] Turbo 2x (perhaps we will remove this)
-    -   [ ] Build Tower
+    -   [x] Build Tower
     -   [x] Shield
     -   [x] Explosion
     -   [x] Mega Explosion
@@ -54,9 +53,9 @@ _Goal: Add resource collection and competitive powers._
 
 _Goal: Satisfying game feel through feedback._
 
--   [ ] Line drawing: smooth glide sound with rising pitch
--   [ ] Land claim: pop + ripple animation and sound
--   [ ] Orb pickup: glow pulse + collection sound
+-   [x] Line drawing: smooth glide sound with rising pitch
+-   [x] Land claim: pop + ripple animation and sound
+-   [x] Orb pickup: glow pulse + collection sound
 -   [ ] Player death: crack sound + shatter dissolve effect
 -   [ ] Explosion: shockwave, particles, screen shake
 -   [ ] Player trails and zone colors should be unique per player

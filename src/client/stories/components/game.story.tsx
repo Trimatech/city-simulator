@@ -8,9 +8,7 @@ import { World } from "client/components/world";
 import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
 import { USER_NAME, WORLD_BOUNDS } from "shared/constants/core";
-import { getRandomAccent } from "shared/constants/palette";
 import { getRandomBaseSoldierSkin } from "shared/constants/skins";
-import { CandyType } from "shared/store/candy";
 import { fillArray } from "shared/utils/object-utils";
 
 import { useMockRemotes } from "../utils/use-mock-remotes";
@@ -36,18 +34,18 @@ export = hoarcekat(() => {
 			});
 		}
 
-		store.populateCandy(
-			fillArray(512, (index) => ({
-				id: `test-${index}`,
-				type: CandyType.Default,
-				position: new Vector2(
-					(math.random() * 2 - 1) * WORLD_BOUNDS * 0.2,
-					(math.random() * 2 - 1) * WORLD_BOUNDS * 0.2,
-				),
-				size: math.random(1, 10),
-				color: getRandomAccent(),
-			})),
-		);
+		// store.populateCandy(
+		// 	fillArray(512, (index) => ({
+		// 		id: `test-${index}`,
+		// 		type: CandyType.Default,
+		// 		position: new Vector2(
+		// 			(math.random() * 2 - 1) * WORLD_BOUNDS * 0.2,
+		// 			(math.random() * 2 - 1) * WORLD_BOUNDS * 0.2,
+		// 		),
+		// 		size: math.random(1, 10),
+		// 		color: getRandomAccent(),
+		// 	})),
+		// );
 	}, []);
 
 	useTimeout(() => {
