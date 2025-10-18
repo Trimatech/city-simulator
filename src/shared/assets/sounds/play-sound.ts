@@ -1,5 +1,5 @@
 import { SoundService } from "@rbxts/services";
-import { IS_EDIT } from "shared/constants/core";
+import { IS_EDITOR } from "shared/constants/core";
 
 export interface SoundOptions {
 	volume?: number;
@@ -49,7 +49,7 @@ export function createSound(
 }
 
 export function playSound(soundId: string, options?: SoundOptions) {
-	if (IS_EDIT) {
+	if (IS_EDITOR) {
 		return;
 	}
 

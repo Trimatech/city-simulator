@@ -1,7 +1,7 @@
 import { useEventListener } from "@rbxts/pretty-react-hooks";
 import React, { useState } from "@rbxts/react";
 import { UserInputService } from "@rbxts/services";
-import { IS_EDIT } from "shared/constants/core";
+import { IS_EDITOR } from "shared/constants/core";
 
 import { Group } from "./layout/group";
 
@@ -25,19 +25,19 @@ export function InputCapture({
 	const [frame, frameRef] = useState<Frame>();
 
 	useEventListener(UserInputService.InputBegan, (input, gameProcessed) => {
-		if (frame && !IS_EDIT && !gameProcessed) {
+		if (frame && !IS_EDITOR && !gameProcessed) {
 			onInputBegan?.(frame, input);
 		}
 	});
 
 	useEventListener(UserInputService.InputEnded, (input) => {
-		if (frame && !IS_EDIT) {
+		if (frame && !IS_EDITOR) {
 			onInputEnded?.(frame, input);
 		}
 	});
 
 	useEventListener(UserInputService.InputChanged, (input) => {
-		if (frame && !IS_EDIT) {
+		if (frame && !IS_EDITOR) {
 			onInputChanged?.(frame, input);
 		}
 	});
@@ -49,9 +49,9 @@ export function InputCapture({
 			position={position}
 			anchorPoint={anchorPoint}
 			event={{
-				InputBegan: IS_EDIT ? onInputBegan : undefined,
-				InputChanged: IS_EDIT ? onInputChanged : undefined,
-				InputEnded: IS_EDIT ? onInputEnded : undefined,
+				InputBegan: IS_EDITOR ? onInputBegan : undefined,
+				InputChanged: IS_EDITOR ? onInputChanged : undefined,
+				InputEnded: IS_EDITOR ? onInputEnded : undefined,
 			}}
 		/>
 	);

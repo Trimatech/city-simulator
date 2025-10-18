@@ -1,10 +1,10 @@
 import { createBroadcastReceiver, ProducerMiddleware } from "@rbxts/reflex";
-import { IS_EDIT } from "shared/constants/core";
+import { IS_EDITOR } from "shared/constants/core";
 import { remotes } from "shared/remotes";
 import { deserializeState } from "shared/serdes";
 
 export function receiverMiddleware(): ProducerMiddleware {
-	if (IS_EDIT) {
+	if (IS_EDITOR) {
 		return () => (dispatch) => dispatch;
 	}
 

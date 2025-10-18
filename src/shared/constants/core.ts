@@ -16,7 +16,8 @@ export const REMOTE_TICK = 1 / 20; // Roblox limits
 
 export const IS_PROD = game.PlaceId === 14162747150;
 export const IS_CANARY = !IS_PROD;
-export const IS_EDIT = RunService.IsStudio() && !RunService.IsRunning();
+export const IS_EDITOR = RunService.IsStudio() && !RunService.IsRunning();
+export const IS_LOCAL = RunService.IsStudio() && RunService.IsRunning();
 
 export const USER_ID = Players.LocalPlayer ? Players.LocalPlayer.UserId : 0;
 export const USER_NAME = Players.LocalPlayer ? Players.LocalPlayer.Name : "(server)";

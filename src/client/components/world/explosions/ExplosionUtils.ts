@@ -315,40 +315,99 @@ export function createCarpetBombExplosionWithCFrame(center: Vector2, size: Vecto
 export function createNuclearExplosion(center: Vector2, size: Vector3): Part[] {
 	const effects: Part[] = [];
 
-	// Create main explosion part
-	const explosion = createCylinderBasePart(
-		"NuclearExplosion",
-		size,
-		new Vector3(center.X, 0.1, center.Y),
+	const center3 = new Vector3(center.X, 0.1, center.Y);
+	// Cylinder shape: local X = thickness (axis), local Y/Z = diameters. We rotate 90deg Z to align axis up.
+	const maxDiameter = math.max(size.Y, size.Z);
+	const ringThickness = math.max(0.2, size.X * 0.6);
+
+	// Core flash (persistent root for audio/fade)
+	const coreInitialSize = new Vector3(size.X, math.max(2, size.Y * 0.25), math.max(2, size.Z * 0.25));
+	const core = createCylinderBasePart(
+		"NuclearCore",
+		coreInitialSize,
+		center3,
 		new Vector3(0, 0, 90),
 		palette.yellow,
-		0.1,
+		0,
 	);
+	const coreLightRange = math.max(30, maxDiameter * 1.3);
+	const coreLight = createPointLight(palette.white, 20, coreLightRange, core);
+	const coreLightTween = TweenService.Create(
+		coreLight,
+		new TweenInfo(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		{ Brightness: 0 },
+	);
+	coreLightTween.Play();
 
-	effects.push(explosion);
+	const coreTween = TweenService.Create(core, new TweenInfo(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+		Size: new Vector3(size.X, size.Y, size.Z),
+		Transparency: 0.6,
+	});
+	coreTween.Play();
+	effects.push(core);
 
-	// Create expanding ring effect
-	const ring = createCylinderBasePart(
-		"NuclearRing",
-		size,
-		new Vector3(center.X, 0.15, center.Y),
+	// Shockwave ring 1 (fast, bright)
+	const ring1Initial = new Vector3(ringThickness, math.max(2, size.Y * 0.15), math.max(2, size.Z * 0.15));
+	const ring1 = createCylinderBasePart(
+		"NuclearShockwave1",
+		ring1Initial,
+		new Vector3(center.X, 0.12, center.Y),
 		new Vector3(0, 0, 90),
 		palette.white,
 		0.05,
 	);
-
-	// Animate ring expansion
-	const ringTween = TweenService.Create(
-		ring,
+	const ring1Tween = TweenService.Create(
+		ring1,
 		new TweenInfo(EXPLOSION_DURATION, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
 		{
-			Size: size,
+			Size: new Vector3(ringThickness, size.Y, size.Z),
 			Transparency: 1,
 		},
 	);
-	ringTween.Play();
+	ring1Tween.Play();
+	effects.push(ring1);
 
-	effects.push(ring);
+	// Shockwave ring 2 (slightly delayed, warmer)
+	const ring2Initial = new Vector3(ringThickness * 0.8, math.max(2, size.Y * 0.1), math.max(2, size.Z * 0.1));
+	const ring2 = createCylinderBasePart(
+		"NuclearShockwave2",
+		ring2Initial,
+		new Vector3(center.X, 0.14, center.Y),
+		new Vector3(0, 0, 90),
+		palette.peach,
+		0.1,
+	);
+	const ring2Tween = TweenService.Create(
+		ring2,
+		new TweenInfo(EXPLOSION_DURATION, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0.08),
+		{
+			Size: new Vector3(ringThickness * 0.8, size.Y * 1.2, size.Z * 1.2),
+			Transparency: 1,
+		},
+	);
+	ring2Tween.Play();
+	effects.push(ring2);
+
+	// Outward streaks
+	const numStreaks = 28;
+	const streakDistance = maxDiameter * 0.9;
+	for (let i = 0; i < numStreaks; i++) {
+		const t = i / numStreaks;
+		const angle = t * math.pi * 2 + (math.random() - 0.5) * 0.1;
+		const dir = new Vector3(math.cos(angle), 0, math.sin(angle));
+		const startPos = new Vector3(center.X, 0.08, center.Y);
+		const endPos = startPos.add(dir.mul(streakDistance));
+		const particle = createAnimatedParticle(
+			"NuclearStreak",
+			new Vector3(0.8, 0.2, 0.8),
+			startPos,
+			palette.yellow,
+			0.2,
+			endPos,
+			EXPLOSION_DURATION,
+		);
+		effects.push(particle);
+	}
 
 	return effects;
 }

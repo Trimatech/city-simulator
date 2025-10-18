@@ -1,4 +1,4 @@
-import { WORLD_TICK } from "shared/constants/core";
+import { IS_LOCAL, WORLD_TICK } from "shared/constants/core";
 import { CandyType } from "shared/store/candy";
 
 // Variable to enable/disable testing stuff, to shorten the work cycle
@@ -12,7 +12,7 @@ export const SOLDIER_TICK_PHASE = 0;
 export const CANDY_TICK_PHASE = 0.33 * WORLD_TICK;
 export const COLLISION_TICK_PHASE = 0.66 * WORLD_TICK;
 
-export const DEFAULT_ORBS = 400; // 15
+export const DEFAULT_ORBS = IS_LOCAL ? 400 : 15; // 15
 
 export const CANDY_LIMITS: { readonly [K in CandyType]: number } = {
 	[CandyType.Default]: 2048,

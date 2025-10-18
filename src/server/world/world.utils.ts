@@ -1,7 +1,7 @@
 import { Players } from "@rbxts/services";
 import { setTimeout } from "@rbxts/set-timeout";
 import { store } from "server/store";
-import { WORLD_BOUNDS } from "shared/constants/core";
+import { IS_LOCAL, WORLD_BOUNDS } from "shared/constants/core";
 import { selectCandyById } from "shared/store/candy";
 import { selectSoldierById } from "shared/store/soldiers";
 
@@ -68,6 +68,10 @@ export function removeForceFieldFromPlayerName(playerName: string) {
 }
 
 export function killSoldier(soldierId: string) {
+	if (IS_LOCAL) {
+		warn(`[DEBUG] Killing soldier ${soldierId} in local mode`);
+		return;
+	}
 	store.setSoldierIsDead(soldierId);
 
 	const humanoid = getPlayerHumanoidByName(soldierId);

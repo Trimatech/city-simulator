@@ -1,12 +1,12 @@
 import { createBroadcaster, ProducerMiddleware } from "@rbxts/reflex";
 import { Players } from "@rbxts/services";
-import { IS_EDIT, WORLD_TICK } from "shared/constants/core";
+import { IS_EDITOR, WORLD_TICK } from "shared/constants/core";
 import { remotes } from "shared/remotes";
 import { serializeState, SharedStateSerialized } from "shared/serdes";
 import { SharedState, slices } from "shared/store";
 
 export function broadcasterMiddleware(): ProducerMiddleware {
-	if (IS_EDIT) {
+	if (IS_EDITOR) {
 		return () => (dispatch) => dispatch;
 	}
 

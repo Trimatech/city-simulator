@@ -1,5 +1,5 @@
 import React from "@rbxts/react";
-import { IS_EDIT } from "shared/constants/core";
+import { IS_EDITOR } from "shared/constants/core";
 
 import { Group } from "./group";
 
@@ -9,7 +9,7 @@ interface LayerProps extends React.PropsWithChildren {
 }
 
 export function Layer({ displayOrder, name, children }: LayerProps) {
-	return IS_EDIT ? (
+	return IS_EDITOR ? (
 		<Group zIndex={displayOrder} name={name}>
 			{children}
 		</Group>
