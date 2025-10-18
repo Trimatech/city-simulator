@@ -112,7 +112,7 @@ export function WorldSounds() {
 			if (!sound) {
 				warn("No sound for step", step);
 			} else {
-				sound.Volume = volume * 0.6;
+				sound.Volume = volume * 0.5;
 				//sound.TimePosition = 0;
 				sound.Play();
 			}

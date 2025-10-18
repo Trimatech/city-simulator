@@ -1,6 +1,5 @@
 import Object from "@rbxts/object-utils";
-import React from "@rbxts/react";
-import { useEffect, useRef } from "@rbxts/react";
+import React, { useEffect, useRef } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { Workspace } from "@rbxts/services";
 import { selectTowersById } from "shared/store/towers/tower-selectors";
@@ -31,8 +30,8 @@ export function Towers() {
 
 	return (
 		<>
-			{Object.entries(towers).map(([id, tower]) => {
-				return <Tower key={id} tower={tower} parentFolder={parentRef.current} />;
+			{Object.values(towers).map((tower) => {
+				return <Tower key={tower.id} towerId={tower.id} parentFolder={parentRef.current} />;
 			})}
 		</>
 	);

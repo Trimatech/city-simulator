@@ -13,6 +13,8 @@ export interface TowerEntity {
 	readonly damage: number;
 	readonly lastAttackTime: number;
 	readonly lastAttackPlayerName: string | undefined;
+	readonly currentTargetId?: string;
+	readonly hasEnemyInRange: boolean;
 }
 
 const initialState: TowerState = {};
@@ -31,6 +33,32 @@ export const towerSlice = createProducer(initialState, {
 			...tower,
 			...props,
 		}));
+	},
+
+	updateTowerTarget: (
+		state,
+		id: string,
+		props: Pick<
+			Partial<TowerEntity>,
+			"currentTargetId" | "hasEnemyInRange" | "lastAttackTime" | "lastAttackPlayerName"
+		>,
+	) => {
+		print("updateTowerTarget.....", id, props);
+		return mapProperty(state, id, (tower) => {
+			const nextS = {
+				...tower,
+				...props,
+			};
+
+			// When no enemies are in range, explicitly clear the current target.
+			// Note: roblox-ts omits fields set to undefined from object literals at runtime,
+			// so we cannot rely on `currentTargetId: undefined` being present in `props`.
+			if (props.hasEnemyInRange === false) {
+				nextS.currentTargetId = undefined;
+			}
+
+			return nextS;
+		});
 	},
 
 	removeTowersByOwnerId: (state, ownerId: string) => {

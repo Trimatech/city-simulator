@@ -29,7 +29,6 @@ import { createScheduler } from "shared/utils/scheduler";
 
 import { candyGrid, eatCandies } from "../candy/candy-utils";
 import { deleteSoldierInput, onSoldierTick, registerSoldierInput } from "./soldier-tick";
-import { placeTower } from "./soldiers.placeTower";
 import { setSoldierSpeed } from "./soldiers.utils";
 
 export async function initSoldierService() {
@@ -65,6 +64,8 @@ export async function initSoldierService() {
 			position: safePoint ? new Vector2(safePoint.X, safePoint.Y) : undefined,
 			skin: currentSkin !== RANDOM_SKIN ? currentSkin : randomSkin,
 			orbs: DEFAULT_ORBS,
+			health: 100,
+			maxHealth: 100,
 		});
 
 		const character = player.Character as Model;
@@ -83,10 +84,6 @@ export async function initSoldierService() {
 
 	remotes.soldier.move.connect((player, position) => {
 		registerSoldierInput(player.Name, position);
-	});
-
-	remotes.soldier.placeTower.connect((player, position) => {
-		placeTower(player, position);
 	});
 
 	remotes.soldier.kill.connect((player) => {

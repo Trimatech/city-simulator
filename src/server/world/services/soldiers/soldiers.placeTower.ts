@@ -50,6 +50,8 @@ export async function placeTower(player: Player) {
 		range: 50,
 		lastAttackTime: 0,
 		lastAttackPlayerName: undefined,
+		currentTargetId: undefined,
+		hasEnemyInRange: false,
 	});
 
 	remotes.client.alert.fire(player, {

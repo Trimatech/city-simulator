@@ -22,5 +22,5 @@ export const sounds = {
 	laser3: "rbxgameasset://Audio/laser3",
 	thump_sound: "rbxgameasset://Audio/thump_sound",
 	POL_organic_thud_02: "rbxgameasset://Audio/POL_organic_thud_02",
-	nuclear_sound_cartoon: "rbxgameasset://Audio/nuclear_sound_cartoon",
+	laser_beam: "rbxgameasset://Audio/laser_beam",
 };
