@@ -3,7 +3,7 @@ import React from "@rbxts/react";
 import { fonts } from "client/constants/fonts";
 import { useMotion, useRem } from "client/hooks";
 import { Outline } from "client/ui/outline";
-import { PrimaryButton } from "client/ui/primary-button";
+import { PrimaryButton } from "client/ui/PrimaryButton";
 import { Shadow } from "client/ui/shadow";
 import { Text } from "client/ui/text";
 import { palette } from "shared/constants/palette";

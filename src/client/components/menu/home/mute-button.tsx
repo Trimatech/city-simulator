@@ -3,7 +3,7 @@ import { useSelector } from "@rbxts/react-reflex";
 import { fonts } from "client/constants/fonts";
 import { useRem, useStore } from "client/hooks";
 import { selectMusicEnabled } from "client/store/menu";
-import { PrimaryButton } from "client/ui/primary-button";
+import { PrimaryButton } from "client/ui/PrimaryButton";
 import { Text } from "client/ui/text";
 import { palette } from "shared/constants/palette";
 

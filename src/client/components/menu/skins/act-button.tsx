@@ -6,7 +6,7 @@ import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
 import { useMotion, useRem } from "client/hooks";
 import { selectMenuCurrentSkin } from "client/store/menu";
-import { PrimaryButton } from "client/ui/primary-button";
+import { PrimaryButton } from "client/ui/PrimaryButton";
 import { Shadow } from "client/ui/shadow";
 import { Text } from "client/ui/text";
 import { formatInteger } from "client/utils/format-integer";

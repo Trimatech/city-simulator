@@ -6,7 +6,7 @@ import { useMotion, useProductPrice, useRem } from "client/hooks";
 import { Frame } from "client/ui/layout/frame";
 import { Group } from "client/ui/layout/group";
 import { Outline } from "client/ui/outline";
-import { PrimaryButton } from "client/ui/primary-button";
+import { PrimaryButton } from "client/ui/PrimaryButton";
 import { ReactiveButton } from "client/ui/reactive-button";
 import { Shadow } from "client/ui/shadow";
 import { Text } from "client/ui/text";

@@ -1,14 +1,11 @@
-import { blend, composeBindings, lerpBinding } from "@rbxts/pretty-react-hooks";
+import { composeBindings, useTimer } from "@rbxts/pretty-react-hooks";
 import React from "@rbxts/react";
-import { images } from "shared/assets";
 import { palette } from "shared/constants/palette";
 
 import { useMotion, useRem } from "../hooks";
-import { Image } from "./image";
 import { Frame } from "./layout/frame";
 import { Outline } from "./outline";
 import { ReactiveButton } from "./reactive-button";
-import { Shadow } from "./shadow";
 
 interface PrimaryButtonProps extends React.PropsWithChildren {
 	readonly onClick?: () => void;
@@ -31,13 +28,20 @@ export function PrimaryButton({
 	position,
 	anchorPoint,
 	overlayGradient,
-	overlayTransparency = 0,
+
 	overlayRotation,
 	layoutOrder,
 	children,
 }: PrimaryButtonProps) {
 	const rem = useRem();
 	const [hover, hoverMotion] = useMotion(0);
+	const timer = useTimer();
+
+	const cornerRadius = new UDim(0, rem(1));
+
+	const gradientColor = new ColorSequence(palette.sky, palette.sky);
+	const gradientSpin = timer.value.map((t) => 30 * t);
+	const gradientRotation = composeBindings(hover, gradientSpin, (h, r) => (h > 0 ? r : 90));
 
 	return (
 		<ReactiveButton
@@ -53,36 +57,23 @@ export function PrimaryButton({
 			position={position}
 			layoutOrder={layoutOrder}
 		>
-			<Shadow
-				shadowSize={rem(2.5)}
-				shadowBlur={0.2}
-				shadowTransparency={lerpBinding(hover, 0.7, 0.4)}
-				shadowPosition={rem(0.5)}
-			/>
-
 			<Frame
 				backgroundColor={palette.white}
 				cornerRadius={new UDim(0, rem(1))}
 				size={new UDim2(1, 0, 1, 0)}
 				backgroundTransparency={0}
 			>
-				<uigradient
-					Offset={lerpBinding(hover, new Vector2(), new Vector2(0, 1))}
-					Rotation={90}
-					Transparency={new NumberSequence(0, 0.1)}
-				/>
+				<uigradient Color={gradientColor} Rotation={gradientRotation} />
 			</Frame>
 
-			<Outline cornerRadius={new UDim(0, rem(1))} innerTransparency={0} />
-
-			<Image
-				image={images.ui.button_glow_top}
-				imageTransparency={composeBindings(overlayTransparency, lerpBinding(hover, 0.3, 0), blend)}
-				cornerRadius={new UDim(0, rem(1))}
-				size={new UDim2(1, 0, 1, 0)}
-			>
-				<uigradient Color={overlayGradient} Rotation={overlayRotation} />
-			</Image>
+			<Outline
+				cornerRadius={cornerRadius}
+				innerTransparency={0}
+				innerThickness={0}
+				outerColor={palette.white}
+				innerColor={palette.white}
+				outerThickness={rem(0.2)}
+			/>
 
 			{children}
 		</ReactiveButton>

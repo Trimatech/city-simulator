@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
 import { useRem } from "client/hooks";
-import { PrimaryButton } from "client/ui/primary-button";
+import { PrimaryButton } from "client/ui/PrimaryButton";
 import { Text } from "client/ui/text";
 import { palette } from "shared/constants/palette";
 

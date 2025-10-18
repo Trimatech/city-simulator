@@ -2,9 +2,7 @@ import "client/app/react-config";
 
 import { hoarcekat, useInterval, useTimeout } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
-import { Controller } from "client/components/controller";
-import { Game } from "client/components/game";
-import { World } from "client/components/world";
+import { GameUI } from "client/components/game";
 import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
 import { USER_NAME, WORLD_BOUNDS } from "shared/constants/core";
@@ -33,7 +31,6 @@ export = hoarcekat(() => {
 				orbs: math.random(0, 5000),
 			});
 		}
-
 		// store.populateCandy(
 		// 	fillArray(512, (index) => ({
 		// 		id: `test-${index}`,
@@ -64,9 +61,7 @@ export = hoarcekat(() => {
 
 	return (
 		<RootProvider>
-			<World />
-			<Game />
-			<Controller />
+			<GameUI />
 		</RootProvider>
 	);
 });
