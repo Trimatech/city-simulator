@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "@rbxts/react";
 import { TweenService } from "@rbxts/services";
+import { playSound, sounds } from "shared/assets";
 import { remotes } from "shared/remotes";
 
 import { cleanupEffects, createCarpetBombExplosionWithCFrame, createNuclearExplosion } from "./ExplosionUtils";
@@ -15,6 +16,8 @@ export function ExplosionEffects() {
 			effectsRef.current.forEach((effect) => {
 				if (effect && effect.IsDescendantOf(game)) effect.Destroy();
 			});
+
+			playSound(sounds.laser3, { volume: 1 });
 			const center = new Vector2(cframe.Position.X, cframe.Position.Z);
 			const effects = createCarpetBombExplosionWithCFrame(center, size, cframe);
 			if (effects[0]) {
@@ -33,6 +36,8 @@ export function ExplosionEffects() {
 			effectsRef.current.forEach((effect) => {
 				if (effect && effect.IsDescendantOf(game)) effect.Destroy();
 			});
+
+			playSound(sounds.explosion_effect, { volume: 1 });
 			const center = new Vector2(cframe.Position.X, cframe.Position.Z);
 			const effects = createNuclearExplosion(center, size);
 			if (effects[0]) {
