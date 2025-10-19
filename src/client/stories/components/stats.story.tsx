@@ -3,7 +3,7 @@ import "client/app/react-config";
 import { hoarcekat, useMountEffect } from "@rbxts/pretty-react-hooks";
 import React from "@rbxts/react";
 import { Menu } from "client/components/menu";
-import { Stats } from "client/components/stats/Stats";
+import { Stats } from "client/components/stats/Stats2";
 import { Backdrop } from "client/components/world/backdrop";
 import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
