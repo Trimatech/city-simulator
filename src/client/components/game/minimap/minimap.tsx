@@ -4,6 +4,7 @@ import { RemProvider } from "client/rem/rem-provider";
 import { Image } from "client/ui/image";
 import { Frame } from "client/ui/layout/frame";
 import { Group } from "client/ui/layout/group";
+import { Outline } from "client/ui/outline";
 import { Shadow } from "client/ui/shadow";
 import { images } from "shared/assets";
 import { palette } from "shared/constants/palette";
@@ -18,6 +19,8 @@ export function Minimap() {
 	const { anchorPoint, position } = touch
 		? { anchorPoint: new Vector2(1, 0.5), position: new UDim2(1, -rem(3.5), 0.5, 0) }
 		: { anchorPoint: new Vector2(1, 1), position: new UDim2(1, -rem(4), 1, -rem(4)) };
+
+	const cornerRadius = new UDim(1, 0);
 
 	return (
 		<RemProvider minimumRem={MINIMUM_MINIMAP_REM}>
@@ -36,7 +39,7 @@ export function Minimap() {
 
 				<Frame
 					backgroundColor={palette.white}
-					cornerRadius={new UDim(1, 0)}
+					cornerRadius={cornerRadius}
 					size={new UDim2(1, 0, 1, 0)}
 					backgroundTransparency={0}
 				>
@@ -50,7 +53,7 @@ export function Minimap() {
 
 				<Frame
 					backgroundTransparency={1}
-					cornerRadius={new UDim(1, 0)}
+					cornerRadius={cornerRadius}
 					size={new UDim2(1, -2, 1, -2)}
 					position={new UDim2(0, 1, 0, 1)}
 				>
@@ -65,6 +68,7 @@ export function Minimap() {
 				/>
 
 				<MinimapNodes />
+				<Outline cornerRadius={cornerRadius} innerTransparency={0} outerTransparency={1} />
 			</Group>
 		</RemProvider>
 	);

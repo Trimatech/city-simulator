@@ -5,7 +5,7 @@ import { useRem } from "client/hooks";
 import { Frame } from "client/ui/layout/frame";
 import { Group } from "client/ui/layout/group";
 import { Layer } from "client/ui/layout/layer";
-import { PrimaryButton } from "client/ui/primary-button";
+import { PrimaryButton } from "client/ui/PrimaryButton";
 import { Text } from "client/ui/text";
 import { TextField } from "client/ui/text-field";
 import { playSound, sounds } from "shared/assets";

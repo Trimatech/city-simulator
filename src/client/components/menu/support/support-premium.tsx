@@ -2,7 +2,7 @@ import React from "@rbxts/react";
 import { MarketplaceService, Players } from "@rbxts/services";
 import { sendAlert } from "client/alerts";
 import { useRem } from "client/hooks";
-import { PrimaryButton } from "client/ui/primary-button";
+import { PrimaryButton } from "client/ui/PrimaryButton";
 import { Text } from "client/ui/text";
 import { palette } from "shared/constants/palette";
 

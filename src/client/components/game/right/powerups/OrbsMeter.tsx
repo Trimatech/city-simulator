@@ -81,7 +81,7 @@ export function OrbsMeter({ position = new UDim2(0, 0, 0, 0) }: Props) {
 				);
 			})}
 
-			<Outline cornerRadius={cornerRadius} innerTransparency={0} />
+			<Outline cornerRadius={cornerRadius} innerTransparency={0} outerTransparency={1} />
 		</Frame>
 	);
 }

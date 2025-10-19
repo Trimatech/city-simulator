@@ -4,7 +4,7 @@ import { Group } from "client/ui/layout/group";
 
 import { GameVersion } from "./GameVersion";
 import { MuteButton } from "./mute-button";
-import { PlayButton } from "./play-button";
+import { PlayButton } from "./PlayButton";
 
 export function Home() {
 	const rem = useRem();

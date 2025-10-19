@@ -12,7 +12,7 @@ import {
 	selectRankForDisplay,
 } from "shared/store/soldiers";
 
-import { StatsCard } from "./stats-card";
+import { StatsCard } from "./StatsCard";
 
 export function Stats() {
 	const rem = useRem();
@@ -43,11 +43,11 @@ export function Stats() {
 			/>
 
 			<StatsCard
-				emoji="📐"
+				emoji="🗺️"
 				label="Area"
 				value={`${formatInteger(area)} studs²`}
-				primary={Color3.fromRGB(255, 203, 80)}
-				secondary={Color3.fromRGB(255, 150, 79)}
+				primary={Color3.fromRGB(186, 250, 255)}
+				secondary={Color3.fromRGB(8, 89, 255)}
 				enabled={currentArea !== undefined}
 				order={0}
 			/>
@@ -56,7 +56,7 @@ export function Stats() {
 				emoji="☠️"
 				label="KOs"
 				value={`${formatInteger(eliminations)}`}
-				primary={Color3.fromRGB(161, 163, 194)}
+				primary={Color3.fromRGB(194, 196, 222)}
 				secondary={Color3.fromRGB(97, 97, 138)}
 				enabled={currentEliminations !== undefined}
 				order={0}
@@ -76,7 +76,7 @@ export function Stats() {
 				emoji="🔮"
 				label="Orbs"
 				value={`${formatInteger(orbs)}`}
-				primary={Color3.fromRGB(181, 64, 64)}
+				primary={Color3.fromRGB(252, 69, 69)}
 				secondary={Color3.fromRGB(150, 59, 84)}
 				enabled={currentOrbs !== undefined}
 				order={1}

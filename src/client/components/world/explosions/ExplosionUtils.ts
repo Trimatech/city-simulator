@@ -186,6 +186,47 @@ export function createAnimatedParticle(
 	return particle;
 }
 
+interface GroundAppearance {
+	color: Color3;
+	material: Enum.Material;
+}
+
+function getGroundAppearanceAt(position: Vector3): GroundAppearance {
+	const origin = position.add(new Vector3(0, 100, 0));
+	const direction = new Vector3(0, -200, 0);
+	const result = Workspace.Raycast(origin, direction);
+	if (result) {
+		const inst = result.Instance;
+		if (inst.IsA("BasePart")) {
+			return { color: inst.Color, material: inst.Material };
+		}
+	}
+	return { color: palette.white, material: Enum.Material.Plastic };
+}
+
+function createDebrisCube(color: Color3, material: Enum.Material, position: Vector3, sizeScale: number): Part {
+	const cube = new Instance("Part");
+	cube.Name = "NuclearDebris";
+	cube.Size = new Vector3(1, 1, 1).mul(sizeScale);
+	cube.Position = position;
+	cube.Color = color;
+	cube.Material = material;
+	cube.Anchored = false;
+	cube.CanCollide = true;
+	cube.CastShadow = false;
+	cube.Parent = Workspace;
+	return cube;
+}
+
+function launchDebris(part: BasePart, direction: Vector3, radialSpeed: number, upwardSpeed: number) {
+	const speedScale = 0.6 + math.random() * 0.8; // 0.6x .. 1.4x
+	const upwardScale = 0.8 + math.random() * 0.6; // 0.8x .. 1.4x
+	const lateral = direction.Unit.mul(radialSpeed * speedScale);
+	const vertical = new Vector3(0, upwardSpeed * upwardScale, 0);
+	part.AssemblyLinearVelocity = lateral.add(vertical);
+	part.AssemblyAngularVelocity = new Vector3(math.random(-3, 3), math.random(-3, 3), math.random(-3, 3));
+}
+
 export function createCarpetBombExplosion(center: Vector2, length: number, width: number, angle: number): Part[] {
 	const effects: Part[] = [];
 
@@ -315,40 +356,100 @@ export function createCarpetBombExplosionWithCFrame(center: Vector2, size: Vecto
 export function createNuclearExplosion(center: Vector2, size: Vector3): Part[] {
 	const effects: Part[] = [];
 
-	// Create main explosion part
-	const explosion = createCylinderBasePart(
-		"NuclearExplosion",
-		size,
-		new Vector3(center.X, 0.1, center.Y),
+	const center3 = new Vector3(center.X, 0.1, center.Y);
+	// Cylinder shape: local X = thickness (axis), local Y/Z = diameters. We rotate 90deg Z to align axis up.
+	const maxDiameter = math.max(size.Y, size.Z);
+	const ringThickness = math.max(0.2, size.X * 0.6);
+
+	// Core flash (persistent root for audio/fade)
+	const coreInitialSize = new Vector3(size.X, math.max(2, size.Y * 0.25), math.max(2, size.Z * 0.25));
+	const core = createCylinderBasePart(
+		"NuclearCore",
+		coreInitialSize,
+		center3,
 		new Vector3(0, 0, 90),
 		palette.yellow,
-		0.1,
+		0,
 	);
+	const coreLightRange = math.max(30, maxDiameter * 1.3);
+	const coreLight = createPointLight(palette.white, 20, coreLightRange, core);
+	const coreLightTween = TweenService.Create(
+		coreLight,
+		new TweenInfo(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		{ Brightness: 0 },
+	);
+	coreLightTween.Play();
 
-	effects.push(explosion);
+	const coreTween = TweenService.Create(core, new TweenInfo(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+		Size: new Vector3(size.X, size.Y, size.Z),
+		Transparency: 0.6,
+	});
+	coreTween.Play();
+	effects.push(core);
 
-	// Create expanding ring effect
-	const ring = createCylinderBasePart(
-		"NuclearRing",
-		size,
-		new Vector3(center.X, 0.15, center.Y),
+	// Shockwave ring 1 (fast, bright)
+	const ring1Initial = new Vector3(ringThickness, math.max(2, size.Y * 0.15), math.max(2, size.Z * 0.15));
+	const ring1 = createCylinderBasePart(
+		"NuclearShockwave1",
+		ring1Initial,
+		new Vector3(center.X, 0.12, center.Y),
 		new Vector3(0, 0, 90),
 		palette.white,
 		0.05,
 	);
-
-	// Animate ring expansion
-	const ringTween = TweenService.Create(
-		ring,
+	const ring1Tween = TweenService.Create(
+		ring1,
 		new TweenInfo(EXPLOSION_DURATION, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
 		{
-			Size: size,
+			Size: new Vector3(ringThickness, size.Y, size.Z),
 			Transparency: 1,
 		},
 	);
-	ringTween.Play();
+	ring1Tween.Play();
+	effects.push(ring1);
 
-	effects.push(ring);
+	// Shockwave ring 2 (slightly delayed, warmer)
+	const ring2Initial = new Vector3(ringThickness * 0.8, math.max(2, size.Y * 0.1), math.max(2, size.Z * 0.1));
+	const ring2 = createCylinderBasePart(
+		"NuclearShockwave2",
+		ring2Initial,
+		new Vector3(center.X, 0.14, center.Y),
+		new Vector3(0, 0, 90),
+		palette.peach,
+		0.1,
+	);
+	const ring2Tween = TweenService.Create(
+		ring2,
+		new TweenInfo(EXPLOSION_DURATION, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0.08),
+		{
+			Size: new Vector3(ringThickness * 0.8, size.Y * 1.2, size.Z * 1.2),
+			Transparency: 1,
+		},
+	);
+	ring2Tween.Play();
+	effects.push(ring2);
+
+	// Debris cubes: simulate ground breaking and flying out
+	const ground = getGroundAppearanceAt(center3);
+	const radialSpeedBase = math.max(55, maxDiameter * 0.7);
+	const upwardSpeedBase = math.max(45, maxDiameter * 0.8);
+	const numSectors = 24; // ensure coverage in all directions
+	const sectorWidth = (2 * math.pi) / numSectors;
+	for (let s = 0; s < numSectors; s++) {
+		const baseAngle = s * sectorWidth;
+		const piecesInSector = 3 + math.floor(math.random() * 4); // 3..6 per sector
+		for (let j = 0; j < piecesInSector; j++) {
+			const jitter = (math.random() - 0.5) * sectorWidth * 0.95;
+			const angle = baseAngle + jitter;
+			const dir = new Vector3(math.cos(angle), 0, math.sin(angle));
+			const sizeScale = 0.7 + math.random() * 0.8; // 0.7 .. 1.5
+			const spawnOffset = dir.mul(0.8 * math.random()).add(new Vector3(0, 1.8 + math.random() * 0.8, 0));
+			const spawnPos = center3.add(spawnOffset);
+			const cube = createDebrisCube(ground.color, ground.material, spawnPos, sizeScale);
+			launchDebris(cube, dir, radialSpeedBase, upwardSpeedBase);
+			effects.push(cube);
+		}
+	}
 
 	return effects;
 }

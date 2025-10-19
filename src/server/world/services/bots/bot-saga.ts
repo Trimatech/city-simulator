@@ -2,7 +2,7 @@ import Object from "@rbxts/object-utils";
 import { Players } from "@rbxts/services";
 import { store } from "server/store";
 import { DEFAULT_ORBS, IS_TESTING_STUFF, SOLDIER_TICK_PHASE } from "server/world/constants";
-import { getSafePointInWorld } from "server/world/world.utils";
+import { getSafePointOutsideSoldierPolygons } from "server/world/world.utils";
 import { SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
 import { selectAliveSoldiersById } from "shared/store/soldiers";
 import { createScheduler } from "shared/utils/scheduler";
@@ -35,7 +35,7 @@ function chooseRandomPlayer(): Player | undefined {
 }
 
 async function spawnBot(botId: string) {
-	const spawnPoint = getSafePointInWorld();
+	const spawnPoint = getSafePointOutsideSoldierPolygons();
 
 	if (IS_TESTING_STUFF) {
 		// const sourcePlayer = chooseRandomPlayer();

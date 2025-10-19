@@ -24,3 +24,15 @@ export const POWERUP_EXPLOSIONS: ExplosionConfig = {
 };
 
 export const POWERUP_TURBO_SPEED = 40;
+
+// Colors per powerup for UI usage
+import { palette } from "./palette";
+
+export const POWERUP_COLORS: Record<PowerupId, Color3> = {
+	// Choose complementary hues to make the emoji stand out
+	turbo: palette.blue, // deeper blue complements ⚡ (orange/yellow)
+	shield: palette.peach, // complements 🛡️ (blue)
+	tower: palette.sky, // complements 🗼 (red)
+	laserBeam: palette.pink, // complements 🔫 (green)
+	nuclearExplosion: palette.mauve, // complements ☢️ (yellow)
+};

@@ -7,6 +7,7 @@ import { cleanupEffects, createCarpetBombExplosionWithCFrame, createNuclearExplo
 
 const EXPLOSION_DURATION = 2;
 const FADE_DURATION = 1.5;
+const NUCLEAR_FADE_DURATION = 4;
 
 export function ExplosionEffects() {
 	const effectsRef = useRef<Part[]>([]);
@@ -43,12 +44,12 @@ export function ExplosionEffects() {
 				playSound(sounds.explosion_effect, { volume: 1, parent: effects[0] });
 				const fadeTween = TweenService.Create(
 					effects[0],
-					new TweenInfo(FADE_DURATION, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+					new TweenInfo(NUCLEAR_FADE_DURATION, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
 					{ Transparency: 1 },
 				);
 				fadeTween.Play();
 			}
-			cleanupEffects(effects, EXPLOSION_DURATION + FADE_DURATION);
+			cleanupEffects(effects, EXPLOSION_DURATION + NUCLEAR_FADE_DURATION);
 			effectsRef.current = effects;
 		});
 
