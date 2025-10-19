@@ -1,6 +1,6 @@
-import { composeBindings, useTimer } from "@rbxts/pretty-react-hooks";
-import React from "@rbxts/react";
+import React, { useRef, useState } from "@rbxts/react";
 import { palette } from "shared/constants/palette";
+import { brighten } from "shared/utils/color-utils";
 
 import { useMotion, useRem } from "../hooks";
 import { Frame } from "./layout/frame";
@@ -27,21 +27,30 @@ export function PrimaryButton({
 	size,
 	position,
 	anchorPoint,
-	overlayGradient,
-
-	overlayRotation,
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	overlayGradient: _overlayGradient,
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	overlayRotation: _overlayRotation,
 	layoutOrder,
 	children,
 }: PrimaryButtonProps) {
 	const rem = useRem();
-	const [hover, hoverMotion] = useMotion(0);
-	const timer = useTimer();
+	const [_hover, hoverMotion] = useMotion(0);
+	const uiRef = useRef<Frame>();
+	const [offset, setOffset] = useState(new Vector2(0.5, 0.5));
+	const [rotation, setRotation] = useState(90);
 
 	const cornerRadius = new UDim(0, rem(1));
 
-	const gradientColor = new ColorSequence(palette.sky, palette.sky);
-	const gradientSpin = timer.value.map((t) => 30 * t);
-	const gradientRotation = composeBindings(hover, gradientSpin, (h, r) => (h > 0 ? r : 90));
+	const brighterBlue = brighten(palette.blue, 0.5);
+
+	const gradientColor = new ColorSequence([
+		new ColorSequenceKeypoint(0, palette.blue),
+		new ColorSequenceKeypoint(0.5, brighterBlue),
+		new ColorSequenceKeypoint(1, palette.blue),
+	]);
+
+	const color = gradientColor;
 
 	return (
 		<ReactiveButton
@@ -50,6 +59,7 @@ export function PrimaryButton({
 				hoverMotion.spring(hovered ? 1 : 0);
 				onHover?.(hovered);
 			}}
+			event={undefined}
 			backgroundTransparency={1}
 			enabled={enabled}
 			anchorPoint={anchorPoint}
@@ -62,8 +72,36 @@ export function PrimaryButton({
 				cornerRadius={new UDim(0, rem(1))}
 				size={new UDim2(1, 0, 1, 0)}
 				backgroundTransparency={0}
+				ref={uiRef}
+				change={{
+					AbsoluteSize: (_rbx) => {
+						setOffset(new Vector2(0.5, 0.5));
+					},
+					AbsolutePosition: (_rbx) => {
+						setOffset(new Vector2(0.5, 0.5));
+					},
+				}}
+				event={{
+					MouseMoved: (rbx, x: number, y: number) => {
+						const frame = uiRef.current;
+						if (frame === undefined) return;
+						const absPos = frame.AbsolutePosition;
+						const absSize = frame.AbsoluteSize;
+						const relX01 = math.clamp((x - absPos.X) / math.max(1, absSize.X), 0, 1);
+						const relY01 = math.clamp((y - absPos.Y) / math.max(1, absSize.Y), 0, 1);
+						// Keep gradient center at mouse in UIGradient [-1, 1] space
+						setOffset(new Vector2(relX01 * 2 - 1, relY01 * 2 - 1));
+						// Rotate the gradient so it faces toward the center from the mouse
+						const vx = 0.5 - relX01;
+						const vy = 0.5 - relY01;
+						if (math.abs(vx) > 1e-4 || math.abs(vy) > 1e-4) {
+							const angle = math.deg(math.atan2(vy, vx));
+							setRotation(angle + 180);
+						}
+					},
+				}}
 			>
-				<uigradient Color={gradientColor} Rotation={gradientRotation} />
+				<uigradient Color={color} Offset={offset} Rotation={rotation} />
 			</Frame>
 
 			<Outline

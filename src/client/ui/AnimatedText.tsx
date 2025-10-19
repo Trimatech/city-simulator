@@ -28,7 +28,7 @@ interface AnimatedTextProps extends FrameProps {
 
 export function AnimatedText({
 	text,
-	font = fonts.inter.medium,
+	font = fonts.inter.bold,
 	textColor = palette.mantle,
 	textSize,
 	spacing,

@@ -2,8 +2,9 @@ import { Players } from "@rbxts/services";
 import { setTimeout } from "@rbxts/set-timeout";
 import { store } from "server/store";
 import { IS_LOCAL, WORLD_BOUNDS } from "shared/constants/core";
+import { isPointInPolygon, vector2ToPoint } from "shared/polybool/poly-utils";
 import { selectCandyById } from "shared/store/candy";
-import { selectSoldierById } from "shared/store/soldiers";
+import { selectAliveSoldiersById, selectSoldierById } from "shared/store/soldiers";
 
 import { getBotHumanoid } from "./services/bots/bot-registry";
 import { soldierGrid } from "./services/soldiers/soldier-grid";
@@ -168,4 +169,47 @@ export function getSafePointInWorld() {
 	}
 
 	return sorted[sorted.size() - 1].position;
+}
+
+/**
+ * Returns true if a point lies within any alive soldier's polygon
+ */
+function isInsideAnySoldierPolygon(point: Vector2): boolean {
+	const aliveById = store.getState(selectAliveSoldiersById);
+	const testPoint = vector2ToPoint(point);
+
+	for (const [, soldier] of pairs(aliveById)) {
+		const polygon = soldier.polygon as ReadonlyArray<Vector2> | undefined;
+		if (!polygon || polygon.size() < 3) continue;
+
+		const polygonPoints = polygon.map(vector2ToPoint);
+		if (isPointInPolygon(testPoint, polygonPoints as unknown as [number, number][])) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Returns a safe point for bots that is also outside all other soldiers' polygons
+ */
+export function getSafePointOutsideSoldierPolygons(maxTries = 25) {
+	for (const _ of $range(1, maxTries)) {
+		const candidate = getSafePointInWorld();
+		if (!isInsideAnySoldierPolygon(candidate)) {
+			return candidate;
+		}
+	}
+
+	// Fallback: sample near origin until outside polygons is found
+	for (const _ of $range(1, maxTries)) {
+		const candidate = getRandomPointNearWorldOrigin(0.8);
+		if (!isInsideAnySoldierPolygon(candidate)) {
+			return candidate;
+		}
+	}
+
+	// As a last resort, return any random point in world
+	return getRandomPointInWorld(0.8);
 }
