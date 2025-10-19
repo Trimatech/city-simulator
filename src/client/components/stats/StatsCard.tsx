@@ -4,6 +4,7 @@ import { springs } from "client/constants/springs";
 import { useMotion, useRem } from "client/hooks";
 import { Frame } from "client/ui/layout/frame";
 import { Group } from "client/ui/layout/group";
+import { Outline } from "client/ui/outline";
 import { ReactiveButton } from "client/ui/reactive-button";
 import { Shadow } from "client/ui/shadow";
 import { Text } from "client/ui/text";
@@ -48,6 +49,8 @@ export function StatsCard({ onClick, emoji, label, value, primary, secondary, en
 		transparencyMotion.spring(enabled ? 0 : 0.75, springs.slow);
 	}, [enabled]);
 
+	const cornerRadius = new UDim(0, rem(1));
+
 	return (
 		<ReactiveButton onClick={onClick} soundVariant="alt" backgroundTransparency={1} size={size} layoutOrder={order}>
 			<Transition
@@ -73,18 +76,14 @@ export function StatsCard({ onClick, emoji, label, value, primary, secondary, en
 				<Frame
 					backgroundTransparency={0.3}
 					backgroundColor={palette.white}
-					cornerRadius={new UDim(0, rem(0.5))}
+					cornerRadius={cornerRadius}
 					size={new UDim2(1, 0, 1, 0)}
 				>
 					<uigradient Color={new ColorSequence(primaryDark, secondaryDark)} />
 				</Frame>
 
 				<Group clipsDescendants size={new UDim2(0, rem(0.35), 1, 0)} name="StatsCardIndicator">
-					<Frame
-						backgroundColor={primary}
-						cornerRadius={new UDim(0, rem(0.5))}
-						size={new UDim2(0, rem(1), 1, 0)}
-					/>
+					<Frame backgroundColor={primary} cornerRadius={cornerRadius} size={new UDim2(0, rem(1), 1, 0)} />
 				</Group>
 
 				<Text
@@ -125,6 +124,8 @@ export function StatsCard({ onClick, emoji, label, value, primary, secondary, en
 						},
 					}}
 				/>
+
+				<Outline cornerRadius={cornerRadius} innerTransparency={0} outerTransparency={1} />
 			</Transition>
 		</ReactiveButton>
 	);

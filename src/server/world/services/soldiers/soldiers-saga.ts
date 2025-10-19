@@ -2,7 +2,7 @@ import Object from "@rbxts/object-utils";
 import { Players } from "@rbxts/services";
 import { store } from "server/store";
 import { DEFAULT_ORBS, SOLDIER_TICK_PHASE } from "server/world/constants";
-import { getCandy, getSafePointInWorld, killSoldier, playerIsSpawned } from "server/world/world.utils";
+import { getCandy, getSafePointOutsideSoldierPolygons, killSoldier, playerIsSpawned } from "server/world/world.utils";
 import { SOLDIER_MIN_AREA, SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
 import {
 	calculatePolygonBoundingBox,
@@ -52,7 +52,7 @@ export async function initSoldierService() {
 		const randomSkin = save.skins[math.random(1, save.skins.size() - 1)];
 		const currentSkin = save.skin;
 
-		const safePoint = getSafePointInWorld();
+		const safePoint = getSafePointOutsideSoldierPolygons();
 
 		await reloadCharacterAsync(player);
 

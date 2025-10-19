@@ -2,7 +2,6 @@ import React from "@rbxts/react";
 import { useMotion } from "client/hooks";
 import { AnimatedText } from "client/ui/AnimatedText";
 import { PrimaryButton } from "client/ui/PrimaryButton";
-import { palette } from "shared/constants/palette";
 import { remotes } from "shared/remotes";
 
 interface PlayButtonProps {
@@ -22,7 +21,6 @@ export function PlayButton({ anchorPoint, size, position }: PlayButtonProps) {
 		<PrimaryButton
 			onClick={onClick}
 			onHover={(hovered) => hoverMotion.spring(hovered ? 1 : 0)}
-			overlayGradient={new ColorSequence(palette.mauve, palette.blue)}
 			anchorPoint={anchorPoint}
 			size={size}
 			position={position}

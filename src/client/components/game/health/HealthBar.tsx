@@ -65,7 +65,7 @@ export function HealthBar() {
 				<uigradient Color={gradientColor} Rotation={90} />
 			</Frame>
 
-			<Outline cornerRadius={cornerRadius} innerTransparency={0} />
+			<Outline cornerRadius={cornerRadius} innerTransparency={0} outerTransparency={1} />
 		</Frame>
 	);
 }

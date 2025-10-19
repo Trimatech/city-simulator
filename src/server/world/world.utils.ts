@@ -1,8 +1,10 @@
 import { Players } from "@rbxts/services";
 import { setTimeout } from "@rbxts/set-timeout";
 import { store } from "server/store";
-import { IS_LOCAL, WORLD_BOUNDS } from "shared/constants/core";
-import { isPointInPolygon, vector2ToPoint } from "shared/polybool/poly-utils";
+import { INITIAL_POLYGON_DIAMETER, INITIAL_POLYGON_ITEMS, WORLD_BOUNDS } from "shared/constants/core";
+import { calculatePolygonOperation, isPointInPolygon, vector2ToPoint } from "shared/polybool/poly-utils";
+import { pointsToPolygon } from "shared/polybool/polybool";
+import { createPolygonAroundPosition } from "shared/polygon-extra.utils";
 import { selectCandyById } from "shared/store/candy";
 import { selectAliveSoldiersById, selectSoldierById } from "shared/store/soldiers";
 
@@ -69,10 +71,10 @@ export function removeForceFieldFromPlayerName(playerName: string) {
 }
 
 export function killSoldier(soldierId: string) {
-	if (IS_LOCAL) {
-		warn(`[DEBUG] Killing soldier ${soldierId} in local mode`);
-		return;
-	}
+	// if (IS_LOCAL) {
+	// 	warn(`[DEBUG] Killing soldier ${soldierId} in local mode`);
+	// 	return;
+	// }
 	store.setSoldierIsDead(soldierId);
 
 	const humanoid = getPlayerHumanoidByName(soldierId);
@@ -192,12 +194,31 @@ function isInsideAnySoldierPolygon(point: Vector2): boolean {
 }
 
 /**
+ * Returns true if the default spawn polygon around a point intersects any alive soldier polygon
+ */
+function intersectsAnySoldierPolygon(point: Vector2): boolean {
+	const aliveById = store.getState(selectAliveSoldiersById);
+	const newPolygonPoints = createPolygonAroundPosition(point, INITIAL_POLYGON_DIAMETER, INITIAL_POLYGON_ITEMS);
+	const newPolygon = pointsToPolygon(newPolygonPoints.map(vector2ToPoint));
+
+	for (const [, soldier] of pairs(aliveById)) {
+		const polygon = soldier.polygon as ReadonlyArray<Vector2> | undefined;
+		if (!polygon || polygon.size() < 3) continue;
+		const otherPolygon = pointsToPolygon(polygon.map(vector2ToPoint));
+		const intersect = calculatePolygonOperation(newPolygon, otherPolygon, "Intersect");
+		if (intersect.regions.size() > 0) return true;
+	}
+
+	return false;
+}
+
+/**
  * Returns a safe point for bots that is also outside all other soldiers' polygons
  */
 export function getSafePointOutsideSoldierPolygons(maxTries = 25) {
 	for (const _ of $range(1, maxTries)) {
 		const candidate = getSafePointInWorld();
-		if (!isInsideAnySoldierPolygon(candidate)) {
+		if (!isInsideAnySoldierPolygon(candidate) && !intersectsAnySoldierPolygon(candidate)) {
 			return candidate;
 		}
 	}
@@ -205,7 +226,7 @@ export function getSafePointOutsideSoldierPolygons(maxTries = 25) {
 	// Fallback: sample near origin until outside polygons is found
 	for (const _ of $range(1, maxTries)) {
 		const candidate = getRandomPointNearWorldOrigin(0.8);
-		if (!isInsideAnySoldierPolygon(candidate)) {
+		if (!isInsideAnySoldierPolygon(candidate) && !intersectsAnySoldierPolygon(candidate)) {
 			return candidate;
 		}
 	}

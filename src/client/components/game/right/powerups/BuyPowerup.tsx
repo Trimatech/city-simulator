@@ -5,6 +5,7 @@ import { springs } from "client/constants/springs";
 import { useRem } from "client/hooks";
 import { Frame } from "client/ui/layout/frame";
 import { HStack } from "client/ui/layout/HStack";
+import { Outline } from "client/ui/outline";
 import { ReactiveButton } from "client/ui/reactive-button";
 import { Text } from "client/ui/text";
 import { Transition } from "client/ui/transition";
@@ -23,8 +24,6 @@ interface Props {
 	readonly emojiSize?: number;
 	readonly price: number;
 }
-
-const MARGIN_Y = 0;
 
 const INTERNAL_PADDING = 1;
 
@@ -85,11 +84,7 @@ export function BuyPowerup({
 			onMouseLeave={() => setShowTooltip(false)}
 			anchorPoint={new Vector2(1, 0.5)}
 		>
-			<Transition
-				groupTransparency={transparency}
-				size={new UDim2(1, 0, 1, rem(2 * MARGIN_Y))}
-				position={new UDim2(0, 0, 0, rem(-MARGIN_Y))}
-			>
+			<Transition groupTransparency={transparency} size={new UDim2(1, 0, 1, 0)} position={new UDim2(0, 0, 0, 0)}>
 				{/* Background */}
 				<Frame
 					backgroundTransparency={0}
@@ -98,7 +93,9 @@ export function BuyPowerup({
 					size={new UDim2(1, -rem(1), 1, -rem(1))}
 					anchorPoint={new Vector2(0.5, 0.5)}
 					position={new UDim2(0.5, 0, 0.5, 0)}
-				/>
+				>
+					<Outline cornerRadius={fullRound} innerTransparency={0.5} outerTransparency={1} />
+				</Frame>
 
 				<HStack clipsDescendants={false} horizontalAlignment={Enum.HorizontalAlignment.Right}>
 					{showTooltip ? (
@@ -121,17 +118,6 @@ export function BuyPowerup({
 					{/* Emoji */}
 
 					<Frame size={new UDim2(0, rem(CIRCLE_SIZE), 0, rem(CIRCLE_SIZE))}>
-						<Frame
-							backgroundColor={palette.white}
-							backgroundTransparency={0.7}
-							cornerRadius={fullRound}
-							anchorPoint={new Vector2(0.5, 0.5)}
-							position={new UDim2(0.5, 0, 0.5, 0)}
-							size={new UDim2(1, -rem(1), 1, -rem(1))}
-						>
-							<uistroke Color={palette.white} Transparency={0.7} Thickness={rem(0.2)} />
-						</Frame>
-
 						<Text
 							text={emoji}
 							textScaled
