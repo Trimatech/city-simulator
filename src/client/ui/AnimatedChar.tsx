@@ -1,5 +1,5 @@
 import { composeBindings } from "@rbxts/pretty-react-hooks";
-import React from "@rbxts/react";
+import React, { useEffect } from "@rbxts/react";
 import { SpringOptions } from "@rbxts/ripple";
 import { springs } from "client/constants/springs";
 import { useMotion } from "client/hooks";
@@ -33,7 +33,7 @@ export function AnimatedChar({
 }: AnimatedCharProps) {
 	const [y, yMotion] = useMotion(0);
 
-	React.useEffect(() => {
+	useEffect(() => {
 		let alive = true;
 		task.spawn(() => {
 			const initialDelay = index * staggerSeconds;

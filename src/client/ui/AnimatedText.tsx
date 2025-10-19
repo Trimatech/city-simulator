@@ -7,6 +7,7 @@ import { HStack } from "client/ui/layout/HStack";
 import { palette } from "shared/constants/palette";
 
 import { AnimatedChar } from "./AnimatedChar";
+import { splitUtf8 } from "./AnimatedText.utils";
 
 interface AnimatedTextProps extends FrameProps {
 	readonly text: string;
@@ -50,19 +51,6 @@ export function AnimatedText({
 	springOptions,
 }: AnimatedTextProps) {
 	const rem = useRem();
-
-	function splitUtf8(input: string) {
-		const result = new Array<string>();
-		let index = 1;
-		let nextP = utf8.offset(input, 2, index);
-		while (nextP !== undefined) {
-			result.push(string.sub(input, index, nextP - 1));
-			index = nextP;
-			nextP = utf8.offset(input, 2, index);
-		}
-		result.push(string.sub(input, index, -1));
-		return result;
-	}
 
 	const chars = splitUtf8(text);
 	const amplitudePx = rem(amplitudeRem);
