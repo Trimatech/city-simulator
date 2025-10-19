@@ -6,7 +6,7 @@ import { selectWorldSubject } from "client/store/world";
 import { selectHasLocalSoldier } from "shared/store/soldiers";
 
 import { Transition } from "../../ui/transition";
-import { Stats } from "../stats/Stats2";
+import { Stats } from "../stats/Stats";
 import { Compass } from "./compass";
 import { HealthView } from "./health/HealthView";
 import { Minimap } from "./minimap";
