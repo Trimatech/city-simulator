@@ -24,3 +24,14 @@ export const POWERUP_EXPLOSIONS: ExplosionConfig = {
 };
 
 export const POWERUP_TURBO_SPEED = 40;
+
+// Colors per powerup for UI usage
+import { palette } from "./palette";
+
+export const POWERUP_COLORS: Record<PowerupId, Color3> = {
+	turbo: palette.yellow,
+	shield: palette.teal,
+	tower: palette.mauve,
+	laserBeam: palette.sapphire,
+	nuclearExplosion: palette.peach,
+};

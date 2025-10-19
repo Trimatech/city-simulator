@@ -54,7 +54,7 @@ export function BuyPowerup({
 	const [backgroundColor, backgroundColorMotion] = useMotion(primaryColor);
 
 	useEffect(() => {
-		transparencyMotion.spring(enabled ? 0.1 : 0.15, springs.slow);
+		transparencyMotion.spring(enabled ? 0.1 : 0.4, springs.slow);
 	}, [enabled]);
 
 	useEffect(() => {
@@ -65,7 +65,7 @@ export function BuyPowerup({
 
 	const [showTooltip, setShowTooltip] = useState(false);
 
-	const TOOLTIP_WIDTH = rem(8);
+	const TOOLTIP_WIDTH = rem(7);
 
 	const FULL_WIDTH = WIDTH + TOOLTIP_WIDTH;
 
@@ -94,13 +94,13 @@ export function BuyPowerup({
 					anchorPoint={new Vector2(0.5, 0.5)}
 					position={new UDim2(0.5, 0, 0.5, 0)}
 				>
-					<Outline cornerRadius={fullRound} innerTransparency={0.5} outerTransparency={1} />
+					<Outline cornerRadius={fullRound} innerTransparency={0} outerTransparency={1} />
 				</Frame>
 
 				<HStack clipsDescendants={false} horizontalAlignment={Enum.HorizontalAlignment.Right}>
 					{showTooltip ? (
 						<HStack spacing={rem(INTERNAL_PADDING)} size={new UDim2(0, TOOLTIP_WIDTH, 0, HEIGHT)} wraps>
-							<uipadding PaddingLeft={new UDim(0, rem(1.5))} />
+							<uipadding PaddingLeft={new UDim(0, rem(3))} />
 							<Text
 								text={label}
 								size={new UDim2(1, 0, 0, rem(1))}

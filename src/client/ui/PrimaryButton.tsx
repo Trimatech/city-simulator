@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "@rbxts/react";
 import { mapMouseToUiGradient } from "client/utils/ui-gradient.utils";
 import { palette } from "shared/constants/palette";
+import { brighten } from "shared/utils/color-utils";
 
 import { useMotion, useRem } from "../hooks";
 import { Frame } from "./layout/frame";
@@ -36,15 +37,19 @@ export function PrimaryButton({
 }: PrimaryButtonProps) {
 	const rem = useRem();
 	const [_hover, hoverMotion] = useMotion(0);
+
+	const [hovered, setHovered] = useState(false);
 	const uiRef = useRef<Frame>();
-	const [offset, setOffset] = useState(new Vector2(0.5, 0.5));
-	const [rotation, setRotation] = useState(45);
+	const defaultOffset = new Vector2(0, 0);
+	const defaultRotation = 0;
+	const [hasMouseSample, setHasMouseSample] = useState(false);
+	const [offset, setOffset] = useState(defaultOffset);
 
 	const cornerRadius = new UDim(0, rem(1));
 
 	const primaryColor = palette.sky;
 
-	const brighterBlue = palette.sapphire;
+	const brighterBlue = brighten(primaryColor, 0.5);
 
 	const gradientColor = new ColorSequence([
 		new ColorSequenceKeypoint(0, primaryColor),
@@ -52,14 +57,19 @@ export function PrimaryButton({
 		new ColorSequenceKeypoint(1, primaryColor),
 	]);
 
-	const color = gradientColor;
+	const color = hovered && hasMouseSample ? gradientColor : new ColorSequence(primaryColor);
 
 	return (
 		<ReactiveButton
 			onClick={onClick}
 			onHover={(hovered) => {
+				setHovered(hovered);
 				hoverMotion.spring(hovered ? 1 : 0);
 				onHover?.(hovered);
+			}}
+			onMouseLeave={() => {
+				setOffset(defaultOffset);
+				setHasMouseSample(false);
 			}}
 			event={undefined}
 			backgroundTransparency={1}
@@ -75,10 +85,6 @@ export function PrimaryButton({
 				size={new UDim2(1, 0, 1, 0)}
 				backgroundTransparency={0}
 				ref={uiRef}
-				change={{
-					AbsoluteSize: () => setOffset(new Vector2(0.5, 0.5)),
-					AbsolutePosition: () => setOffset(new Vector2(0.5, 0.5)),
-				}}
 				event={{
 					MouseMoved: (rbx, x: number, y: number) => {
 						const frame = uiRef.current;
@@ -86,11 +92,11 @@ export function PrimaryButton({
 
 						const result = mapMouseToUiGradient({ frame, mouseX: x, mouseY: y });
 						setOffset(result.offset);
-						if (result.rotation !== undefined) setRotation(result.rotation);
+						setHasMouseSample(true);
 					},
 				}}
 			>
-				<uigradient Color={color} Offset={offset} Rotation={rotation} />
+				<uigradient Color={color} Offset={offset} Rotation={defaultRotation} />
 			</Frame>
 
 			<Outline

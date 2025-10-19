@@ -3,8 +3,7 @@ import { useSelector } from "@rbxts/react-reflex";
 import { useRem } from "client/hooks";
 import { HStack } from "client/ui/layout/HStack";
 import { VStack } from "client/ui/layout/VStack";
-import { palette } from "shared/constants/palette";
-import { POWERUP_PRICES } from "shared/constants/powerups";
+import { POWERUP_COLORS, POWERUP_PRICES } from "shared/constants/powerups";
 import { selectLocalOrbs } from "shared/store/soldiers";
 
 import { BuyPowerup } from "./BuyPowerup";
@@ -25,8 +24,8 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 	return (
 		<HStack
 			name="powerups-panel"
-			anchorPoint={new Vector2(1, 0.5)}
-			position={new UDim2(1, 0, 0.5, 0)}
+			anchorPoint={anchorPoint}
+			position={position}
 			size={size}
 			verticalAlignment={Enum.VerticalAlignment.Top}
 			spacing={rem(1)}
@@ -50,7 +49,7 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 					id="nuclearExplosion"
 					label="Nuclear"
 					emoji="☢️"
-					primaryColor={palette.flamingo}
+					primaryColor={POWERUP_COLORS.nuclearExplosion}
 					enabled={orbs >= POWERUP_PRICES.nuclearExplosion}
 					order={1}
 					price={POWERUP_PRICES.nuclearExplosion}
@@ -59,8 +58,8 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 				<BuyPowerup
 					id="laserBeam"
 					label="Laser"
-					emoji="🔆"
-					primaryColor={palette.flamingo}
+					emoji="🔫"
+					primaryColor={POWERUP_COLORS.laserBeam}
 					enabled={orbs >= POWERUP_PRICES.laserBeam}
 					order={2}
 					price={POWERUP_PRICES.laserBeam}
@@ -69,7 +68,7 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 					id="shield"
 					label="Shield"
 					emoji="🛡️"
-					primaryColor={palette.flamingo}
+					primaryColor={POWERUP_COLORS.shield}
 					enabled={orbs >= POWERUP_PRICES.shield}
 					order={3}
 					price={POWERUP_PRICES.shield}
@@ -79,7 +78,7 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 					id="tower"
 					label="Tower"
 					emoji="🗼"
-					primaryColor={palette.flamingo}
+					primaryColor={POWERUP_COLORS.tower}
 					enabled={orbs >= POWERUP_PRICES.tower}
 					order={4}
 					price={POWERUP_PRICES.tower}
@@ -89,7 +88,7 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 					id="turbo"
 					emoji="⚡"
 					label="Turbo"
-					primaryColor={palette.flamingo}
+					primaryColor={POWERUP_COLORS.turbo}
 					enabled={orbs >= POWERUP_PRICES.turbo}
 					order={5}
 					price={POWERUP_PRICES.turbo}
