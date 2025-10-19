@@ -29,9 +29,10 @@ export const POWERUP_TURBO_SPEED = 40;
 import { palette } from "./palette";
 
 export const POWERUP_COLORS: Record<PowerupId, Color3> = {
-	turbo: palette.yellow,
-	shield: palette.teal,
-	tower: palette.mauve,
-	laserBeam: palette.sapphire,
-	nuclearExplosion: palette.peach,
+	// Choose complementary hues to make the emoji stand out
+	turbo: palette.blue, // deeper blue complements ⚡ (orange/yellow)
+	shield: palette.peach, // complements 🛡️ (blue)
+	tower: palette.sky, // complements 🗼 (red)
+	laserBeam: palette.pink, // complements 🔫 (green)
+	nuclearExplosion: palette.mauve, // complements ☢️ (yellow)
 };
