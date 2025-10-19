@@ -1,4 +1,4 @@
-import React from "@rbxts/react";
+import React, { useEffect, useState } from "@rbxts/react";
 import { SpringOptions } from "@rbxts/ripple";
 import { fonts } from "client/constants/fonts";
 import { useRem } from "client/hooks";
@@ -32,7 +32,7 @@ export function AnimatedText({
 	textColor = palette.mantle,
 	textSize,
 	spacing,
-	speed = 0.6,
+	speed: _speed = 0.6,
 	amplitudeRem = 0.5,
 	phaseStep = 0.09,
 	staggerSeconds,
@@ -58,6 +58,22 @@ export function AnimatedText({
 	const actualTextSize = textSize ?? rem(1.5);
 	const effectiveStagger = (staggerSeconds !== undefined ? staggerSeconds : phaseStep) ?? 0;
 
+	const [pulseToken, setPulseToken] = useState(0);
+
+	useEffect(() => {
+		let alive = true;
+		const cycle = holdSeconds + periodSeconds;
+		const tick = () => {
+			if (!alive) return;
+			setPulseToken((v) => v + 1);
+			task.delay(cycle, tick);
+		};
+		tick();
+		return () => {
+			alive = false;
+		};
+	}, [holdSeconds, periodSeconds]);
+
 	return (
 		<HStack
 			name={name ?? "animated-text"}
@@ -81,6 +97,7 @@ export function AnimatedText({
 					staggerSeconds={effectiveStagger}
 					periodSeconds={periodSeconds}
 					holdSeconds={holdSeconds}
+					pulseToken={pulseToken}
 					font={font}
 					textColor={textColor}
 					textSize={actualTextSize}

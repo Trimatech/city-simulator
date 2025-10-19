@@ -17,6 +17,7 @@ interface AnimatedCharProps {
 	readonly textColor: Color3;
 	readonly textSize: number;
 	readonly springOptions?: SpringOptions;
+	readonly pulseToken?: number;
 }
 
 export function AnimatedChar({
@@ -24,31 +25,43 @@ export function AnimatedChar({
 	char,
 	amplitudePx,
 	staggerSeconds,
-	periodSeconds,
+	periodSeconds: _periodSeconds,
 	holdSeconds,
 	font,
 	textColor,
 	textSize,
 	springOptions,
+	pulseToken,
 }: AnimatedCharProps) {
 	const [y, yMotion] = useMotion(0);
 
+	const animationSpring = springOptions ?? springs.bubbly;
+
 	useEffect(() => {
+		if (pulseToken === undefined) return;
+
 		let alive = true;
-		task.spawn(() => {
-			const initialDelay = index * staggerSeconds;
-			if (initialDelay > 0) task.wait(initialDelay);
-			while (alive) {
-				yMotion.spring(-amplitudePx, springOptions ?? springs.bubbly);
-				task.wait(holdSeconds);
-				yMotion.spring(0, springOptions ?? springs.bubbly);
-				task.wait(periodSeconds);
-			}
-		});
+		const startDelay = index * staggerSeconds;
+
+		const trigger = () => {
+			if (!alive) return;
+
+			yMotion.spring(-amplitudePx, springs.responsive);
+
+			task.delay(holdSeconds, () => {
+				if (!alive) return;
+				yMotion.spring(0, animationSpring);
+			});
+		};
+		if (startDelay > 0) {
+			task.delay(startDelay, trigger);
+		} else {
+			trigger();
+		}
 		return () => {
 			alive = false;
 		};
-	}, [index, amplitudePx, staggerSeconds, periodSeconds, holdSeconds, springOptions]);
+	}, [pulseToken, index, amplitudePx, staggerSeconds, holdSeconds, animationSpring]);
 
 	const positionBinding = composeBindings(y, (v) => new UDim2(0, 0, 0.5, v));
 
