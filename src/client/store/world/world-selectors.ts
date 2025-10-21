@@ -24,6 +24,22 @@ export const selectSoldierFromWorldSubject = (state: RootState) => {
 	return state.soldiers[state.world.subject];
 };
 
+export const selectWorldSubjectDead = (state: RootState) => {
+	return state.soldiers[state.world.subject]?.dead ?? false;
+};
+
+export const selectWorldSubjectOrbs = (state: RootState) => {
+	return state.soldiers[state.world.subject]?.orbs ?? 0;
+};
+
+export const selectWorldSubjectTracersSize = (state: RootState) => {
+	return state.soldiers[state.world.subject]?.tracers?.size() ?? 0;
+};
+
+export const selectWorldSubjectPolygonAreaSize = (state: RootState) => {
+	return state.soldiers[state.world.subject]?.polygonAreaSize ?? 0;
+};
+
 export const selectWorldCamera = createSelector(
 	[selectSoldierFromWorldSubject],
 	(soldier) => {

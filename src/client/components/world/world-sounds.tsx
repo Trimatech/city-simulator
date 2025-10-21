@@ -1,9 +1,14 @@
 import { usePrevious, useThrottleCallback } from "@rbxts/pretty-react-hooks";
-import React, { useEffect, useRef } from "@rbxts/react";
+import React, { memo, useEffect, useRef } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { ContentProvider, Players, SoundService } from "@rbxts/services";
 import { useCharacter } from "client/hooks/use-character";
-import { selectSoldierFromWorldSubject } from "client/store/world";
+import {
+	selectWorldSubjectDead,
+	selectWorldSubjectOrbs,
+	selectWorldSubjectPolygonAreaSize,
+	selectWorldSubjectTracersSize,
+} from "client/store/world";
 import { playSound, sounds } from "shared/assets";
 import { selectHasLocalSoldier } from "shared/store/soldiers";
 
@@ -12,18 +17,20 @@ const ERROR_SOUNDS = [sounds.error_1, sounds.error_2, sounds.error_3];
 const random = new Random();
 const TOTAL_STEPS = 10; // 10 pre-made sounds (0.5 -> 1.0)
 
-export function WorldSounds() {
-	const soldier = useSelector(selectSoldierFromWorldSubject);
+function WorldSoundsComponent() {
+	const dead = useSelector(selectWorldSubjectDead);
+	const orbs = useSelector(selectWorldSubjectOrbs);
+	const tracersSize = useSelector(selectWorldSubjectTracersSize);
+	const polygonAreaSize = useSelector(selectWorldSubjectPolygonAreaSize);
+
 	const hasLocalSoldier = useSelector(selectHasLocalSoldier);
-	const previousOrbs = usePrevious(soldier?.orbs);
-	const previousTracerLength = usePrevious(soldier?.tracers?.size());
-	const previousPolygonAreaSize = usePrevious(soldier?.polygonAreaSize);
+	const previousOrbs = usePrevious(orbs);
+	const previousTracerLength = usePrevious(tracersSize);
+	const previousPolygonAreaSize = usePrevious(polygonAreaSize);
 
 	// Mute default Roblox footstep sounds from the character
 	const localPlayer = Players.LocalPlayer;
 	const character = useCharacter(localPlayer);
-
-	warn("WorldSounds rendering");
 
 	useEffect(() => {
 		if (!character) return;
@@ -127,11 +134,11 @@ export function WorldSounds() {
 
 	// Death sound
 	useEffect(() => {
-		if (soldier?.dead) {
+		if (dead) {
 			const index = random.NextInteger(0, ERROR_SOUNDS.size() - 1);
 			playSound(ERROR_SOUNDS[index], { volume: 2 * volume });
 		}
-	}, [soldier?.dead]);
+	}, [dead]);
 
 	// Spawn sound
 	useEffect(() => {
@@ -142,15 +149,15 @@ export function WorldSounds() {
 
 	// Candy eat sound
 	useEffect(() => {
-		if ((soldier?.orbs ?? 0) > (previousOrbs ?? 0)) {
+		if (orbs > (previousOrbs ?? 0)) {
 			const speed = random.NextNumber(0.87, 1);
 			playSound(sounds.whoosh, { volume: 0.6 * volume, speed });
 		}
-	}, [soldier?.orbs]);
+	}, [orbs]);
 
 	// Polygon grew sound
 	useEffect(() => {
-		const currentArea = soldier?.polygonAreaSize;
+		const currentArea = polygonAreaSize;
 		const previousArea = previousPolygonAreaSize;
 
 		if (currentArea === undefined || previousArea === undefined) return;
@@ -168,11 +175,11 @@ export function WorldSounds() {
 		// Restart from beginning to ensure instant attack
 		sound.TimePosition = 0;
 		sound.Play();
-	}, [soldier?.polygonAreaSize]);
+	}, [polygonAreaSize]);
 
 	// Tracer placement sound with cycling pitch
 	useEffect(() => {
-		const currentLength = soldier?.tracers?.size();
+		const currentLength = tracersSize;
 		const prevLength = previousTracerLength;
 
 		print(`currentLength=${currentLength}, prevLength=${prevLength}`);
@@ -189,7 +196,9 @@ export function WorldSounds() {
 		if (prevLength !== undefined && currentLength > prevLength) {
 			onTracerSound.run();
 		}
-	}, [soldier?.tracers]);
+	}, [tracersSize]);
 
 	return <></>;
 }
+
+export const WorldSounds = memo(WorldSoundsComponent);

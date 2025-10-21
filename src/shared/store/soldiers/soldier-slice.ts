@@ -97,6 +97,7 @@ export const soldiersSlice = createProducer(initialState, {
 			}
 
 			if (soldier.isInside) {
+				//warn(`Soldier ${soldier.id} is inside`);
 				return soldier;
 			}
 
