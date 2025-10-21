@@ -1,4 +1,4 @@
-import { TweenService } from "@rbxts/services";
+import { Debris, TweenService, Workspace } from "@rbxts/services";
 import { CollisionGroups } from "shared/constants/collision-groups";
 import { sliceArray } from "shared/polybool/poly-utils";
 
@@ -400,4 +400,11 @@ export function createCylinder({
 	cylinder.CFrame = cylinderCFrame;
 
 	return cylinder;
+}
+
+export function uncollideAndDestroy(part: Part, delay: number) {
+	part.CanCollide = false;
+	part.Anchored = false;
+	part.Parent = Workspace;
+	Debris.AddItem(part, delay);
 }

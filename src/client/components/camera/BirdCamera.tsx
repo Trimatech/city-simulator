@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useRef } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { Players, RunService } from "@rbxts/services";
 import { WORLD_BOUNDS } from "shared/constants/core";
-import { selectLocalSoldier } from "shared/store/soldiers";
+import { selectLocalIsSpawned } from "shared/store/soldiers";
 import { clampToCircle } from "shared/utils/world-bounds";
 
 function noiseDirection(t: number, seedX: number, seedY: number) {
@@ -48,8 +48,9 @@ function rotateTowards(current: Vector2, target: Vector2, maxAngleRadians: numbe
 
 export function BirdCamera() {
 	const camera = useCamera();
-	const soldier = useSelector(selectLocalSoldier);
-	const isSpawnedAlive = soldier !== undefined && !soldier.dead;
+	const isSpawned = useSelector(selectLocalIsSpawned);
+
+	warn("BirdCamera rendering");
 
 	const timeRef = useRef(0);
 	const position2DRef = useRef(new Vector2(0, 0));
@@ -77,7 +78,7 @@ export function BirdCamera() {
 	}, []);
 
 	useEffect(() => {
-		if (isSpawnedAlive) {
+		if (isSpawned) {
 			// Reset camera to follow the local humanoid when player (re)spawns
 			const resetToCharacter = () => {
 				const character = Players.LocalPlayer.Character;
@@ -99,10 +100,10 @@ export function BirdCamera() {
 		return () => {
 			camera.CameraType = Enum.CameraType.Custom;
 		};
-	}, [isSpawnedAlive]);
+	}, [isSpawned]);
 
 	useEventListener(RunService.RenderStepped, (dt) => {
-		if (isSpawnedAlive) return;
+		if (isSpawned) return;
 
 		// Ensure we keep control of the camera while spectating
 		camera.CameraType = Enum.CameraType.Scriptable;

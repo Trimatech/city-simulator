@@ -8,9 +8,7 @@ import {
 	createCylinder,
 	createWallHighlight,
 	createWallPart,
-	createWallPieces,
-	startCrumbling,
-	startFadeOut,
+	uncollideAndDestroy,
 } from "./Walls.utils";
 
 interface Props {
@@ -25,6 +23,7 @@ interface Props {
 	skinId?: string;
 	tracerIndex?: number;
 	outline?: boolean;
+	crumbleDelaySeconds?: number;
 }
 
 function WallComponent({
@@ -42,8 +41,6 @@ function WallComponent({
 }: Props) {
 	const mainPartRef = useRef<Part>();
 	const cylinderRef = useRef<Part>();
-	const debrisRef = useRef<Part[]>([]);
-	const cleanupRef = useRef<() => void>();
 
 	// Get skin properties
 	const wallProperties = (() => {
@@ -122,12 +119,10 @@ function WallComponent({
 
 		return () => {
 			if (mainPartRef.current) {
-				mainPartRef.current.Destroy();
-				mainPartRef.current = undefined;
+				uncollideAndDestroy(mainPartRef.current, math.random(0.5, 2));
 			}
 			if (cylinderRef.current) {
-				cylinderRef.current.Destroy();
-				cylinderRef.current = undefined;
+				uncollideAndDestroy(cylinderRef.current, math.random(0.5, 2));
 			}
 		};
 	}, [
@@ -142,54 +137,6 @@ function WallComponent({
 		thickness,
 		isCrumbling,
 	]);
-
-	// Crumbling effect
-	useEffect(() => {
-		if (!isCrumbling) return;
-
-		// Clean up main wall and cylinder if they exist
-		if (mainPartRef.current) {
-			mainPartRef.current.Destroy();
-			mainPartRef.current = undefined;
-		}
-		if (cylinderRef.current) {
-			cylinderRef.current.Destroy();
-			cylinderRef.current = undefined;
-		}
-
-		const { width, center, rotation } = calculateWallTransform([startPoint, endPoint], height);
-
-		// Create debris pieces
-		const pieces = createWallPieces({
-			position: center,
-			size: new Vector3(width, height, thickness),
-			rotation: rotation,
-			color: wallProperties.color,
-			transparency: wallProperties.transparency,
-			material: wallProperties.material,
-		});
-
-		// Ensure folder exists
-		let folder = Workspace.FindFirstChild(folderName) as Folder;
-		if (!folder) {
-			folder = new Instance("Folder");
-			folder.Name = folderName;
-			folder.Parent = Workspace;
-		}
-
-		// Add pieces to folder
-		pieces.forEach((piece) => (piece.Parent = folder));
-
-		// Start crumbling animation
-		cleanupRef.current = startCrumbling(pieces);
-		debrisRef.current = pieces;
-
-		return () => {
-			cleanupRef.current?.();
-			debrisRef.current.forEach((piece) => startFadeOut(piece));
-			debrisRef.current = [];
-		};
-	}, [isCrumbling]);
 
 	return undefined;
 }

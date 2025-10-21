@@ -71,12 +71,29 @@ export const selectLocalSoldier = (state: SharedState) => {
 	return state.soldiers[USER_NAME];
 };
 
+export const selectLocalSoldierId = (state: SharedState) => {
+	return state.soldiers[USER_NAME]?.id;
+};
+
+export const selectLocalIsSpawned = (state: SharedState) => {
+	const soldier = state.soldiers[USER_NAME];
+	return soldier !== undefined && !soldier.dead;
+};
+
 export const selectLocalOrbs = (state: SharedState) => {
 	return state.soldiers[USER_NAME]?.orbs;
 };
 
 export const selectLocalEliminations = (state: SharedState) => {
 	return state.soldiers[USER_NAME]?.eliminations;
+};
+
+export const selectLocalHealth = (state: SharedState) => {
+	return state.soldiers[USER_NAME]?.health;
+};
+
+export const selectLocalMaxHealth = (state: SharedState) => {
+	return state.soldiers[USER_NAME]?.maxHealth;
 };
 
 export const selectLocalPolygonAreaSize = (state: SharedState) => {

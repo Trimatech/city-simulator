@@ -23,6 +23,8 @@ export function WorldSounds() {
 	const localPlayer = Players.LocalPlayer;
 	const character = useCharacter(localPlayer);
 
+	warn("WorldSounds rendering");
+
 	useEffect(() => {
 		if (!character) return;
 

@@ -1,17 +1,13 @@
 import { useInterval } from "@rbxts/pretty-react-hooks";
-import React, { useEffect } from "@rbxts/react";
+import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { Players } from "@rbxts/services";
-import { useStore } from "client/hooks";
 import { WORLD_TICK } from "shared/constants/core";
 import { remotes } from "shared/remotes";
-import { selectLocalSoldier } from "shared/store/soldiers";
+import { selectLocalIsSpawned } from "shared/store/soldiers";
 
 export function Controller() {
-	const store = useStore();
-	const soldier = useSelector(selectLocalSoldier);
-
-	const isSpawned = soldier !== undefined && !soldier.dead;
+	const isSpawned = useSelector(selectLocalIsSpawned);
 
 	useInterval(() => {
 		if (!isSpawned) return;
@@ -21,12 +17,6 @@ export function Controller() {
 			remotes.soldier.move.fire(vector2);
 		}
 	}, WORLD_TICK);
-
-	useEffect(() => {
-		if (soldier) {
-			store.setWorldInputAngle(0);
-		}
-	}, [!soldier]);
 
 	return <></>;
 }

@@ -6,7 +6,7 @@ import { Frame } from "client/ui/layout/frame";
 import { Outline } from "client/ui/outline";
 import { Shadow } from "client/ui/shadow";
 import { palette } from "shared/constants/palette";
-import { selectLocalSoldier } from "shared/store/soldiers";
+import { selectLocalHealth, selectLocalMaxHealth } from "shared/store/soldiers";
 
 const defaultSoldier = {
 	health: 100,
@@ -15,10 +15,8 @@ const defaultSoldier = {
 
 export function HealthBar() {
 	const rem = useRem();
-	const soldier = useSelector(selectLocalSoldier) ?? defaultSoldier;
-
-	const health = soldier.health;
-	const maxHealth = soldier.maxHealth;
+	const health = useSelector(selectLocalHealth) ?? 0;
+	const maxHealth = useSelector(selectLocalMaxHealth) ?? 0;
 
 	const progress = math.clamp(math.max(health, 15) / maxHealth, 0, 1);
 

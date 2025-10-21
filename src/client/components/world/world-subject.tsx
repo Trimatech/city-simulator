@@ -2,24 +2,23 @@ import { useInterval } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { useStore } from "client/hooks";
-import { selectSoldierspectated } from "client/store/world";
-import { cycleNextSoldier, selectLocalSoldier } from "shared/store/soldiers";
+import { cycleNextSoldier, selectLocalSoldierId } from "shared/store/soldiers";
 
 export function WorldSubject() {
 	const store = useStore();
-	const soldierClient = useSelector(selectLocalSoldier);
-	const soldierspectated = useSelector(selectSoldierspectated);
+	const soldierClientId = useSelector(selectLocalSoldierId);
+	const soldierSpectatedId = useSelector(selectLocalSoldierId);
 
 	useEffect(() => {
-		if (soldierClient) {
-			store.setWorldSubject(soldierClient.id);
-		} else if (soldierspectated) {
-			store.setWorldSubject(soldierspectated.id);
+		if (soldierClientId) {
+			store.setWorldSubject(soldierClientId);
+		} else if (soldierSpectatedId) {
+			store.setWorldSubject(soldierSpectatedId);
 		}
-	}, [soldierClient?.id, soldierspectated?.id]);
+	}, [soldierClientId, soldierSpectatedId]);
 
 	useInterval(() => {
-		if (!soldierspectated) {
+		if (!soldierSpectatedId) {
 			store.setWorldSpectating(store.getState(cycleNextSoldier("")));
 		}
 	}, 1);

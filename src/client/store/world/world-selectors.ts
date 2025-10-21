@@ -20,16 +20,6 @@ export const selectWorldSpectating = (state: RootState) => {
 	return state.world.spectating;
 };
 
-export const selectSoldierspectated = (state: RootState) => {
-	return state.soldiers[state.world.spectating];
-};
-
-export const selectWorldInputAngle = (isClient = true) => {
-	return (state: RootState) => {
-		return isClient ? state.world.inputAngle : 0;
-	};
-};
-
 export const selectSoldierFromWorldSubject = (state: RootState) => {
 	return state.soldiers[state.world.subject];
 };
