@@ -108,7 +108,27 @@ export const selectSoldiers = createSelector(selectSoldiersById, (soldiersById) 
 	return Object.values(soldiersById);
 });
 
-export const selectTopSoldier = createSelector(selectSoldiersById, (soldiersById) => {
+export const selectTopSoldier = createSelector(
+	[selectSoldiersById],
+	(soldiersById) => {
+		let topSoldier: SoldierEntity | undefined;
+
+		for (const [, soldier] of pairs(soldiersById)) {
+			if (topSoldier === undefined || soldier.polygonAreaSize > topSoldier.polygonAreaSize) {
+				topSoldier = soldier;
+			}
+		}
+
+		return topSoldier ? { id: topSoldier.id, position: topSoldier.position } : undefined;
+	},
+	(a, b) => {
+		if (a === b) return true;
+		if (!a || !b) return a === b;
+		return a.id === b.id && a.position === b.position;
+	},
+);
+
+export const selectTopSoldierPosition = createSelector(selectSoldiersById, (soldiersById) => {
 	let topSoldier: SoldierEntity | undefined;
 
 	for (const [, soldier] of pairs(soldiersById)) {
@@ -117,7 +137,7 @@ export const selectTopSoldier = createSelector(selectSoldiersById, (soldiersById
 		}
 	}
 
-	return topSoldier;
+	return topSoldier?.position;
 });
 
 export const selectSoldiersSorted = (comparator: (current: SoldierEntity, existing: SoldierEntity) => boolean) => {

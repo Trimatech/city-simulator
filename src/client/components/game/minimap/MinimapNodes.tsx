@@ -2,7 +2,7 @@ import { map, useInterval } from "@rbxts/pretty-react-hooks";
 import React, { Element, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { useDefined, useStore } from "client/hooks";
-import { selectSoldierFromWorldSubject } from "client/store/world";
+import { selectWorldSubjectDesiredAngle, selectWorldSubjectPosition } from "client/store/world";
 import { CanvasGroup } from "client/ui/canvas-group";
 import { selectSoldiersById, selectTopSoldier } from "shared/store/soldiers";
 
@@ -12,7 +12,9 @@ import { isValidPlayer, normalizeToWorldBounds, useFriendsInServer } from "./uti
 
 export function MinimapNodes() {
 	const store = useStore();
-	const soldier = useDefined(useSelector(selectSoldierFromWorldSubject));
+	const soldierPosition = useDefined(useSelector(selectWorldSubjectPosition));
+	const soldierAngle = useDefined(useSelector(selectWorldSubjectDesiredAngle));
+
 	const friends = useFriendsInServer();
 
 	const [nodes, setNodes] = useState<Element[]>([]);
@@ -83,7 +85,7 @@ export function MinimapNodes() {
 				{nodes}
 			</CanvasGroup>
 
-			{soldier && <MinimapCursor point={normalizeToWorldBounds(soldier.position)} angle={soldier.angle} />}
+			{soldierPosition && <MinimapCursor point={normalizeToWorldBounds(soldierPosition)} angle={soldierAngle} />}
 		</>
 	);
 }

@@ -15,6 +15,8 @@ export function WorldBorder() {
 	const rem = useRem();
 	const world = useSelector(selectWorldCamera);
 
+	warn("WorldBorder rendering", world);
+
 	const [worldCamera, worldCameraMotion] = useMotion({
 		x: -world.offset.X,
 		y: -world.offset.Y,

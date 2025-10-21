@@ -28,8 +28,22 @@ export const selectWorldSubjectDead = (state: RootState) => {
 	return state.soldiers[state.world.subject]?.dead ?? false;
 };
 
+export const selectWorldSubjectPosition = (state: RootState) => {
+	return state.soldiers[state.world.subject]?.position ?? Vector2.zero;
+};
+
+export const selectWorldSubjectDesiredAngle = (state: RootState) => {
+	return state.soldiers[state.world.subject]?.desiredAngle ?? 0;
+};
+
 export const selectWorldSubjectOrbs = (state: RootState) => {
 	return state.soldiers[state.world.subject]?.orbs ?? 0;
+};
+
+const emptyTracers: Vector2[] = [];
+
+export const selectWorldSubjectTracers = (state: RootState) => {
+	return state.soldiers[state.world.subject]?.tracers ?? emptyTracers;
 };
 
 export const selectWorldSubjectTracersSize = (state: RootState) => {

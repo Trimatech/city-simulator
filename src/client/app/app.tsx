@@ -8,7 +8,6 @@ import { GameUI } from "../components/game";
 import { Menu } from "../components/menu";
 import { Music } from "../components/music";
 import { Preloader } from "../components/preloader";
-import { Voice } from "../components/voice";
 import { World } from "../components/world";
 import { Layer } from "../ui/layout/layer";
 
@@ -17,7 +16,7 @@ export function App() {
 		<ErrorHandler>
 			<Music />
 			<Preloader />
-			<Voice />
+			{/* <Voice /> */}
 
 			<Layer>
 				<BirdCamera />

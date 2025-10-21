@@ -10,6 +10,8 @@ export function VoiceCamera() {
 	const camera = useCamera();
 	const soldier = useSelector(selectSoldierFromWorldSubject);
 
+	warn("VoiceCamera rendering", soldier);
+
 	const getCameraCFrame = (position: Vector2) => {
 		const origin = toRealSpace(position).Position;
 		return CFrame.lookAt(origin, origin.add(new Vector3(0, -1, 0)), new Vector3(0, 0, -1));

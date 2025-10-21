@@ -11,6 +11,9 @@ import { useCandyOnScreen } from "./use-candy-on-screen";
 export function Candy() {
 	const rem = useRem();
 	const world = useSelector(selectWorldCamera);
+
+	warn("Candy rendering", world);
+
 	const candyOnScreen = useCandyOnScreen(world.offset, world.scale);
 
 	const [smoothOffset, offsetMotion] = useMotion(world.offset);

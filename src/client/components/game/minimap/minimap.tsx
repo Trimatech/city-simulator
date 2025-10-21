@@ -9,7 +9,7 @@ import { Shadow } from "client/ui/shadow";
 import { images } from "shared/assets";
 import { palette } from "shared/constants/palette";
 
-import { MinimapNodes } from "./minimap-nodes";
+import { MinimapNodes } from "./MinimapNodes";
 import { MINIMUM_MINIMAP_REM, useMinimapRem } from "./utils";
 
 export function Minimap() {

@@ -21,6 +21,9 @@ function mod(value: number, min: number, max: number) {
 export function BackdropBall() {
 	const camera = useCamera();
 	const world = useSelector(selectWorldCamera);
+
+	warn("BackdropBall rendering", world);
+
 	const seed = useSeed();
 	const [timer, setTimer] = useBinding(0);
 	const [smoothOffset, smoothOffsetMotion] = useMotion(world.offset);

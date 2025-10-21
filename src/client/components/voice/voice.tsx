@@ -5,6 +5,7 @@ import { useVoiceCharacters } from "./utils";
 import { VoiceCamera } from "./voice-camera";
 import { VoiceCharacter } from "./voice-character";
 
+// need to rethink this
 export function Voice() {
 	const characters = useVoiceCharacters();
 

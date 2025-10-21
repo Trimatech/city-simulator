@@ -2,13 +2,13 @@ import { composeBindings, lerpBinding, useViewport } from "@rbxts/pretty-react-h
 import React, { useEffect, useMemo } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { useMotion, useRem } from "client/hooks";
-import { selectSoldierFromWorldSubject } from "client/store/world";
+import { selectWorldSubjectPosition } from "client/store/world";
 import { Image } from "client/ui/image";
 import { Group } from "client/ui/layout/group";
 import { Text } from "client/ui/text";
 import { images } from "shared/assets";
 
-import { useLeader } from "./utils";
+import { useLeaderPosition } from "./utils";
 
 const ANGLE_FIX = math.rad(-90);
 const MIN_RANGE = 20;
@@ -16,8 +16,10 @@ const MIN_RANGE = 20;
 export function Compass() {
 	const rem = useRem();
 	const viewport = useViewport();
-	const leader = useLeader();
-	const subject = useSelector(selectSoldierFromWorldSubject);
+	const leaderPosition = useLeaderPosition();
+	const subjectPosition = useSelector(selectWorldSubjectPosition);
+
+	//warn("Compass rendering");
 
 	const [displacement, displacementMotion] = useMotion(new Vector2());
 	const [visible, visibleMotion] = useMotion(0);
@@ -42,17 +44,17 @@ export function Compass() {
 	}, []);
 
 	useEffect(() => {
-		if (subject && leader && subject !== leader) {
-			displacementMotion.spring(leader.position.sub(subject.position));
+		if (subjectPosition && leaderPosition && subjectPosition !== leaderPosition) {
+			displacementMotion.spring(leaderPosition.sub(subjectPosition));
 
-			if (leader.position.sub(subject.position).Magnitude > MIN_RANGE) {
+			if (leaderPosition.sub(subjectPosition).Magnitude > MIN_RANGE) {
 				visibleMotion.spring(1);
 				return;
 			}
 		}
 
 		visibleMotion.spring(0);
-	}, [subject, leader]);
+	}, [subjectPosition, leaderPosition]);
 
 	return (
 		<Group name="Compass">
