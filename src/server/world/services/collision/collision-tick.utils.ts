@@ -1,8 +1,7 @@
-import { store } from "server/store";
 import { getSoldier } from "server/world/world.utils";
 import { WORLD_BOUNDS } from "shared/constants/core";
 import { isPointInPolygon, vector2ToPoint, vectorsToPoints } from "shared/polybool/poly-utils";
-import { selectSoldiersById, SOLDIER_RADIUS_BASE, SoldierEntity } from "shared/store/soldiers";
+import { SOLDIER_RADIUS_BASE, SoldierEntity } from "shared/store/soldiers";
 
 import { soldierGrid } from "../soldiers";
 
@@ -74,25 +73,25 @@ export function checkCollisionWithTracers(headPosition: Vector2, tracers: Vector
 	return false;
 }
 
-export function checkCollisionWithEnemyTracers(soldier: SoldierEntity): string | undefined {
-	const moveStart = soldier.lastPosition;
-	const moveEnd = soldier.position;
+// export function checkCollisionWithEnemyTracers(soldier: SoldierEntity): string | undefined {
+// 	const moveStart = soldier.lastPosition;
+// 	const moveEnd = soldier.position;
 
-	const soldiersById = store.getState(selectSoldiersById);
-	for (const [ownerId, enemy] of pairs(soldiersById)) {
-		if (!enemy || enemy.dead || ownerId === soldier.id) continue;
-		const tracers = enemy.tracers;
-		if (tracers.size() < 2) continue;
-		for (let i = 0; i < tracers.size() - 1; i++) {
-			const startPoint = tracers[i];
-			const endPoint = tracers[i + 1];
-			if (doLinesIntersect(moveStart, moveEnd, startPoint, endPoint)) {
-				return ownerId as string;
-			}
-		}
-	}
-	return undefined;
-}
+// 	const soldiersById = store.getState(selectSoldiersById);
+// 	for (const [ownerId, enemy] of pairs(soldiersById)) {
+// 		if (!enemy || enemy.dead || ownerId === soldier.id) continue;
+// 		const tracers = enemy.tracers;
+// 		if (tracers.size() < 2) continue;
+// 		for (let i = 0; i < tracers.size() - 1; i++) {
+// 			const startPoint = tracers[i];
+// 			const endPoint = tracers[i + 1];
+// 			if (doLinesIntersect(moveStart, moveEnd, startPoint, endPoint)) {
+// 				return ownerId as string;
+// 			}
+// 		}
+// 	}
+// 	return undefined;
+// }
 
 export function isInsidePolygon(soldier: SoldierEntity) {
 	const polygon = vectorsToPoints(soldier.polygon as Vector2[]);
@@ -125,6 +124,38 @@ export function isCollidingWithOwnTracers(soldier: SoldierEntity) {
 	}
 
 	return checkCollisionWithTracers(me.position, nearest.metadata.tracers);
+}
+
+export function isCollidingWithEnemyTracers(soldier: SoldierEntity) {
+	const radius = SOLDIER_RADIUS_BASE;
+
+	const nearest = soldierGrid.nearest(soldier.position, radius + 5, (data) => {
+		const enemy = getSoldier(data.metadata.id);
+		return enemy !== undefined && !enemy.dead && enemy.id !== soldier.id;
+	});
+
+	const enemy = nearest && getSoldier(nearest.metadata.id);
+
+	if (!enemy) {
+		return;
+	}
+
+	if (!nearest || !nearest.metadata.tracers) {
+		print(`No tracer data found for soldier ${enemy.id}`);
+		return;
+	}
+
+	const moveStart = soldier.lastPosition;
+	const moveEnd = soldier.position;
+	const tracers = nearest.metadata.tracers as Vector2[];
+
+	for (let i = 0; i < tracers.size() - 1; i++) {
+		const startPoint = tracers[i];
+		const endPoint = tracers[i + 1];
+		if (doLinesIntersect(moveStart, moveEnd, startPoint, endPoint)) {
+			return enemy.id;
+		}
+	}
 }
 
 export function isCollidingWithSoldier(soldier: SoldierEntity) {

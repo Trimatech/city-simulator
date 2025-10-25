@@ -1,9 +1,10 @@
 import { store } from "server/store";
 import { killSoldier } from "server/world/world.utils";
-import { selectSoldiersSorted } from "shared/store/soldiers";
+import { selectSoldiers, selectSoldiersById } from "shared/store/soldiers";
 
 import { soldierIsInsideChanged } from "../soldiers/soldier-events";
 import {
+	isCollidingWithEnemyTracers,
 	isCollidingWithOwnTracers,
 	isCollidingWithSoldier,
 	isCollidingWithWall,
@@ -12,13 +13,15 @@ import {
 
 export function onCollisionTick() {
 	// in a head-on collision, the soldier with the lowest area is killed
-	const soldiers = store.getState(selectSoldiersSorted((a, b) => a.polygonAreaSize < b.polygonAreaSize));
+
+	const soldiers = store.getState(selectSoldiers);
 
 	for (const soldier of soldiers) {
 		if (soldier.dead) {
 			continue;
 		}
 
+		// This is to prevent hackers claiming areas outside of the map
 		if (isCollidingWithWall(soldier)) {
 			print(`Collided with wall, kill soldier ${soldier.id}`);
 			killSoldier(soldier.id);
@@ -36,26 +39,26 @@ export function onCollisionTick() {
 
 		debug.profileend();
 
-		// Check collision with enemy tracers first; give precedence over head-on
-		// debug.profilebegin("TICK_ENEMY_TRACERS");
-		// const ownerId = checkCollisionWithEnemyTracers(soldier);
-		// debug.profileend();
+		//Check collision with enemy tracers first; give precedence over head-on
+		debug.profilebegin("TICK_ENEMY_TRACERS");
+		const enemyId = isCollidingWithEnemyTracers(soldier);
+		debug.profileend();
 
-		// if (ownerId) {
-		// 	const owner = store.getState(selectSoldiersById)[ownerId];
-		// 	if (owner && owner.shieldActive) {
-		// 		print(`Collided with enemy tracer while owner shielded, kill collider ${soldier.id}`);
-		// 		killSoldier(soldier.id);
-		// 		store.playerKilledSoldier(ownerId, soldier.id);
-		// 		store.incrementSoldierEliminations(ownerId);
-		// 	} else {
-		// 		print(`Collided with enemy tracer, kill owner ${ownerId}`);
-		// 		killSoldier(ownerId);
-		// 		store.playerKilledSoldier(soldier.id, ownerId);
-		// 		store.incrementSoldierEliminations(soldier.id);
-		// 	}
-		// 	continue;
-		// }
+		if (enemyId !== undefined) {
+			const owner = store.getState(selectSoldiersById)[enemyId];
+			if (owner && owner.shieldActive) {
+				print(`Collided with enemy tracer while owner shielded, kill collider ${soldier.id}`);
+				killSoldier(soldier.id);
+				store.playerKilledSoldier(enemyId, soldier.id);
+				store.incrementSoldierEliminations(enemyId);
+			} else {
+				print(`Collided with enemy tracer, kill owner ${enemyId}`);
+				killSoldier(enemyId);
+				store.playerKilledSoldier(soldier.id, enemyId);
+				store.incrementSoldierEliminations(soldier.id);
+			}
+			continue;
+		}
 
 		// Check for collision with own tracers
 		debug.profilebegin("TICK_OWN_TRACERS");
