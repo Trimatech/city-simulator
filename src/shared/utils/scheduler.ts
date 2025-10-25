@@ -14,20 +14,18 @@ export function createScheduler({ name, tick, phase, onTick, onRender }: Schedul
 	let timer = phase ?? 0;
 
 	const connection = RunService.Heartbeat.Connect((deltaTime) => {
-		debug.profilebegin("MYPROFILER NAME: " + name);
 		const frameTime = math.min(deltaTime, tick);
 
 		timer += frameTime;
 
 		while (timer >= tick) {
 			timer -= tick;
-			//	debug.profilebegin(name);
+			//debug.profilebegin(name);
 			onTick?.(tick);
-			//	debug.profileend();
+			//debug.profileend();
 		}
 
-		onRender?.(frameTime, timer / tick);
-		debug.profileend();
+		//	onRender?.(frameTime, timer / tick);
 	});
 
 	connected.add(connection);

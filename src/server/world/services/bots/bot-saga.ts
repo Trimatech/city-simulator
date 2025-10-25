@@ -55,7 +55,7 @@ async function spawnBot(botId: string) {
 		// warn(`Bot ${botId} pivoted to primary part position`, pos);
 	} else {
 		//characterClone.PivotTo(new CFrame(spawnPoint.X, 10, spawnPoint.Y));
-		warn(`Bot ${botId} pivoted to spawn point`);
+		print(`Bot ${botId} pivoted to spawn point`, spawnPoint);
 	}
 
 	// create soldier entity in store
@@ -167,6 +167,8 @@ function removeBots(ids: ReadonlyArray<string>) {
 	}
 }
 
+const MAX_BOTS = 0;
+
 export async function initBotService() {
 	// React to inside-state changes
 	soldierIsInsideChanged.Connect((id, isInside) => {
@@ -203,13 +205,13 @@ export async function initBotService() {
 				return;
 			}
 
-			if (aliveNonBots > 0 && aliveBots < 5) {
-				spawnBots(5 - aliveBots);
+			if (aliveNonBots > 0 && aliveBots < MAX_BOTS) {
+				spawnBots(MAX_BOTS - aliveBots);
 				return;
 			}
 
-			if (aliveNonBots > 0 && aliveBots > 5) {
-				const extras = aliveBots - 5;
+			if (aliveNonBots > 0 && aliveBots > MAX_BOTS) {
+				const extras = aliveBots - MAX_BOTS;
 				const start = aliveBotIds.size() - extras;
 				const toRemove = aliveBotIds.move(start, aliveBotIds.size() - 1, 0, [] as string[]);
 				removeBots(toRemove);

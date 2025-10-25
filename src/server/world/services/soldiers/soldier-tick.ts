@@ -1,6 +1,7 @@
 import { store } from "server/store";
 
 import { updateSoldierGrid } from "./soldier-grid";
+import { updateSoldierGridVisualization } from "./soldier-grid-visualizer";
 
 const nextSoldierInputs = new Map<string, Vector2>();
 
@@ -8,6 +9,7 @@ export function onSoldierTick() {
 	consumeNextSoldierInputs();
 	store.soldierTick();
 	updateSoldierGrid(); //
+	updateSoldierGridVisualization();
 }
 
 export function registerSoldierInput(id: string, position: Vector2) {
