@@ -3,6 +3,7 @@ import { Players } from "@rbxts/services";
 import { IS_EDITOR, WORLD_TICK } from "shared/constants/core";
 import { remotes } from "shared/remotes";
 import { serializeState, SharedStateSerialized } from "shared/serdes";
+import { serializeCellLines } from "shared/serdes/handlers/serdes-grid";
 import { SharedState, slices } from "shared/store";
 
 const excludedActions = ["setSoldierPolygon", "setSoldierTracers", "clearSoldierTracers", "soldierTick"];
@@ -18,6 +19,20 @@ export function broadcasterMiddleware(): ProducerMiddleware {
 		producers: slices,
 		dispatchRate: WORLD_TICK,
 		hydrateRate: -1,
+		beforeDispatch: (_player, action) => {
+			// Compress heavy grid updates
+			if (action.name === "setCellLines") {
+				const cellKey = action.arguments[0] as string;
+				const lines = action.arguments[1] as defined;
+				// Only serialize if the payload is a table (server side)
+				if (typeOf(lines) === "table") {
+					const encoded = serializeCellLines(lines as unknown as never);
+					return { name: action.name, arguments: [cellKey, encoded] };
+				}
+			}
+
+			return action;
+		},
 		dispatch: (player, actions) => {
 			remotes.store.dispatch.fire(
 				player,

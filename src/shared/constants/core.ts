@@ -28,5 +28,5 @@ export const INITIAL_POLYGON_ITEMS = 40;
 export const WALL_HEIGHT = 7.1;
 export const WALL_THICKNESS = 1;
 
-export const TRACER_PIECE_LENGTH = 2;
+export const TRACER_PIECE_LENGTH = 5;
 export const TRACER_PIECE_HEIGHT = 4;

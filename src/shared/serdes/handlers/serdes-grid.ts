@@ -64,3 +64,41 @@ export function deserializeGrid(data: string): GridState {
 
 	return { resolution, cells } as GridState;
 }
+
+// Serialize only a single cell's lines map used by setCellLines action
+export function serializeCellLines(lines: GridCellsByEdgeId): string {
+	const buffer = new BitBuffer();
+
+	// write number of edges in this cell
+	let edges = 0;
+	for (const [,] of pairs(lines)) edges++;
+	buffer.WriteUInt(16, edges);
+
+	for (const [edgeId, line] of pairs(lines)) {
+		const l = line as GridLine;
+		buffer.WriteString(edgeId as string);
+		buffer.WriteString(l.ownerId);
+		buffer.WriteUInt(8, l.kind === "tracer" ? 1 : 2);
+		writeVector2(buffer, l.a);
+		writeVector2(buffer, l.b);
+	}
+
+	return buffer.ToString();
+}
+
+export function deserializeCellLines(data: string): GridCellsByEdgeId {
+	const buffer = BitBuffer.FromString(data);
+	const edgeCount = buffer.ReadUInt(16);
+
+	const cell: Record<string, GridLine> = {};
+	for (const _ of $range(1, edgeCount)) {
+		const edgeId = buffer.ReadString();
+		const ownerId = buffer.ReadString();
+		const kindByte = buffer.ReadUInt(8);
+		const a = readVector2(buffer);
+		const b = readVector2(buffer);
+		cell[edgeId] = { a, b, ownerId, kind: kindByte === 1 ? "tracer" : "area" };
+	}
+
+	return cell as GridCellsByEdgeId;
+}
