@@ -205,7 +205,13 @@ function intersectsAnySoldierPolygon(point: Vector2): boolean {
 		const polygon = soldier.polygon as ReadonlyArray<Vector2> | undefined;
 		if (!polygon || polygon.size() < 3) continue;
 		const otherPolygon = pointsToPolygon(polygon.map(vector2ToPoint));
-		const intersect = calculatePolygonOperation(newPolygon, otherPolygon, "Intersect");
+		let intersect;
+		try {
+			intersect = calculatePolygonOperation(newPolygon, otherPolygon, "Intersect");
+		} catch (err) {
+			warn("getSafePointOutsideSoldierPolygons: intersect failed", err);
+			continue;
+		}
 		if (intersect.regions.size() > 0) return true;
 	}
 

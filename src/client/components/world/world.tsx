@@ -1,5 +1,4 @@
 import React from "@rbxts/react";
-import { MemoGridWalls } from "client/components/walls/GridWalls";
 import { RemProvider } from "client/rem/rem-provider";
 import { Group } from "client/ui/layout/group";
 
@@ -13,7 +12,7 @@ export function World() {
 		<RemProvider minimumRem={6}>
 			<Group name="World">
 				<WorldSubject />
-				<MemoGridWalls />
+				{/* <MemoGridWalls /> */}
 				<Soldiers />
 
 				<Bots />

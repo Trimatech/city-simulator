@@ -140,86 +140,90 @@ export async function initSoldierService() {
 		debug.profilebegin("SOLDIER_IS_INSIDE");
 		print(`Soldier ${id} is ${isInside ? "inside" : "outside"}--------------------`);
 
-		const resultPolygon = pointsToPolygon(vectorsToPoints(polygon as Vector2[]));
-		const points = vectorsToPoints(tracers as Vector2[]);
-		const newCutPolygon = setIntersectionPoints(resultPolygon, points);
+		try {
+			const resultPolygon = pointsToPolygon(vectorsToPoints(polygon as Vector2[]));
+			const points = vectorsToPoints(tracers as Vector2[]);
+			const newCutPolygon = setIntersectionPoints(resultPolygon, points);
 
-		if (newCutPolygon) {
-			//	print(`newCutPolygon ${id}`, tracers);
-			const result = calculatePolygonOperation(resultPolygon, newCutPolygon, "Union");
+			if (newCutPolygon) {
+				//	print(`newCutPolygon ${id}`, tracers);
+				const result = calculatePolygonOperation(resultPolygon, newCutPolygon, "Union");
 
-			if (result.regions.size() > 0) {
-				const bestRegion = selectLargestRegionByArea(result.regions);
+				if (result.regions.size() > 0) {
+					const bestRegion = selectLargestRegionByArea(result.regions);
 
-				if (bestRegion !== undefined) {
-					const resultPolygon = pointsToVectors(bestRegion);
-					const polygonAreaSize = calculatePolygonArea(resultPolygon);
+					if (bestRegion !== undefined) {
+						const resultPolygon = pointsToVectors(bestRegion);
+						const polygonAreaSize = calculatePolygonArea(resultPolygon);
 
-					store.setSoldierPolygon(id, resultPolygon, polygonAreaSize, true);
+						store.setSoldierPolygon(id, resultPolygon, polygonAreaSize, true);
 
-					// Build area lines per cell for updated polygon and diff grid
-					updateAreaGridForPolygon({ ownerId: id, polygon: resultPolygon as Vector2[] });
+						// Build area lines per cell for updated polygon and diff grid
+						updateAreaGridForPolygon({ ownerId: id, polygon: resultPolygon as Vector2[] });
 
-					// Calculate bounding box for the new cut polygon
-					const newCutPoints = newCutPolygon.regions[0] as Point[];
-					const boundingBox = calculatePolygonBoundingBox(newCutPoints);
+						// Calculate bounding box for the new cut polygon
+						const newCutPoints = newCutPolygon.regions[0] as Point[];
+						const boundingBox = calculatePolygonBoundingBox(newCutPoints);
 
-					// Eat all candies inside the newly claimed area
-					const candiesInNewArea = candyGrid.queryBox(boundingBox.min, boundingBox.size, (point) => {
-						const candy = getCandy(point.metadata.id);
-						if (!candy || candy.eatenAt) return false;
+						// Eat all candies inside the newly claimed area
+						const candiesInNewArea = candyGrid.queryBox(boundingBox.min, boundingBox.size, (point) => {
+							const candy = getCandy(point.metadata.id);
+							if (!candy || candy.eatenAt) return false;
 
-						return isPointInPolygon(vector2ToPoint(point.position), newCutPoints);
-					});
+							return isPointInPolygon(vector2ToPoint(point.position), newCutPoints);
+						});
 
-					eatCandies(candiesInNewArea, id);
+						eatCandies(candiesInNewArea, id);
 
-					const state = store.getState();
-					const soldiersById = selectSoldiersById(state);
-					// AABB prefilter against the newly cut polygon to avoid expensive poly ops
-					const newCutBounds = calculatePolygonBoundingBox(newCutPoints);
+						const state = store.getState();
+						const soldiersById = selectSoldiersById(state);
+						// AABB prefilter against the newly cut polygon to avoid expensive poly ops
+						const newCutBounds = calculatePolygonBoundingBox(newCutPoints);
 
-					for (const [, soldier] of pairs(soldiersById)) {
-						const soldierId = soldier.id;
-						if (soldierId !== id && soldier.polygon) {
-							// Quick reject using cached bounding boxes
-							const otherBounds = soldier.polygonBounds;
-							if (!aabbIntersects(otherBounds, newCutBounds)) {
-								continue;
-							}
-							const otherSoldierPolygon = pointsToPolygon(vectorsToPoints(soldier.polygon));
-							const differenceResult = calculatePolygonOperation(
-								otherSoldierPolygon,
-								newCutPolygon,
-								"Difference",
-							);
+						for (const [, soldier] of pairs(soldiersById)) {
+							const soldierId = soldier.id;
+							if (soldierId !== id && soldier.polygon) {
+								// Quick reject using cached bounding boxes
+								const otherBounds = soldier.polygonBounds;
+								if (!aabbIntersects(otherBounds, newCutBounds)) {
+									continue;
+								}
+								const otherSoldierPolygon = pointsToPolygon(vectorsToPoints(soldier.polygon));
+								const differenceResult = calculatePolygonOperation(
+									otherSoldierPolygon,
+									newCutPolygon,
+									"Difference",
+								);
 
-							if (differenceResult.regions.size() > 0) {
-								const bestRegion = selectLargestRegionByArea(differenceResult.regions);
-								if (bestRegion !== undefined) {
-									const updatedPolygon = pointsToVectors(bestRegion);
-									const updatedArea = calculatePolygonArea(updatedPolygon);
-									store.setSoldierPolygon(soldierId, updatedPolygon, updatedArea);
-									if (updatedArea < SOLDIER_MIN_AREA) {
-										print(`Soldier ${soldierId} is too small, killing`);
-										killSoldier(soldierId);
-										store.playerKilledSoldier(id, soldierId);
-										store.incrementSoldierEliminations(soldierId);
+								if (differenceResult.regions.size() > 0) {
+									const bestRegion = selectLargestRegionByArea(differenceResult.regions);
+									if (bestRegion !== undefined) {
+										const updatedPolygon = pointsToVectors(bestRegion);
+										const updatedArea = calculatePolygonArea(updatedPolygon);
+										store.setSoldierPolygon(soldierId, updatedPolygon, updatedArea);
+										if (updatedArea < SOLDIER_MIN_AREA) {
+											print(`Soldier ${soldierId} is too small, killing`);
+											killSoldier(soldierId);
+											store.playerKilledSoldier(id, soldierId);
+											store.incrementSoldierEliminations(soldierId);
+										}
 									}
 								}
 							}
 						}
 					}
+				} else {
+					warn("No valid REGIONS found", { result, points, newCutPolygon });
 				}
 			} else {
-				warn("No valid REGIONS found", { result, points, newCutPolygon });
+				warn("No INTERSECTION found", { points, newCutPolygon });
 			}
-		} else {
-			warn("No INTERSECTION found", { points, newCutPolygon });
+		} catch (err) {
+			warn("SOLDIER_IS_INSIDE failed", { id, err });
+		} finally {
+			// Keep tracers; do not clear here.
+			debug.profileend();
 		}
-
-		// Keep tracers; do not clear here.
-		debug.profileend();
 		return () => {
 			print(`Soldier ${id} is no longer inside--------------------`);
 		};

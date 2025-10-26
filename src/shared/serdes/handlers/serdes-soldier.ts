@@ -1,9 +1,9 @@
 import BitBuffer from "@rbxts/bitbuffer2";
-import { calculateVector2ArrayBoundingBox } from "shared/polybool/poly-utils";
+import { BoundingBox } from "shared/polybool/poly-utils";
 import { SoldiersState } from "shared/store/soldiers";
 import { countProperties } from "shared/utils/object-utils";
 
-import { readArray, readVector2, writeArray, writeVector2 } from "../utils";
+import { readVector2, writeVector2 } from "../utils";
 
 export function serializeSoldiers(state: SoldiersState): string {
 	const buffer = new BitBuffer();
@@ -18,13 +18,13 @@ export function serializeSoldiers(state: SoldiersState): string {
 		buffer.WriteFloat32(soldier.angle);
 		buffer.WriteFloat32(soldier.desiredAngle);
 		buffer.WriteUInt(32, soldier.orbs);
-		writeArray(buffer, soldier.tracers, writeVector2);
-		writeArray(buffer, soldier.polygon, writeVector2);
+		//	writeArray(buffer, soldier.tracers, writeVector2);
+		//	writeArray(buffer, soldier.polygon, writeVector2);
 		buffer.WriteString(soldier.skin);
 		buffer.WriteBool(soldier.dead);
 		buffer.WriteUInt(16, soldier.eliminations);
 		buffer.WriteBool(soldier.isInside);
-		buffer.WriteFloat32(soldier.polygonAreaSize);
+		//	buffer.WriteFloat32(soldier.polygonAreaSize);
 		buffer.WriteBool(soldier.shieldActive);
 		buffer.WriteUInt(16, soldier.health);
 		buffer.WriteUInt(16, soldier.maxHealth);
@@ -32,6 +32,8 @@ export function serializeSoldiers(state: SoldiersState): string {
 
 	return buffer.ToString();
 }
+
+const defaultPolygonBounds: BoundingBox = { min: new Vector2(), max: new Vector2(), size: new Vector2() };
 
 export function deserializeSoldiers(data: string): SoldiersState {
 	const state: Writable<SoldiersState> = {};
@@ -41,8 +43,6 @@ export function deserializeSoldiers(data: string): SoldiersState {
 	for (const _ of $range(1, size)) {
 		const id = buffer.ReadString();
 
-		const polygon = readArray(buffer, readVector2);
-
 		state[id] = {
 			id,
 			name: buffer.ReadString(),
@@ -51,14 +51,14 @@ export function deserializeSoldiers(data: string): SoldiersState {
 			angle: buffer.ReadFloat32(),
 			desiredAngle: buffer.ReadFloat32(),
 			orbs: buffer.ReadUInt(32),
-			tracers: readArray(buffer, readVector2),
-			polygon,
+			tracers: [],
+			polygon: [],
 			skin: buffer.ReadString(),
 			dead: buffer.ReadBool(),
 			eliminations: buffer.ReadUInt(16),
 			isInside: buffer.ReadBool(),
-			polygonAreaSize: buffer.ReadFloat32(),
-			polygonBounds: calculateVector2ArrayBoundingBox(polygon),
+			polygonAreaSize: 0,
+			polygonBounds: defaultPolygonBounds,
 			shieldActive: buffer.ReadBool(),
 			health: buffer.ReadUInt(16),
 			maxHealth: buffer.ReadUInt(16),
