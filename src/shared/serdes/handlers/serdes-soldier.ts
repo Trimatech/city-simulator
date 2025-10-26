@@ -1,4 +1,5 @@
 import BitBuffer from "@rbxts/bitbuffer2";
+import { calculateVector2ArrayBoundingBox } from "shared/polybool/poly-utils";
 import { SoldiersState } from "shared/store/soldiers";
 import { countProperties } from "shared/utils/object-utils";
 
@@ -40,6 +41,8 @@ export function deserializeSoldiers(data: string): SoldiersState {
 	for (const _ of $range(1, size)) {
 		const id = buffer.ReadString();
 
+		const polygon = readArray(buffer, readVector2);
+
 		state[id] = {
 			id,
 			name: buffer.ReadString(),
@@ -49,12 +52,13 @@ export function deserializeSoldiers(data: string): SoldiersState {
 			desiredAngle: buffer.ReadFloat32(),
 			orbs: buffer.ReadUInt(32),
 			tracers: readArray(buffer, readVector2),
-			polygon: readArray(buffer, readVector2),
+			polygon,
 			skin: buffer.ReadString(),
 			dead: buffer.ReadBool(),
 			eliminations: buffer.ReadUInt(16),
 			isInside: buffer.ReadBool(),
 			polygonAreaSize: buffer.ReadFloat32(),
+			polygonBounds: calculateVector2ArrayBoundingBox(polygon),
 			shieldActive: buffer.ReadBool(),
 			health: buffer.ReadUInt(16),
 			maxHealth: buffer.ReadUInt(16),

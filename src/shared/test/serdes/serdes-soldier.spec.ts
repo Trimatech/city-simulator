@@ -3,12 +3,14 @@
 import { shallowEqual } from "@rbxts/reflex";
 import { HttpService } from "@rbxts/services";
 import { getRandomBaseSoldierSkin } from "shared/constants/skins";
+import { calculateVector2ArrayBoundingBox } from "shared/polybool/poly-utils";
 import { deserializeSoldiers, serializeSoldiers } from "shared/serdes/handlers/serdes-soldier";
 import { SoldierEntity, SoldiersState } from "shared/store/soldiers";
 import { fillArray } from "shared/utils/object-utils";
 
 export = () => {
 	function generateSoldier(id?: string): SoldierEntity {
+		const polygon = fillArray(10, () => new Vector2(math.random(), math.random()));
 		return {
 			id: id ?? HttpService.GenerateGUID(false),
 			name: HttpService.GenerateGUID(false),
@@ -21,8 +23,9 @@ export = () => {
 			skin: getRandomBaseSoldierSkin().id,
 			dead: math.random() > 0.5,
 			eliminations: math.random(1, 100),
-			polygon: fillArray(10, () => new Vector2(math.random(), math.random())),
+			polygon,
 			polygonAreaSize: 0,
+			polygonBounds: calculateVector2ArrayBoundingBox(polygon),
 			isInside: true,
 			shieldActive: math.random() > 0.5,
 			health: 100,
@@ -38,6 +41,9 @@ export = () => {
 				assert(shallowEqual(value, deserialized[key]), "polygon are not equal");
 			} else if (key === "angle" || key === "desiredAngle") {
 				expect(value).to.be.near(deserialized[key], 0.0001);
+			} else if (key === "polygonBounds") {
+				// polygonBounds is derived from polygon and may not round-trip bitwise equal
+				continue;
 			} else {
 				expect(value).to.equal(deserialized[key]);
 			}

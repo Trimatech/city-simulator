@@ -1,10 +1,10 @@
-import Object from "@rbxts/object-utils";
 import { Players } from "@rbxts/services";
 import { store } from "server/store";
 import { DEFAULT_ORBS, SOLDIER_TICK_PHASE } from "server/world/constants";
 import { getCandy, getSafePointOutsideSoldierPolygons, killSoldier, playerIsSpawned } from "server/world/world.utils";
 import { SOLDIER_MIN_AREA, SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
 import {
+	aabbIntersects,
 	calculatePolygonBoundingBox,
 	calculatePolygonOperation,
 	isPointInPolygon,
@@ -136,7 +136,10 @@ export async function initSoldierService() {
 
 	// TODO: should only check if spawned
 
-	store.observe(selectIsInsideBySoldierById, identifySoldier, ({ id, polygon, tracers }) => {
+	store.observe(selectIsInsideBySoldierById, identifySoldier, ({ id, polygon, tracers, isInside }) => {
+		debug.profilebegin("SOLDIER_IS_INSIDE");
+		print(`Soldier ${id} is ${isInside ? "inside" : "outside"}--------------------`);
+
 		const resultPolygon = pointsToPolygon(vectorsToPoints(polygon as Vector2[]));
 		const points = vectorsToPoints(tracers as Vector2[]);
 		const newCutPolygon = setIntersectionPoints(resultPolygon, points);
@@ -172,11 +175,18 @@ export async function initSoldierService() {
 					eatCandies(candiesInNewArea, id);
 
 					const state = store.getState();
-					const allSoldiers = Object.values(selectSoldiersById(state));
+					const soldiersById = selectSoldiersById(state);
+					// AABB prefilter against the newly cut polygon to avoid expensive poly ops
+					const newCutBounds = calculatePolygonBoundingBox(newCutPoints);
 
-					allSoldiers.forEach((soldier) => {
+					for (const [, soldier] of pairs(soldiersById)) {
 						const soldierId = soldier.id;
 						if (soldierId !== id && soldier.polygon) {
+							// Quick reject using cached bounding boxes
+							const otherBounds = soldier.polygonBounds;
+							if (!aabbIntersects(otherBounds, newCutBounds)) {
+								continue;
+							}
 							const otherSoldierPolygon = pointsToPolygon(vectorsToPoints(soldier.polygon));
 							const differenceResult = calculatePolygonOperation(
 								otherSoldierPolygon,
@@ -199,7 +209,7 @@ export async function initSoldierService() {
 								}
 							}
 						}
-					});
+					}
 				}
 			} else {
 				warn("No valid REGIONS found", { result, points, newCutPolygon });
@@ -209,7 +219,7 @@ export async function initSoldierService() {
 		}
 
 		// Keep tracers; do not clear here.
-
+		debug.profileend();
 		return () => {
 			print(`Soldier ${id} is no longer inside--------------------`);
 		};

@@ -5,7 +5,14 @@ import {
 	SOLDIER_MAX_ORBS,
 	TRACER_PIECE_LENGTH,
 } from "shared/constants/core";
-import { connectLineToPolygon, pointsToVectors, vector2ToPoint, vectorsToPoints } from "shared/polybool/poly-utils";
+import {
+	BoundingBox,
+	calculateVector2ArrayBoundingBox,
+	connectLineToPolygon,
+	pointsToVectors,
+	vector2ToPoint,
+	vectorsToPoints,
+} from "shared/polybool/poly-utils";
 import { pointsToPolygon } from "shared/polybool/polybool";
 import { calculatePolygonArea, createPolygonAroundPosition } from "shared/polygon-extra.utils";
 import { mapProperties, mapProperty } from "shared/utils/object-utils";
@@ -28,6 +35,7 @@ export interface SoldierEntity {
 	readonly eliminations: number;
 	readonly polygon: readonly Vector2[];
 	readonly polygonAreaSize: number;
+	readonly polygonBounds: BoundingBox;
 	readonly isInside: boolean;
 	readonly shieldActive: boolean;
 	readonly health: number;
@@ -48,6 +56,7 @@ const defaultEntity: SoldierEntity = {
 	eliminations: 0,
 	polygon: [],
 	polygonAreaSize: 0,
+	polygonBounds: { min: new Vector2(), max: new Vector2(), size: new Vector2() },
 	isInside: true,
 	shieldActive: false,
 	health: 100,
@@ -65,6 +74,7 @@ export const soldiersSlice = createProducer(initialState, {
 			INITIAL_POLYGON_ITEMS,
 		);
 		const polygonAreaSize = calculatePolygonArea(polygon);
+		const polygonBounds = calculateVector2ArrayBoundingBox(polygon);
 
 		return {
 			...state,
@@ -74,6 +84,7 @@ export const soldiersSlice = createProducer(initialState, {
 				name: id,
 				polygon,
 				polygonAreaSize,
+				polygonBounds,
 				...patch,
 				orbs: math.min(patch?.orbs ?? 0, SOLDIER_MAX_ORBS),
 				health:
@@ -141,12 +152,16 @@ export const soldiersSlice = createProducer(initialState, {
 
 	setSoldierPolygon: (state, id: string, polygon: Vector2[], polygonAreaSize: number, resetTracers = false) => {
 		// print(`setSoldierPolygon ${id}`, { polygon, polygonAreaSize });
-		return mapProperty(state, id, (soldier) => ({
-			...soldier,
-			polygon,
-			polygonAreaSize,
-			tracers: resetTracers ? [] : soldier.tracers,
-		}));
+		return mapProperty(state, id, (soldier) => {
+			const polygonBounds = calculateVector2ArrayBoundingBox(polygon);
+			return {
+				...soldier,
+				polygon,
+				polygonAreaSize,
+				polygonBounds,
+				tracers: resetTracers ? [] : soldier.tracers,
+			};
+		});
 	},
 
 	clearSoldierTracers: (state, id: string) => {
