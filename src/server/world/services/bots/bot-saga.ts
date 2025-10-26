@@ -167,7 +167,7 @@ function removeBots(ids: ReadonlyArray<string>) {
 	}
 }
 
-const MAX_BOTS = 20;
+const MAX_BOTS = 0;
 
 export async function initBotService() {
 	// React to inside-state changes

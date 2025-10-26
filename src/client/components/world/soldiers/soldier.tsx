@@ -1,6 +1,5 @@
 import React from "@rbxts/react";
 import { Players } from "@rbxts/services";
-import { AreaWalls } from "client/components/walls/AreaWalls";
 import { TracerLastWall } from "client/components/walls/TracerLastWall";
 import { TracerWalls } from "client/components/walls/TracerWalls";
 import { palette } from "shared/constants/palette";
@@ -12,7 +11,7 @@ interface Props {
 	transparency?: number;
 }
 
-export function Soldier({ soldier, color = palette.white, transparency = 0 }: Props) {
+export function Soldier({ soldier, color: _color = palette.white, transparency: _transparency = 0 }: Props) {
 	const isDead = soldier.dead;
 	const localPlayer = Players.LocalPlayer;
 	const character = localPlayer?.Character;
@@ -27,14 +26,7 @@ export function Soldier({ soldier, color = palette.white, transparency = 0 }: Pr
 			{/* Tracer lines */}
 			<TracerWalls tracers={soldier.tracers as Vector2[]} skinId={soldier.skin} outline={soldier.shieldActive} />
 
-			{/* Home polygon */}
-			<AreaWalls
-				points={soldier.polygon as Vector2[]}
-				isCrumbling={isDead}
-				color={color}
-				transparency={transparency}
-				skinId={soldier.skin}
-			/>
+			{/* Home polygon removed: now rendered via grid lines */}
 
 			{/* player connection line - hide if dead */}
 			{isClient && character && lastTracerPoint && !isDead && (

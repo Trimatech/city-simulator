@@ -17,6 +17,7 @@ import {
 import { Point, pointsToPolygon } from "shared/polybool/polybool";
 import { calculatePolygonArea } from "shared/polygon-extra.utils";
 import { remotes } from "shared/remotes";
+import { selectGridCells, selectGridResolution } from "shared/store/grid/grid-slice";
 import { defaultPlayerSave, RANDOM_SKIN, selectPlayerSave } from "shared/store/saves";
 import {
 	identifySoldier,
@@ -24,6 +25,12 @@ import {
 	selectIsInsideBySoldierById,
 	selectSoldiersById,
 } from "shared/store/soldiers";
+import {
+	buildAreaLinesByCell,
+	buildMergedCellContent,
+	computeAffectedCells,
+	shallowEqualCell,
+} from "shared/utils/grid-lines.utils";
 import { findCharacterPrimaryPart, reloadCharacterAsync } from "shared/utils/player-utils";
 import { createScheduler } from "shared/utils/scheduler";
 
@@ -114,6 +121,23 @@ export async function initSoldierService() {
 					const polygonAreaSize = calculatePolygonArea(resultPolygon);
 
 					store.setSoldierPolygon(id, resultPolygon, polygonAreaSize, true);
+
+					// Build area lines per cell for updated polygon and diff grid
+					const resolution = selectGridResolution(store.getState() as never);
+					const areaLinesByCell = buildAreaLinesByCell(resultPolygon, resolution);
+
+					// Merge area lines into grid cells for this soldier, and remove stale ones
+					const currentCells = selectGridCells(store.getState() as never);
+					const affectedCells = computeAffectedCells(currentCells, areaLinesByCell, id);
+
+					affectedCells.forEach((cellKey) => {
+						const existing = currentCells[cellKey];
+						const newLines = areaLinesByCell.get(cellKey);
+						const merged = buildMergedCellContent(existing, newLines, id);
+						if (!shallowEqualCell(existing, merged)) {
+							store.setCellLines(cellKey, merged as never);
+						}
+					});
 
 					// Calculate bounding box for the new cut polygon
 					const newCutPoints = newCutPolygon.regions[0] as Point[];

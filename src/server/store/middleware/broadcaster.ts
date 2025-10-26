@@ -5,6 +5,8 @@ import { remotes } from "shared/remotes";
 import { serializeState, SharedStateSerialized } from "shared/serdes";
 import { SharedState, slices } from "shared/store";
 
+const excludedActions = ["setSoldierPolygon"];
+
 export function broadcasterMiddleware(): ProducerMiddleware {
 	if (IS_EDITOR) {
 		return () => (dispatch) => dispatch;
@@ -17,7 +19,10 @@ export function broadcasterMiddleware(): ProducerMiddleware {
 		dispatchRate: WORLD_TICK,
 		hydrateRate: 60,
 		dispatch: (player, actions) => {
-			remotes.store.dispatch.fire(player, actions);
+			remotes.store.dispatch.fire(
+				player,
+				actions.filter((action) => !excludedActions.includes(action.name)),
+			);
 		},
 		hydrate: (player, state) => {
 			remotes.store.hydrate.fire(player, state as unknown as SharedStateSerialized);

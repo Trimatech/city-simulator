@@ -50,23 +50,7 @@ export function MinimapNodes() {
 				);
 			}
 
-			const polygonSize = soldier.polygon.size();
-
-			for (let i = 0; i < polygonSize - 1; i += step) {
-				const point = soldier.polygon[i];
-				const nextPoint = soldier.polygon[i + 1];
-
-				nodes.push(
-					<MinimapTracer
-						key={`poly-${soldier.id}-${i}`}
-						from={normalizeToWorldBounds(point)}
-						to={normalizeToWorldBounds(nextPoint)}
-						isPlayer={isPlayer}
-						isFriend={isFriend}
-						isLeader={isLeader}
-					/>,
-				);
-			}
+			// polygon walls are now rendered from grid on the world, skip on minimap
 		}
 
 		setNodes(nodes);
