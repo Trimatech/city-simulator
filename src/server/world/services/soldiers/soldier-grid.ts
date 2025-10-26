@@ -1,18 +1,40 @@
 import { store } from "server/store";
-import { selectGridResolution } from "shared/store/grid/grid-slice";
+import { selectGridCells, selectGridResolution } from "shared/store/grid/grid-slice";
 import { selectSoldiersById } from "shared/store/soldiers";
 import { filterTracersForCell } from "shared/utils/geometry-utils";
 import { Grid } from "shared/utils/grid";
+import {
+	buildMergedCellContentUnionKind,
+	buildTracerLinesByCell,
+	computeCellsFromNew,
+	shallowEqualCell,
+} from "shared/utils/grid-lines.utils";
 
 // Local debug/visualization grid (kept for soldier-grid-visualizer)
 export const soldierGrid = new Grid<{ id: string; tracers?: Vector2[] }>(10);
 
 // Build per-tick tracer lines per cell and dispatch diffs into shared grid slice
 
+export function updateTracerGridForOwner({ ownerId, positions }: { ownerId: string; positions: Vector2[] }) {
+	const state = store.getState();
+	const resolution = selectGridResolution({ grid: state.grid });
+	const linesByCell = buildTracerLinesByCell(positions, resolution, ownerId);
+	const currentCells = selectGridCells({ grid: state.grid });
+	// Only touch cells that have new tracer segments; never delete existing ones here
+	const affected = computeCellsFromNew(linesByCell);
+	affected.forEach((cellKey) => {
+		const existing = currentCells[cellKey];
+		const newLines = linesByCell.get(cellKey);
+		const merged = buildMergedCellContentUnionKind(existing, newLines, ownerId, "tracer");
+		if (!shallowEqualCell(existing, merged)) {
+			store.setCellLines(cellKey, merged);
+		}
+	});
+}
+
 export function updateSoldierGrid() {
 	const state = store.getState();
 	const soldiers = selectSoldiersById(state);
-	const resolution = selectGridResolution({ grid: state.grid });
 
 	// Maintain debug grid contents for visualizer
 	soldierGrid.clear();
@@ -36,5 +58,9 @@ export function updateSoldierGrid() {
 				tracers: tracersAtCell.size() >= 2 ? tracersAtCell : undefined,
 			});
 		}
+
+		// Emit tracer lines into grid slice with upstream diffing
+		const positions = tracersAtHeadCell.size() >= 2 ? tracersAtHeadCell : tracers;
+		updateTracerGridForOwner({ ownerId: soldier.id, positions });
 	}
 }

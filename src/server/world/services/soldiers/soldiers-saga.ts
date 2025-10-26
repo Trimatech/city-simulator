@@ -28,6 +28,7 @@ import {
 import {
 	buildAreaLinesByCell,
 	buildMergedCellContent,
+	buildMergedCellContentReplaceKind,
 	computeAffectedCells,
 	shallowEqualCell,
 } from "shared/utils/grid-lines.utils";
@@ -37,6 +38,27 @@ import { createScheduler } from "shared/utils/scheduler";
 import { candyGrid, eatCandies } from "../candy/candy-utils";
 import { deleteSoldierInput, onSoldierTick, registerSoldierInput } from "./soldier-tick";
 import { setSoldierSpeed } from "./soldiers.utils";
+
+function updateAreaGridForPolygon({ ownerId, polygon }: { ownerId: string; polygon: Vector2[] }) {
+	if (!polygon || polygon.size() === 0) return;
+	const state = store.getState();
+	const resolution = selectGridResolution({ grid: state.grid });
+	const areaLinesByCell = buildAreaLinesByCell(polygon, resolution);
+	const currentCells = selectGridCells({ grid: state.grid });
+	const affectedCells = computeAffectedCells(currentCells, areaLinesByCell, ownerId);
+
+	affectedCells.forEach((cellKey) => {
+		const existing = currentCells[cellKey];
+		const newLines = areaLinesByCell.get(cellKey);
+		// Step 1: drop owned tracer lines in this cell
+		const withoutOwnedTracers = buildMergedCellContentReplaceKind(existing, undefined, ownerId, "tracer");
+		// Step 2: drop owned area lines and add new area lines
+		const merged = buildMergedCellContent(withoutOwnedTracers, newLines, ownerId);
+		if (!shallowEqualCell(existing, merged)) {
+			store.setCellLines(cellKey, merged);
+		}
+	});
+}
 
 export async function initSoldierService() {
 	createScheduler({
@@ -74,6 +96,16 @@ export async function initSoldierService() {
 			health: 100,
 			maxHealth: 100,
 		});
+
+		// Initialize grid cells for the initial polygon right after spawn
+		{
+			const state = store.getState();
+			const soldier = selectSoldiersById(state)[player.Name];
+			const polygon = soldier?.polygon as Vector2[] | undefined;
+			if (polygon && polygon.size() > 0) {
+				updateAreaGridForPolygon({ ownerId: player.Name, polygon });
+			}
+		}
 
 		const character = player.Character as Model;
 
@@ -123,21 +155,7 @@ export async function initSoldierService() {
 					store.setSoldierPolygon(id, resultPolygon, polygonAreaSize, true);
 
 					// Build area lines per cell for updated polygon and diff grid
-					const resolution = selectGridResolution(store.getState() as never);
-					const areaLinesByCell = buildAreaLinesByCell(resultPolygon, resolution);
-
-					// Merge area lines into grid cells for this soldier, and remove stale ones
-					const currentCells = selectGridCells(store.getState() as never);
-					const affectedCells = computeAffectedCells(currentCells, areaLinesByCell, id);
-
-					affectedCells.forEach((cellKey) => {
-						const existing = currentCells[cellKey];
-						const newLines = areaLinesByCell.get(cellKey);
-						const merged = buildMergedCellContent(existing, newLines, id);
-						if (!shallowEqualCell(existing, merged)) {
-							store.setCellLines(cellKey, merged as never);
-						}
-					});
+					updateAreaGridForPolygon({ ownerId: id, polygon: resultPolygon as Vector2[] });
 
 					// Calculate bounding box for the new cut polygon
 					const newCutPoints = newCutPolygon.regions[0] as Point[];
@@ -190,7 +208,7 @@ export async function initSoldierService() {
 			warn("No INTERSECTION found", { points, newCutPolygon });
 		}
 
-		store.clearSoldierTracers(id);
+		// Keep tracers; do not clear here.
 
 		return () => {
 			print(`Soldier ${id} is no longer inside--------------------`);

@@ -1,7 +1,6 @@
 import React from "@rbxts/react";
 import { Players } from "@rbxts/services";
 import { TracerLastWall } from "client/components/walls/TracerLastWall";
-import { TracerWalls } from "client/components/walls/TracerWalls";
 import { palette } from "shared/constants/palette";
 import { SoldierEntity } from "shared/store/soldiers/soldier-slice";
 
@@ -24,7 +23,7 @@ export function Soldier({ soldier, color: _color = palette.white, transparency: 
 	return (
 		<>
 			{/* Tracer lines */}
-			<TracerWalls tracers={soldier.tracers as Vector2[]} skinId={soldier.skin} outline={soldier.shieldActive} />
+			{/* <TracerWalls tracers={soldier.tracers as Vector2[]} skinId={soldier.skin} outline={soldier.shieldActive} /> */}
 
 			{/* Home polygon removed: now rendered via grid lines */}
 
