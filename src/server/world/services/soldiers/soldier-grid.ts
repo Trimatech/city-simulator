@@ -1,5 +1,5 @@
 import { store } from "server/store";
-import { selectGridCells, selectGridResolution } from "shared/store/grid/grid-slice";
+import { selectGridCells, selectGridResolution } from "shared/store/grid/grid-selectors";
 import { selectSoldiersById } from "shared/store/soldiers";
 import { filterTracersForCell } from "shared/utils/geometry-utils";
 import { Grid } from "shared/utils/grid";

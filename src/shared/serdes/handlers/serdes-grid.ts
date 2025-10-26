@@ -1,5 +1,5 @@
 import BitBuffer from "@rbxts/bitbuffer2";
-import type { GridCellsByEdgeId, GridLine, GridState } from "shared/store/grid/grid-slice";
+import type { GridCellsByEdgeId, GridLine, GridState } from "shared/store/grid/grid-types";
 
 function writeVector2(buffer: BitBuffer, v: Vector2) {
 	buffer.WriteFloat32(v.X);

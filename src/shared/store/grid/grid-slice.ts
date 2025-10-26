@@ -1,26 +1,7 @@
 import { createProducer } from "@rbxts/reflex";
 import { getEdgeId } from "shared/utils/edge-id";
 
-export interface GridLine {
-	readonly a: Vector2;
-	readonly b: Vector2;
-	readonly ownerId: string;
-	readonly kind: "tracer" | "area";
-}
-
-export interface GridCellsByEdgeId {
-	readonly [edgeId: string]: GridLine | undefined;
-}
-
-export interface GridState {
-	readonly resolution: number;
-	readonly cells: { readonly [cellKey: string]: GridCellsByEdgeId | undefined };
-}
-
-const defaultState: GridState = {
-	resolution: 10,
-	cells: {},
-};
+import { GridCellsByEdgeId, GridState } from "./grid-types";
 
 export function shallowEqualCell(a?: GridCellsByEdgeId, b?: GridCellsByEdgeId) {
 	if (a === b) return true;
@@ -41,6 +22,11 @@ export function shallowEqualCell(a?: GridCellsByEdgeId, b?: GridCellsByEdgeId) {
 	return countA === countB;
 }
 
+const defaultState: GridState = {
+	resolution: 10,
+	cells: {},
+};
+
 export const gridSlice = createProducer(defaultState, {
 	setCellLines: (state, cellKey: string, lines: GridCellsByEdgeId) => {
 		return {
@@ -54,7 +40,3 @@ export const gridSlice = createProducer(defaultState, {
 
 	clearGrid: (state) => ({ ...state, cells: {} }),
 });
-
-export const selectGrid = (state: { grid: GridState }) => state.grid;
-export const selectGridResolution = (state: { grid: GridState }) => state.grid.resolution;
-export const selectGridCells = (state: { grid: GridState }) => state.grid.cells;

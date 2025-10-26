@@ -17,7 +17,7 @@ import {
 import { Point, pointsToPolygon } from "shared/polybool/polybool";
 import { calculatePolygonArea } from "shared/polygon-extra.utils";
 import { remotes } from "shared/remotes";
-import { selectGridCells, selectGridResolution } from "shared/store/grid/grid-slice";
+import { selectGridCells, selectGridResolution } from "shared/store/grid/grid-selectors";
 import { defaultPlayerSave, RANDOM_SKIN, selectPlayerSave } from "shared/store/saves";
 import {
 	identifySoldier,

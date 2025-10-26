@@ -1,4 +1,4 @@
-import { GridCellsByEdgeId, GridLine } from "shared/store/grid/grid-slice";
+import { GridCellsByEdgeId, GridLine } from "shared/store/grid/grid-types";
 import { getCellAABBFromCoord, getCellCoordFromPos, getCellKeyFromCoord } from "shared/utils/cell-key";
 import { getEdgeId, quantizeVector2 } from "shared/utils/edge-id";
 import { segmentIntersectsRect } from "shared/utils/geometry-utils";
