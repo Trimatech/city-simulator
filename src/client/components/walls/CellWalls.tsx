@@ -15,7 +15,8 @@ function CellWallsComponent({ cellKey }: CellWallsProps) {
 	const cell = useSelectorCreator(selectGridCell, cellKey);
 
 	const items = useMemo(() => {
-		if (!cell) return [];
+		if (!cell) return undefined;
+
 		const nextP = new Array<GridLineWithKey>();
 
 		for (const [edgeId, line] of pairs(cell)) {
@@ -25,17 +26,14 @@ function CellWallsComponent({ cellKey }: CellWallsProps) {
 		return nextP;
 	}, [cell]);
 
-	if (!cell) return undefined;
+	if (!cell) {
+		//print(`no cell found for cellKey ${cellKey}`);
+		return undefined;
+	}
 
-	print(`rendering cell walls ${cellKey} ${items.size()}`);
+	//print(`rendering cell walls ${cellKey} ${items?.size()}`);
 
-	return (
-		<>
-			{items.map((it) => (
-				<WallWithKey key={it.edgeId} cellKey={cellKey} edgeId={it.edgeId} />
-			))}
-		</>
-	);
+	return <>{items?.map((it) => <WallWithKey key={it.edgeId} cellKey={cellKey} edgeId={it.edgeId} />)}</>;
 }
 
 export const CellWalls = memo(CellWallsComponent);

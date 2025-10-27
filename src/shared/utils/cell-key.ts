@@ -29,3 +29,14 @@ export function getCellAABBFromCoord(coord: Vector2, res: number): [Vector2, Vec
 	const max = new Vector2((coord.X + 1) * res, (coord.Y + 1) * res);
 	return [min, max];
 }
+
+export function iterateCellsAroundCoord(centerCoord: Vector2, halfWidthCells: number): string[] {
+	const hw = math.max(0, halfWidthCells);
+	const keys = new Array<string>();
+	for (const ix of $range(centerCoord.X - hw, centerCoord.X + hw)) {
+		for (const iy of $range(centerCoord.Y - hw, centerCoord.Y + hw)) {
+			keys.push(getCellKeyFromCoord(new Vector2(ix, iy)));
+		}
+	}
+	return keys;
+}

@@ -119,7 +119,7 @@ export function isCollidingWithOwnTracers(soldier: SoldierEntity) {
 	}
 
 	if (!nearest || !nearest.metadata.tracers) {
-		print(`No tracer data found for soldier ${soldier.id}`);
+		//print(`No tracer data found for soldier ${soldier.id}`);
 		return;
 	}
 
@@ -141,7 +141,7 @@ export function isCollidingWithEnemyTracers(soldier: SoldierEntity) {
 	}
 
 	if (!nearest || !nearest.metadata.tracers) {
-		print(`No tracer data found for soldier ${enemy.id}`);
+		//	print(`No tracer data found for soldier ${enemy.id}`);
 		return;
 	}
 
