@@ -42,10 +42,13 @@ function WallComponent({
 	const mainPartRef = useRef<Part>();
 	const cylinderRef = useRef<Part>();
 
+	print(`rendering wall ${folderName} ${startPoint.X},${startPoint.Y} -> ${endPoint.X},${endPoint.Y}`);
+
 	//	print("rendering properties", wallProperties);
 
 	// Main wall creation effect
 	useEffect(() => {
+		print(`creating wall ${folderName} ${startPoint.X},${startPoint.Y} -> ${endPoint.X},${endPoint.Y}`);
 		if (isCrumbling) return;
 
 		const { width, center, rotation, startPosition } = calculateWallTransform([startPoint, endPoint], height);
