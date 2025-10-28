@@ -29,7 +29,7 @@ import { findCharacterPrimaryPart, reloadCharacterAsync } from "shared/utils/pla
 import { createScheduler } from "shared/utils/scheduler";
 
 import { candyGrid, eatCandies } from "../candy/candy-utils";
-import { updateAreaGridForPolygon } from "./soldier-grid";
+import { clearOwnerTracersFromGrid, updateAreaGridForPolygon } from "./soldier-grid";
 import { deleteSoldierInput, onSoldierTick, registerSoldierInput } from "./soldier-tick";
 import { setSoldierSpeed } from "./soldiers.utils";
 
@@ -204,9 +204,15 @@ export async function initSoldierService() {
 					}
 				} else {
 					warn("No valid REGIONS found", { result, points, newCutPolygon });
+					// Could not form a valid region; clear tracers and their grid lines to avoid residue
+					store.setSoldierTracers(id, []);
+					clearOwnerTracersFromGrid(id);
 				}
 			} else {
 				warn("No INTERSECTION found", { points, newCutPolygon });
+				// Could not compute intersection; clear tracers and their grid lines
+				store.setSoldierTracers(id, []);
+				clearOwnerTracersFromGrid(id);
 			}
 		} catch (err) {
 			warn("SOLDIER_IS_INSIDE failed", { id, err });

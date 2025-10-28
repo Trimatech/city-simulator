@@ -114,3 +114,17 @@ export function clearOwnerFromGrid(ownerId: string) {
 		}
 	}
 }
+
+// Remove only tracer lines belonging to an owner across all cells
+export function clearOwnerTracersFromGrid(ownerId: string) {
+	const state = store.getState();
+	const currentCells = selectGridCells({ grid: state.grid });
+
+	for (const [cellKey, existing] of pairs(currentCells)) {
+		if (!existing) continue;
+		const noTracers = buildMergedCellContentReplaceKind(existing, undefined, ownerId, "tracer");
+		if (!shallowEqualCell(existing, noTracers)) {
+			store.setCellLines(cellKey as string, noTracers);
+		}
+	}
+}

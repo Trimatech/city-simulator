@@ -230,6 +230,25 @@ export function addIntersectionPointsWithLines(cutLines: Line[], polygon: Polygo
 			const insertIndex = closestIntersection.index + 1;
 			points.insert(insertIndex, closestIntersection.point);
 			cutPoints.push(closestIntersection.point);
+		} else {
+			// Fallback: connect to the closest existing polygon vertex to ensure we have a usable anchor
+			warn("No intersection found when adding intersection points with lines; falling back to closest vertex", {
+				cutLine,
+			});
+			const center = getCenterPoint(cutLine);
+			let bestIdx = 0;
+			let bestDist = math.huge;
+			for (let j = 0; j < points.size(); j++) {
+				const candidate = points[j] as Point;
+				const d = getDistanceBetweenPoints(center, candidate);
+				if (d < bestDist) {
+					bestDist = d;
+					bestIdx = j;
+				}
+			}
+			const closestVertex = points[bestIdx] as Point;
+			// Do not insert a duplicate vertex; just record it as a cut point so downstream logic can use its index
+			cutPoints.push(closestVertex);
 		}
 	}
 
