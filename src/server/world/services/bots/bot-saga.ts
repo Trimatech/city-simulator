@@ -1,9 +1,9 @@
 import Object from "@rbxts/object-utils";
-import { Players } from "@rbxts/services";
 import { store } from "server/store";
 import { DEFAULT_ORBS, IS_TESTING_STUFF, SOLDIER_TICK_PHASE } from "server/world/constants";
 import { getSafePointOutsideSoldierPolygons } from "server/world/world.utils";
 import { SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
+import { getRandomBaseSoldierSkin } from "shared/constants/skins";
 import { selectAliveSoldiersById } from "shared/store/soldiers";
 import { createScheduler } from "shared/utils/scheduler";
 
@@ -12,6 +12,8 @@ import { registerSoldierInput } from "../soldiers/soldier-tick";
 import { setSoldierSpeed } from "../soldiers/soldiers.utils";
 import { botStopped } from "./bot-events";
 import { buildBotMovementPath } from "./buildBotMovementPath";
+
+const MAX_BOTS = 20;
 
 interface BotController {
 	readonly id: string;
@@ -24,15 +26,6 @@ interface BotController {
 }
 
 const botControllers = new Map<string, BotController>();
-
-function chooseRandomPlayer(): Player | undefined {
-	const players = Players.GetPlayers();
-	if (players.size() === 0) {
-		return undefined;
-	}
-	const random = new Random();
-	return players[random.NextInteger(1, players.size()) - 1];
-}
 
 async function spawnBot(botId: string) {
 	const spawnPoint = getSafePointOutsideSoldierPolygons();
@@ -59,11 +52,13 @@ async function spawnBot(botId: string) {
 	}
 
 	// create soldier entity in store
+	const randomSkinId = getRandomBaseSoldierSkin().id;
 	store.addSoldier(botId, {
 		name: `Bot ${botId}`,
 		position: spawnPoint,
 		lastPosition: spawnPoint,
 		orbs: DEFAULT_ORBS,
+		skin: randomSkinId,
 	});
 	// ensure walk speed matches soldiers
 	setSoldierSpeed(botId, SOLDIER_SPEED);
@@ -166,8 +161,6 @@ function removeBots(ids: ReadonlyArray<string>) {
 		store.removeSoldier(id);
 	}
 }
-
-const MAX_BOTS = 20;
 
 export async function initBotService() {
 	// React to inside-state changes

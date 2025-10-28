@@ -171,6 +171,14 @@ export const selectSoldierById = (id: string) => {
 	return (state: SharedState) => state.soldiers[id];
 };
 
+export const selectSoldierSkin = (id: string) => {
+	return (state: SharedState) => state.soldiers[id]?.skin;
+};
+
+export const selectSoldierShieldActive = (id: string) => {
+	return (state: SharedState) => state.soldiers[id]?.shieldActive ?? false;
+};
+
 export const selectSoldierOrbs = (id: string) => {
 	return (state: SharedState) => state.soldiers[id]?.orbs;
 };
