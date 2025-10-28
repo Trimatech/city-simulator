@@ -1,35 +1,19 @@
 import { Players } from "@rbxts/services";
 import { store } from "server/store";
 import { DEFAULT_ORBS, SOLDIER_TICK_PHASE } from "server/world/constants";
-import { getCandy, getSafePointOutsideSoldierPolygons, killSoldier, playerIsSpawned } from "server/world/world.utils";
-import { SOLDIER_MIN_AREA, SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
-import {
-	aabbIntersects,
-	calculatePolygonBoundingBox,
-	calculatePolygonOperation,
-	isPointInPolygon,
-	pointsToVectors,
-	selectLargestRegionByArea,
-	setIntersectionPoints,
-	vector2ToPoint,
-	vectorsToPoints,
-} from "shared/polybool/poly-utils";
-import { Point, pointsToPolygon } from "shared/polybool/polybool";
-import { calculatePolygonArea } from "shared/polygon-extra.utils";
+import { getSafePointOutsideSoldierPolygons, killSoldier, playerIsSpawned } from "server/world/world.utils";
+import { SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
+import { setIntersectionPoints, vectorsToPoints } from "shared/polybool/poly-utils";
+import { pointsToPolygon } from "shared/polybool/polybool";
 import { remotes } from "shared/remotes";
 import { defaultPlayerSave, RANDOM_SKIN, selectPlayerSave } from "shared/store/saves";
-import {
-	identifySoldier,
-	selectAliveSoldiersById,
-	selectIsInsideBySoldierById,
-	selectSoldiersById,
-} from "shared/store/soldiers";
+import { identifySoldier, selectAliveSoldiersById, selectIsInsideBySoldierById } from "shared/store/soldiers";
 // grid-lines utils imported in soldier-grid helpers
 import { findCharacterPrimaryPart, reloadCharacterAsync } from "shared/utils/player-utils";
 import { createScheduler } from "shared/utils/scheduler";
 
-import { candyGrid, eatCandies } from "../candy/candy-utils";
-import { clearOwnerTracersFromGrid, updateAreaGridForPolygon } from "./soldier-grid";
+import { applyInitialPolygonClaim, processNewAreaClaim } from "./soldier-claims";
+import { clearOwnerTracersFromGrid } from "./soldier-grid";
 import { deleteSoldierInput, onSoldierTick, registerSoldierInput } from "./soldier-tick";
 import { setSoldierSpeed } from "./soldiers.utils";
 
@@ -71,14 +55,7 @@ export async function initSoldierService() {
 		});
 
 		// Initialize grid cells for the initial polygon right after spawn
-		{
-			const state = store.getState();
-			const soldier = selectSoldiersById(state)[player.Name];
-			const polygon = soldier?.polygon as Vector2[] | undefined;
-			if (polygon && polygon.size() > 0) {
-				updateAreaGridForPolygon({ ownerId: player.Name, polygon });
-			}
-		}
+		applyInitialPolygonClaim(player.Name);
 
 		const character = player.Character as Model;
 
@@ -114,100 +91,12 @@ export async function initSoldierService() {
 		print(`Soldier ${id} is ${isInside ? "inside" : "outside"}--------------------`);
 
 		try {
-			const resultPolygon = pointsToPolygon(vectorsToPoints(polygon as Vector2[]));
-			const points = vectorsToPoints(tracers as Vector2[]);
+			const resultPolygon = pointsToPolygon(vectorsToPoints(polygon));
+			const points = vectorsToPoints(tracers);
 			const newCutPolygon = setIntersectionPoints(resultPolygon, points);
 
 			if (newCutPolygon) {
-				//	print(`newCutPolygon ${id}`, tracers);
-				const result = calculatePolygonOperation(resultPolygon, newCutPolygon, "Union");
-
-				if (result.regions.size() > 0) {
-					const bestRegion = selectLargestRegionByArea(result.regions);
-
-					if (bestRegion !== undefined) {
-						const resultPolygon = pointsToVectors(bestRegion);
-						const polygonAreaSize = calculatePolygonArea(resultPolygon);
-
-						store.setSoldierPolygon(id, resultPolygon, polygonAreaSize, true);
-
-						// Build area lines per cell for updated polygon and diff grid
-						updateAreaGridForPolygon({ ownerId: id, polygon: resultPolygon as Vector2[] });
-
-						// Calculate bounding box for the new cut polygon
-						const newCutPoints = newCutPolygon.regions[0] as Point[];
-						const boundingBox = calculatePolygonBoundingBox(newCutPoints);
-
-						// Eat all candies inside the newly claimed area
-						const candiesInNewArea = candyGrid.queryBox(boundingBox.min, boundingBox.size, (point) => {
-							const candy = getCandy(point.metadata.id);
-							if (!candy || candy.eatenAt) return false;
-
-							return isPointInPolygon(vector2ToPoint(point.position), newCutPoints);
-						});
-
-						eatCandies(candiesInNewArea, id);
-
-						const state = store.getState();
-						const soldiersById = selectSoldiersById(state);
-						// AABB prefilter against the newly cut polygon to avoid expensive poly ops
-						const newCutBounds = calculatePolygonBoundingBox(newCutPoints);
-
-						for (const [, soldier] of pairs(soldiersById)) {
-							const soldierId = soldier.id;
-							if (soldierId !== id && soldier.polygon) {
-								// Quick reject using cached bounding boxes
-								const otherBounds = soldier.polygonBounds;
-								if (!aabbIntersects(otherBounds, newCutBounds)) {
-									continue;
-								}
-								const otherSoldierPolygon = pointsToPolygon(vectorsToPoints(soldier.polygon));
-								const differenceResult = calculatePolygonOperation(
-									otherSoldierPolygon,
-									newCutPolygon,
-									"Difference",
-								);
-
-								if (differenceResult.regions.size() > 0) {
-									const bestRegion = selectLargestRegionByArea(differenceResult.regions);
-									if (bestRegion !== undefined) {
-										const updatedPolygon = pointsToVectors(bestRegion);
-										const updatedArea = calculatePolygonArea(updatedPolygon);
-										store.setSoldierPolygon(soldierId, updatedPolygon, updatedArea);
-										// Reflect the victim's new area in grid without dropping their tracers
-										updateAreaGridForPolygon({
-											ownerId: soldierId,
-											polygon: updatedPolygon as Vector2[],
-											dropTracers: false,
-										});
-										if (updatedArea < SOLDIER_MIN_AREA) {
-											print(`Soldier ${soldierId} is too small, killing`);
-											killSoldier(soldierId);
-											store.playerKilledSoldier(id, soldierId);
-											store.incrementSoldierEliminations(id);
-										}
-									}
-								} else {
-									// Fully covered: clear victim's area on grid and eliminate
-									updateAreaGridForPolygon({
-										ownerId: soldierId,
-										polygon: [] as Vector2[],
-										dropTracers: false,
-									});
-									store.setSoldierPolygon(soldierId, [], 0, true);
-									killSoldier(soldierId);
-									store.playerKilledSoldier(id, soldierId);
-									store.incrementSoldierEliminations(id);
-								}
-							}
-						}
-					}
-				} else {
-					warn("No valid REGIONS found", { result, points, newCutPolygon });
-					// Could not form a valid region; clear tracers and their grid lines to avoid residue
-					store.setSoldierTracers(id, []);
-					clearOwnerTracersFromGrid(id);
-				}
+				processNewAreaClaim(id, newCutPolygon);
 			} else {
 				warn("No INTERSECTION found", { points, newCutPolygon });
 				// Could not compute intersection; clear tracers and their grid lines

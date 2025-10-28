@@ -7,6 +7,7 @@ import { getRandomBaseSoldierSkin } from "shared/constants/skins";
 import { selectAliveSoldiersById } from "shared/store/soldiers";
 import { createScheduler } from "shared/utils/scheduler";
 
+import { applyInitialPolygonClaim } from "../soldiers/soldier-claims";
 import { soldierIsInsideChanged } from "../soldiers/soldier-events";
 import { registerSoldierInput } from "../soldiers/soldier-tick";
 import { setSoldierSpeed } from "../soldiers/soldiers.utils";
@@ -60,6 +61,9 @@ async function spawnBot(botId: string) {
 		orbs: DEFAULT_ORBS,
 		skin: randomSkinId,
 	});
+
+	// Apply initial polygon claim through the same cutting logic as updates
+	applyInitialPolygonClaim(botId);
 	// ensure walk speed matches soldiers
 	setSoldierSpeed(botId, SOLDIER_SPEED);
 	// initialize controller via events
