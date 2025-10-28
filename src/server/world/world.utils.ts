@@ -1,6 +1,7 @@
 import { Players } from "@rbxts/services";
 import { setTimeout } from "@rbxts/set-timeout";
 import { store } from "server/store";
+import { clearOwnerFromGrid } from "server/world/services/soldiers/soldier-grid";
 import { INITIAL_POLYGON_DIAMETER, INITIAL_POLYGON_ITEMS, WORLD_BOUNDS } from "shared/constants/core";
 import { calculatePolygonOperation, isPointInPolygon, vector2ToPoint } from "shared/polybool/poly-utils";
 import { pointsToPolygon } from "shared/polybool/polybool";
@@ -87,6 +88,9 @@ export function killSoldier(soldierId: string) {
 	}
 
 	store.removeTowersByOwnerId(soldierId);
+
+	// Clear all grid lines owned by this soldier
+	clearOwnerFromGrid(soldierId);
 
 	setTimeout(() => {
 		store.removeSoldier(soldierId);

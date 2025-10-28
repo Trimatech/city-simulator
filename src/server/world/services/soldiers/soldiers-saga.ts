@@ -17,7 +17,6 @@ import {
 import { Point, pointsToPolygon } from "shared/polybool/polybool";
 import { calculatePolygonArea } from "shared/polygon-extra.utils";
 import { remotes } from "shared/remotes";
-import { selectGridCells, selectGridResolution } from "shared/store/grid/grid-selectors";
 import { defaultPlayerSave, RANDOM_SKIN, selectPlayerSave } from "shared/store/saves";
 import {
 	identifySoldier,
@@ -25,40 +24,14 @@ import {
 	selectIsInsideBySoldierById,
 	selectSoldiersById,
 } from "shared/store/soldiers";
-import {
-	buildAreaLinesByCell,
-	buildMergedCellContent,
-	buildMergedCellContentReplaceKind,
-	computeAffectedCells,
-	shallowEqualCell,
-} from "shared/utils/grid-lines.utils";
+// grid-lines utils imported in soldier-grid helpers
 import { findCharacterPrimaryPart, reloadCharacterAsync } from "shared/utils/player-utils";
 import { createScheduler } from "shared/utils/scheduler";
 
 import { candyGrid, eatCandies } from "../candy/candy-utils";
+import { updateAreaGridForPolygon } from "./soldier-grid";
 import { deleteSoldierInput, onSoldierTick, registerSoldierInput } from "./soldier-tick";
 import { setSoldierSpeed } from "./soldiers.utils";
-
-function updateAreaGridForPolygon({ ownerId, polygon }: { ownerId: string; polygon: Vector2[] }) {
-	if (!polygon || polygon.size() === 0) return;
-	const state = store.getState();
-	const resolution = selectGridResolution({ grid: state.grid });
-	const areaLinesByCell = buildAreaLinesByCell(polygon, resolution);
-	const currentCells = selectGridCells({ grid: state.grid });
-	const affectedCells = computeAffectedCells(currentCells, areaLinesByCell, ownerId);
-
-	affectedCells.forEach((cellKey) => {
-		const existing = currentCells[cellKey];
-		const newLines = areaLinesByCell.get(cellKey);
-		// Step 1: drop owned tracer lines in this cell
-		const withoutOwnedTracers = buildMergedCellContentReplaceKind(existing, undefined, ownerId, "tracer");
-		// Step 2: drop owned area lines and add new area lines
-		const merged = buildMergedCellContent(withoutOwnedTracers, newLines, ownerId);
-		if (!shallowEqualCell(existing, merged)) {
-			store.setCellLines(cellKey, merged);
-		}
-	});
-}
 
 export async function initSoldierService() {
 	createScheduler({
@@ -201,13 +174,30 @@ export async function initSoldierService() {
 										const updatedPolygon = pointsToVectors(bestRegion);
 										const updatedArea = calculatePolygonArea(updatedPolygon);
 										store.setSoldierPolygon(soldierId, updatedPolygon, updatedArea);
+										// Reflect the victim's new area in grid without dropping their tracers
+										updateAreaGridForPolygon({
+											ownerId: soldierId,
+											polygon: updatedPolygon as Vector2[],
+											dropTracers: false,
+										});
 										if (updatedArea < SOLDIER_MIN_AREA) {
 											print(`Soldier ${soldierId} is too small, killing`);
 											killSoldier(soldierId);
 											store.playerKilledSoldier(id, soldierId);
-											store.incrementSoldierEliminations(soldierId);
+											store.incrementSoldierEliminations(id);
 										}
 									}
+								} else {
+									// Fully covered: clear victim's area on grid and eliminate
+									updateAreaGridForPolygon({
+										ownerId: soldierId,
+										polygon: [] as Vector2[],
+										dropTracers: false,
+									});
+									store.setSoldierPolygon(soldierId, [], 0, true);
+									killSoldier(soldierId);
+									store.playerKilledSoldier(id, soldierId);
+									store.incrementSoldierEliminations(id);
 								}
 							}
 						}
