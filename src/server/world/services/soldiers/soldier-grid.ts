@@ -15,7 +15,7 @@ import {
 } from "shared/utils/grid-lines.utils";
 
 // Local debug/visualization grid (kept for soldier-grid-visualizer)
-export const soldierGrid = new Grid<{ id: string; tracers?: Vector2[] }>(10);
+export const soldierGrid = new Grid<{ id: string; tracers?: Vector2[] }>(20);
 
 // Build per-tick tracer lines per cell and dispatch diffs into shared grid slice
 

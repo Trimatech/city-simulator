@@ -23,7 +23,7 @@ export function shallowEqualCell(a?: GridCellsByEdgeId, b?: GridCellsByEdgeId) {
 }
 
 const defaultState: GridState = {
-	resolution: 10,
+	resolution: 20,
 	cells: {},
 };
 
