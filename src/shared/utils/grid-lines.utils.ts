@@ -3,22 +3,35 @@ import { getCellAABBFromCoord, getCellCoordFromPos, getCellKeyFromCoord } from "
 import { getEdgeId, quantizeVector2 } from "shared/utils/edge-id";
 import { segmentIntersectsRect } from "shared/utils/geometry-utils";
 
+// Compound-key helpers enable multi-owner lines on the same geometric edge
+export function getCompoundEdgeKey(edgeId: string, ownerId: string, kind: GridLine["kind"]) {
+	return `${edgeId}#${ownerId}#${kind}`;
+}
+
+export function isCompoundEdgeKey(key: string) {
+	return key.find("#") !== undefined;
+}
+
 export function shallowEqualCell(a?: GridCellsByEdgeId, b?: GridCellsByEdgeId) {
 	if (a === b) return true;
 	if (!a || !b) return false;
-	let countA = 0;
-	for (const [id, line] of pairs(a)) {
-		countA++;
-		const other = b[id as string];
-		if (!other) return false;
-		if (other.kind !== line!.kind || other.ownerId !== line!.ownerId) return false;
-		const idA = getEdgeId({ a: line!.a, b: line!.b });
-		const idB = getEdgeId({ a: other.a, b: other.b });
-		if (idA !== idB) return false;
+	// Compare by triples (edgeIdFromGeom, ownerId, kind) to be robust to legacy keys
+	const setA = new Map<string, true>();
+	for (const [, line] of pairs(a)) {
+		if (!line) continue;
+		const eid = getEdgeId({ a: line.a, b: line.b });
+		setA.set(`${eid}|${line.ownerId}|${line.kind}`, true);
 	}
-	let countB = 0;
-	for (const [,] of pairs(b)) countB++;
-	return countA === countB;
+	const countA = setA.size();
+	let matchCount = 0;
+	for (const [, line] of pairs(b)) {
+		if (!line) continue;
+		const eid = getEdgeId({ a: line.a, b: line.b });
+		const key = `${eid}|${line.ownerId}|${line.kind}`;
+		if (setA.has(key)) matchCount++;
+		else return false;
+	}
+	return matchCount === countA;
 }
 
 export function buildAreaLinesByCell(points: Vector2[], resolution: number) {
@@ -153,12 +166,19 @@ export function buildMergedCellContent(
 	if (existing) {
 		for (const [eid, line] of pairs(existing)) {
 			if (!line) continue;
+			// Keep all tracer lines; keep area lines not owned by the current owner
 			if (line.kind === "tracer" || (line.kind === "area" && line.ownerId !== ownerId)) {
 				merged[eid as string] = line;
 			}
+			// Drop legacy non-compound area entries for this owner to avoid duplicates
+			// Will be re-added under compound key below
 		}
 	}
-	if (newLines) newLines.forEach((v, k) => (merged[k] = { ...v, ownerId }));
+	if (newLines)
+		newLines.forEach((v, k) => {
+			const compound = getCompoundEdgeKey(k, ownerId, v.kind);
+			merged[compound] = { ...v, ownerId };
+		});
 	return merged as unknown as GridCellsByEdgeId;
 }
 
@@ -172,13 +192,17 @@ export function buildMergedCellContentReplaceKind(
 	if (existing) {
 		for (const [eid, line] of pairs(existing)) {
 			if (!line) continue;
-			// Drop owned lines of the kind being replaced; keep everything else
+			// Drop only this owner's lines of the kind being replaced; keep everything else
 			if (!(line.kind === kindToReplace && line.ownerId === ownerId)) {
 				merged[eid as string] = line;
 			}
 		}
 	}
-	if (newLines) newLines.forEach((v, k) => (merged[k] = { ...v, ownerId }));
+	if (newLines)
+		newLines.forEach((v, k) => {
+			const compound = getCompoundEdgeKey(k, ownerId, v.kind);
+			merged[compound] = { ...v, ownerId };
+		});
 	return merged as unknown as GridCellsByEdgeId;
 }
 
@@ -195,6 +219,10 @@ export function buildMergedCellContentUnionKind(
 			merged[eid as string] = line;
 		}
 	}
-	if (newLines) newLines.forEach((v, k) => (merged[k] = { ...v, ownerId, kind: v.kind }));
+	if (newLines)
+		newLines.forEach((v, k) => {
+			const compound = getCompoundEdgeKey(k, ownerId, v.kind);
+			merged[compound] = { ...v, ownerId, kind: v.kind };
+		});
 	return merged as unknown as GridCellsByEdgeId;
 }
