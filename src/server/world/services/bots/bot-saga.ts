@@ -188,7 +188,7 @@ export async function initBotService() {
 		}
 	});
 
-	// Maintain 5 bots only when there is at least one alive non-bot soldier
+	// Maintain dynamic bot count: max bots = 20 - alive non-bot soldiers
 	store.subscribe(
 		selectAliveSoldiersById,
 		() => true,
@@ -197,18 +197,22 @@ export async function initBotService() {
 			const aliveBots = aliveBotIds.size();
 			const aliveNonBots = getAliveNonBotCount();
 
-			if (aliveNonBots <= 0 && aliveBots > 0) {
-				removeBots(aliveBotIds);
+			// No humans alive -> remove all bots (conserve resources)
+			if (aliveNonBots <= 0) {
+				if (aliveBots > 0) removeBots(aliveBotIds);
 				return;
 			}
 
-			if (aliveNonBots > 0 && aliveBots < MAX_BOTS) {
-				spawnBots(MAX_BOTS - aliveBots);
+			// Target bots is capped by available slots: 20 - players
+			const targetBots = math.max(0, MAX_BOTS - aliveNonBots);
+
+			if (aliveBots < targetBots) {
+				spawnBots(targetBots - aliveBots);
 				return;
 			}
 
-			if (aliveNonBots > 0 && aliveBots > MAX_BOTS) {
-				const extras = aliveBots - MAX_BOTS;
+			if (aliveBots > targetBots) {
+				const extras = aliveBots - targetBots;
 				const start = aliveBotIds.size() - extras;
 				const toRemove = aliveBotIds.move(start, aliveBotIds.size() - 1, 0, [] as string[]);
 				removeBots(toRemove);
