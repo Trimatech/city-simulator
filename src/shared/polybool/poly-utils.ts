@@ -191,7 +191,8 @@ export function connectLineToPolygon(line: Line, polygon: Polygon) {
 		return [closestIntersection.point, line[1]];
 	}
 
-	warn("No intersection found when connecting line to polygon", { line, polygon });
+	//warn("No intersection found when connecting line to polygon", { line, polygon });
+	warn("No intersection found when connecting line to polygon");
 
 	return [getCenterPoint(line)];
 }
@@ -229,6 +230,25 @@ export function addIntersectionPointsWithLines(cutLines: Line[], polygon: Polygo
 			const insertIndex = closestIntersection.index + 1;
 			points.insert(insertIndex, closestIntersection.point);
 			cutPoints.push(closestIntersection.point);
+		} else {
+			// Fallback: connect to the closest existing polygon vertex to ensure we have a usable anchor
+			warn("No intersection found when adding intersection points with lines; falling back to closest vertex", {
+				cutLine,
+			});
+			const center = getCenterPoint(cutLine);
+			let bestIdx = 0;
+			let bestDist = math.huge;
+			for (let j = 0; j < points.size(); j++) {
+				const candidate = points[j] as Point;
+				const d = getDistanceBetweenPoints(center, candidate);
+				if (d < bestDist) {
+					bestDist = d;
+					bestIdx = j;
+				}
+			}
+			const closestVertex = points[bestIdx] as Point;
+			// Do not insert a duplicate vertex; just record it as a cut point so downstream logic can use its index
+			cutPoints.push(closestVertex);
 		}
 	}
 
@@ -510,6 +530,32 @@ export function calculatePolygonBoundingBox(points: Point[]): BoundingBox {
 	const size = max.sub(min);
 
 	return { min, max, size };
+}
+
+export function calculateVector2ArrayBoundingBox(points: ReadonlyArray<Vector2>): BoundingBox {
+	let minX = math.huge;
+	let minY = math.huge;
+	let maxX = -math.huge;
+	let maxY = -math.huge;
+
+	for (const v of points) {
+		minX = math.min(minX, v.X);
+		minY = math.min(minY, v.Y);
+		maxX = math.max(maxX, v.X);
+		maxY = math.max(maxY, v.Y);
+	}
+
+	const min = new Vector2(minX, minY);
+	const max = new Vector2(maxX, maxY);
+	const size = max.sub(min);
+
+	return { min, max, size };
+}
+
+export function aabbIntersects(a: BoundingBox, b: BoundingBox): boolean {
+	if (a.max.X < b.min.X || a.min.X > b.max.X) return false;
+	if (a.max.Y < b.min.Y || a.min.Y > b.max.Y) return false;
+	return true;
 }
 
 // Select the largest region by polygon area from a PolyBool result

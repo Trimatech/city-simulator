@@ -1,17 +1,20 @@
 import Object from "@rbxts/object-utils";
-import { Players } from "@rbxts/services";
 import { store } from "server/store";
 import { DEFAULT_ORBS, IS_TESTING_STUFF, SOLDIER_TICK_PHASE } from "server/world/constants";
 import { getSafePointOutsideSoldierPolygons } from "server/world/world.utils";
 import { SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
+import { getRandomBaseSoldierSkin } from "shared/constants/skins";
 import { selectAliveSoldiersById } from "shared/store/soldiers";
 import { createScheduler } from "shared/utils/scheduler";
 
+import { applyInitialPolygonClaim } from "../soldiers/soldier-claims";
 import { soldierIsInsideChanged } from "../soldiers/soldier-events";
 import { registerSoldierInput } from "../soldiers/soldier-tick";
 import { setSoldierSpeed } from "../soldiers/soldiers.utils";
 import { botStopped } from "./bot-events";
 import { buildBotMovementPath } from "./buildBotMovementPath";
+
+const MAX_BOTS = 20;
 
 interface BotController {
 	readonly id: string;
@@ -24,15 +27,6 @@ interface BotController {
 }
 
 const botControllers = new Map<string, BotController>();
-
-function chooseRandomPlayer(): Player | undefined {
-	const players = Players.GetPlayers();
-	if (players.size() === 0) {
-		return undefined;
-	}
-	const random = new Random();
-	return players[random.NextInteger(1, players.size()) - 1];
-}
 
 async function spawnBot(botId: string) {
 	const spawnPoint = getSafePointOutsideSoldierPolygons();
@@ -55,16 +49,21 @@ async function spawnBot(botId: string) {
 		// warn(`Bot ${botId} pivoted to primary part position`, pos);
 	} else {
 		//characterClone.PivotTo(new CFrame(spawnPoint.X, 10, spawnPoint.Y));
-		warn(`Bot ${botId} pivoted to spawn point`);
+		print(`Bot ${botId} pivoted to spawn point`, spawnPoint);
 	}
 
 	// create soldier entity in store
+	const randomSkinId = getRandomBaseSoldierSkin().id;
 	store.addSoldier(botId, {
 		name: `Bot ${botId}`,
 		position: spawnPoint,
 		lastPosition: spawnPoint,
 		orbs: DEFAULT_ORBS,
+		skin: randomSkinId,
 	});
+
+	// Apply initial polygon claim through the same cutting logic as updates
+	applyInitialPolygonClaim(botId);
 	// ensure walk speed matches soldiers
 	setSoldierSpeed(botId, SOLDIER_SPEED);
 	// initialize controller via events
@@ -189,7 +188,7 @@ export async function initBotService() {
 		}
 	});
 
-	// Maintain 5 bots only when there is at least one alive non-bot soldier
+	// Maintain dynamic bot count: max bots = 20 - alive non-bot soldiers
 	store.subscribe(
 		selectAliveSoldiersById,
 		() => true,
@@ -198,18 +197,22 @@ export async function initBotService() {
 			const aliveBots = aliveBotIds.size();
 			const aliveNonBots = getAliveNonBotCount();
 
-			if (aliveNonBots <= 0 && aliveBots > 0) {
-				removeBots(aliveBotIds);
+			// No humans alive -> remove all bots (conserve resources)
+			if (aliveNonBots <= 0) {
+				if (aliveBots > 0) removeBots(aliveBotIds);
 				return;
 			}
 
-			if (aliveNonBots > 0 && aliveBots < 5) {
-				spawnBots(5 - aliveBots);
+			// Target bots is capped by available slots: 20 - players
+			const targetBots = math.max(0, MAX_BOTS - aliveNonBots);
+
+			if (aliveBots < targetBots) {
+				spawnBots(targetBots - aliveBots);
 				return;
 			}
 
-			if (aliveNonBots > 0 && aliveBots > 5) {
-				const extras = aliveBots - 5;
+			if (aliveBots > targetBots) {
+				const extras = aliveBots - targetBots;
 				const start = aliveBotIds.size() - extras;
 				const toRemove = aliveBotIds.move(start, aliveBotIds.size() - 1, 0, [] as string[]);
 				removeBots(toRemove);

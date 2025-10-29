@@ -8,6 +8,7 @@ export function onSoldierTick() {
 	consumeNextSoldierInputs();
 	store.soldierTick();
 	updateSoldierGrid(); //
+	//	updateSoldierGridVisualization();
 }
 
 export function registerSoldierInput(id: string, position: Vector2) {

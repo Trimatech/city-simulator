@@ -1,33 +1,19 @@
-import Object from "@rbxts/object-utils";
 import { Players } from "@rbxts/services";
 import { store } from "server/store";
 import { DEFAULT_ORBS, SOLDIER_TICK_PHASE } from "server/world/constants";
-import { getCandy, getSafePointOutsideSoldierPolygons, killSoldier, playerIsSpawned } from "server/world/world.utils";
-import { SOLDIER_MIN_AREA, SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
-import {
-	calculatePolygonBoundingBox,
-	calculatePolygonOperation,
-	isPointInPolygon,
-	pointsToVectors,
-	selectLargestRegionByArea,
-	setIntersectionPoints,
-	vector2ToPoint,
-	vectorsToPoints,
-} from "shared/polybool/poly-utils";
-import { Point, pointsToPolygon } from "shared/polybool/polybool";
-import { calculatePolygonArea } from "shared/polygon-extra.utils";
+import { getSafePointOutsideSoldierPolygons, killSoldier, playerIsSpawned } from "server/world/world.utils";
+import { SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
+import { setIntersectionPoints, vectorsToPoints } from "shared/polybool/poly-utils";
+import { pointsToPolygon } from "shared/polybool/polybool";
 import { remotes } from "shared/remotes";
 import { defaultPlayerSave, RANDOM_SKIN, selectPlayerSave } from "shared/store/saves";
-import {
-	identifySoldier,
-	selectAliveSoldiersById,
-	selectIsInsideBySoldierById,
-	selectSoldiersById,
-} from "shared/store/soldiers";
+import { identifySoldier, selectAliveSoldiersById, selectIsInsideBySoldierById } from "shared/store/soldiers";
+// grid-lines utils imported in soldier-grid helpers
 import { findCharacterPrimaryPart, reloadCharacterAsync } from "shared/utils/player-utils";
 import { createScheduler } from "shared/utils/scheduler";
 
-import { candyGrid, eatCandies } from "../candy/candy-utils";
+import { applyInitialPolygonClaim, processNewAreaClaim } from "./soldier-claims";
+import { clearOwnerTracersFromGrid } from "./soldier-grid";
 import { deleteSoldierInput, onSoldierTick, registerSoldierInput } from "./soldier-tick";
 import { setSoldierSpeed } from "./soldiers.utils";
 
@@ -68,6 +54,9 @@ export async function initSoldierService() {
 			maxHealth: 100,
 		});
 
+		// Initialize grid cells for the initial polygon right after spawn
+		applyInitialPolygonClaim(player.Name);
+
 		const character = player.Character as Model;
 
 		const primaryPart = findCharacterPrimaryPart(character);
@@ -97,77 +86,29 @@ export async function initSoldierService() {
 
 	// TODO: should only check if spawned
 
-	store.observe(selectIsInsideBySoldierById, identifySoldier, ({ id, polygon, tracers }) => {
-		const resultPolygon = pointsToPolygon(vectorsToPoints(polygon as Vector2[]));
-		const points = vectorsToPoints(tracers as Vector2[]);
-		const newCutPolygon = setIntersectionPoints(resultPolygon, points);
+	store.observe(selectIsInsideBySoldierById, identifySoldier, ({ id, polygon, tracers, isInside }) => {
+		debug.profilebegin("SOLDIER_IS_INSIDE");
+		print(`Soldier ${id} is ${isInside ? "inside" : "outside"}--------------------`);
 
-		if (newCutPolygon) {
-			//	print(`newCutPolygon ${id}`, tracers);
-			const result = calculatePolygonOperation(resultPolygon, newCutPolygon, "Union");
+		try {
+			const resultPolygon = pointsToPolygon(vectorsToPoints(polygon));
+			const points = vectorsToPoints(tracers);
+			const newCutPolygon = setIntersectionPoints(resultPolygon, points);
 
-			if (result.regions.size() > 0) {
-				const bestRegion = selectLargestRegionByArea(result.regions);
-
-				if (bestRegion !== undefined) {
-					const resultPolygon = pointsToVectors(bestRegion);
-					const polygonAreaSize = calculatePolygonArea(resultPolygon);
-
-					store.setSoldierPolygon(id, resultPolygon, polygonAreaSize, true);
-
-					// Calculate bounding box for the new cut polygon
-					const newCutPoints = newCutPolygon.regions[0] as Point[];
-					const boundingBox = calculatePolygonBoundingBox(newCutPoints);
-
-					// Eat all candies inside the newly claimed area
-					const candiesInNewArea = candyGrid.queryBox(boundingBox.min, boundingBox.size, (point) => {
-						const candy = getCandy(point.metadata.id);
-						if (!candy || candy.eatenAt) return false;
-
-						return isPointInPolygon(vector2ToPoint(point.position), newCutPoints);
-					});
-
-					eatCandies(candiesInNewArea, id);
-
-					const state = store.getState();
-					const allSoldiers = Object.values(selectSoldiersById(state));
-
-					allSoldiers.forEach((soldier) => {
-						const soldierId = soldier.id;
-						if (soldierId !== id && soldier.polygon) {
-							const otherSoldierPolygon = pointsToPolygon(vectorsToPoints(soldier.polygon));
-							const differenceResult = calculatePolygonOperation(
-								otherSoldierPolygon,
-								newCutPolygon,
-								"Difference",
-							);
-
-							if (differenceResult.regions.size() > 0) {
-								const bestRegion = selectLargestRegionByArea(differenceResult.regions);
-								if (bestRegion !== undefined) {
-									const updatedPolygon = pointsToVectors(bestRegion);
-									const updatedArea = calculatePolygonArea(updatedPolygon);
-									store.setSoldierPolygon(soldierId, updatedPolygon, updatedArea);
-									if (updatedArea < SOLDIER_MIN_AREA) {
-										print(`Soldier ${soldierId} is too small, killing`);
-										killSoldier(soldierId);
-										store.playerKilledSoldier(id, soldierId);
-										store.incrementSoldierEliminations(soldierId);
-									}
-								}
-							}
-						}
-					});
-				}
+			if (newCutPolygon) {
+				processNewAreaClaim(id, newCutPolygon);
 			} else {
-				warn("No valid REGIONS found", { result, points, newCutPolygon });
+				warn("No INTERSECTION found", { points, newCutPolygon });
+				// Could not compute intersection; clear tracers and their grid lines
+				store.setSoldierTracers(id, []);
+				clearOwnerTracersFromGrid(id);
 			}
-		} else {
-			warn("No INTERSECTION found", { points, newCutPolygon });
+		} catch (err) {
+			warn("SOLDIER_IS_INSIDE failed", { id, err });
+		} finally {
+			// Keep tracers; do not clear here.
+			debug.profileend();
 		}
-
-		store.clearSoldierTracers(id);
-
 		return () => {
 			print(`Soldier ${id} is no longer inside--------------------`);
 		};

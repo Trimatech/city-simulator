@@ -1,5 +1,4 @@
-import React from "@rbxts/react";
-import { memo } from "@rbxts/react";
+import React, { memo } from "@rbxts/react";
 import { TRACER_PIECE_HEIGHT } from "shared/constants/core";
 
 import { useCharacterPosition } from "../../hooks/use-character-position";

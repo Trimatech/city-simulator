@@ -47,6 +47,7 @@ export const selectAliveSoldiersById = createSelector(selectSoldiersById, (soldi
 export const selectIsInsideBySoldierById = createSelector(selectSoldiersById, (soldiersById) => {
 	return mapProperties(soldiersById, (soldier) => (soldier.isInside ? soldier : undefined));
 });
+
 export const selectPlayerSoldiersById = createSelector(selectSoldiersById, (soldiersById) => {
 	return mapProperties(soldiersById, (soldier) => (getPlayerByName(soldier.id) ? soldier : undefined));
 });
@@ -168,6 +169,14 @@ export const selectSoldierIds = createSelector(
 
 export const selectSoldierById = (id: string) => {
 	return (state: SharedState) => state.soldiers[id];
+};
+
+export const selectSoldierSkin = (id: string) => {
+	return (state: SharedState) => state.soldiers[id]?.skin;
+};
+
+export const selectSoldierShieldActive = (id: string) => {
+	return (state: SharedState) => state.soldiers[id]?.shieldActive ?? false;
 };
 
 export const selectSoldierOrbs = (id: string) => {

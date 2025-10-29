@@ -22,6 +22,22 @@ export class Grid<T = void> {
 		this.resolution = resolution;
 	}
 
+	// public getAt(position: Vector2): GridPoint<T> | undefined {
+	// 	const key = vectorize(this.snapToGrid(position));
+	// 	const cell = this.cells.get(key);
+	// 	if (!cell) {
+	// 		return undefined;
+	// 	}
+
+	// 	return cell.get(vectorize(position));
+	// }
+
+	// public upsert(position: Vector2, f: (prev?: T) => T) {
+	// 	const prev = this.getAt(position)?.metadata;
+	// 	const next = f(prev);
+	// 	this.insert(position, next);
+	// }
+
 	public insert(vector: Vector2, metadata: T) {
 		const key = vectorize(this.snapToGrid(vector));
 		const cell = this.cells.get(key) || new Map<Vector3, GridPoint<T>>();

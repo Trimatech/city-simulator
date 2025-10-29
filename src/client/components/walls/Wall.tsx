@@ -42,33 +42,13 @@ function WallComponent({
 	const mainPartRef = useRef<Part>();
 	const cylinderRef = useRef<Part>();
 
-	// Get skin properties
-	const wallProperties = (() => {
-		// eslint-disable-next-line roblox-ts/lua-truthiness
-		if (skinId) {
-			// eslint-disable-next-line roblox-ts/lua-truthiness
-			if (tracerIndex !== undefined) {
-				const tracerSkin = getSoldierSkinForTracer(skinId, tracerIndex);
-				return {
-					color: tracerSkin.tint,
-					material: Enum.Material.SmoothPlastic,
-					transparency: transparency,
-				};
-			}
-			const skin = getSoldierSkin(skinId);
-			return {
-				color: skin.tint[0],
-				material: Enum.Material.SmoothPlastic,
-				transparency: transparency,
-			};
-		}
-		return { color, material: Enum.Material.SmoothPlastic, transparency };
-	})();
+	//print(`rendering wall ${folderName} ${startPoint.X},${startPoint.Y} -> ${endPoint.X},${endPoint.Y}`);
 
 	//	print("rendering properties", wallProperties);
 
 	// Main wall creation effect
 	useEffect(() => {
+		//print(`creating wall ${folderName} ${startPoint.X},${startPoint.Y} -> ${endPoint.X},${endPoint.Y}`);
 		if (isCrumbling) return;
 
 		const { width, center, rotation, startPosition } = calculateWallTransform([startPoint, endPoint], height);
@@ -80,6 +60,31 @@ function WallComponent({
 			folder.Name = folderName;
 			folder.Parent = Workspace;
 		}
+
+		const wallProperties = (() => {
+			//print(`wallProperties ${skinId} ${tracerIndex}`);
+			// eslint-disable-next-line roblox-ts/lua-truthiness
+			if (skinId) {
+				// eslint-disable-next-line roblox-ts/lua-truthiness
+				if (tracerIndex !== undefined) {
+					const tracerSkin = getSoldierSkinForTracer(skinId, tracerIndex);
+					return {
+						color: tracerSkin.tint,
+						material: Enum.Material.SmoothPlastic,
+						transparency: transparency,
+					};
+				}
+				const skin = getSoldierSkin(skinId);
+				//	print(`skin ${skinId} ${skin.tint[0]}`);
+				return {
+					color: skin.tint[0],
+					material: Enum.Material.SmoothPlastic,
+					transparency: transparency,
+				};
+			}
+			//	print(`no skin ${color}`);
+			return { color, material: Enum.Material.SmoothPlastic, transparency };
+		})();
 
 		// Create main wall part
 		const part = createWallPart({
@@ -125,18 +130,7 @@ function WallComponent({
 				uncollideAndDestroy(cylinderRef.current, math.random(0.5, 2));
 			}
 		};
-	}, [
-		startPoint.X,
-		startPoint.Y,
-		endPoint.X,
-		endPoint.Y,
-		wallProperties.color,
-		wallProperties.transparency,
-		wallProperties.material,
-		height,
-		thickness,
-		isCrumbling,
-	]);
+	}, [startPoint.X, startPoint.Y, endPoint.X, endPoint.Y, height, thickness, isCrumbling]);
 
 	return undefined;
 }
