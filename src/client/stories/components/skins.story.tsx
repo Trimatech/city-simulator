@@ -4,7 +4,7 @@ import { hoarcekat, useMountEffect } from "@rbxts/pretty-react-hooks";
 import React from "@rbxts/react";
 import { Alerts } from "client/components/alerts";
 import { Menu } from "client/components/menu";
-import { World } from "client/components/world";
+import { World } from "client/components/world/World2";
 import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
 import { USER_NAME } from "shared/constants/core";

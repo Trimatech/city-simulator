@@ -3,7 +3,7 @@ import "client/app/react-config";
 import { hoarcekat, useInterval } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { Controller } from "client/components/controller";
-import { World } from "client/components/world/world";
+import { World } from "client/components/world/World2";
 import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
 import { USER_NAME } from "shared/constants/core";

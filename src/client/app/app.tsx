@@ -8,7 +8,7 @@ import { GameUI } from "../components/game";
 import { Menu } from "../components/menu";
 import { Music } from "../components/music";
 import { Preloader } from "../components/preloader";
-import { World } from "../components/world";
+import { World } from "../components/world/World2";
 import { Layer } from "../ui/layout/layer";
 
 export function App() {
