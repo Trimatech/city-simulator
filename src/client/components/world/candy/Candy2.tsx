@@ -5,7 +5,7 @@ import { useMotion, useRem } from "client/hooks";
 import { selectWorldCamera } from "client/store/world";
 import { Group } from "client/ui/layout/group";
 
-import { CandyItem } from "./candy-item";
+import { CandyItem } from "./CandyItem";
 import { useCandyOnScreen } from "./use-candy-on-screen";
 
 export function Candy() {
