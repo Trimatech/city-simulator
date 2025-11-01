@@ -11,6 +11,46 @@ import {
 	uncollideAndDestroy,
 } from "./Walls.utils";
 
+const WALL_MATERIAL = Enum.Material.SmoothPlastic;
+
+interface Appearance {
+	color: Color3;
+	material: Enum.Material;
+	transparency: number;
+}
+
+function resolveAppearance({
+	skinId,
+	tracerIndex,
+	fallbackColor,
+	transparency,
+}: {
+	skinId?: string;
+	tracerIndex?: number;
+	fallbackColor: Color3;
+	transparency: number;
+}): Appearance {
+	if (skinId !== undefined) {
+		if (tracerIndex !== undefined) {
+			const tracerSkin = getSoldierSkinForTracer(skinId, tracerIndex);
+			return { color: tracerSkin.tint, material: WALL_MATERIAL, transparency };
+		}
+		const skin = getSoldierSkin(skinId);
+		return { color: skin.tint[0], material: WALL_MATERIAL, transparency };
+	}
+	return { color: fallbackColor, material: WALL_MATERIAL, transparency };
+}
+
+function ensureFolder(name: string): Folder {
+	let folder = Workspace.FindFirstChild(name) as Folder;
+	if (!folder) {
+		folder = new Instance("Folder");
+		folder.Name = name;
+		folder.Parent = Workspace;
+	}
+	return folder;
+}
+
 interface Props {
 	folderName: string;
 	startPoint: Vector2;
@@ -41,52 +81,27 @@ function WallComponent({
 }: Props) {
 	const mainPartRef = useRef<Part>();
 	const cylinderRef = useRef<Part>();
+	const outlineRef = useRef<Highlight>();
 
 	//print(`rendering wall ${folderName} ${startPoint.X},${startPoint.Y} -> ${endPoint.X},${endPoint.Y}`);
 
 	//	print("rendering properties", wallProperties);
 
-	// Main wall creation effect
+	// Create wall parts once
 	useEffect(() => {
-		//print(`creating wall ${folderName} ${startPoint.X},${startPoint.Y} -> ${endPoint.X},${endPoint.Y}`);
 		if (isCrumbling) return;
+
+		const folder = ensureFolder(folderName);
 
 		const { width, center, rotation, startPosition } = calculateWallTransform([startPoint, endPoint], height);
 
-		// Ensure folder exists
-		let folder = Workspace.FindFirstChild(folderName) as Folder;
-		if (!folder) {
-			folder = new Instance("Folder");
-			folder.Name = folderName;
-			folder.Parent = Workspace;
-		}
+		const wallProperties = resolveAppearance({
+			skinId,
+			tracerIndex,
+			fallbackColor: color,
+			transparency,
+		});
 
-		const wallProperties = (() => {
-			//print(`wallProperties ${skinId} ${tracerIndex}`);
-			// eslint-disable-next-line roblox-ts/lua-truthiness
-			if (skinId) {
-				// eslint-disable-next-line roblox-ts/lua-truthiness
-				if (tracerIndex !== undefined) {
-					const tracerSkin = getSoldierSkinForTracer(skinId, tracerIndex);
-					return {
-						color: tracerSkin.tint,
-						material: Enum.Material.SmoothPlastic,
-						transparency: transparency,
-					};
-				}
-				const skin = getSoldierSkin(skinId);
-				//	print(`skin ${skinId} ${skin.tint[0]}`);
-				return {
-					color: skin.tint[0],
-					material: Enum.Material.SmoothPlastic,
-					transparency: transparency,
-				};
-			}
-			//	print(`no skin ${color}`);
-			return { color, material: Enum.Material.SmoothPlastic, transparency };
-		})();
-
-		// Create main wall part
 		const part = createWallPart({
 			folderName,
 			width,
@@ -100,12 +115,6 @@ function WallComponent({
 		});
 		part.Parent = folder;
 
-		// Optional outline via Highlight (client-side visual)
-		if (outline) {
-			createWallHighlight(part);
-		}
-
-		// Create cylinder for smooth start
 		const cylinder = createCylinder({
 			folderName,
 			height,
@@ -117,20 +126,90 @@ function WallComponent({
 		});
 		cylinder.Parent = folder;
 
-		if (outline && part) createWallHighlight(part);
+		if (outline) {
+			outlineRef.current = createWallHighlight(part);
+		}
 
 		mainPartRef.current = part;
 		cylinderRef.current = cylinder;
 
 		return () => {
-			if (mainPartRef.current) {
-				uncollideAndDestroy(mainPartRef.current, math.random(0.5, 2));
-			}
-			if (cylinderRef.current) {
-				uncollideAndDestroy(cylinderRef.current, math.random(0.5, 2));
-			}
+			if (outlineRef.current) outlineRef.current.Destroy();
+			if (mainPartRef.current) uncollideAndDestroy(mainPartRef.current, math.random(0.5, 2));
+			if (cylinderRef.current) uncollideAndDestroy(cylinderRef.current, math.random(0.5, 2));
 		};
-	}, [startPoint.X, startPoint.Y, endPoint.X, endPoint.Y, height, thickness, isCrumbling]);
+		// create once; subsequent updates handled by effects below
+	}, []);
+
+	// Update transform (position/size/orientation) on geometry changes
+	useEffect(() => {
+		const part = mainPartRef.current;
+		const cylinder = cylinderRef.current;
+		if (!part || !cylinder) return;
+
+		const { width, center, rotation, startPosition } = calculateWallTransform([startPoint, endPoint], height);
+
+		part.Size = new Vector3(width, height, thickness);
+		part.CFrame = new CFrame(center).mul(rotation);
+
+		cylinder.Size = new Vector3(height, thickness, thickness);
+		cylinder.CFrame = new CFrame(startPosition).mul(CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90)));
+	}, [startPoint.X, startPoint.Y, endPoint.X, endPoint.Y, height, thickness]);
+
+	// Update visuals (color/material/transparency) when appearance props change
+	useEffect(() => {
+		const part = mainPartRef.current;
+		const cylinder = cylinderRef.current;
+		if (!part || !cylinder) return;
+
+		const wallProperties = resolveAppearance({
+			skinId,
+			tracerIndex,
+			fallbackColor: color,
+			transparency,
+		});
+
+		part.Color = wallProperties.color;
+		part.Transparency = wallProperties.transparency;
+		part.Material = wallProperties.material;
+
+		cylinder.Color = wallProperties.color;
+		cylinder.Transparency = wallProperties.transparency;
+		cylinder.Material = wallProperties.material;
+	}, [color, transparency, skinId, tracerIndex]);
+
+	// Toggle outline without recreating
+	useEffect(() => {
+		const part = mainPartRef.current;
+		if (!part) return;
+		if (outline) {
+			if (!outlineRef.current || outlineRef.current.Parent !== part) {
+				outlineRef.current = createWallHighlight(part);
+			}
+			return;
+		}
+		if (outlineRef.current) {
+			outlineRef.current.Destroy();
+			outlineRef.current = undefined;
+		}
+	}, [outline]);
+
+	// Handle crumbling: destroy existing parts once when enabled
+	useEffect(() => {
+		if (!isCrumbling) return;
+		if (outlineRef.current) {
+			outlineRef.current.Destroy();
+			outlineRef.current = undefined;
+		}
+		if (mainPartRef.current) {
+			uncollideAndDestroy(mainPartRef.current, math.random(0.5, 2));
+			mainPartRef.current = undefined;
+		}
+		if (cylinderRef.current) {
+			uncollideAndDestroy(cylinderRef.current, math.random(0.5, 2));
+			cylinderRef.current = undefined;
+		}
+	}, [isCrumbling]);
 
 	return undefined;
 }

@@ -4,7 +4,7 @@ import { RemProvider } from "client/rem/rem-provider";
 import { Group } from "client/ui/layout/group";
 
 import { Bots } from "./bots/Bots";
-import { Soldiers } from "./soldiers";
+import { Soldiers } from "./soldiers/Soldiers2";
 import { WorldSounds } from "./world-sounds";
 import { WorldSubject } from "./world-subject";
 

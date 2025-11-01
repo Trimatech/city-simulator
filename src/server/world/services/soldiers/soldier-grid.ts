@@ -1,6 +1,8 @@
 import { store } from "server/store";
 import { selectGridCells, selectGridResolution } from "shared/store/grid/grid-selectors";
 import { selectSoldiersById } from "shared/store/soldiers";
+import { getCellCoordFromPos, getCellKeyFromCoord } from "shared/utils/cell-key";
+import { getEdgeId, quantizeVector2 } from "shared/utils/edge-id";
 import { filterTracersForCell } from "shared/utils/geometry-utils";
 import { Grid } from "shared/utils/grid";
 import {
@@ -11,6 +13,7 @@ import {
 	buildTracerLinesByCell,
 	computeAffectedCells,
 	computeCellsFromNew,
+	getCompoundEdgeKey,
 	shallowEqualCell,
 } from "shared/utils/grid-lines.utils";
 
@@ -34,6 +37,23 @@ export function updateTracerGridForOwner({ ownerId, positions }: { ownerId: stri
 			store.setCellLines(cellKey, merged);
 		}
 	});
+
+	// Update the soldier's last tracer reference to the final segment in positions
+	if (positions.size() >= 2) {
+		const a = positions[positions.size() - 2];
+		const b = positions[positions.size() - 1];
+		const quantQ = math.max(0.1, resolution / 10);
+		const qa = quantizeVector2(a, quantQ);
+		const qb = quantizeVector2(b, quantQ);
+		const edgeId = getEdgeId({ a: qa, b: qb });
+		const mid = new Vector2((qa.X + qb.X) / 2, (qa.Y + qb.Y) / 2);
+		const coord = getCellCoordFromPos(mid, resolution);
+		const cellKey = getCellKeyFromCoord(coord);
+		const compound = getCompoundEdgeKey(edgeId, ownerId, "tracer");
+		store.setSoldierLastTracerRef(ownerId, cellKey, compound);
+	} else {
+		store.setSoldierLastTracerRef(ownerId, undefined, undefined);
+	}
 }
 
 export function updateSoldierGrid() {

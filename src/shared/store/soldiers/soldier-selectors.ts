@@ -71,7 +71,23 @@ export const selectPlayerCountIsAbove = (count: number) => {
 export const selectLocalSoldier = (state: SharedState) => {
 	return state.soldiers[USER_NAME];
 };
+export const selectSoldierTracers = (id: string) => {
+	return (state: SharedState) => state.soldiers[id]?.tracers;
+};
 
+export const selectSoldierLastTracerPoint = (id: string) => {
+	return (state: SharedState) => {
+		const soldier = state.soldiers[id];
+		if (!soldier) return undefined;
+		const cellKey = soldier.lastTracerCellKey;
+		const edgeId = soldier.lastTracerEdgeId;
+		if (!cellKey || !edgeId) return undefined;
+		const cell = state.grid.cells[cellKey];
+		if (!cell) return undefined;
+		const line = cell[edgeId];
+		return line?.b;
+	};
+};
 export const selectLocalSoldierId = (state: SharedState) => {
 	return state.soldiers[USER_NAME]?.id;
 };
@@ -162,9 +178,11 @@ export const selectSoldiersSorted = (comparator: (current: SoldierEntity, existi
 export const selectSoldierIds = createSelector(
 	[selectSoldiersById],
 	(soldiersById) => {
-		return Object.keys(soldiersById) as readonly string[];
+		const ids = Object.keys(soldiersById) as string[];
+		ids.sort();
+		return ids as readonly string[];
 	},
-	shallowEqual,
+	{ resultEqualityCheck: shallowEqual },
 );
 
 export const selectSoldierById = (id: string) => {
@@ -191,6 +209,13 @@ export const selectSoldierIsDead = (id: string) => {
 	return (state: SharedState) => {
 		const soldier = state.soldiers[id];
 		return soldier ? soldier.dead : true;
+	};
+};
+
+export const selectSoldierIsInside = (id: string) => {
+	return (state: SharedState) => {
+		const soldier = state.soldiers[id];
+		return soldier ? soldier.isInside : true;
 	};
 };
 

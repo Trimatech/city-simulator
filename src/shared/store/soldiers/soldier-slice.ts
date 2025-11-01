@@ -30,6 +30,8 @@ export interface SoldierEntity {
 	readonly desiredAngle: number;
 	readonly orbs: number;
 	readonly tracers: readonly Vector2[];
+	readonly lastTracerCellKey?: string;
+	readonly lastTracerEdgeId?: string;
 	readonly skin: string;
 	readonly dead: boolean;
 	readonly eliminations: number;
@@ -51,6 +53,8 @@ const defaultEntity: SoldierEntity = {
 	desiredAngle: 0,
 	orbs: 0,
 	tracers: [],
+	lastTracerCellKey: undefined,
+	lastTracerEdgeId: undefined,
 	skin: "",
 	dead: false,
 	eliminations: 0,
@@ -160,6 +164,8 @@ export const soldiersSlice = createProducer(initialState, {
 				polygonAreaSize,
 				polygonBounds,
 				tracers: resetTracers ? [] : soldier.tracers,
+				lastTracerCellKey: resetTracers ? undefined : soldier.lastTracerCellKey,
+				lastTracerEdgeId: resetTracers ? undefined : soldier.lastTracerEdgeId,
 			};
 		});
 	},
@@ -168,6 +174,8 @@ export const soldiersSlice = createProducer(initialState, {
 		return mapProperty(state, id, (soldier) => ({
 			...soldier,
 			tracers: [],
+			lastTracerCellKey: undefined,
+			lastTracerEdgeId: undefined,
 		}));
 	},
 
@@ -175,6 +183,14 @@ export const soldiersSlice = createProducer(initialState, {
 		return mapProperty(state, id, (soldier) => ({
 			...soldier,
 			tracers,
+		}));
+	},
+
+	setSoldierLastTracerRef: (state, id: string, cellKey?: string, edgeId?: string) => {
+		return mapProperty(state, id, (soldier) => ({
+			...soldier,
+			lastTracerCellKey: cellKey,
+			lastTracerEdgeId: edgeId,
 		}));
 	},
 

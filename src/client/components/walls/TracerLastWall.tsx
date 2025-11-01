@@ -1,27 +1,33 @@
 import React, { memo } from "@rbxts/react";
+import { useSelector } from "@rbxts/react-reflex";
+import { useDebouncedValue } from "client/hooks/use-debounced-value";
+import { useCharacterPositionRounded } from "client/hooks/useCharacterPositionRounded";
 import { TRACER_PIECE_HEIGHT } from "shared/constants/core";
+import { selectSoldierLastTracerPoint, selectSoldierSkin } from "shared/store/soldiers";
 
-import { useCharacterPosition } from "../../hooks/use-character-position";
 import { Wall } from "./Wall";
 
 interface Props {
-	lastTracerPoint: Vector2;
-	skinId?: string;
+	soldierId: string;
 }
 
-function TracerLastWallComponent({ lastTracerPoint, skinId }: Props) {
-	const characterPosition = useCharacterPosition();
+function TracerLastWallComponent({ soldierId }: Props) {
+	const characterPosition = useCharacterPositionRounded();
+	const skin = useSelector(selectSoldierSkin(soldierId));
+	const lastTracerPoint = useSelector(selectSoldierLastTracerPoint(soldierId));
 
-	const characterPositionValue = characterPosition.getValue();
-	if (!characterPositionValue) return undefined;
+	const settledLastTracerPoint = useDebouncedValue(lastTracerPoint, { wait: 0.05 });
+
+	if (!settledLastTracerPoint) return undefined;
+
+	if (!characterPosition) return undefined;
 
 	return (
 		<Wall
-			key="player-connection-line"
 			folderName={`tracer`}
-			startPoint={lastTracerPoint}
-			endPoint={characterPositionValue}
-			skinId={skinId}
+			startPoint={settledLastTracerPoint}
+			endPoint={characterPosition}
+			skinId={skin}
 			height={TRACER_PIECE_HEIGHT}
 		/>
 	);
