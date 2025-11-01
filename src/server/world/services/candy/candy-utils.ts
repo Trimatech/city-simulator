@@ -43,7 +43,7 @@ export function removeCandy(id: string, eatenAt?: Vector2) {
 
 	setTimeout(() => {
 		store.removeCandy(id);
-	}, 5);
+	}, 2);
 }
 
 export function eatCandy(candyId: string, soldierId: string) {
