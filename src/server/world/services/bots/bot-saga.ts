@@ -1,7 +1,7 @@
 import Object from "@rbxts/object-utils";
 import { store } from "server/store";
 import { DEFAULT_ORBS, IS_TESTING_STUFF, SOLDIER_TICK_PHASE } from "server/world/constants";
-import { getSafePointOutsideSoldierPolygons } from "server/world/world.utils";
+import { getSafePointOutsideSoldierPolygons, killSoldier } from "server/world/world.utils";
 import { SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
 import { getRandomBaseSoldierSkin } from "shared/constants/skins";
 import { selectAliveSoldiersById } from "shared/store/soldiers";
@@ -171,13 +171,6 @@ async function spawnBots(amount: number) {
 	}
 }
 
-function removeBots(ids: ReadonlyArray<string>) {
-	for (const id of ids) {
-		cleanupBot(id);
-		store.removeSoldier(id);
-	}
-}
-
 export async function initBotService() {
 	// React to inside-state changes
 	soldierIsInsideChanged.Connect((id, isInside) => {
@@ -190,6 +183,7 @@ export async function initBotService() {
 		}
 		controller.wasInside = isInside;
 	});
+
 	botStopped.Connect((id) => {
 		const bot = botControllers.get(id);
 		if (bot && bot.waypoints.size() === 0) {
@@ -210,10 +204,10 @@ export async function initBotService() {
 			const aliveNonBots = getAliveNonBotCount();
 
 			// No humans alive -> remove all bots (conserve resources)
-			if (aliveNonBots <= 0) {
-				if (aliveBots > 0) removeBots(aliveBotIds);
-				return;
-			}
+			// if (aliveNonBots <= 0) {
+			// 	if (aliveBots > 0) removeBots(aliveBotIds);
+			// 	return;
+			// }
 
 			// Target bots is capped by available slots: 20 - players
 			const targetBots = math.max(0, MAX_BOTS - aliveNonBots);
@@ -222,15 +216,20 @@ export async function initBotService() {
 				const activeCooldowns = getActiveCooldownIds();
 				const shortage = targetBots - aliveBots;
 				const allowedToSpawn = math.max(0, shortage - activeCooldowns.size());
-				if (allowedToSpawn > 0) spawnBots(allowedToSpawn);
+				if (allowedToSpawn > 0) {
+					spawnBots(allowedToSpawn);
+				}
 				return;
 			}
 
 			if (aliveBots > targetBots) {
 				const extras = aliveBots - targetBots;
 				const start = aliveBotIds.size() - extras;
-				const toRemove = aliveBotIds.move(start, aliveBotIds.size() - 1, 0, [] as string[]);
-				removeBots(toRemove);
+				const toKill = aliveBotIds.move(start, aliveBotIds.size() - 1, 0, [] as string[]);
+				for (const id of toKill) {
+					print(`Killing bot ${id} because there are too many bots`);
+					killSoldier(id);
+				}
 			}
 		},
 	);
