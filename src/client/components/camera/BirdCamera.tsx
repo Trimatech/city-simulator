@@ -60,7 +60,7 @@ export function BirdCamera() {
 	const settings = useMemo(() => {
 		return {
 			altitude: 120,
-			moveSpeed: 40, // 10x speed for large area coverage
+			moveSpeed: 20, // slower sweep speed
 			followDistance: 50, // how far behind the focus to place the eye (2D space)
 			seedX: math.random(1, 1000),
 			seedY: math.random(1, 1000),
