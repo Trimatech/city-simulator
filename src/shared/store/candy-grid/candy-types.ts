@@ -12,5 +12,3 @@ export enum CandyType {
 	Loot,
 	Dropping,
 }
-
-

@@ -47,20 +47,20 @@ async function setup() {
 		});
 	}
 
-    // Generate the maximum number of candies
-    const candies = fillArray(CANDY_LIMITS[CandyType.Default], () => createCandy());
-    // add to grid state via candy-utils populate path
-    // Note: populateCandy(amount) also updates replicated grid; here we already created entities
-    for (const c of candies) {
-        // mimic addCandyEntity without import to keep bench isolated
-        const x = math.floor(c.position.X / candyGrid.resolution);
-        const y = math.floor(c.position.Y / candyGrid.resolution);
-        const key = `${x},${y}`;
-        const cells = store.getState().candyGrid.cells;
-        const current = { ...(cells[key] ?? {}) } as { [id: string]: typeof c | undefined };
-        current[c.id] = c;
-        store.setCandyCell(key, current);
-    }
+	// Generate the maximum number of candies
+	const candies = fillArray(CANDY_LIMITS[CandyType.Default], () => createCandy());
+	// add to grid state via candy-utils populate path
+	// Note: populateCandy(amount) also updates replicated grid; here we already created entities
+	for (const c of candies) {
+		// mimic addCandyEntity without import to keep bench isolated
+		const x = math.floor(c.position.X / candyGrid.resolution);
+		const y = math.floor(c.position.Y / candyGrid.resolution);
+		const key = `${x},${y}`;
+		const cells = store.getState().candyGrid.cells;
+		const current = { ...(cells[key] ?? {}) } as { [id: string]: typeof c | undefined };
+		current[c.id] = c;
+		store.setCandyCell(key, current);
+	}
 
 	// Initialize core services
 	initCandyService();
