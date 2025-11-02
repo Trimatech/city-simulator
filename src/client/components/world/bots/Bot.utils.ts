@@ -1,5 +1,6 @@
 import { CollectionService, Players, TweenService, Workspace } from "@rbxts/services";
 import { WORLD_TICK } from "shared/constants/core";
+import { findSharedInstanceByPath } from "shared/SharedModelManager";
 
 const GROUND_TAG = "ground";
 
@@ -165,4 +166,115 @@ export function setRunState(runtime: BotRuntime, isMoving: boolean) {
 		return;
 	}
 	if (track.IsPlaying) track.Stop(0.1);
+}
+
+export async function initializeBotRuntime(id: string, initial2D: Vector2): Promise<BotRuntime> {
+	let source: Model | undefined;
+	const existing = Workspace.FindFirstChild(id);
+	if (existing && existing.IsA("Model")) {
+		const prev = existing.Archivable;
+		existing.Archivable = true;
+		source = existing.Clone();
+		existing.Archivable = prev;
+	}
+	if (!source) source = tryCloneRandomPlayerCharacter();
+	if (!source) source = (await findSharedInstanceByPath<Model>("ReplicatedStorage/Models/Characters/Noob")).Clone();
+
+	const model = source!;
+	model.Name = id;
+	model.GetDescendants().forEach((inst) => {
+		if (inst.IsA("BasePart")) {
+			inst.Anchored = false;
+			inst.CanCollide = false;
+		}
+	});
+	const hrp = model.FindFirstChild("HumanoidRootPart") as BasePart;
+	if (hrp) model.PrimaryPart = hrp;
+	else {
+		const first = model.FindFirstChildWhichIsA("BasePart");
+		if (first) model.PrimaryPart = first;
+	}
+	model.Parent = Workspace;
+
+	const animateScript = model.FindFirstChild("Animate");
+	if (animateScript && (animateScript.IsA("LocalScript") || animateScript.IsA("Script"))) {
+		(animateScript as LocalScript | Script).Disabled = true;
+	}
+
+	const humanoid = model.FindFirstChildOfClass("Humanoid");
+	if (humanoid) {
+		humanoid.AutoRotate = false;
+		humanoid.ChangeState(Enum.HumanoidStateType.RunningNoPhysics);
+	}
+
+	const groundY = sampleGroundYAt(initial2D);
+	const offset = computeStableGroundOffset(model);
+	const start = new Vector3(initial2D.X, groundY + offset, initial2D.Y);
+	model.PivotTo(new CFrame(start));
+
+	const runtime: BotRuntime = { model, lastLookDir: new Vector3(0, 0, 1), groundOffset: offset };
+	const posV = new Instance("Vector3Value");
+	posV.Value = start;
+	posV.Changed.Connect((newPos) => {
+		const pos = newPos as Vector3;
+		const dir = runtime.lastLookDir ?? new Vector3(0, 0, 1);
+		runtime.model.PivotTo(CFrame.lookAt(pos, pos.add(dir), new Vector3(0, 1, 0)));
+	});
+	runtime.posV = posV;
+
+	ensureRun(runtime);
+
+	return runtime;
+}
+
+export function cleanupBotRuntime(runtime: BotRuntime) {
+	runtime.activeTween?.Cancel();
+	runtime.posV?.Destroy();
+	runtime.model.Destroy();
+}
+
+function computeDesiredLookDirection(prev: Vector3 | undefined, delta2D: Vector2): Vector3 {
+	if (delta2D.Magnitude <= 1e-6) return prev ?? new Vector3(0, 0, 1);
+	const desired = new Vector3(delta2D.X, 0, delta2D.Y).Unit;
+	const base = prev ?? new Vector3(0, 0, 1);
+	const smoothed = base.Lerp(desired, 0.6);
+	return smoothed.Magnitude > 1e-3 ? smoothed.Unit : base;
+}
+
+export function updateBotRuntimeForPosition(
+	runtime: BotRuntime,
+	position: Vector2,
+	lastPosition: Vector2,
+	moveEpsilon = 0.15,
+	targetEpsilon = 0.05,
+) {
+	const groundY = sampleGroundYAt(position);
+	const offsetStable = runtime.groundOffset ?? computeStableGroundOffset(runtime.model);
+	if (runtime.groundOffset === undefined) runtime.groundOffset = offsetStable;
+	const target = new Vector3(position.X, groundY + offsetStable, position.Y);
+
+	const delta = position.sub(lastPosition);
+	const isMoving = delta.Magnitude > moveEpsilon;
+
+	if (isMoving) {
+		const dir = computeDesiredLookDirection(runtime.lastLookDir, delta);
+		runtime.lastLookDir = dir;
+		const currentPos = runtime.posV?.Value ?? runtime.model.GetPivot().Position;
+		runtime.model.PivotTo(CFrame.lookAt(currentPos, currentPos.add(dir), new Vector3(0, 1, 0)));
+		tweenPosition(runtime, target, WORLD_TICK * 0.95);
+		setRunState(runtime, true);
+		return;
+	}
+
+	const holdDir = runtime.lastLookDir ?? new Vector3(0, 0, 1);
+	const curPos = runtime.posV?.Value ?? runtime.model.GetPivot().Position;
+	runtime.model.PivotTo(CFrame.lookAt(curPos, curPos.add(holdDir), new Vector3(0, 1, 0)));
+	if (curPos.sub(target).Magnitude > targetEpsilon) {
+		tweenPosition(runtime, target, WORLD_TICK * 0.95);
+	} else {
+		runtime.activeTween?.Cancel();
+		if (runtime.posV) runtime.posV.Value = target;
+		else runtime.model.PivotTo(new CFrame(target));
+	}
+	setRunState(runtime, false);
 }
