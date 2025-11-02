@@ -58,5 +58,3 @@ export function deserializeCandyGrid(data: string): CandyGridState {
 
 	return { resolution, cells };
 }
-
-

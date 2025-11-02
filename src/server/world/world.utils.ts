@@ -6,10 +6,10 @@ import { INITIAL_POLYGON_DIAMETER, INITIAL_POLYGON_ITEMS, WORLD_BOUNDS } from "s
 import { calculatePolygonOperation, isPointInPolygon, vector2ToPoint } from "shared/polybool/poly-utils";
 import { pointsToPolygon } from "shared/polybool/polybool";
 import { createPolygonAroundPosition } from "shared/polygon-extra.utils";
-import { getCandy as getCandyLocal } from "./services/candy/candy-store";
 import { selectAliveSoldiersById, selectSoldierById } from "shared/store/soldiers";
 
 import { getBotHumanoid } from "./services/bots/bot-registry";
+import { getCandy as getCandyLocal } from "./services/candy/candy-store";
 import { soldierGrid } from "./services/soldiers/soldier-grid";
 
 const MIN_SAFE_DISTANCE = 10;
@@ -19,7 +19,7 @@ export function getSoldier(soldierId: string) {
 }
 
 export function getCandy(candyId: string) {
-    return getCandyLocal(candyId);
+	return getCandyLocal(candyId);
 }
 
 export function getPlayerHumanoidByName(name: string) {

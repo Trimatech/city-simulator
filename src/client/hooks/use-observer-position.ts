@@ -17,5 +17,3 @@ export function useObserverPosition() {
 
 	return position;
 }
-
-
