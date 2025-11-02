@@ -7,6 +7,7 @@ import { Bot } from "./Bot";
 
 export function Bots() {
 	const soldiersById = useSelector(selectSoldiersById);
+
 	const botIds = useMemo(() => {
 		const ids: string[] = [];
 		for (const rawId of Object.keys(soldiersById as unknown as { [id: string]: unknown })) {
