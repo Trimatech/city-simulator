@@ -15,16 +15,28 @@ function sampleGroundYAt(position: Vector2): number {
 	params.FilterType = Enum.RaycastFilterType.Include;
 	params.FilterDescendantsInstances = CollectionService.GetTagged(GROUND_TAG);
 	const result = Workspace.Raycast(origin, direction, params);
-	return result ? result.Position.Y : 2;
+	print(".....sampleGroundYAt", result?.Position?.Y);
+	return result ? result.Position.Y : 15;
 }
 
 function getCharacterGroundOffset(character: Model): number {
-	const humanoid = character.FindFirstChildOfClass("Humanoid");
+	// Use half of the model's total height so the model's pivot is placed at mid-height above ground
+	const [, size] = character.GetBoundingBox();
+	const height = size.Y;
+	if (height > 0) {
+		return height * 0.5;
+	}
+
+	// Fallbacks if bounding box is unavailable for some reason
 	const hrp = character.FindFirstChild("HumanoidRootPart");
-	let offset = 2;
-	if (humanoid) offset = humanoid.HipHeight;
-	if (hrp && hrp.IsA("BasePart")) offset += hrp.Size.Y * 0.5;
-	return offset;
+	if (hrp && hrp.IsA("BasePart")) {
+		return hrp.Size.Y * 0.5;
+	}
+	const humanoid = character.FindFirstChildOfClass("Humanoid");
+	if (humanoid) {
+		return humanoid.HipHeight;
+	}
+	return 2;
 }
 
 function findRunAnimation(character: Model): Animation | undefined {
@@ -164,7 +176,7 @@ export function Bot({ id, soldier }: BotProps) {
 			}
 			if (!source) source = tryCloneRandomPlayerCharacter();
 			if (!source)
-				source = (await findSharedInstanceByPath<Model>("ReplicatedStorage/Models/Gameplay/Tower")).Clone();
+				source = (await findSharedInstanceByPath<Model>("ReplicatedStorage/Models/Characters/Noob")).Clone();
 
 			const model = source!;
 			model.Name = id;
