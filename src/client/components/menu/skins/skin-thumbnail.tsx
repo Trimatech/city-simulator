@@ -5,7 +5,7 @@ import { Image } from "client/ui/image";
 import { SoldierSkin } from "shared/constants/skins";
 import { fillArray } from "shared/utils/object-utils";
 
-import { SOLDIER_ANGLE_OFFSET } from "../../world/soldiers";
+import { SOLDIER_ANGLE_OFFSET } from "../../world/soldiers/constants";
 
 interface SkinThumbnailProps {
 	readonly skin: SoldierSkin;

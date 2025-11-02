@@ -1,37 +1,38 @@
-import React, { memo } from "@rbxts/react";
+import React, { memo, useMemo } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { selectCandies } from "shared/store/candy/candy-selectors";
+import { useGridPosition } from "client/hooks/use-grid-position";
+import { selectCandyGridResolution } from "shared/store/candy-grid/candy-grid-selectors";
+import { getCellKeyFromCoord } from "shared/utils/cell-key";
 
-import { useCharacterPosition } from "../../../hooks/use-character-position";
-import { Candy } from "./Candy";
+import { DelayedCellCandies } from "./DelayedCellCandies";
 
 const VISIBLE_RADIUS_STUDS = 300;
 
 function CandiesComponent() {
-	const candies = useSelector(selectCandies);
-	const characterPosition = useCharacterPosition();
-	const characterPositionValue = characterPosition.getValue();
+	const resolution = useSelector(selectCandyGridResolution);
+	const gridPosition = useGridPosition(selectCandyGridResolution);
 
-	return (
-		<>
-			{candies
-				// .filter((candy) => {
-				// 	if (!characterPositionValue) return false;
-				// 	const distance = candy.position.sub(characterPositionValue).Magnitude;
-				// 	return distance <= VISIBLE_RADIUS_STUDS;
-				// })
-				.map((candy) => (
-					<Candy
-						key={candy.id}
-						name={`candy_${candy.id}`}
-						position={candy.position}
-						color={candy.color}
-						size={candy.size}
-						eatenAt={candy.eatenAt}
-					/>
-				))}
-		</>
-	);
+	const relativeTemplate = useMemo(() => {
+		if (resolution <= 0) return [] as Vector2[];
+		const cellRadius = math.ceil(VISIBLE_RADIUS_STUDS / resolution);
+		const offsets = new Array<Vector2>();
+		for (const dx of $range(-cellRadius, cellRadius)) {
+			for (const dy of $range(-cellRadius, cellRadius)) {
+				offsets.push(new Vector2(dx, dy));
+			}
+		}
+		return offsets;
+	}, [resolution]);
+
+	if (gridPosition === undefined || resolution <= 0) return undefined;
+
+	return relativeTemplate.map((offset) => {
+		const cx = gridPosition.X + offset.X;
+		const cy = gridPosition.Y + offset.Y;
+		const cellKey = getCellKeyFromCoord(new Vector2(cx, cy));
+
+		return <DelayedCellCandies key={cellKey} cellKey={cellKey} />;
+	});
 }
 
 export const Candies = memo(CandiesComponent);

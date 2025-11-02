@@ -54,7 +54,7 @@ export function broadcasterMiddleware(): ProducerMiddleware {
 			// exclude candy to reduce network traffic
 			return {
 				...serialized,
-				candy: undefined,
+				candyGrid: undefined,
 			};
 		},
 	});

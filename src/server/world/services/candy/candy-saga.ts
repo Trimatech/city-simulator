@@ -1,7 +1,8 @@
 import { store } from "server/store";
 import { CANDY_LIMITS, CANDY_TICK_PHASE } from "server/world/constants";
 import { WORLD_TICK } from "shared/constants/core";
-import { CandyType, selectCandyCount } from "shared/store/candy";
+import { CandyType } from "shared/store/candy-grid/candy-types";
+import { selectCandyGridCount } from "shared/store/candy-grid/candy-grid-selectors";
 import { identifySoldier, selectAliveSoldiersById } from "shared/store/soldiers";
 import { createScheduler } from "shared/utils/scheduler";
 
@@ -18,22 +19,22 @@ export async function initCandyService() {
 
 	// keep the amount of candy in the world at a constant size
 	// if the amount of candy is less than the max, create more
-	store.subscribe(
-		selectCandyCount(CandyType.Default),
+    store.subscribe(
+        selectCandyGridCount(CandyType.Default),
 		(count) => count < CANDY_LIMITS[CandyType.Default],
 		(count) => populateCandy(CANDY_LIMITS[CandyType.Default] - count),
 	);
 
 	// delete excess loot candy if it is over the limit
-	store.subscribe(
-		selectCandyCount(CandyType.Loot),
+    store.subscribe(
+        selectCandyGridCount(CandyType.Loot),
 		(count) => count > CANDY_LIMITS[CandyType.Loot],
 		() => removeCandyIfAtLimit(CandyType.Loot),
 	);
 
 	// delete excess boost candy if it is over the limit
-	store.subscribe(
-		selectCandyCount(CandyType.Dropping),
+    store.subscribe(
+        selectCandyGridCount(CandyType.Dropping),
 		(count) => count > CANDY_LIMITS[CandyType.Dropping],
 		() => removeCandyIfAtLimit(CandyType.Dropping),
 	);
@@ -46,5 +47,5 @@ export async function initCandyService() {
 		};
 	});
 
-	populateCandy(CANDY_LIMITS[CandyType.Default]);
+    populateCandy(CANDY_LIMITS[CandyType.Default]);
 }

@@ -1,21 +1,18 @@
-import { map, useInterval } from "@rbxts/pretty-react-hooks";
+import { useInterval } from "@rbxts/pretty-react-hooks";
 import React, { Element, useState } from "@rbxts/react";
-import { useSelector } from "@rbxts/react-reflex";
-import { useDefined, useStore } from "client/hooks";
-import { selectWorldSubjectDesiredAngle, selectWorldSubjectPosition } from "client/store/world";
+import { useObserverPosition, useStore } from "client/hooks";
 import { CanvasGroup } from "client/ui/canvas-group";
-import { selectSoldiersById, selectTopSoldier } from "shared/store/soldiers";
+import { Image } from "client/ui/image";
+import { images } from "shared/assets";
+import { palette } from "shared/constants/palette";
+import { getSoldierSkin } from "shared/constants/skins";
+import { selectLocalSoldierId, selectSoldiersById, selectSoldierSkin } from "shared/store/soldiers";
 
-import { MinimapCursor } from "./minimap-cursor";
-import { MinimapTracer } from "./minimap-tracer";
-import { isValidPlayer, normalizeToWorldBounds, useFriendsInServer } from "./utils";
+import { normalizeToWorldBounds } from "./utils";
 
 export function MinimapNodes() {
 	const store = useStore();
-	const soldierPosition = useDefined(useSelector(selectWorldSubjectPosition));
-	const soldierAngle = useDefined(useSelector(selectWorldSubjectDesiredAngle));
-
-	const friends = useFriendsInServer();
+	const observerPosition = useObserverPosition();
 
 	const [nodes, setNodes] = useState<Element[]>([]);
 
@@ -24,33 +21,27 @@ export function MinimapNodes() {
 
 		// this doesn't need useSelector so we can avoid unneeded re-renders
 		const soldiers = store.getState(selectSoldiersById);
-		const topSoldier = store.getState(selectTopSoldier);
+		const localId = store.getState(selectLocalSoldierId);
 
 		for (const [, soldier] of pairs(soldiers)) {
-			const size = soldier.tracers.size();
-			const step = math.floor(map(size, 0, 100, 2, 10));
+			const pos = normalizeToWorldBounds(soldier.position);
+			const skinId = store.getState(selectSoldierSkin(soldier.id));
+			const color = skinId !== undefined ? getSoldierSkin(skinId).tint[0] : palette.offwhite;
+			const isLocal = soldier.id === localId;
+			const sizePx = isLocal ? 5 : 3;
 
-			const isPlayer = isValidPlayer(soldier.id);
-			const isFriend = friends.includes(soldier.id);
-			const isLeader = topSoldier?.id === soldier.id;
-
-			for (let i = 0; i < size - 1; i += step) {
-				const point = soldier.tracers[i];
-				const nextPoint = soldier.tracers[i + 1];
-
+			if (!isLocal) {
 				nodes.push(
-					<MinimapTracer
-						key={`tracer-${soldier.id}-${i}`}
-						from={normalizeToWorldBounds(point)}
-						to={normalizeToWorldBounds(nextPoint)}
-						isPlayer={isPlayer}
-						isFriend={isFriend}
-						isLeader={isLeader}
+					<Image
+						key={`soldier-${soldier.id}`}
+						image={images.ui.circle}
+						imageColor={color}
+						anchorPoint={new Vector2(0.5, 0.5)}
+						size={new UDim2(0, sizePx, 0, sizePx)}
+						position={new UDim2(pos.X, 0, pos.Y, 0)}
 					/>,
 				);
 			}
-
-			// polygon walls are now rendered from grid on the world, skip on minimap
 		}
 
 		setNodes(nodes);
@@ -59,17 +50,32 @@ export function MinimapNodes() {
 	useInterval(update, 2, { immediate: true });
 
 	return (
-		<>
-			<CanvasGroup
-				groupTransparency={0.5}
-				backgroundTransparency={1}
-				cornerRadius={new UDim(1, 0)}
-				size={new UDim2(1, 0, 1, 0)}
-			>
-				{nodes}
-			</CanvasGroup>
-
-			{soldierPosition && <MinimapCursor point={normalizeToWorldBounds(soldierPosition)} angle={soldierAngle} />}
-		</>
+		<CanvasGroup
+			groupTransparency={0.5}
+			backgroundTransparency={1}
+			cornerRadius={new UDim(1, 0)}
+			size={new UDim2(1, 0, 1, 0)}
+		>
+			{nodes}
+			{(() => {
+				const localId = store.getState(selectLocalSoldierId);
+				if (localId === undefined) return undefined;
+				const skinId = store.getState(selectSoldierSkin(localId));
+				const color = skinId !== undefined ? getSoldierSkin(skinId).tint[0] : palette.offwhite;
+				const current = observerPosition;
+				if (current === undefined) return undefined;
+				const pos = normalizeToWorldBounds(current);
+				return (
+					<Image
+						key={`soldier-${localId}`}
+						image={images.ui.circle}
+						imageColor={color}
+						anchorPoint={new Vector2(0.5, 0.5)}
+						size={new UDim2(0, 5, 0, 5)}
+						position={new UDim2(pos.X, 0, pos.Y, 0)}
+					/>
+				);
+			})()}
+		</CanvasGroup>
 	);
 }

@@ -1,23 +1,21 @@
 import { useBinding, useEffect } from "@rbxts/react";
-import { Players, RunService } from "@rbxts/services";
+import { useSelector } from "@rbxts/react-reflex";
+import { RunService } from "@rbxts/services";
+import { getObserverPosition2D } from "client/utils/camera-position.utils";
+import { selectLocalIsSpawned } from "shared/store/soldiers";
 
 export function useCharacterPosition() {
-	const localPlayer = Players.LocalPlayer;
 	const [position, setPosition] = useBinding<Vector2 | undefined>(undefined);
+	const isSpawned = useSelector(selectLocalIsSpawned);
 
 	useEffect(() => {
 		const connection = RunService.Heartbeat.Connect(() => {
-			const character = localPlayer?.Character;
-			if (!character) {
-				setPosition(undefined);
-				return;
-			}
-			const pivot = character.GetPivot();
-			setPosition(new Vector2(pivot.Position.X, pivot.Position.Z));
+			const pos = getObserverPosition2D({ preferCamera: !isSpawned });
+			setPosition(pos);
 		});
 
 		return () => connection.Disconnect();
-	}, []);
+	}, [isSpawned]);
 
 	return position;
 }

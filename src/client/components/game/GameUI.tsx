@@ -9,7 +9,7 @@ import { Transition } from "../../ui/transition";
 import { Stats } from "../stats/Stats";
 import { Compass } from "./compass";
 import { HealthView } from "./health/HealthView";
-import { Minimap } from "./minimap";
+import { Minimap } from "./minimap/Minimap2";
 import { RightSide } from "./right/RightSide";
 
 export function GameUI() {

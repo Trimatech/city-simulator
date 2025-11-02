@@ -1,33 +1,46 @@
-import { useEffect, useState } from "@rbxts/react";
+import { useEffect, useRef, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { Players, RunService } from "@rbxts/services";
-import { selectGridResolution } from "shared/store/grid/grid-selectors";
+import { RunService } from "@rbxts/services";
+import { getObserverPosition2D } from "client/utils/camera-position.utils";
+import { selectLocalIsSpawned } from "shared/store/soldiers";
 import { getCellCoordFromPos } from "shared/utils/cell-key";
 
-export function useGridPosition() {
-	const resolution = useSelector(selectGridResolution);
+export function useGridPosition<TState>(selectResolution: (state: TState) => number) {
+	const resolution = useSelector(selectResolution);
+	const isSpawned = useSelector(selectLocalIsSpawned);
 	const [position, setPosition] = useState<Vector2 | undefined>(undefined);
+	const lastCellRef = useRef<Vector2 | undefined>(undefined);
 
 	useEffect(() => {
 		const conn = RunService.Heartbeat.Connect(() => {
-			const character = Players.LocalPlayer?.Character;
-			if (!character || resolution <= 0) {
+			if (resolution <= 0) {
+				lastCellRef.current = undefined;
 				setPosition(undefined);
 				return;
 			}
 
-			const pivot = character.GetPivot();
-			const pos2d = new Vector2(pivot.Position.X, pivot.Position.Z);
-			const cell = getCellCoordFromPos(pos2d, resolution);
+			const pos2d = getObserverPosition2D({ preferCamera: !isSpawned });
 
-			if (cell.X !== position?.X) {
-				setPosition(new Vector2(cell.X, cell.Y));
-			} else if (cell.Y !== position?.Y) {
-				setPosition(new Vector2(cell.X, cell.Y));
+			if (!pos2d) {
+				lastCellRef.current = undefined;
+				setPosition(undefined);
+				return;
+			}
+
+			const cell = getCellCoordFromPos(pos2d, resolution);
+			const prev = lastCellRef.current;
+
+			if (prev === undefined || cell.X !== prev.X || cell.Y !== prev.Y) {
+				const nextCell = new Vector2(cell.X, cell.Y);
+				lastCellRef.current = nextCell;
+				setPosition(nextCell);
 			}
 		});
-		return () => conn.Disconnect();
-	}, [resolution, position]);
+		return () => {
+			conn.Disconnect();
+			lastCellRef.current = undefined;
+		};
+	}, [resolution, isSpawned]);
 
 	return position;
 }

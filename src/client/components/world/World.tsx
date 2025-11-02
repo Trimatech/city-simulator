@@ -4,9 +4,10 @@ import { RemProvider } from "client/rem/rem-provider";
 import { Group } from "client/ui/layout/group";
 
 import { Bots } from "./bots/Bots";
-import { Soldiers } from "./soldiers";
-import { WorldSounds } from "./world-sounds";
-import { WorldSubject } from "./world-subject";
+import { Candies } from "./candies/Candies";
+import { Soldiers } from "./soldiers/Soldiers";
+import { WorldSounds } from "./WorldSounds";
+import { WorldSubject } from "./WorldSubject";
 
 export function World() {
 	return (
@@ -20,9 +21,9 @@ export function World() {
 
 				<WorldSounds />
 
-				{/* <Candies />
+				<Candies />
 
-				<Towers /> */}
+				{/*<Towers /> */}
 			</Group>
 		</RemProvider>
 	);

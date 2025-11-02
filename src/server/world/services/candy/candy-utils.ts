@@ -1,12 +1,25 @@
 import { setTimeout } from "@rbxts/set-timeout";
 import { store } from "server/store";
 import { CANDY_LIMITS } from "server/world/constants";
-import { getCandy, getRandomPointNearWorldOrigin, getSoldier } from "server/world/world.utils";
+import { getRandomPointNearWorldOrigin, getSoldier } from "server/world/world.utils";
 import { getRandomAccent } from "shared/constants/palette";
-import { CandyEntity, CandyType, selectCandyById, selectCandyCount } from "shared/store/candy";
+import {
+	selectCandyGridCells,
+	selectCandyGridCount,
+	selectCandyGridResolution,
+} from "shared/store/candy-grid/candy-grid-selectors";
+import { CandyEntity, CandyType } from "shared/store/candy-grid/candy-types";
 import { SOLDIER_RADIUS_BASE } from "shared/store/soldiers";
 import { Grid, GridPoint } from "shared/utils/grid";
 import { fillArray } from "shared/utils/object-utils";
+
+import {
+	addCandies,
+	addCandy as addCandyLocal,
+	getCandy as getCandyLocal,
+	removeCandyLocal,
+	setCandyEatenAtLocal,
+} from "./candy-store";
 
 const random = new Random();
 
@@ -27,27 +40,77 @@ export function createCandy(patch?: Partial<CandyEntity>): CandyEntity {
 	};
 
 	candyGrid.insert(candy.position, { id: candy.id });
+	addCandyLocal(candy);
 
 	return candy;
 }
 
+function getCandyCellKeyForPosition(position: Vector2) {
+	const state = store.getState();
+	const resolution = selectCandyGridResolution({ candyGrid: state.candyGrid });
+	const res = resolution > 0 ? resolution : candyGrid.resolution;
+	const x = math.floor(position.X / res);
+	const y = math.floor(position.Y / res);
+	return `${x},${y}`;
+}
+
+function patchCandyCell(cellKey: string, apply: (cell: { [id: string]: CandyEntity | undefined }) => void) {
+	const state = store.getState();
+	const cells = selectCandyGridCells({ candyGrid: state.candyGrid });
+	const nextp = { ...(cells[cellKey] ?? {}) } as { [id: string]: CandyEntity | undefined };
+	apply(nextp);
+	store.setCandyCell(cellKey, nextp);
+}
+
+function markCandyEatenInGrid(id: string, position: Vector2) {
+	const cellKey = getCandyCellKeyForPosition(position);
+	patchCandyCell(cellKey, (cell) => {
+		const existing = cell[id] ?? getCandyLocal(id)!;
+		cell[id] = { ...existing, eatenAt: position };
+	});
+}
+
+function markCandiesEatenInGrid(entries: { id: string; position: Vector2 }[]) {
+	if (entries.size() === 0) return;
+	const byCell: { [cellKey: string]: { id: string; position: Vector2 }[] } = {};
+	for (const e of entries as unknown as { id: string; position: Vector2 }[]) {
+		const key = getCandyCellKeyForPosition(e.position);
+		(byCell[key] ||= []).push(e);
+	}
+	for (const [cellKey, group] of pairs(byCell)) {
+		patchCandyCell(cellKey as string, (cell) => {
+			for (const e of group as unknown as { id: string; position: Vector2 }[]) {
+				const existing = cell[e.id] ?? getCandyLocal(e.id)!;
+				cell[e.id] = { ...existing, eatenAt: e.position };
+			}
+		});
+	}
+}
+
 export function removeCandy(id: string, eatenAt?: Vector2) {
-	const candy = store.getState(selectCandyById(id));
+	const candy = getCandyLocal(id);
 
 	if (!candy) {
 		return;
 	}
 
-	store.setCandyEatenAt(id, eatenAt ?? candy.position);
+	setCandyEatenAtLocal(id, eatenAt ?? candy.position);
 	candyGrid.remove(candy.position);
 
+	// Immediately mark as eaten in replicated grid so clients animate
+	markCandyEatenInGrid(id, eatenAt ?? candy.position);
+
 	setTimeout(() => {
-		store.removeCandy(id);
-	}, 5);
+		const cellKeyToRemove = getCandyCellKeyForPosition(candy.position);
+		patchCandyCell(cellKeyToRemove, (cell) => {
+			cell[id] = undefined;
+		});
+		removeCandyLocal(id);
+	}, 2);
 }
 
 export function eatCandy(candyId: string, soldierId: string) {
-	const candy = getCandy(candyId);
+	const candy = getCandyLocal(candyId);
 	const soldier = getSoldier(soldierId);
 
 	if (soldier && candy && !candy.eatenAt) {
@@ -62,7 +125,7 @@ export function eatCandies(candyPoints: GridPoint<{ id: string }>[], soldierId: 
 
 	// Collect all valid candies and their data
 	const candyUpdates = candyPoints.mapFiltered((point) => {
-		const candy = getCandy(point.metadata.id);
+		const candy = getCandyLocal(point.metadata.id);
 		if (!candy || candy.eatenAt) return undefined;
 
 		return {
@@ -82,32 +145,89 @@ export function eatCandies(candyPoints: GridPoint<{ id: string }>[], soldierId: 
 		candyGrid.remove(candy.position);
 	}
 
-	// Bulk updates to store
-	const candyIds = candyUpdates.map((c) => c.id);
+	// Eaten positions for replication + later cleanup
+	// const candyIds = candyUpdates.map((c) => c.id);
 	const eatenPositions = candyUpdates.map((c) => ({
 		id: c.id,
 		position: c.position,
 	}));
-
-	store.setCandiesEatenAt(eatenPositions);
 	store.incrementSoldierOrbs(soldierId, totalOrbs);
 
-	// Schedule removal from state
+	// Immediately mark as eaten in replicated grid so clients animate
+	markCandiesEatenInGrid(eatenPositions);
+
+	// Schedule removal from replicated candy grid and state
 	setTimeout(() => {
-		store.removeCandiesByIds(candyIds);
+		const state = store.getState();
+		const resolution = selectCandyGridResolution({ candyGrid: state.candyGrid });
+		const res = resolution > 0 ? resolution : candyGrid.resolution;
+
+		// Group removals by cell
+		const byCell: { [cellKey: string]: CandyEntity[] } = {};
+		for (const { id, position } of eatenPositions) {
+			const x = math.floor(position.X / res);
+			const y = math.floor(position.Y / res);
+			const key = `${x},${y}`;
+			(byCell[key] ||= new Array<CandyEntity>()).push(getCandyLocal(id)!);
+		}
+
+		const currentCells = selectCandyGridCells({ candyGrid: state.candyGrid });
+		for (const [cellKey, toRemove] of pairs(byCell)) {
+			const current = { ...(currentCells[cellKey as string] ?? {}) } as { [id: string]: CandyEntity | undefined };
+			for (const e of toRemove as unknown as CandyEntity[]) {
+				current[e.id] = undefined;
+				removeCandyLocal(e.id);
+			}
+			store.setCandyCell(cellKey as string, current);
+		}
 	}, 5);
 }
 
 export function populateCandy(amount: number) {
-	store.populateCandy(fillArray(amount, () => createCandy()));
+	const candies = fillArray(amount, () => createCandy());
+	addCandies(candies);
+
+	// Update replicated candy grid cells with new ids
+	const state = store.getState();
+	const resolution = selectCandyGridResolution({ candyGrid: state.candyGrid });
+	const res = resolution > 0 ? resolution : candyGrid.resolution;
+	const byCell: { [cellKey: string]: { [id: string]: CandyEntity } } = {};
+	for (const c of candies) {
+		const x = math.floor(c.position.X / res);
+		const y = math.floor(c.position.Y / res);
+		const key = `${x},${y}`;
+		(byCell[key] ||= {})[c.id] = c;
+	}
+	const cells = selectCandyGridCells({ candyGrid: store.getState().candyGrid });
+	for (const [cellKey, newIds] of pairs(byCell)) {
+		const current = { ...(cells[cellKey as string] ?? {}) } as { [id: string]: CandyEntity | undefined };
+		for (const [nid, entity] of pairs(newIds as unknown as { [id: string]: CandyEntity })) {
+			current[nid as string] = entity as CandyEntity;
+		}
+		store.setCandyCell(cellKey as string, current);
+	}
 }
 
 export function removeCandyIfAtLimit(candyType: CandyType) {
 	const max = CANDY_LIMITS[candyType];
-	const count = store.getState(selectCandyCount(candyType));
+	const count = store.getState(selectCandyGridCount(candyType));
 
 	if (count > max) {
-		store.bulkRemoveStaleCandy(candyType, count - max);
+		// Remove oldest by id order
+		const state = store.getState();
+		const cells = selectCandyGridCells({ candyGrid: state.candyGrid });
+		const all: CandyEntity[] = [];
+		for (const [, cell] of pairs(cells)) {
+			if (!cell) continue;
+			for (const [, candy] of pairs(cell)) {
+				if (candy && candy.type === candyType && !candy.eatenAt) all.push(candy);
+			}
+		}
+		all.sort((a, b) => tonumber(a.id)! < tonumber(b.id)!);
+		const toRemove = count - max;
+		for (let i = 0; i < toRemove && i < all.size(); i++) {
+			removeCandy(all[i].id);
+		}
 	}
 }
 
@@ -203,5 +323,38 @@ export function dropCandyOnDeath(id: string): void {
 			if (!pushWithBudget(soldier.position.add(new Vector2(x, y)))) break;
 		}
 	}
-	store.populateCandy(candies);
+	// Add created candies to in-memory and replicated grid
+	addCandies(candies);
+	const state = store.getState();
+	const resolution = selectCandyGridResolution({ candyGrid: state.candyGrid });
+	const res = resolution > 0 ? resolution : candyGrid.resolution;
+	const byCell: { [cellKey: string]: { [id: string]: CandyEntity } } = {};
+	for (const c of candies) {
+		const x = math.floor(c.position.X / res);
+		const y = math.floor(c.position.Y / res);
+		const key = `${x},${y}`;
+		(byCell[key] ||= {})[c.id] = c;
+	}
+	const cells = selectCandyGridCells({ candyGrid: store.getState().candyGrid });
+	for (const [cellKey, newIds] of pairs(byCell)) {
+		const current = { ...(cells[cellKey as string] ?? {}) } as { [id: string]: CandyEntity | undefined };
+		for (const [nid, entity] of pairs(newIds as unknown as { [id: string]: CandyEntity })) {
+			current[nid as string] = entity as CandyEntity;
+		}
+		store.setCandyCell(cellKey as string, current);
+	}
+}
+
+export function addCandyEntity(entity: CandyEntity) {
+	addCandyLocal(entity);
+	const state = store.getState();
+	const resolution = selectCandyGridResolution({ candyGrid: state.candyGrid });
+	const res = resolution > 0 ? resolution : candyGrid.resolution;
+	const x = math.floor(entity.position.X / res);
+	const y = math.floor(entity.position.Y / res);
+	const key = `${x},${y}`;
+	const cells = selectCandyGridCells({ candyGrid: state.candyGrid });
+	const current = { ...(cells[key] ?? {}) } as { [id: string]: CandyEntity | undefined };
+	current[entity.id] = entity;
+	store.setCandyCell(key, current);
 }
