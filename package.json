@@ -1,6 +1,6 @@
 {
 	"name": "expr-2-qonquer",
-	"version": "1.2.4",
+	"version": "1.2.5",
 	"scripts": {
 		"dev": "concurrently \"pnpm watch\" \"pnpm serve\"",
 		"lint": "eslint src && prettier --check src",
