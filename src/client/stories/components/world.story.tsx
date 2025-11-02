@@ -9,7 +9,9 @@ import { store } from "client/store";
 import { USER_NAME } from "shared/constants/core";
 import { getRandomAccent } from "shared/constants/palette";
 import { getRandomBaseSoldierSkin } from "shared/constants/skins";
-import { CandyType } from "shared/store/candy";
+import { CandyType, CandyEntity } from "shared/store/candy-grid/candy-types";
+import { CandyGridCell } from "shared/store/candy-grid/candy-grid-types";
+import { selectCandyGridResolution } from "shared/store/candy-grid/candy-grid-selectors";
 import { fillArray } from "shared/utils/object-utils";
 
 import { useMockRemotes } from "../utils/use-mock-remotes";
@@ -29,15 +31,25 @@ export = hoarcekat(() => {
 			});
 		}
 
-		store.populateCandy(
-			fillArray(50, (index) => ({
+		// Populate candyGrid cells directly for the story
+		const res = store.getState(selectCandyGridResolution);
+		const byCell: { [cellKey: string]: { [id: string]: CandyEntity } } = {};
+		for (const index of $range(0, 49)) {
+			const entity: CandyEntity = {
 				id: `${index}`,
 				position: new Vector2(math.random(-50, 50), math.random(-25, 25)),
 				size: math.random(1, 50),
 				color: getRandomAccent(),
 				type: CandyType.Default,
-			})),
-		);
+			};
+			const x = math.floor(entity.position.X / res);
+			const y = math.floor(entity.position.Y / res);
+			const key = `${x},${y}`;
+			(byCell[key] ||= {})[entity.id] = entity;
+		}
+		for (const [cellKey, cell] of pairs(byCell)) {
+			store.setCandyCell(cellKey as string, cell as CandyGridCell);
+		}
 	}, []);
 
 	useInterval(() => {

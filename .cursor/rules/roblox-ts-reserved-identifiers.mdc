@@ -1,0 +1,30 @@
+---
+description: Avoid reserved identifiers in roblox-ts; never use `next` as a variable name.
+globs:
+alwaysApply: true
+---
+
+# Roblox-ts reserved identifiers
+
+In roblox-ts/Luau, certain identifiers are reserved or used internally by the compiler/runtime. Using them as variable/function names will cause compile errors.
+
+- Do not use the identifier `next` for variables, parameters, functions, or imports. It is reserved for compiler/internal usage.
+
+## Do / Don't
+
+Don't:
+```ts
+const next = { ... } // ERROR: reserved identifier
+```
+
+Do:
+```ts
+const nextState = { ... }
+const following = { ... }
+```
+
+## Notes
+
+- Prefer descriptive alternatives like `nextState`, `following`, `result`, `updated`, etc.
+- When in doubt, rename away from `next` to avoid roblox-ts compile failures.
+

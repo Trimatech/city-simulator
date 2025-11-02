@@ -10,7 +10,7 @@ const VISIBLE_RADIUS_STUDS = 300;
 
 function GridWallsComponent() {
 	const resolution = useSelector(selectGridResolution);
-	const gridPosition = useGridPosition();
+	const gridPosition = useGridPosition(selectGridResolution);
 
 	const relativeTemplate = useMemo(() => {
 		if (resolution <= 0) return [] as Vector2[];

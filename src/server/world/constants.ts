@@ -1,5 +1,5 @@
 import { IS_LOCAL, WORLD_TICK } from "shared/constants/core";
-import { CandyType } from "shared/store/candy";
+import { CandyType } from "shared/store/candy-grid/candy-types";
 
 // Variable to enable/disable testing stuff, to shorten the work cycle
 export const IS_TESTING_STUFF = false;

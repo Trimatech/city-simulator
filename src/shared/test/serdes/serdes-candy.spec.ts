@@ -2,8 +2,8 @@
 
 import { HttpService } from "@rbxts/services";
 import { getRandomAccent } from "shared/constants/palette";
-import { deserializeCandy, serializeCandy } from "shared/serdes/handlers/serdes-candy";
-import { CandyEntity, CandyState } from "shared/store/candy";
+import { deserializeCandy, serializeCandy, CandyState } from "shared/serdes/handlers/serdes-candy";
+import { CandyEntity } from "shared/store/candy-grid/candy-types";
 
 export = () => {
 	function generateCandy(id?: string): CandyEntity {

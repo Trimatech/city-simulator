@@ -1,8 +1,12 @@
 import BitBuffer from "@rbxts/bitbuffer2";
-import { CandyState } from "shared/store/candy";
+import { CandyEntity } from "shared/store/candy-grid/candy-types";
 import { countProperties } from "shared/utils/object-utils";
 
 import { readColor3, readVector2, writeColor3, writeVector2 } from "../utils";
+
+export interface CandyState {
+	readonly [id: string]: CandyEntity | undefined;
+}
 
 export function serializeCandy(state: CandyState): string {
 	const buffer = new BitBuffer();
