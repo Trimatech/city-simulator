@@ -9,3 +9,4 @@ export * from "./use-premium";
 export * from "./use-product-price";
 export * from "./use-seed";
 export * from "./use-store";
+export * from "./use-observer-position";

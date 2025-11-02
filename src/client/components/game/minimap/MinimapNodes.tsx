@@ -1,8 +1,6 @@
 import { useInterval } from "@rbxts/pretty-react-hooks";
 import React, { Element, useState } from "@rbxts/react";
-import { useSelector } from "@rbxts/react-reflex";
-import { useStore } from "client/hooks";
-import { selectWorldSubjectPosition } from "client/store/world";
+import { useObserverPosition, useStore } from "client/hooks";
 import { CanvasGroup } from "client/ui/canvas-group";
 import { Image } from "client/ui/image";
 import { images } from "shared/assets";
@@ -14,7 +12,7 @@ import { normalizeToWorldBounds } from "./utils";
 
 export function MinimapNodes() {
 	const store = useStore();
-	const localPosition = useSelector(selectWorldSubjectPosition);
+	const observerPosition = useObserverPosition();
 
 	const [nodes, setNodes] = useState<Element[]>([]);
 
@@ -64,7 +62,9 @@ export function MinimapNodes() {
 				if (localId === undefined) return undefined;
 				const skinId = store.getState(selectSoldierSkin(localId));
 				const color = skinId !== undefined ? getSoldierSkin(skinId).tint[0] : palette.offwhite;
-				const pos = normalizeToWorldBounds(localPosition);
+				const current = observerPosition;
+				if (current === undefined) return undefined;
+				const pos = normalizeToWorldBounds(current);
 				return (
 					<Image
 						key={`soldier-${localId}`}

@@ -31,22 +31,16 @@ function CellCandiesComponent({ cellKey }: CellCandiesProps) {
 
 	if (!items || items.size() === 0) return undefined;
 
-	print("candies in cell....", cellKey, items);
-
-	return (
-		<>
-			{items.map((candy) => (
-				<Candy
-					key={candy.id}
-					name={`candy_${candy.id}`}
-					position={candy.position}
-					color={candy.color}
-					size={candy.size}
-					eatenAt={candy.eatenAt}
-				/>
-			))}
-		</>
-	);
+	return items.map((candy) => (
+		<Candy
+			key={candy.id}
+			name={`candy_${candy.id}`}
+			position={candy.position}
+			color={candy.color}
+			size={candy.size}
+			eatenAt={candy.eatenAt}
+		/>
+	));
 }
 
 export const CellCandies = memo(CellCandiesComponent);

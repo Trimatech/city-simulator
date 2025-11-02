@@ -59,11 +59,8 @@ export function findClosestPoint(mousePos: Vector2, polygons: Polygon[], range =
 	let closestDist = math.huge;
 	let closest: ClosestPointResult | undefined;
 
-	// warn(`checking ${polyName} r${regionIndex} p${pointIndex}=${point[0]}_${point[1]}`);
-
 	const mouseX = mousePos.X;
 	const mouseY = mousePos.Y;
-	// warn(`.... mouse x=${mouseX}, y=${mouseY}`);
 
 	const setClosestIfCloser = (point: PointShape, polygonIndex: number, regionIndex: number, pointIndex: number) => {
 		const dist = math.sqrt(math.pow(mouseX - point[0], 2) + math.pow(mouseY - point[1], 2));

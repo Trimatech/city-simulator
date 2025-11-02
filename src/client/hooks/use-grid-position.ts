@@ -1,25 +1,32 @@
 import { useEffect, useRef, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { Players, RunService } from "@rbxts/services";
-// no default; caller must pass a selector
+import { RunService } from "@rbxts/services";
+import { getObserverPosition2D } from "client/utils/camera-position.utils";
+import { selectLocalIsSpawned } from "shared/store/soldiers";
 import { getCellCoordFromPos } from "shared/utils/cell-key";
 
 export function useGridPosition<TState>(selectResolution: (state: TState) => number) {
-	const resolution = useSelector(selectResolution as unknown as (state: unknown) => number);
+	const resolution = useSelector(selectResolution);
+	const isSpawned = useSelector(selectLocalIsSpawned);
 	const [position, setPosition] = useState<Vector2 | undefined>(undefined);
 	const lastCellRef = useRef<Vector2 | undefined>(undefined);
 
 	useEffect(() => {
 		const conn = RunService.Heartbeat.Connect(() => {
-			const character = Players.LocalPlayer?.Character;
-			if (!character || resolution <= 0) {
+			if (resolution <= 0) {
 				lastCellRef.current = undefined;
 				setPosition(undefined);
 				return;
 			}
 
-			const pivot = character.GetPivot();
-			const pos2d = new Vector2(pivot.Position.X, pivot.Position.Z);
+			const pos2d = getObserverPosition2D({ preferCamera: !isSpawned });
+
+			if (!pos2d) {
+				lastCellRef.current = undefined;
+				setPosition(undefined);
+				return;
+			}
+
 			const cell = getCellCoordFromPos(pos2d, resolution);
 			const prev = lastCellRef.current;
 
@@ -33,7 +40,7 @@ export function useGridPosition<TState>(selectResolution: (state: TState) => num
 			conn.Disconnect();
 			lastCellRef.current = undefined;
 		};
-	}, [resolution]);
+	}, [resolution, isSpawned]);
 
 	return position;
 }

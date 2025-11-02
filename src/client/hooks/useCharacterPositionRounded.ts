@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from "@rbxts/react";
-import { Players, RunService } from "@rbxts/services";
+import { useSelector } from "@rbxts/react-reflex";
+import { RunService } from "@rbxts/services";
+import { getObserverPosition2D } from "client/utils/camera-position.utils";
+import { selectLocalIsSpawned } from "shared/store/soldiers";
 
 export interface UseCharacterPositionOptions {
 	resolution?: number;
@@ -8,17 +11,16 @@ export interface UseCharacterPositionOptions {
 export function useCharacterPositionRounded({ resolution = 10 }: UseCharacterPositionOptions = {}) {
 	const [position, setPosition] = useState<Vector2 | undefined>(undefined);
 	const last = useRef<Vector2 | undefined>(undefined);
+	const isSpawned = useSelector(selectLocalIsSpawned);
 
 	useEffect(() => {
 		const conn = RunService.Heartbeat.Connect(() => {
-			const character = Players.LocalPlayer?.Character;
-			if (!character) {
+			const pos2d = getObserverPosition2D({ preferCamera: !isSpawned });
+
+			if (!pos2d) {
 				setPosition(undefined);
 				return;
 			}
-
-			const pivot = character.GetPivot();
-			const pos2d = new Vector2(pivot.Position.X, pivot.Position.Z);
 
 			const snappedX = math.round(pos2d.X * resolution) / resolution;
 			const snappedY = math.round(pos2d.Y * resolution) / resolution;
@@ -31,7 +33,7 @@ export function useCharacterPositionRounded({ resolution = 10 }: UseCharacterPos
 			}
 		});
 		return () => conn.Disconnect();
-	}, []);
+	}, [isSpawned]);
 
 	return position;
 }
