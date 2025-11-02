@@ -6,8 +6,6 @@ interface PickCoordSpaceParams {
 	readonly mouseY: number;
 }
 
-export interface MapMouseToGradientParams extends PickCoordSpaceParams {}
-
 export interface MapMouseToGradientResult {
 	readonly offset: Vector2;
 	readonly rotation?: number;
@@ -35,7 +33,7 @@ function pickMouseCoordSpaceForFrame({ frame, mouseX, mouseY }: PickCoordSpacePa
 	return candidates[0];
 }
 
-export function mapMouseToUiGradient({ frame, mouseX, mouseY }: MapMouseToGradientParams): MapMouseToGradientResult {
+export function mapMouseToUiGradient({ frame, mouseX, mouseY }: PickCoordSpaceParams): MapMouseToGradientResult {
 	const point = pickMouseCoordSpaceForFrame({ frame, mouseX, mouseY });
 	const absPos = frame.AbsolutePosition;
 	const absSize = frame.AbsoluteSize;
