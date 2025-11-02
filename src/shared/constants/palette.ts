@@ -16,6 +16,7 @@ export const accents = {
 	green: Color3.fromRGB(166, 227, 161),
 	teal: Color3.fromRGB(148, 226, 213),
 	sky: Color3.fromRGB(137, 220, 235),
+	sky2: Color3.fromRGB(84, 171, 250),
 	sapphire: Color3.fromRGB(116, 199, 236),
 	blue: Color3.fromRGB(137, 180, 250),
 	lavender: Color3.fromRGB(180, 190, 254),

@@ -99,14 +99,7 @@ export function PrimaryButton({
 				<uigradient Color={color} Offset={offset} Rotation={defaultRotation} />
 			</Frame>
 
-			<Outline
-				cornerRadius={cornerRadius}
-				innerTransparency={0}
-				innerThickness={0}
-				outerColor={palette.white}
-				innerColor={palette.white}
-				outerThickness={rem(0.2)}
-			/>
+			<Outline cornerRadius={cornerRadius} innerTransparency={0} outerTransparency={1} />
 
 			{children}
 		</ReactiveButton>
