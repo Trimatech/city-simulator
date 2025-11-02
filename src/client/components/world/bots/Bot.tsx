@@ -1,7 +1,9 @@
 import React, { useEffect, useRef } from "@rbxts/react";
+import { useSelector } from "@rbxts/react-reflex";
 import { Workspace } from "@rbxts/services";
 import { WORLD_TICK } from "shared/constants/core";
 import { findSharedInstanceByPath } from "shared/SharedModelManager";
+import { selectSoldierPosition } from "shared/store/soldiers";
 
 import {
 	BotRuntime,
@@ -15,14 +17,12 @@ import {
 
 interface BotProps {
 	readonly id: string;
-	readonly soldier: {
-		readonly position: Vector2;
-	};
 }
 
-export function Bot({ id, soldier }: BotProps) {
+export function Bot({ id }: BotProps) {
+	const position = useSelector(selectSoldierPosition(id));
 	const runtimeRef = useRef<BotRuntime>();
-	const lastPosRef = useRef<Vector2>(soldier.position);
+	const lastPosRef = useRef<Vector2>(position);
 
 	// Movement thresholds to avoid perpetual minor motion
 	const MOVE_EPSILON = 0.15;
@@ -72,9 +72,9 @@ export function Bot({ id, soldier }: BotProps) {
 				humanoid.ChangeState(Enum.HumanoidStateType.RunningNoPhysics);
 			}
 
-			const groundY = sampleGroundYAt(soldier.position);
+			const groundY = sampleGroundYAt(position);
 			const offset = computeStableGroundOffset(model);
-			const start = new Vector3(soldier.position.X, groundY + offset, soldier.position.Y);
+			const start = new Vector3(position.X, groundY + offset, position.Y);
 			model.PivotTo(new CFrame(start));
 
 			const posV = new Instance("Vector3Value");
@@ -104,9 +104,9 @@ export function Bot({ id, soldier }: BotProps) {
 	}, []);
 
 	useEffect(() => {
+		if (!position) return;
 		const runtime = runtimeRef.current;
 		if (!runtime) return;
-		const position = soldier.position;
 		const groundY = sampleGroundYAt(position);
 		const offsetStable = runtime.groundOffset ?? computeStableGroundOffset(runtime.model);
 		if (runtime.groundOffset === undefined) runtime.groundOffset = offsetStable;
@@ -146,7 +146,7 @@ export function Bot({ id, soldier }: BotProps) {
 		}
 
 		lastPosRef.current = position;
-	}, [soldier]);
+	}, [position]);
 
 	return <></>;
 }

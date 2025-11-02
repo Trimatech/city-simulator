@@ -17,12 +17,5 @@ export function Bots() {
 		return ids;
 	}, [soldiersById]);
 
-	return (
-		<>
-			{botIds.map((id) => {
-				const soldier = soldiersById[id]!;
-				return <Bot key={id} id={id} soldier={soldier} />;
-			})}
-		</>
-	);
+	return botIds.map((id) => <Bot key={id} id={id} />);
 }

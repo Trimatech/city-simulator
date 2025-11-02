@@ -213,6 +213,13 @@ export const selectSoldierIsInside = (id: string) => {
 	};
 };
 
+export const selectSoldierPosition = (id: string) => {
+	return (state: SharedState) => {
+		const soldier = state.soldiers[id];
+		return soldier ? soldier.position : new Vector2();
+	};
+};
+
 export const selectSoldierRanking = (id: string) => {
 	const comparator = (current: SoldierEntity, existing: SoldierEntity) => {
 		return current.polygonAreaSize > existing.polygonAreaSize;
