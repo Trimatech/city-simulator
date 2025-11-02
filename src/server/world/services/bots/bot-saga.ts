@@ -15,6 +15,7 @@ import { botStopped } from "./bot-events";
 import { buildBotMovementPath } from "./buildBotMovementPath";
 
 const MAX_BOTS = 20;
+const BOT_RESPAWN_DELAY = 2; // seconds to wait before replacing a dead bot
 
 interface BotController {
 	readonly id: string;
@@ -27,6 +28,17 @@ interface BotController {
 }
 
 const botControllers = new Map<string, BotController>();
+const botRespawnCooldowns = new Map<string, number>();
+
+function getActiveCooldownIds(): string[] {
+	const now = tick();
+	const active: string[] = [];
+	for (const [id, expiresAt] of botRespawnCooldowns) {
+		if (expiresAt > now) active.push(id);
+		else botRespawnCooldowns.delete(id);
+	}
+	return active;
+}
 
 async function spawnBot(botId: string) {
 	const spawnPoint = getSafePointOutsideSoldierPolygons();
@@ -152,7 +164,7 @@ function nextBotId(existing: ReadonlyArray<string>): string {
 async function spawnBots(amount: number) {
 	let remaining = amount;
 	while (remaining > 0) {
-		const existing = getAliveBotIds();
+		const existing = [...getAliveBotIds(), ...getActiveCooldownIds()];
 		const id = nextBotId(existing);
 		await spawnBot(id);
 		remaining -= 1;
@@ -207,7 +219,10 @@ export async function initBotService() {
 			const targetBots = math.max(0, MAX_BOTS - aliveNonBots);
 
 			if (aliveBots < targetBots) {
-				spawnBots(targetBots - aliveBots);
+				const activeCooldowns = getActiveCooldownIds();
+				const shortage = targetBots - aliveBots;
+				const allowedToSpawn = math.max(0, shortage - activeCooldowns.size());
+				if (allowedToSpawn > 0) spawnBots(allowedToSpawn);
 				return;
 			}
 
@@ -229,7 +244,8 @@ export async function initBotService() {
 			for (const [, controller] of botControllers) {
 				const entity = store.getState((state) => state.soldiers[controller.id]);
 				if (!entity || entity.dead) {
-					// clean up and optionally respawn later
+					// mark cooldown and clean up; respawn will be delayed by subscriber logic
+					botRespawnCooldowns.set(controller.id, tick() + BOT_RESPAWN_DELAY);
 					cleanupBot(controller.id);
 					continue;
 				}

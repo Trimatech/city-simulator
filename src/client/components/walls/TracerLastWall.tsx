@@ -16,7 +16,7 @@ function TracerLastWallComponent({ soldierId }: Props) {
 	const skin = useSelector(selectSoldierSkin(soldierId));
 	const lastTracerPoint = useSelector(selectSoldierLastTracerPoint(soldierId));
 
-	const settledLastTracerPoint = useDebouncedValue(lastTracerPoint, { wait: 0.05 });
+	const settledLastTracerPoint = useDebouncedValue(lastTracerPoint, { wait: 0.01 });
 
 	if (!settledLastTracerPoint) return undefined;
 

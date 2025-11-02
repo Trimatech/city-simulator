@@ -1,8 +1,6 @@
 import { store } from "server/store";
 import { selectGridCells, selectGridResolution } from "shared/store/grid/grid-selectors";
 import { selectSoldiersById } from "shared/store/soldiers";
-import { getCellCoordFromPos, getCellKeyFromCoord } from "shared/utils/cell-key";
-import { getEdgeId, quantizeVector2 } from "shared/utils/edge-id";
 import { filterTracersForCell } from "shared/utils/geometry-utils";
 import { Grid } from "shared/utils/grid";
 import {
@@ -13,7 +11,6 @@ import {
 	buildTracerLinesByCell,
 	computeAffectedCells,
 	computeCellsFromNew,
-	getCompoundEdgeKey,
 	shallowEqualCell,
 } from "shared/utils/grid-lines.utils";
 
@@ -38,21 +35,12 @@ export function updateTracerGridForOwner({ ownerId, positions }: { ownerId: stri
 		}
 	});
 
-	// Update the soldier's last tracer reference to the final segment in positions
-	if (positions.size() >= 2) {
-		const a = positions[positions.size() - 2];
-		const b = positions[positions.size() - 1];
-		const quantQ = math.max(0.1, resolution / 10);
-		const qa = quantizeVector2(a, quantQ);
-		const qb = quantizeVector2(b, quantQ);
-		const edgeId = getEdgeId({ a: qa, b: qb });
-		const mid = new Vector2((qa.X + qb.X) / 2, (qa.Y + qb.Y) / 2);
-		const coord = getCellCoordFromPos(mid, resolution);
-		const cellKey = getCellKeyFromCoord(coord);
-		const compound = getCompoundEdgeKey(edgeId, ownerId, "tracer");
-		store.setSoldierLastTracerRef(ownerId, cellKey, compound);
+	// Publish the soldier's last tracer point for client rendering
+	if (positions.size() >= 1) {
+		const last = positions[positions.size() - 1];
+		store.setSoldierLastTracerPoint(ownerId, last);
 	} else {
-		store.setSoldierLastTracerRef(ownerId, undefined, undefined);
+		store.setSoldierLastTracerPoint(ownerId, undefined);
 	}
 }
 
@@ -66,7 +54,7 @@ export function updateSoldierGrid() {
 	for (const [, soldier] of pairs(soldiers)) {
 		if (soldier.dead) continue;
 		const tracers = [...soldier.tracers] as Vector2[];
-		if (!tracers || tracers.size() < 2) continue;
+		if (!tracers) continue;
 
 		// Populate debug grid near head cell
 		const tracersAtHeadCell = filterTracersForCell(tracers, soldier.position, soldierGrid.resolution);
@@ -83,8 +71,8 @@ export function updateSoldierGrid() {
 			});
 		}
 
-		// Emit tracer lines into grid slice with upstream diffing
-		const positions = tracersAtHeadCell.size() >= 2 ? tracersAtHeadCell : tracers;
+		// Emit tracer lines based on the full, authoritative tracer list
+		const positions = tracers;
 		updateTracerGridForOwner({ ownerId: soldier.id, positions });
 	}
 }
@@ -99,6 +87,13 @@ export function updateAreaGridForPolygon({
 	polygon: Vector2[];
 	dropTracers?: boolean;
 }) {
+	// Do not write grid lines for dead or missing owners to avoid re-adding walls after death
+	const soldiersById = selectSoldiersById(store.getState());
+	const owner = soldiersById[ownerId];
+	if (!owner || owner.dead) {
+		warn(`updateAreaGridForPolygon: owner ${ownerId} is dead or missing`);
+		return;
+	}
 	const state = store.getState();
 	const resolution = selectGridResolution({ grid: state.grid });
 	const areaLinesByCell = buildAreaLinesByCell(polygon, resolution);

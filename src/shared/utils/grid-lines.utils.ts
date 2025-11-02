@@ -3,6 +3,17 @@ import { getCellAABBFromCoord, getCellCoordFromPos, getCellKeyFromCoord } from "
 import { getEdgeId, quantizeVector2 } from "shared/utils/edge-id";
 import { segmentIntersectsRect } from "shared/utils/geometry-utils";
 
+// Quantization used when deriving stable edge ids for grid lines.
+// Keep this relatively small to avoid collapsing nearby vertices onto the
+// same coordinate (which can visually connect unrelated lines when points are
+// close to cell edges). Tie it to resolution but cap with a low floor.
+export function getQuantizationStep(resolution: number) {
+	// Tighter quantization to avoid accidental id collisions between
+	// distinct-but-nearby vertices (e.g., near cell borders).
+	// Example: resolution=20 -> 0.1; resolution=10 -> 0.05
+	return math.max(0.01, resolution / 200);
+}
+
 // Compound-key helpers enable multi-owner lines on the same geometric edge
 export function getCompoundEdgeKey(edgeId: string, ownerId: string, kind: GridLine["kind"]) {
 	return `${edgeId}#${ownerId}#${kind}`;
@@ -36,7 +47,7 @@ export function shallowEqualCell(a?: GridCellsByEdgeId, b?: GridCellsByEdgeId) {
 
 export function buildAreaLinesByCell(points: Vector2[], resolution: number) {
 	const areaLinesByCell = new Map<string, Map<string, GridLine>>();
-	const quantQ = math.max(0.1, resolution / 10);
+    const quantQ = getQuantizationStep(resolution);
 
 	for (let i = 0; i < points.size(); i++) {
 		const a = points[i];
@@ -60,10 +71,11 @@ export function buildAreaLinesByCell(points: Vector2[], resolution: number) {
 					cell = new Map<string, GridLine>();
 					areaLinesByCell.set(key, cell);
 				}
-				const qa = quantizeVector2(a, quantQ);
-				const qb = quantizeVector2(b, quantQ);
-				const edgeId = getEdgeId({ a: qa, b: qb });
-				cell.set(edgeId, { a: qa, b: qb, ownerId: "", kind: "area" });
+                const qa = quantizeVector2(a, quantQ);
+                const qb = quantizeVector2(b, quantQ);
+                const edgeId = getEdgeId({ a: qa, b: qb });
+                // Store original geometry; use quantized only for stable ids
+                cell.set(edgeId, { a, b, ownerId: "", kind: "area" });
 			}
 		}
 	}
@@ -73,7 +85,7 @@ export function buildAreaLinesByCell(points: Vector2[], resolution: number) {
 
 function buildSegmentLinesByCell(segments: Vector2[], resolution: number, kind: "tracer" | "area", ownerId: string) {
 	const byCell = new Map<string, Map<string, GridLine>>();
-	const quantQ = math.max(0.1, resolution / 10);
+    const quantQ = getQuantizationStep(resolution);
 
 	for (let i = 0; i < segments.size() - 1; i++) {
 		const a = segments[i];
@@ -97,10 +109,11 @@ function buildSegmentLinesByCell(segments: Vector2[], resolution: number, kind: 
 					cell = new Map<string, GridLine>();
 					byCell.set(key, cell);
 				}
-				const qa = quantizeVector2(a, quantQ);
-				const qb = quantizeVector2(b, quantQ);
-				const edgeId = getEdgeId({ a: qa, b: qb });
-				cell.set(edgeId, { a: qa, b: qb, ownerId, kind });
+                const qa = quantizeVector2(a, quantQ);
+                const qb = quantizeVector2(b, quantQ);
+                const edgeId = getEdgeId({ a: qa, b: qb });
+                // Store original geometry; use quantized only for stable ids
+                cell.set(edgeId, { a, b, ownerId, kind });
 			}
 		}
 	}

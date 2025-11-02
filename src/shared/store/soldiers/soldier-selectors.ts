@@ -79,13 +79,7 @@ export const selectSoldierLastTracerPoint = (id: string) => {
 	return (state: SharedState) => {
 		const soldier = state.soldiers[id];
 		if (!soldier) return undefined;
-		const cellKey = soldier.lastTracerCellKey;
-		const edgeId = soldier.lastTracerEdgeId;
-		if (!cellKey || !edgeId) return undefined;
-		const cell = state.grid.cells[cellKey];
-		if (!cell) return undefined;
-		const line = cell[edgeId];
-		return line?.b;
+		return soldier.lastTracerPoint;
 	};
 };
 export const selectLocalSoldierId = (state: SharedState) => {

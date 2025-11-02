@@ -90,6 +90,11 @@ export async function initSoldierService() {
 		debug.profilebegin("SOLDIER_IS_INSIDE");
 		print(`Soldier ${id} is ${isInside ? "inside" : "outside"}--------------------`);
 
+		if (tracers.size() < 2) {
+			print(`Soldier ${id} has less than 2 tracers, skipping`);
+			return;
+		}
+
 		try {
 			const resultPolygon = pointsToPolygon(vectorsToPoints(polygon));
 			const points = vectorsToPoints(tracers);

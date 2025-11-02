@@ -30,8 +30,7 @@ export interface SoldierEntity {
 	readonly desiredAngle: number;
 	readonly orbs: number;
 	readonly tracers: readonly Vector2[];
-	readonly lastTracerCellKey?: string;
-	readonly lastTracerEdgeId?: string;
+	readonly lastTracerPoint?: Vector2;
 	readonly skin: string;
 	readonly dead: boolean;
 	readonly eliminations: number;
@@ -53,8 +52,7 @@ const defaultEntity: SoldierEntity = {
 	desiredAngle: 0,
 	orbs: 0,
 	tracers: [],
-	lastTracerCellKey: undefined,
-	lastTracerEdgeId: undefined,
+	lastTracerPoint: undefined,
 	skin: "",
 	dead: false,
 	eliminations: 0,
@@ -140,7 +138,8 @@ export const soldiersSlice = createProducer(initialState, {
 			}
 
 			if (tracers.size() !== currentLength) {
-				return { ...soldier, tracers };
+				const lastTracerPoint = tracers.size() > 0 ? tracers[tracers.size() - 1] : undefined;
+				return { ...soldier, tracers, lastTracerPoint };
 			}
 
 			return soldier;
@@ -164,8 +163,7 @@ export const soldiersSlice = createProducer(initialState, {
 				polygonAreaSize,
 				polygonBounds,
 				tracers: resetTracers ? [] : soldier.tracers,
-				lastTracerCellKey: resetTracers ? undefined : soldier.lastTracerCellKey,
-				lastTracerEdgeId: resetTracers ? undefined : soldier.lastTracerEdgeId,
+				lastTracerPoint: resetTracers ? undefined : soldier.lastTracerPoint,
 			};
 		});
 	},
@@ -174,8 +172,7 @@ export const soldiersSlice = createProducer(initialState, {
 		return mapProperty(state, id, (soldier) => ({
 			...soldier,
 			tracers: [],
-			lastTracerCellKey: undefined,
-			lastTracerEdgeId: undefined,
+			lastTracerPoint: undefined,
 		}));
 	},
 
@@ -183,14 +180,14 @@ export const soldiersSlice = createProducer(initialState, {
 		return mapProperty(state, id, (soldier) => ({
 			...soldier,
 			tracers,
+			lastTracerPoint: tracers.size() > 0 ? tracers[tracers.size() - 1] : undefined,
 		}));
 	},
 
-	setSoldierLastTracerRef: (state, id: string, cellKey?: string, edgeId?: string) => {
+	setSoldierLastTracerPoint: (state, id: string, point?: Vector2) => {
 		return mapProperty(state, id, (soldier) => ({
 			...soldier,
-			lastTracerCellKey: cellKey,
-			lastTracerEdgeId: edgeId,
+			lastTracerPoint: point,
 		}));
 	},
 

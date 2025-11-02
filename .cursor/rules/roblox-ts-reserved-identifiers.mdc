@@ -1,5 +1,5 @@
 ---
-description: Avoid reserved identifiers in roblox-ts; never use `next` as a variable name.
+description: Avoid reserved identifiers in roblox-ts; never use `next` or Luau keywords (e.g., `until`).
 globs:
 alwaysApply: true
 ---
@@ -9,18 +9,21 @@ alwaysApply: true
 In roblox-ts/Luau, certain identifiers are reserved or used internally by the compiler/runtime. Using them as variable/function names will cause compile errors.
 
 - Do not use the identifier `next` for variables, parameters, functions, or imports. It is reserved for compiler/internal usage.
+- Do not use Luau keywords as identifiers (e.g., `until`, `and`, `or`, `repeat`, `then`, ...).
 
 ## Do / Don't
 
 Don't:
 ```ts
 const next = { ... } // ERROR: reserved identifier
+const until = 10 // ERROR: Luau keyword
 ```
 
 Do:
 ```ts
 const nextState = { ... }
 const following = { ... }
+const expiresAt = 10
 ```
 
 ## Notes
