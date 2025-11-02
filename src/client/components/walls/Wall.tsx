@@ -1,13 +1,15 @@
 import { memo, useEffect, useRef } from "@rbxts/react";
 import { Workspace } from "@rbxts/services";
 import { palette } from "shared/constants/palette";
-import { getSoldierSkin, getSoldierSkinForTracer } from "shared/constants/skins";
+import { getSoldierSkin } from "shared/constants/skins";
 
 import {
 	calculateWallTransform,
 	createCylinder,
 	createWallHighlight,
 	createWallPart,
+	positionWallAtGround,
+	tweenWallToTarget,
 	uncollideAndDestroy,
 } from "./Walls.utils";
 
@@ -21,20 +23,14 @@ interface Appearance {
 
 function resolveAppearance({
 	skinId,
-	tracerIndex,
 	fallbackColor,
 	transparency,
 }: {
 	skinId?: string;
-	tracerIndex?: number;
 	fallbackColor: Color3;
 	transparency: number;
 }): Appearance {
 	if (skinId !== undefined) {
-		if (tracerIndex !== undefined) {
-			const tracerSkin = getSoldierSkinForTracer(skinId, tracerIndex);
-			return { color: tracerSkin.tint, material: WALL_MATERIAL, transparency };
-		}
 		const skin = getSoldierSkin(skinId);
 		return { color: skin.tint[0], material: WALL_MATERIAL, transparency };
 	}
@@ -61,7 +57,7 @@ interface Props {
 	thickness?: number;
 	isCrumbling?: boolean;
 	skinId?: string;
-	tracerIndex?: number;
+	kind: "tracer" | "area";
 	outline?: boolean;
 	crumbleDelaySeconds?: number;
 }
@@ -76,12 +72,14 @@ function WallComponent({
 	thickness = 1,
 	isCrumbling = false,
 	skinId,
-	tracerIndex,
+	kind,
 	outline = false,
 }: Props) {
 	const mainPartRef = useRef<Part>();
 	const cylinderRef = useRef<Part>();
 	const outlineRef = useRef<Highlight>();
+	const hasAnimatedRef = useRef(false);
+	const tweenCleanupRef = useRef<() => void>();
 
 	//print(`rendering wall ${folderName} ${startPoint.X},${startPoint.Y} -> ${endPoint.X},${endPoint.Y}`);
 
@@ -97,7 +95,6 @@ function WallComponent({
 
 		const wallProperties = resolveAppearance({
 			skinId,
-			tracerIndex,
 			fallbackColor: color,
 			transparency,
 		});
@@ -126,6 +123,11 @@ function WallComponent({
 		});
 		cylinder.Parent = folder;
 
+		// Start at ground level only if we intend to animate (non-tracer)
+		if (kind !== "tracer") {
+			positionWallAtGround({ part, cylinder, center, rotation, startPosition });
+		}
+
 		if (outline) {
 			outlineRef.current = createWallHighlight(part);
 		}
@@ -134,6 +136,7 @@ function WallComponent({
 		cylinderRef.current = cylinder;
 
 		return () => {
+			if (tweenCleanupRef.current) tweenCleanupRef.current();
 			if (outlineRef.current) outlineRef.current.Destroy();
 			if (mainPartRef.current) uncollideAndDestroy(mainPartRef.current, math.random(0.5, 2));
 			if (cylinderRef.current) uncollideAndDestroy(cylinderRef.current, math.random(0.5, 2));
@@ -150,10 +153,30 @@ function WallComponent({
 		const { width, center, rotation, startPosition } = calculateWallTransform([startPoint, endPoint], height);
 
 		part.Size = new Vector3(width, height, thickness);
-		part.CFrame = new CFrame(center).mul(rotation);
-
 		cylinder.Size = new Vector3(height, thickness, thickness);
-		cylinder.CFrame = new CFrame(startPosition).mul(CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90)));
+
+		const targetPartCFrame = new CFrame(center).mul(rotation);
+		const targetCylinderCFrame = new CFrame(startPosition).mul(CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90)));
+
+		const shouldAnimate = !hasAnimatedRef.current && kind !== "tracer";
+		if (shouldAnimate) {
+			// Position from ground then tween to targets
+			positionWallAtGround({ part, cylinder, center, rotation, startPosition });
+			tweenCleanupRef.current = tweenWallToTarget({
+				part,
+				cylinder,
+				targetPartCFrame,
+				targetCylinderCFrame,
+				duration: 0.8,
+			});
+			hasAnimatedRef.current = true;
+			return;
+		}
+
+		// Apply transforms directly (for tracer or subsequent updates)
+		part.CFrame = targetPartCFrame;
+		cylinder.CFrame = targetCylinderCFrame;
+		hasAnimatedRef.current = true;
 	}, [startPoint.X, startPoint.Y, endPoint.X, endPoint.Y, height, thickness]);
 
 	// Update visuals (color/material/transparency) when appearance props change
@@ -164,7 +187,6 @@ function WallComponent({
 
 		const wallProperties = resolveAppearance({
 			skinId,
-			tracerIndex,
 			fallbackColor: color,
 			transparency,
 		});
@@ -176,7 +198,7 @@ function WallComponent({
 		cylinder.Color = wallProperties.color;
 		cylinder.Transparency = wallProperties.transparency;
 		cylinder.Material = wallProperties.material;
-	}, [color, transparency, skinId, tracerIndex]);
+	}, [color, transparency, skinId, kind]);
 
 	// Toggle outline without recreating
 	useEffect(() => {
@@ -197,6 +219,10 @@ function WallComponent({
 	// Handle crumbling: destroy existing parts once when enabled
 	useEffect(() => {
 		if (!isCrumbling) return;
+		if (tweenCleanupRef.current) {
+			tweenCleanupRef.current();
+			tweenCleanupRef.current = undefined;
+		}
 		if (outlineRef.current) {
 			outlineRef.current.Destroy();
 			outlineRef.current = undefined;

@@ -1,23 +1,14 @@
-import Object from "@rbxts/object-utils";
 import { createSelector } from "@rbxts/reflex";
 
 import { CandyGridState } from "./candy-grid-types";
 import { CandyEntity, CandyType } from "./candy-types";
 
-const emptyItems: readonly CandyEntity[] = [];
-
 export const selectCandyGridResolution = (state: { candyGrid: CandyGridState }) => state.candyGrid.resolution;
 export const selectCandyGridCells = (state: { candyGrid: CandyGridState }) => state.candyGrid.cells;
-export const selectCandyGridCell = (cellKey: string) => (state: { candyGrid: CandyGridState }) => state.candyGrid.cells[cellKey];
+export const selectCandyGridCell = (cellKey: string) => (state: { candyGrid: CandyGridState }) =>
+	state.candyGrid.cells[cellKey];
 
-export const selectCandiesInCell = (cellKey: string) =>
-	createSelector(selectCandyGridCell(cellKey), (cell) => {
-		if (!cell) return emptyItems;
-		const vals = Object.values(cell) as (CandyEntity | undefined)[];
-		const out = new Array<CandyEntity>();
-		for (const v of vals) if (v) out.push(v);
-		return out as readonly CandyEntity[];
-	});
+export const selectCandiesInCell = (cellKey: string) => createSelector(selectCandyGridCell(cellKey), (cell) => cell);
 
 export const selectCandyGridCount = (filter?: CandyType) =>
 	createSelector(selectCandyGridCells, (cells) => {
@@ -44,5 +35,3 @@ export const selectAllCandies = createSelector(selectCandyGridCells, (cells) => 
 	}
 	return items as readonly CandyEntity[];
 });
-
-

@@ -408,3 +408,50 @@ export function uncollideAndDestroy(part: Part, delay: number) {
 	part.Parent = Workspace;
 	Debris.AddItem(part, delay);
 }
+
+export function positionWallAtGround({
+	part,
+	cylinder,
+	center,
+	rotation,
+	startPosition,
+}: {
+	part: Part;
+	cylinder: Part;
+	center: Vector3;
+	rotation: CFrame;
+	startPosition: Vector3;
+}) {
+	const groundPartCFrame = new CFrame(new Vector3(center.X, 0, center.Z)).mul(rotation);
+	part.CFrame = groundPartCFrame;
+	const groundCylinderCFrame = new CFrame(new Vector3(startPosition.X, 0, startPosition.Z)).mul(
+		CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90)),
+	);
+	cylinder.CFrame = groundCylinderCFrame;
+}
+
+export function tweenWallToTarget({
+	part,
+	cylinder,
+	targetPartCFrame,
+	targetCylinderCFrame,
+	duration = 0.8,
+}: {
+	part: Part;
+	cylinder: Part;
+	targetPartCFrame: CFrame;
+	targetCylinderCFrame: CFrame;
+	duration?: number;
+}) {
+	const info = new TweenInfo(duration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out);
+	const partTween = TweenService.Create(part, info, { CFrame: targetPartCFrame });
+	const cylinderTween = TweenService.Create(cylinder, info, { CFrame: targetCylinderCFrame });
+
+	partTween.Play();
+	cylinderTween.Play();
+
+	return () => {
+		partTween.Cancel();
+		cylinderTween.Cancel();
+	};
+}

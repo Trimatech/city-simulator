@@ -28,3 +28,15 @@ const following = { ... }
 - Prefer descriptive alternatives like `nextState`, `following`, `result`, `updated`, etc.
 - When in doubt, rename away from `next` to avoid roblox-ts compile failures.
 
+## Reserved identifiers reference (only those allowed in TypeScript)
+
+The following identifiers are valid in TypeScript but will break in roblox-ts/Luau. Avoid using them as variable, parameter, function, or import names.
+
+### Luau keywords not reserved by TypeScript
+
+`and`, `elseif`, `end`, `local`, `nil`, `not`, `or`, `repeat`, `then`, `until`
+
+### roblox-ts compiler-reserved identifiers
+
+- `next` — used internally; do not use as variable/parameter/function/import name
+

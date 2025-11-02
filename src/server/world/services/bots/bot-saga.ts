@@ -14,7 +14,7 @@ import { setSoldierSpeed } from "../soldiers/soldiers.utils";
 import { botStopped } from "./bot-events";
 import { buildBotMovementPath } from "./buildBotMovementPath";
 
-const MAX_BOTS = 0;
+const MAX_BOTS = 20;
 
 interface BotController {
 	readonly id: string;

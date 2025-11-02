@@ -28,6 +28,7 @@ function TracerLastWallComponent({ soldierId }: Props) {
 			startPoint={settledLastTracerPoint}
 			endPoint={characterPosition}
 			skinId={skin}
+			kind={"tracer"}
 			height={TRACER_PIECE_HEIGHT}
 		/>
 	);

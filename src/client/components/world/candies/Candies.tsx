@@ -4,7 +4,7 @@ import { useGridPosition } from "client/hooks/use-grid-position";
 import { selectCandyGridResolution } from "shared/store/candy-grid/candy-grid-selectors";
 import { getCellKeyFromCoord } from "shared/utils/cell-key";
 
-import { CellCandies } from "./CellCandies";
+import { DelayedCellCandies } from "./DelayedCellCandies";
 
 const VISIBLE_RADIUS_STUDS = 300;
 
@@ -31,7 +31,7 @@ function CandiesComponent() {
 		const cy = gridPosition.Y + offset.Y;
 		const cellKey = getCellKeyFromCoord(new Vector2(cx, cy));
 
-		return <CellCandies key={cellKey} cellKey={cellKey} />;
+		return <DelayedCellCandies key={cellKey} cellKey={cellKey} />;
 	});
 }
 

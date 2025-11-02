@@ -1,6 +1,7 @@
-import React, { memo } from "@rbxts/react";
+import React, { memo, useMemo } from "@rbxts/react";
 import { useSelectorCreator } from "@rbxts/react-reflex";
 import { selectCandiesInCell } from "shared/store/candy-grid/candy-grid-selectors";
+import { CandyEntity } from "shared/store/candy-grid/candy-types";
 
 import { Candy } from "./Candy";
 
@@ -9,11 +10,28 @@ interface CellCandiesProps {
 }
 
 function CellCandiesComponent({ cellKey }: CellCandiesProps) {
-	const items = useSelectorCreator(selectCandiesInCell, cellKey);
+	const cell = useSelectorCreator(selectCandiesInCell, cellKey);
 
-	print("items....", cellKey, items);
+	const items = useMemo(() => {
+		if (!cell) return undefined;
+
+		const nextP = new Array<CandyEntity>();
+
+		for (const [, candy] of pairs(cell)) {
+			if (!candy) continue;
+			nextP.push(candy);
+		}
+		return nextP;
+	}, [cell]);
+
+	if (!cell) {
+		//print(`no cell found for cellKey ${cellKey}`);
+		return undefined;
+	}
 
 	if (!items || items.size() === 0) return undefined;
+
+	print("candies in cell....", cellKey, items);
 
 	return (
 		<>

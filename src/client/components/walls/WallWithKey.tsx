@@ -27,6 +27,7 @@ function WallWithKeyComponent({ cellKey, edgeId }: { cellKey: string; edgeId: st
 			startPoint={edge.a}
 			endPoint={edge.b}
 			height={edge.kind === "tracer" ? TRACER_PIECE_HEIGHT : WALL_HEIGHT}
+			kind={edge.kind}
 			skinId={skinId}
 			outline={shieldActive}
 		/>
