@@ -317,8 +317,6 @@ export function createCarpetBombExplosion(center: Vector2, length: number, width
 	return effects;
 }
 
-const VISUAL_HEIGHT = 5;
-
 function createRectangleBasePart(name: string, size: Vector3, cframe: CFrame): Part {
 	const explosion = new Instance("Part");
 	explosion.Name = name;
