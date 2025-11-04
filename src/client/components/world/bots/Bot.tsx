@@ -4,13 +4,7 @@ import { RunService, TweenService } from "@rbxts/services";
 import { WORLD_TICK } from "shared/constants/core";
 import { selectSoldierPosition } from "shared/store/soldiers";
 
-import {
-	computeDesiredLookDirection,
-	getCharacterHalfSize,
-	initializeBotModel,
-	sampleGroundYAt,
-	setRunState,
-} from "./Bot.utils";
+import { computeDesiredLookDirection, getCharacterHalfSize, initializeBotModel, sampleGroundYAt } from "./Bot.utils";
 
 interface BotProps {
 	readonly id: string;
@@ -30,8 +24,6 @@ export function Bot({ id }: BotProps) {
 			const model = await initializeBotModel(id);
 			halfSize.current = getCharacterHalfSize(model);
 			modelRef.current = model;
-
-			setRunState(model, true);
 		})();
 
 		return () => {
@@ -40,20 +32,9 @@ export function Bot({ id }: BotProps) {
 		};
 	}, []);
 
-	// Recompute ground offset at 1Hz and apply Y adjustment even if position is unchanged
+	// Keep for future use if we want periodic rebasing; currently we recompute per position update
 	useEffect(() => {
-		let acc = 0;
-		const conn = RunService.Heartbeat.Connect((dt) => {
-			acc += dt;
-			if (acc < 1) return;
-			acc = 0;
-
-			if (!modelRef.current) return;
-
-			if (!lastPosRef.current) return;
-
-			groundYOffset.current = sampleGroundYAt(lastPosRef.current);
-		});
+		const conn = RunService.Heartbeat.Connect(() => {});
 		return () => conn.Disconnect();
 	}, []);
 
@@ -63,14 +44,14 @@ export function Bot({ id }: BotProps) {
 		const model = modelRef.current;
 		if (!model) return;
 
-		const playTween = (target: Vector3, duration: number) => {
+		const playTween = (targetCf: CFrame, duration: number) => {
 			const part = model.PrimaryPart;
 			if (!part) {
 				warn("No primary part found");
 				return;
 			}
 
-			if (part.Position.sub(target).Magnitude <= 1e-4) {
+			if (part.CFrame.Position.sub(targetCf.Position).Magnitude <= 1e-4) {
 				warn("Position is already at target");
 				return;
 			}
@@ -79,7 +60,7 @@ export function Bot({ id }: BotProps) {
 			const tween = TweenService.Create(
 				part,
 				new TweenInfo(duration, Enum.EasingStyle.Linear, Enum.EasingDirection.In),
-				{ Position: target },
+				{ CFrame: targetCf },
 			);
 
 			tweenRef.current = tween;
@@ -92,16 +73,18 @@ export function Bot({ id }: BotProps) {
 			tween.Play();
 		};
 
-		const target = new Vector3(position.X, groundYOffset.current + halfSize.current, position.Y);
+		// Ground-lock Y at the current 2D position
+		const groundY = sampleGroundYAt(position);
+		groundYOffset.current = groundY;
+		const targetPos = new Vector3(position.X, groundY + halfSize.current, position.Y);
 
-		print(`target=${target}`);
 		const delta = position.sub(lastPosRef.current);
 
 		const dir = computeDesiredLookDirection(lastLookDirRef.current, delta);
 		lastLookDirRef.current = dir;
-		//	const currentPos = model.GetPivot().Position;
-		//	model.PivotTo(CFrame.lookAt(currentPos, currentPos.add(dir), new Vector3(0, 1, 0)));
-		playTween(target, WORLD_TICK * 0.95);
+		// Build a target CFrame that faces the movement direction while keeping Y fixed
+		const targetCf = CFrame.lookAt(targetPos, targetPos.add(dir), new Vector3(0, 1, 0));
+		playTween(targetCf, WORLD_TICK * 0.95);
 
 		lastPosRef.current = position;
 	}, [position]);

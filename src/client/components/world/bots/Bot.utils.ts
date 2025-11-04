@@ -112,7 +112,7 @@ export interface BotRuntime {
 
 // Tweening is now owned by the Bot component; no tween state is kept here.
 
-export function ensureRunAnimation(model: Model) {
+export function setRunningAnimation(model: Model) {
 	const humanoid = model.FindFirstChildOfClass("Humanoid");
 	if (!humanoid) return;
 	let animator = humanoid.FindFirstChildOfClass("Animator");
@@ -120,29 +120,19 @@ export function ensureRunAnimation(model: Model) {
 		animator = new Instance("Animator");
 		animator.Parent = humanoid;
 	}
-	let run = findRunAnimation(model);
-	if (!run) {
-		const idFromAnimate = findRunAnimationIdFromAnimate(model) ?? pickDefaultRunAnimationId(humanoid);
-		run = new Instance("Animation");
-		run.AnimationId = idFromAnimate;
-		run.Name = "RunAuto";
-		run.Parent = model;
-	}
+
+	const idFromAnimate = "rbxassetid://913376220";
+
+	const run = new Instance("Animation");
+	run.AnimationId = idFromAnimate;
+	run.Name = "RunningAnimationx";
+	run.Parent = model;
+
 	const track = animator.LoadAnimation(run);
 	track.Looped = true;
-	track.Priority = Enum.AnimationPriority.Movement;
-}
-
-export function setRunState(model: Model, isMoving: boolean) {
-	ensureRunAnimation(model);
-	const track = model.FindFirstChild("RunAuto") as AnimationTrack;
-	if (!track) return;
-	if (isMoving) {
-		if (!track.IsPlaying) track.Play(0.1);
-		track.AdjustSpeed(1);
-		return;
-	}
-	if (track.IsPlaying) track.Stop(0.1);
+	track.Priority = Enum.AnimationPriority.Core;
+	track.Play(0.1);
+	return track;
 }
 
 export async function initializeBotModel(id: string): Promise<Model> {
@@ -174,6 +164,15 @@ export async function initializeBotModel(id: string): Promise<Model> {
 	}
 	model.Parent = Workspace;
 
+	// Anchor primary part to fully remove physics/gravity influence; we manually tween CFrame
+	const primary = model.PrimaryPart;
+	if (primary) {
+		primary.Anchored = true;
+		primary.CanCollide = false;
+		primary.AssemblyLinearVelocity = new Vector3(0, 0, 0);
+		primary.AssemblyAngularVelocity = new Vector3(0, 0, 0);
+	}
+
 	const animateScript = model.FindFirstChild("Animate");
 	if (animateScript && (animateScript.IsA("LocalScript") || animateScript.IsA("Script"))) {
 		(animateScript as LocalScript | Script).Disabled = true;
@@ -185,7 +184,7 @@ export async function initializeBotModel(id: string): Promise<Model> {
 		humanoid.ChangeState(Enum.HumanoidStateType.RunningNoPhysics);
 	}
 
-	ensureRunAnimation(model);
+	setRunningAnimation(model);
 
 	return model;
 }
