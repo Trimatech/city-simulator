@@ -1,7 +1,7 @@
 import { images } from "shared/assets";
 import { darken } from "shared/utils/color-utils";
 
-import { accentList, accents, palette } from "../palette";
+import { accentList, palette } from "../palette";
 import { defaultSoldierSkin, SoldierSkin } from "./types";
 import { blendColorSequence, duplicate } from "./utils";
 
@@ -9,7 +9,7 @@ const catppuccinSoldierSkins: readonly SoldierSkin[] = accentList.map((id) => {
 	return {
 		...defaultSoldierSkin,
 		id,
-		tint: blendColorSequence([accents[id], accents[id].Lerp(palette.black, 0.1)], 12),
+		tint: blendColorSequence([palette[id], palette[id].Lerp(palette.black, 0.1)], 12),
 	};
 });
 

@@ -66,6 +66,7 @@ async function spawnBot(botId: string) {
 
 	// create soldier entity in store
 	const randomSkinId = getRandomBaseSoldierSkin().id;
+	print(`Bot ${botId} using skin ${randomSkinId}`);
 	store.addSoldier(botId, {
 		name: `Bot ${botId}`,
 		position: spawnPoint,
