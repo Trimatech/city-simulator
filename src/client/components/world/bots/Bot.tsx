@@ -34,7 +34,19 @@ export function Bot({ id }: BotProps) {
 
 	// Keep for future use if we want periodic rebasing; currently we recompute per position update
 	useEffect(() => {
-		const conn = RunService.Heartbeat.Connect(() => {});
+		let acc = 0;
+		const conn = RunService.Heartbeat.Connect((dt) => {
+			acc += dt;
+			if (acc < 1) return;
+			acc = 0;
+
+			if (!modelRef.current) return;
+
+			if (!lastPosRef.current) return;
+
+			groundYOffset.current = sampleGroundYAt(lastPosRef.current);
+		});
+
 		return () => conn.Disconnect();
 	}, []);
 
@@ -73,10 +85,8 @@ export function Bot({ id }: BotProps) {
 			tween.Play();
 		};
 
-		// Ground-lock Y at the current 2D position
-		const groundY = sampleGroundYAt(position);
-		groundYOffset.current = groundY;
-		const targetPos = new Vector3(position.X, groundY + halfSize.current, position.Y);
+
+		const targetPos = new Vector3(position.X, groundYOffset.current + halfSize.current, position.Y);
 
 		const delta = position.sub(lastPosRef.current);
 

@@ -23,52 +23,17 @@ export function sampleGroundYAt(position: Vector2): number {
 }
 
 export function getCharacterHalfSize(character: Model): number {
-	// Preferred: compute current pivot-to-bottom distance using world-aligned bounding box.
-	// This places the model so its lowest point sits on the ground regardless of rig or HRP size.
-	const [boundsCFrame, boundsSize] = character.GetBoundingBox();
-	if (boundsSize.Y > 0) {
-		const pivotY = character.GetPivot().Position.Y;
-		const bottomY = boundsCFrame.Position.Y - boundsSize.Y * 0.5;
-		const offset = pivotY - bottomY;
-		if (offset > 0 && offset < 1000) return offset;
-	}
-
-	// Fallbacks if bounding box is unavailable/degenerate
 	const humanoid = character.FindFirstChildOfClass("Humanoid");
 	const hrp = character.FindFirstChild("HumanoidRootPart");
-	if (humanoid && hrp && hrp.IsA("BasePart")) return humanoid.HipHeight;
-	if (hrp && hrp.IsA("BasePart")) return hrp.Size.Y * 0.5;
+	if (humanoid && hrp && hrp.IsA("BasePart")) {
+		return humanoid.HipHeight;
+	}
+	if (hrp && hrp.IsA("BasePart")) {
+		warn("No humanoid found, using HRP size");
+		return hrp.Size.Y * 0.5;
+	}
+	warn("No humanoid or HRP found, using default size");
 	return 2;
-}
-
-function findRunAnimation(character: Model): Animation | undefined {
-	let candidate: Animation | undefined;
-	character.GetDescendants().forEach((inst) => {
-		if (inst.IsA("Animation")) {
-			const name = string.lower(inst.Name);
-			if (string.find(name, "run")[0] !== undefined) candidate = inst;
-		}
-	});
-	return candidate;
-}
-
-function findRunAnimationIdFromAnimate(character: Model): string | undefined {
-	let found: string | undefined = undefined;
-	character.GetDescendants().forEach((inst) => {
-		if (found !== undefined) return;
-		if (inst.IsA("StringValue")) {
-			const nameLower = string.lower(inst.Name);
-			if (string.find(nameLower, "run")[0] !== undefined) {
-				const value = (inst as StringValue).Value;
-				if (string.find(string.lower(value), "rbxassetid")[0] !== undefined) found = value;
-			}
-		}
-	});
-	return found;
-}
-
-function pickDefaultRunAnimationId(humanoid: Humanoid): string {
-	return humanoid.RigType === Enum.HumanoidRigType.R15 ? DEFAULT_RUN_R15 : DEFAULT_RUN_R6;
 }
 
 function chooseRandomPlayer(): Player | undefined {
