@@ -1,7 +1,7 @@
 import { setTimeout } from "@rbxts/set-timeout";
 import { store } from "server/store";
 import { CANDY_LIMITS } from "server/world/constants";
-import { getRandomPointNearWorldOrigin, getSoldier } from "server/world/world.utils";
+import { getRandomPointInWorld, getSoldier } from "server/world/world.utils";
 import { getRandomAccent } from "shared/constants/palette";
 import {
 	selectCandyGridCells,
@@ -34,7 +34,7 @@ export function createCandy(patch?: Partial<CandyEntity>): CandyEntity {
 		id: `${nextCandyId++}`,
 		type: CandyType.Default,
 		size: math.min(random.NextInteger(1, 4), random.NextInteger(1, 5)),
-		position: getRandomPointNearWorldOrigin(0.98),
+		position: getRandomPointInWorld(0.98),
 		color: getRandomAccent(),
 		...patch,
 	};
