@@ -1,5 +1,4 @@
-import { CollectionService, Players, TweenService, Workspace } from "@rbxts/services";
-import { WORLD_TICK } from "shared/constants/core";
+import { CollectionService, Players, Workspace } from "@rbxts/services";
 import { findSharedInstanceByPath } from "shared/SharedModelManager";
 
 const GROUND_TAG = "ground";
@@ -10,34 +9,35 @@ const DEFAULT_RUN_R15 = "rbxassetid://507767714";
 export function sampleGroundYAt(position: Vector2): number {
 	const origin = new Vector3(position.X, 2048, position.Y);
 	const direction = new Vector3(0, -8192, 0);
+
 	const params = new RaycastParams();
 	params.FilterType = Enum.RaycastFilterType.Include;
 	params.IgnoreWater = true;
+
 	const taggedGround = CollectionService.GetTagged(GROUND_TAG);
 	const includeList = [Workspace.Terrain as Instance, ...taggedGround];
 	params.FilterDescendantsInstances = includeList;
+
 	const result = Workspace.Raycast(origin, direction, params);
 	return result ? result.Position.Y : 15;
 }
 
-export function computeStableGroundOffset(character: Model): number {
-	// Prefer humanoid-based calculation which is stable across animation:
-	// offset = HipHeight + (HRP height)/2
+export function getCharacterHalfSize(character: Model): number {
+	// Preferred: compute current pivot-to-bottom distance using world-aligned bounding box.
+	// This places the model so its lowest point sits on the ground regardless of rig or HRP size.
+	const [boundsCFrame, boundsSize] = character.GetBoundingBox();
+	if (boundsSize.Y > 0) {
+		const pivotY = character.GetPivot().Position.Y;
+		const bottomY = boundsCFrame.Position.Y - boundsSize.Y * 0.5;
+		const offset = pivotY - bottomY;
+		if (offset > 0 && offset < 1000) return offset;
+	}
+
+	// Fallbacks if bounding box is unavailable/degenerate
 	const humanoid = character.FindFirstChildOfClass("Humanoid");
 	const hrp = character.FindFirstChild("HumanoidRootPart");
-	if (humanoid && hrp && hrp.IsA("BasePart")) {
-		return humanoid.HipHeight + hrp.Size.Y * 0.5;
-	}
-
-	// Next, try half of a primary/base part height
-	if (hrp && hrp.IsA("BasePart")) {
-		return hrp.Size.Y * 0.5;
-	}
-
-	// Finally, fallback to half of bounding box height if available
-	const [, size] = character.GetBoundingBox();
-	if (size.Y > 0) return size.Y * 0.5;
-
+	if (humanoid && hrp && hrp.IsA("BasePart")) return humanoid.HipHeight;
+	if (hrp && hrp.IsA("BasePart")) return hrp.Size.Y * 0.5;
 	return 2;
 }
 
@@ -110,55 +110,32 @@ export interface BotRuntime {
 	groundOffset?: number;
 }
 
-export function tweenPosition(runtime: BotRuntime, target: Vector3, duration = WORLD_TICK) {
-	if (!runtime.posV) {
-		runtime.model.PivotTo(new CFrame(target));
-		return;
-	}
+// Tweening is now owned by the Bot component; no tween state is kept here.
 
-	const current = runtime.posV.Value;
-	if (current.sub(target).Magnitude <= 1e-4) return;
-
-	runtime.activeTween?.Cancel();
-	const tween = TweenService.Create(
-		runtime.posV,
-		new TweenInfo(duration, Enum.EasingStyle.Linear, Enum.EasingDirection.In),
-		{ Value: target },
-	);
-	runtime.activeTween = tween;
-	tween.Completed.Once(() => {
-		if (runtime.activeTween === tween) runtime.activeTween = undefined;
-	});
-	tween.Play();
-}
-
-export function ensureRun(runtime: BotRuntime) {
-	if (runtime.runTrack && runtime.animator) return;
-	const humanoid = runtime.model.FindFirstChildOfClass("Humanoid");
+export function ensureRunAnimation(model: Model) {
+	const humanoid = model.FindFirstChildOfClass("Humanoid");
 	if (!humanoid) return;
 	let animator = humanoid.FindFirstChildOfClass("Animator");
 	if (!animator) {
 		animator = new Instance("Animator");
 		animator.Parent = humanoid;
 	}
-	let run = findRunAnimation(runtime.model);
+	let run = findRunAnimation(model);
 	if (!run) {
-		const idFromAnimate = findRunAnimationIdFromAnimate(runtime.model) ?? pickDefaultRunAnimationId(humanoid);
+		const idFromAnimate = findRunAnimationIdFromAnimate(model) ?? pickDefaultRunAnimationId(humanoid);
 		run = new Instance("Animation");
 		run.AnimationId = idFromAnimate;
 		run.Name = "RunAuto";
-		run.Parent = runtime.model;
+		run.Parent = model;
 	}
 	const track = animator.LoadAnimation(run);
 	track.Looped = true;
 	track.Priority = Enum.AnimationPriority.Movement;
-	runtime.runTrack = track;
-	runtime.animator = animator;
 }
 
-export function setRunState(runtime: BotRuntime, isMoving: boolean) {
-	ensureRun(runtime);
-	const track = runtime.runTrack;
+export function setRunState(model: Model, isMoving: boolean) {
+	ensureRunAnimation(model);
+	const track = model.FindFirstChild("RunAuto") as AnimationTrack;
 	if (!track) return;
 	if (isMoving) {
 		if (!track.IsPlaying) track.Play(0.1);
@@ -168,7 +145,7 @@ export function setRunState(runtime: BotRuntime, isMoving: boolean) {
 	if (track.IsPlaying) track.Stop(0.1);
 }
 
-export async function initializeBotRuntime(id: string, initial2D: Vector2): Promise<BotRuntime> {
+export async function initializeBotModel(id: string): Promise<Model> {
 	let source: Model | undefined;
 	const existing = Workspace.FindFirstChild(id);
 	if (existing && existing.IsA("Model")) {
@@ -189,8 +166,9 @@ export async function initializeBotRuntime(id: string, initial2D: Vector2): Prom
 		}
 	});
 	const hrp = model.FindFirstChild("HumanoidRootPart") as BasePart;
-	if (hrp) model.PrimaryPart = hrp;
-	else {
+	if (hrp) {
+		model.PrimaryPart = hrp;
+	} else {
 		const first = model.FindFirstChildWhichIsA("BasePart");
 		if (first) model.PrimaryPart = first;
 	}
@@ -207,24 +185,9 @@ export async function initializeBotRuntime(id: string, initial2D: Vector2): Prom
 		humanoid.ChangeState(Enum.HumanoidStateType.RunningNoPhysics);
 	}
 
-	const groundY = sampleGroundYAt(initial2D);
-	const offset = computeStableGroundOffset(model);
-	const start = new Vector3(initial2D.X, groundY + offset, initial2D.Y);
-	model.PivotTo(new CFrame(start));
+	ensureRunAnimation(model);
 
-	const runtime: BotRuntime = { model, lastLookDir: new Vector3(0, 0, 1), groundOffset: offset };
-	const posV = new Instance("Vector3Value");
-	posV.Value = start;
-	posV.Changed.Connect((newPos) => {
-		const pos = newPos as Vector3;
-		const dir = runtime.lastLookDir ?? new Vector3(0, 0, 1);
-		runtime.model.PivotTo(CFrame.lookAt(pos, pos.add(dir), new Vector3(0, 1, 0)));
-	});
-	runtime.posV = posV;
-
-	ensureRun(runtime);
-
-	return runtime;
+	return model;
 }
 
 export function cleanupBotRuntime(runtime: BotRuntime) {
@@ -233,48 +196,10 @@ export function cleanupBotRuntime(runtime: BotRuntime) {
 	runtime.model.Destroy();
 }
 
-function computeDesiredLookDirection(prev: Vector3 | undefined, delta2D: Vector2): Vector3 {
+export function computeDesiredLookDirection(prev: Vector3 | undefined, delta2D: Vector2): Vector3 {
 	if (delta2D.Magnitude <= 1e-6) return prev ?? new Vector3(0, 0, 1);
 	const desired = new Vector3(delta2D.X, 0, delta2D.Y).Unit;
 	const base = prev ?? new Vector3(0, 0, 1);
 	const smoothed = base.Lerp(desired, 0.6);
 	return smoothed.Magnitude > 1e-3 ? smoothed.Unit : base;
-}
-
-export function updateBotRuntimeForPosition(
-	runtime: BotRuntime,
-	position: Vector2,
-	lastPosition: Vector2,
-	moveEpsilon = 0.15,
-	targetEpsilon = 0.05,
-) {
-	const groundY = sampleGroundYAt(position);
-	const offsetStable = runtime.groundOffset ?? computeStableGroundOffset(runtime.model);
-	if (runtime.groundOffset === undefined) runtime.groundOffset = offsetStable;
-	const target = new Vector3(position.X, groundY + offsetStable, position.Y);
-
-	const delta = position.sub(lastPosition);
-	const isMoving = delta.Magnitude > moveEpsilon;
-
-	if (isMoving) {
-		const dir = computeDesiredLookDirection(runtime.lastLookDir, delta);
-		runtime.lastLookDir = dir;
-		const currentPos = runtime.posV?.Value ?? runtime.model.GetPivot().Position;
-		runtime.model.PivotTo(CFrame.lookAt(currentPos, currentPos.add(dir), new Vector3(0, 1, 0)));
-		tweenPosition(runtime, target, WORLD_TICK * 0.95);
-		setRunState(runtime, true);
-		return;
-	}
-
-	const holdDir = runtime.lastLookDir ?? new Vector3(0, 0, 1);
-	const curPos = runtime.posV?.Value ?? runtime.model.GetPivot().Position;
-	runtime.model.PivotTo(CFrame.lookAt(curPos, curPos.add(holdDir), new Vector3(0, 1, 0)));
-	if (curPos.sub(target).Magnitude > targetEpsilon) {
-		tweenPosition(runtime, target, WORLD_TICK * 0.95);
-	} else {
-		runtime.activeTween?.Cancel();
-		if (runtime.posV) runtime.posV.Value = target;
-		else runtime.model.PivotTo(new CFrame(target));
-	}
-	setRunState(runtime, false);
 }
