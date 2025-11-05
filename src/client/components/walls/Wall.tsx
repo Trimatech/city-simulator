@@ -57,7 +57,7 @@ interface Props {
 	thickness?: number;
 	isCrumbling?: boolean;
 	skinId?: string;
-	kind: "tracer" | "area";
+	kind: "tracer" | "area" | "area2";
 	outline?: boolean;
 	crumbleDelaySeconds?: number;
 }

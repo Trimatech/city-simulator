@@ -20,13 +20,15 @@ function WallWithKeyComponent({ cellKey, edgeId }: { cellKey: string; edgeId: st
 	// 	print(`mounting wall with key ${edge.kind} ${cellKey}:${edgeId}`);
 	// }, []);
 
+	const height = edge.kind === "tracer" ? TRACER_PIECE_HEIGHT : edge.kind === "area2" ? WALL_HEIGHT + 1 : WALL_HEIGHT;
+	const folderName = edge.kind === "tracer" ? "tracer" : "outerWall";
 	return (
 		<Wall
 			key={edgeId}
-			folderName={edge.kind === "tracer" ? "tracer" : "outerWall"}
+			folderName={folderName}
 			startPoint={edge.a}
 			endPoint={edge.b}
-			height={edge.kind === "tracer" ? TRACER_PIECE_HEIGHT : WALL_HEIGHT}
+			height={height}
 			kind={edge.kind}
 			skinId={skinId}
 			outline={shieldActive}

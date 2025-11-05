@@ -2,7 +2,7 @@ export interface GridLine {
 	readonly a: Vector2;
 	readonly b: Vector2;
 	readonly ownerId: string;
-	readonly kind: "tracer" | "area";
+	readonly kind: "tracer" | "area" | "area2";
 }
 
 export interface GridCellsByEdgeId {

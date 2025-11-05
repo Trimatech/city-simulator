@@ -1,5 +1,7 @@
 import { store } from "server/store";
+import { createParallelPolygon } from "shared/polygon.utils";
 import { selectGridCells, selectGridResolution } from "shared/store/grid/grid-selectors";
+import type { GridLine } from "shared/store/grid/grid-types";
 import { selectSoldiersById } from "shared/store/soldiers";
 import { filterTracersForCell } from "shared/utils/geometry-utils";
 import { Grid } from "shared/utils/grid";
@@ -96,16 +98,46 @@ export function updateAreaGridForPolygon({
 	}
 	const state = store.getState();
 	const resolution = selectGridResolution({ grid: state.grid });
-	const areaLinesByCell = buildAreaLinesByCell(polygon, resolution);
+
+	// Build outer area lines (original polygon)
+	const areaLinesByCell = buildAreaLinesByCell(polygon, resolution, "area");
+
+	// Build inner area2 lines (1 stud smaller) if polygon is valid
+	let area2LinesByCell = new Map<string, Map<string, GridLine>>();
+	if (polygon.size() >= 3) {
+		const inner = createParallelPolygon(polygon, 1);
+		if (inner.size() >= 3) {
+			area2LinesByCell = buildAreaLinesByCell(inner, resolution, "area2");
+		}
+	}
+
+	// Merge area and area2 lines per cell
+	const combinedLinesByCell = new Map<string, Map<string, GridLine>>();
+	areaLinesByCell.forEach((map, key) => {
+		const clone = new Map<string, GridLine>();
+		map.forEach((v, k) => clone.set(k, v));
+		combinedLinesByCell.set(key, clone);
+	});
+	area2LinesByCell.forEach((map, key) => {
+		let target = combinedLinesByCell.get(key);
+		if (!target) {
+			target = new Map();
+			combinedLinesByCell.set(key, target);
+		}
+		map.forEach((v, k) => target!.set(k, v));
+	});
 	const currentCells = selectGridCells({ grid: state.grid });
-	const affectedCells = computeAffectedCells(currentCells, areaLinesByCell, ownerId);
+	const affectedCells = computeAffectedCells(currentCells, combinedLinesByCell, ownerId);
 
 	affectedCells.forEach((cellKey) => {
 		const existing = currentCells[cellKey];
-		const newLines = areaLinesByCell.get(cellKey);
-		const base = dropTracers
+		const newLines = combinedLinesByCell.get(cellKey);
+		let base = dropTracers
 			? buildMergedCellContentReplaceKind(existing, undefined, ownerId, "tracer")
 			: (existing as typeof existing);
+		// Ensure previous area2 lines by this owner are also removed before adding new ones
+		base = buildMergedCellContentReplaceKind(base, undefined, ownerId, "area");
+		base = buildMergedCellContentReplaceKind(base, undefined, ownerId, "area2");
 		const merged = buildMergedCellContent(base, newLines, ownerId);
 		if (!shallowEqualCell(existing, merged)) {
 			store.setCellLines(cellKey, merged);
@@ -120,10 +152,11 @@ export function clearOwnerFromGrid(ownerId: string) {
 
 	for (const [cellKey, existing] of pairs(currentCells)) {
 		if (!existing) continue;
-		// Remove area lines by owner
-		const noArea = buildMergedCellContentReplaceKind(existing, undefined, ownerId, "area");
+		// Remove area and area2 lines by owner
+		let cleaned = buildMergedCellContentReplaceKind(existing, undefined, ownerId, "area");
+		cleaned = buildMergedCellContentReplaceKind(cleaned, undefined, ownerId, "area2");
 		// Then remove tracer lines by owner
-		const noOwner = buildMergedCellContentReplaceKind(noArea, undefined, ownerId, "tracer");
+		const noOwner = buildMergedCellContentReplaceKind(cleaned, undefined, ownerId, "tracer");
 		if (!shallowEqualCell(existing, noOwner)) {
 			store.setCellLines(cellKey as string, noOwner);
 		}

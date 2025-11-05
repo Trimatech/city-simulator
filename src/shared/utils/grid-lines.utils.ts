@@ -45,9 +45,9 @@ export function shallowEqualCell(a?: GridCellsByEdgeId, b?: GridCellsByEdgeId) {
 	return matchCount === countA;
 }
 
-export function buildAreaLinesByCell(points: Vector2[], resolution: number) {
+export function buildAreaLinesByCell(points: Vector2[], resolution: number, kind: "area" | "area2" = "area") {
 	const areaLinesByCell = new Map<string, Map<string, GridLine>>();
-    const quantQ = getQuantizationStep(resolution);
+	const quantQ = getQuantizationStep(resolution);
 
 	for (let i = 0; i < points.size(); i++) {
 		const a = points[i];
@@ -71,11 +71,11 @@ export function buildAreaLinesByCell(points: Vector2[], resolution: number) {
 					cell = new Map<string, GridLine>();
 					areaLinesByCell.set(key, cell);
 				}
-                const qa = quantizeVector2(a, quantQ);
-                const qb = quantizeVector2(b, quantQ);
-                const edgeId = getEdgeId({ a: qa, b: qb });
-                // Store original geometry; use quantized only for stable ids
-                cell.set(edgeId, { a, b, ownerId: "", kind: "area" });
+				const qa = quantizeVector2(a, quantQ);
+				const qb = quantizeVector2(b, quantQ);
+				const edgeId = getEdgeId({ a: qa, b: qb });
+				// Store original geometry; use quantized only for stable ids
+				cell.set(edgeId, { a, b, ownerId: "", kind });
 			}
 		}
 	}
@@ -83,9 +83,14 @@ export function buildAreaLinesByCell(points: Vector2[], resolution: number) {
 	return areaLinesByCell;
 }
 
-function buildSegmentLinesByCell(segments: Vector2[], resolution: number, kind: "tracer" | "area", ownerId: string) {
+function buildSegmentLinesByCell(
+	segments: Vector2[],
+	resolution: number,
+	kind: "tracer" | "area" | "area2",
+	ownerId: string,
+) {
 	const byCell = new Map<string, Map<string, GridLine>>();
-    const quantQ = getQuantizationStep(resolution);
+	const quantQ = getQuantizationStep(resolution);
 
 	for (let i = 0; i < segments.size() - 1; i++) {
 		const a = segments[i];
@@ -109,11 +114,11 @@ function buildSegmentLinesByCell(segments: Vector2[], resolution: number, kind: 
 					cell = new Map<string, GridLine>();
 					byCell.set(key, cell);
 				}
-                const qa = quantizeVector2(a, quantQ);
-                const qb = quantizeVector2(b, quantQ);
-                const edgeId = getEdgeId({ a: qa, b: qb });
-                // Store original geometry; use quantized only for stable ids
-                cell.set(edgeId, { a, b, ownerId, kind });
+				const qa = quantizeVector2(a, quantQ);
+				const qb = quantizeVector2(b, quantQ);
+				const edgeId = getEdgeId({ a: qa, b: qb });
+				// Store original geometry; use quantized only for stable ids
+				cell.set(edgeId, { a, b, ownerId, kind });
 			}
 		}
 	}
@@ -135,7 +140,7 @@ export function computeAffectedCells(
 	for (const [cellKey, existing] of pairs(currentCells)) {
 		if (!existing) continue;
 		for (const [, line] of pairs(existing)) {
-			if (line && line.kind === "area" && line.ownerId === ownerId) {
+			if (line && (line.kind === "area" || line.kind === "area2") && line.ownerId === ownerId) {
 				affected.add(cellKey as string);
 				break;
 			}
@@ -148,7 +153,7 @@ export function computeAffectedCellsForKind(
 	currentCells: { readonly [cellKey: string]: GridCellsByEdgeId | undefined },
 	linesByCell: Map<string, Map<string, GridLine>>,
 	ownerId: string,
-	kind: "tracer" | "area",
+	kind: "tracer" | "area" | "area2",
 ) {
 	const affected = new Set<string>();
 	linesByCell.forEach((_, key) => affected.add(key));
@@ -179,8 +184,11 @@ export function buildMergedCellContent(
 	if (existing) {
 		for (const [eid, line] of pairs(existing)) {
 			if (!line) continue;
-			// Keep all tracer lines; keep area lines not owned by the current owner
-			if (line.kind === "tracer" || (line.kind === "area" && line.ownerId !== ownerId)) {
+			// Keep all tracer lines; keep area/area2 lines not owned by the current owner
+			if (
+				line.kind === "tracer" ||
+				((line.kind === "area" || line.kind === "area2") && line.ownerId !== ownerId)
+			) {
 				merged[eid as string] = line;
 			}
 			// Drop legacy non-compound area entries for this owner to avoid duplicates
@@ -199,7 +207,7 @@ export function buildMergedCellContentReplaceKind(
 	existing: GridCellsByEdgeId | undefined,
 	newLines: Map<string, GridLine> | undefined,
 	ownerId: string,
-	kindToReplace: "tracer" | "area",
+	kindToReplace: "tracer" | "area" | "area2",
 ): GridCellsByEdgeId {
 	const merged: Record<string, GridLine> = {};
 	if (existing) {
@@ -223,7 +231,7 @@ export function buildMergedCellContentUnionKind(
 	existing: GridCellsByEdgeId | undefined,
 	newLines: Map<string, GridLine> | undefined,
 	ownerId: string,
-	kind: "tracer" | "area",
+	_kind: "tracer" | "area" | "area2",
 ): GridCellsByEdgeId {
 	const merged: Record<string, GridLine> = {};
 	if (existing) {
