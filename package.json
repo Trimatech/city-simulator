@@ -4,6 +4,7 @@
 	"scripts": {
 		"dev": "concurrently \"pnpm watch\" \"pnpm serve\"",
 		"lint": "eslint src && prettier --check src",
+		"lint:fix": "eslint src --fix && prettier --write src",
 		"watch": "rbxtsc -w",
 		"tarmac": "tarmac sync --target roblox",
 		"serve": "rojo serve",

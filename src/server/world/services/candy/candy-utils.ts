@@ -1,7 +1,7 @@
 import { setTimeout } from "@rbxts/set-timeout";
 import { store } from "server/store";
 import { CANDY_LIMITS } from "server/world/constants";
-import { getRandomPointNearWorldOrigin, getSoldier } from "server/world/world.utils";
+import { getRandomPointInWorld, getSoldier } from "server/world/world.utils";
 import { getRandomAccent } from "shared/constants/palette";
 import {
 	selectCandyGridCells,
@@ -27,6 +27,8 @@ export const candyGrid = new Grid<{ id: string }>(5);
 
 let nextCandyId = 0;
 
+const TIMEOUT_DELAY = 2;
+
 export function createCandy(patch?: Partial<CandyEntity>): CandyEntity {
 	const random = new Random();
 
@@ -34,7 +36,7 @@ export function createCandy(patch?: Partial<CandyEntity>): CandyEntity {
 		id: `${nextCandyId++}`,
 		type: CandyType.Default,
 		size: math.min(random.NextInteger(1, 4), random.NextInteger(1, 5)),
-		position: getRandomPointNearWorldOrigin(0.98),
+		position: getRandomPointInWorld(0.98),
 		color: getRandomAccent(),
 		...patch,
 	};
@@ -106,7 +108,7 @@ export function removeCandy(id: string, eatenAt?: Vector2) {
 			cell[id] = undefined;
 		});
 		removeCandyLocal(id);
-	}, 2);
+	}, TIMEOUT_DELAY);
 }
 
 export function eatCandy(candyId: string, soldierId: string) {
@@ -162,25 +164,25 @@ export function eatCandies(candyPoints: GridPoint<{ id: string }>[], soldierId: 
 		const resolution = selectCandyGridResolution({ candyGrid: state.candyGrid });
 		const res = resolution > 0 ? resolution : candyGrid.resolution;
 
-		// Group removals by cell
-		const byCell: { [cellKey: string]: CandyEntity[] } = {};
+		// Group removals by cell (by id only to avoid stale entity lookups)
+		const byCell: { [cellKey: string]: string[] } = {};
 		for (const { id, position } of eatenPositions) {
 			const x = math.floor(position.X / res);
 			const y = math.floor(position.Y / res);
 			const key = `${x},${y}`;
-			(byCell[key] ||= new Array<CandyEntity>()).push(getCandyLocal(id)!);
+			(byCell[key] ||= new Array<string>()).push(id);
 		}
 
 		const currentCells = selectCandyGridCells({ candyGrid: state.candyGrid });
-		for (const [cellKey, toRemove] of pairs(byCell)) {
+		for (const [cellKey, ids] of pairs(byCell)) {
 			const current = { ...(currentCells[cellKey as string] ?? {}) } as { [id: string]: CandyEntity | undefined };
-			for (const e of toRemove as unknown as CandyEntity[]) {
-				current[e.id] = undefined;
-				removeCandyLocal(e.id);
+			for (const candyId of ids as unknown as string[]) {
+				current[candyId] = undefined;
+				removeCandyLocal(candyId);
 			}
 			store.setCandyCell(cellKey as string, current);
 		}
-	}, 5);
+	}, TIMEOUT_DELAY);
 }
 
 export function populateCandy(amount: number) {

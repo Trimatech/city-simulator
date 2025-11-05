@@ -9,9 +9,9 @@ import { store } from "client/store";
 import { USER_NAME } from "shared/constants/core";
 import { getRandomAccent } from "shared/constants/palette";
 import { getRandomBaseSoldierSkin } from "shared/constants/skins";
-import { CandyType, CandyEntity } from "shared/store/candy-grid/candy-types";
-import { CandyGridCell } from "shared/store/candy-grid/candy-grid-types";
 import { selectCandyGridResolution } from "shared/store/candy-grid/candy-grid-selectors";
+import { CandyGridCell } from "shared/store/candy-grid/candy-grid-types";
+import { CandyEntity, CandyType } from "shared/store/candy-grid/candy-types";
 import { fillArray } from "shared/utils/object-utils";
 
 import { useMockRemotes } from "../utils/use-mock-remotes";

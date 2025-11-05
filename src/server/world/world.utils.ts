@@ -10,9 +10,24 @@ import { selectAliveSoldiersById, selectSoldierById } from "shared/store/soldier
 
 import { getBotHumanoid } from "./services/bots/bot-registry";
 import { getCandy as getCandyLocal } from "./services/candy/candy-store";
-import { soldierGrid } from "./services/soldiers/soldier-grid";
 
-const MIN_SAFE_DISTANCE = 10;
+const MIN_SPAWN_SPACING = 35;
+const SAFE_SPAWN_ATTEMPTS = 40;
+
+const RANDOM_POINT_MARGIN = 0.8;
+
+function getNearestAliveSoldierDistance(point: Vector2): number {
+	const aliveById = store.getState(selectAliveSoldiersById);
+	let nearest = math.huge;
+	for (const [, soldier] of pairs(aliveById)) {
+		if ((soldier as { dead?: boolean }).dead) continue;
+		const pos = (soldier as { position?: Vector2 }).position;
+		if (!pos) continue;
+		const d = pos.sub(point).Magnitude;
+		if (d < nearest) nearest = d;
+	}
+	return nearest;
+}
 
 export function getSoldier(soldierId: string) {
 	return store.getState(selectSoldierById(soldierId));
@@ -126,55 +141,20 @@ export function getRandomPointInWorld(margin = 1) {
 }
 
 /**
- * Returns a random point in the world that is more likely to be
- * closer to the origin.
- */
-export function getRandomPointNearWorldOrigin(margin = 1, passes = 2) {
-	let currentPosition = new Vector2();
-	let currentDistance = math.huge;
-
-	for (const _ of $range(0, passes)) {
-		const position = getRandomPointInWorld(margin);
-		const distance = position.Magnitude;
-
-		if (distance < currentDistance) {
-			currentPosition = position;
-			currentDistance = distance;
-		}
-	}
-
-	return currentPosition;
-}
-
-/**
- * Returns a safe point in the world. This should be a point that is
- * not too close to any other soldier, but not the farthest point either.
+ * Returns a safe point in the world. Enforces a minimum spacing from existing
+ * alive soldiers using store-based positions to prevent initial clustering.
  */
 export function getSafePointInWorld() {
-	const spawns: { position: Vector2; safety: number }[] = [];
-
-	const scoreSafety = (spawn: Vector2) => {
-		const nearest = soldierGrid.nearest(spawn, MIN_SAFE_DISTANCE * 2);
-		const distance = nearest ? nearest.position.sub(spawn).Magnitude : math.huge;
-		return distance;
-	};
-
-	for (const _ of $range(0, 10)) {
-		const position = getRandomPointNearWorldOrigin(0.8);
-		const safety = scoreSafety(position);
-		spawns.push({ position, safety });
-	}
-
-	const sorted = spawns.sort((a, b) => a.safety < b.safety);
-
-	// Find the first safe spawn that is still close to another soldier
-	for (const spawn of sorted) {
-		if (spawn.safety > MIN_SAFE_DISTANCE) {
-			return spawn.position;
+	let best: { position: Vector2; safety: number } | undefined;
+	for (const _ of $range(1, SAFE_SPAWN_ATTEMPTS)) {
+		const position = getRandomPointInWorld(RANDOM_POINT_MARGIN);
+		const safety = getNearestAliveSoldierDistance(position);
+		if (!best || safety > best.safety) best = { position, safety };
+		if (safety >= MIN_SPAWN_SPACING) {
+			return position;
 		}
 	}
-
-	return sorted[sorted.size() - 1].position;
+	return best ? best.position : getRandomPointInWorld(RANDOM_POINT_MARGIN);
 }
 
 /**
@@ -235,12 +215,12 @@ export function getSafePointOutsideSoldierPolygons(maxTries = 25) {
 
 	// Fallback: sample near origin until outside polygons is found
 	for (const _ of $range(1, maxTries)) {
-		const candidate = getRandomPointNearWorldOrigin(0.8);
+		const candidate = getRandomPointInWorld(RANDOM_POINT_MARGIN);
 		if (!isInsideAnySoldierPolygon(candidate) && !intersectsAnySoldierPolygon(candidate)) {
 			return candidate;
 		}
 	}
 
 	// As a last resort, return any random point in world
-	return getRandomPointInWorld(0.8);
+	return getRandomPointInWorld(RANDOM_POINT_MARGIN);
 }

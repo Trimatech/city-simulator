@@ -3,7 +3,7 @@ import { useSelector } from "@rbxts/react-reflex";
 import { useDebouncedValue } from "client/hooks/use-debounced-value";
 import { useCharacterPositionRounded } from "client/hooks/useCharacterPositionRounded";
 import { TRACER_PIECE_HEIGHT } from "shared/constants/core";
-import { selectSoldierLastTracerPoint, selectSoldierSkin } from "shared/store/soldiers";
+import { selectSoldierLastTracerPoint, selectSoldierSkin, selectSoldierZIndex } from "shared/store/soldiers";
 
 import { Wall } from "./Wall";
 
@@ -15,6 +15,7 @@ function TracerLastWallComponent({ soldierId }: Props) {
 	const characterPosition = useCharacterPositionRounded();
 	const skin = useSelector(selectSoldierSkin(soldierId));
 	const lastTracerPoint = useSelector(selectSoldierLastTracerPoint(soldierId));
+	const zIndex = useSelector(selectSoldierZIndex(soldierId));
 
 	const settledLastTracerPoint = useDebouncedValue(lastTracerPoint, { wait: 0.01 });
 
@@ -30,6 +31,7 @@ function TracerLastWallComponent({ soldierId }: Props) {
 			skinId={skin}
 			kind={"tracer"}
 			height={TRACER_PIECE_HEIGHT}
+			zIndex={zIndex}
 		/>
 	);
 }

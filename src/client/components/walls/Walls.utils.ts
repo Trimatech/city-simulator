@@ -144,7 +144,7 @@ export function createWallPieces({
 
 const Y_OFFSET = -1;
 
-export function calculateWallTransform(line: [Vector2, Vector2], height: number) {
+export function calculateWallTransform(line: [Vector2, Vector2], height: number, yOffsetExtra = 0) {
 	const startP = line[0];
 	const endP = line[1];
 
@@ -157,10 +157,10 @@ export function calculateWallTransform(line: [Vector2, Vector2], height: number)
 
 	// Calculate center position at ground level, then move up by height/2
 	const groundCenter = startPoint.add(direction.mul(0.5));
-	const center = new Vector3(groundCenter.X, height / 2 + Y_OFFSET, groundCenter.Z);
+	const center = new Vector3(groundCenter.X, height / 2 + Y_OFFSET + yOffsetExtra, groundCenter.Z);
 
 	// Calculate start position for cylinder
-	const startPosition = new Vector3(startPoint.X, height / 2 + Y_OFFSET, startPoint.Z);
+	const startPosition = new Vector3(startPoint.X, height / 2 + Y_OFFSET + yOffsetExtra, startPoint.Z);
 
 	const rotation = CFrame.lookAt(new Vector3(), new Vector3(direction.X, 0, direction.Z)).mul(
 		CFrame.fromEulerAnglesXYZ(0, math.rad(90), 0),

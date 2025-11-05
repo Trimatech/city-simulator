@@ -2,7 +2,7 @@
 
 import { HttpService } from "@rbxts/services";
 import { getRandomAccent } from "shared/constants/palette";
-import { deserializeCandy, serializeCandy, CandyState } from "shared/serdes/handlers/serdes-candy";
+import { CandyState, deserializeCandy, serializeCandy } from "shared/serdes/handlers/serdes-candy";
 import { CandyEntity } from "shared/store/candy-grid/candy-types";
 
 export = () => {

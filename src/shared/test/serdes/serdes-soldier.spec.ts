@@ -30,6 +30,7 @@ export = () => {
 			shieldActive: math.random() > 0.5,
 			health: 100,
 			maxHealth: 100,
+			zIndex: 0,
 		};
 	}
 
