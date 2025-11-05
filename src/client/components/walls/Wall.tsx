@@ -60,6 +60,7 @@ interface Props {
 	kind: "tracer" | "area" | "area2";
 	outline?: boolean;
 	crumbleDelaySeconds?: number;
+	zIndex?: number;
 }
 
 function WallComponent({
@@ -74,6 +75,7 @@ function WallComponent({
 	skinId,
 	kind,
 	outline = false,
+	zIndex,
 }: Props) {
 	const mainPartRef = useRef<Part>();
 	const cylinderRef = useRef<Part>();
@@ -91,7 +93,12 @@ function WallComponent({
 
 		const folder = ensureFolder(folderName);
 
-		const { width, center, rotation, startPosition } = calculateWallTransform([startPoint, endPoint], height);
+		const yOffsetExtra = (zIndex ?? 0) * 0.0001;
+		const { width, center, rotation, startPosition } = calculateWallTransform(
+			[startPoint, endPoint],
+			height,
+			yOffsetExtra,
+		);
 
 		const wallProperties = resolveAppearance({
 			skinId,
@@ -150,7 +157,12 @@ function WallComponent({
 		const cylinder = cylinderRef.current;
 		if (!part || !cylinder) return;
 
-		const { width, center, rotation, startPosition } = calculateWallTransform([startPoint, endPoint], height);
+		const yOffsetExtra = (zIndex ?? 0) * 0.0001;
+		const { width, center, rotation, startPosition } = calculateWallTransform(
+			[startPoint, endPoint],
+			height,
+			yOffsetExtra,
+		);
 
 		part.Size = new Vector3(width, height, thickness);
 		cylinder.Size = new Vector3(height, thickness, thickness);

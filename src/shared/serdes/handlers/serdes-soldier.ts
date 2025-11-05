@@ -28,6 +28,7 @@ export function serializeSoldiers(state: SoldiersState): string {
 		buffer.WriteBool(soldier.shieldActive);
 		buffer.WriteUInt(16, soldier.health);
 		buffer.WriteUInt(16, soldier.maxHealth);
+		buffer.WriteInt(16, soldier.zIndex);
 	}
 
 	return buffer.ToString();
@@ -62,6 +63,7 @@ export function deserializeSoldiers(data: string): SoldiersState {
 			shieldActive: buffer.ReadBool(),
 			health: buffer.ReadUInt(16),
 			maxHealth: buffer.ReadUInt(16),
+			zIndex: buffer.ReadInt(16),
 		};
 	}
 

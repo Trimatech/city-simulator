@@ -2,7 +2,7 @@ import React, { memo } from "@rbxts/react";
 import { useSelectorCreator } from "@rbxts/react-reflex";
 import { TRACER_PIECE_HEIGHT, WALL_HEIGHT } from "shared/constants/core";
 import { selectGridEdge } from "shared/store/grid/grid-selectors";
-import { selectSoldierShieldActive, selectSoldierSkin } from "shared/store/soldiers";
+import { selectSoldierShieldActive, selectSoldierSkin, selectSoldierZIndex } from "shared/store/soldiers";
 
 import { Wall } from "./Wall";
 
@@ -11,6 +11,7 @@ function WallWithKeyComponent({ cellKey, edgeId }: { cellKey: string; edgeId: st
 	const ownerId = edge?.ownerId ?? "__none__";
 	const skinId = useSelectorCreator(selectSoldierSkin, ownerId);
 	const shieldActive = useSelectorCreator(selectSoldierShieldActive, ownerId);
+	const zIndex = useSelectorCreator(selectSoldierZIndex, ownerId);
 
 	//print(`wallWithKeyComponent ${cellKey} ${edgeId} ${ownerId} ${skinId} ${shieldActive}`);
 
@@ -32,6 +33,7 @@ function WallWithKeyComponent({ cellKey, edgeId }: { cellKey: string; edgeId: st
 			kind={edge.kind}
 			skinId={skinId}
 			outline={shieldActive}
+			zIndex={zIndex}
 		/>
 	);
 }

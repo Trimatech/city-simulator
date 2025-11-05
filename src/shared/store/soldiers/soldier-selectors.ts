@@ -187,6 +187,10 @@ export const selectSoldierSkin = (id: string) => {
 	return (state: SharedState) => state.soldiers[id]?.skin;
 };
 
+export const selectSoldierZIndex = (id: string) => {
+	return (state: SharedState) => state.soldiers[id]?.zIndex ?? 0;
+};
+
 export const selectSoldierShieldActive = (id: string) => {
 	return (state: SharedState) => state.soldiers[id]?.shieldActive ?? false;
 };

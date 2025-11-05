@@ -14,6 +14,8 @@ import { getCandy as getCandyLocal } from "./services/candy/candy-store";
 const MIN_SPAWN_SPACING = 35;
 const SAFE_SPAWN_ATTEMPTS = 40;
 
+const RANDOM_POINT_MARGIN = 0.8;
+
 function getNearestAliveSoldierDistance(point: Vector2): number {
 	const aliveById = store.getState(selectAliveSoldiersById);
 	let nearest = math.huge;
@@ -145,14 +147,14 @@ export function getRandomPointInWorld(margin = 1) {
 export function getSafePointInWorld() {
 	let best: { position: Vector2; safety: number } | undefined;
 	for (const _ of $range(1, SAFE_SPAWN_ATTEMPTS)) {
-		const position = getRandomPointInWorld(0.9);
+		const position = getRandomPointInWorld(RANDOM_POINT_MARGIN);
 		const safety = getNearestAliveSoldierDistance(position);
 		if (!best || safety > best.safety) best = { position, safety };
 		if (safety >= MIN_SPAWN_SPACING) {
 			return position;
 		}
 	}
-	return best ? best.position : getRandomPointInWorld(0.9);
+	return best ? best.position : getRandomPointInWorld(RANDOM_POINT_MARGIN);
 }
 
 /**
@@ -213,12 +215,12 @@ export function getSafePointOutsideSoldierPolygons(maxTries = 25) {
 
 	// Fallback: sample near origin until outside polygons is found
 	for (const _ of $range(1, maxTries)) {
-		const candidate = getRandomPointInWorld(0.9);
+		const candidate = getRandomPointInWorld(RANDOM_POINT_MARGIN);
 		if (!isInsideAnySoldierPolygon(candidate) && !intersectsAnySoldierPolygon(candidate)) {
 			return candidate;
 		}
 	}
 
 	// As a last resort, return any random point in world
-	return getRandomPointInWorld(0.9);
+	return getRandomPointInWorld(RANDOM_POINT_MARGIN);
 }

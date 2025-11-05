@@ -41,6 +41,7 @@ export interface SoldierEntity {
 	readonly shieldActive: boolean;
 	readonly health: number;
 	readonly maxHealth: number;
+	readonly zIndex: number;
 }
 
 const defaultEntity: SoldierEntity = {
@@ -63,6 +64,7 @@ const defaultEntity: SoldierEntity = {
 	shieldActive: false,
 	health: 100,
 	maxHealth: 100,
+	zIndex: 0,
 };
 
 const initialState: SoldiersState = {};
@@ -70,6 +72,18 @@ const initialState: SoldiersState = {};
 export const soldiersSlice = createProducer(initialState, {
 	addSoldier: (state, id: string, patch?: Partial<SoldierEntity>) => {
 		print(`Add soldier ${id}`, { patch });
+
+		// compute smallest available zIndex if not provided
+		let computedZ = 0;
+		if (patch === undefined || patch.zIndex === undefined) {
+			const used: { [key: number]: boolean } = {};
+			for (const [, soldier] of pairs(state)) {
+				if (soldier !== undefined) {
+					used[soldier.zIndex ?? 0] = true;
+				}
+			}
+			while (used[computedZ] === true) computedZ += 1;
+		}
 		const polygon = createPolygonAroundPosition(
 			patch?.position || defaultEntity.position,
 			INITIAL_POLYGON_DIAMETER,
@@ -88,6 +102,7 @@ export const soldiersSlice = createProducer(initialState, {
 				polygonAreaSize,
 				polygonBounds,
 				...patch,
+				zIndex: patch?.zIndex !== undefined ? patch.zIndex : computedZ,
 				orbs: math.min(patch?.orbs ?? 0, SOLDIER_MAX_ORBS),
 				health:
 					patch?.health !== undefined
