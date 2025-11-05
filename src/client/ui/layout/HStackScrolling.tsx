@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
-import { omit } from "../../utils/object-utils";
 
+import { omit } from "../../utils/object-utils";
 import { ScrollingFrame, ScrollingFrameProps } from "./ScrollingFrame";
 
 export interface StackProps extends ScrollingFrameProps {

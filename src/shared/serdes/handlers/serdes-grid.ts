@@ -32,14 +32,7 @@ export function serializeGrid(state: GridState): string {
 			const l = line as GridLine;
 			buffer.WriteString(edgeId as string);
 			buffer.WriteString(l.ownerId);
-			buffer.WriteUInt(
-				8,
-				l.kind === "tracer"
-					? 1
-					: l.kind === "area"
-					? 2
-					: 3,
-			);
+			buffer.WriteUInt(8, l.kind === "tracer" ? 1 : l.kind === "area" ? 2 : 3);
 			writeVector2(buffer, l.a);
 			writeVector2(buffer, l.b);
 		}
@@ -90,14 +83,7 @@ export function serializeCellLines(lines: GridCellsByEdgeId): string {
 		const l = line as GridLine;
 		buffer.WriteString(edgeId as string);
 		buffer.WriteString(l.ownerId);
-		buffer.WriteUInt(
-			8,
-			l.kind === "tracer"
-				? 1
-				: l.kind === "area"
-				? 2
-				: 3,
-		);
+		buffer.WriteUInt(8, l.kind === "tracer" ? 1 : l.kind === "area" ? 2 : 3);
 		writeVector2(buffer, l.a);
 		writeVector2(buffer, l.b);
 	}

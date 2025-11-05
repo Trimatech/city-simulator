@@ -85,7 +85,6 @@ export function Bot({ id }: BotProps) {
 			tween.Play();
 		};
 
-
 		const targetPos = new Vector3(position.X, groundYOffset.current + halfSize.current, position.Y);
 
 		const delta = position.sub(lastPosRef.current);
