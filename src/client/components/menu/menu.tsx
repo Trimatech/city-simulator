@@ -7,6 +7,7 @@ import { selectHasLocalSoldier } from "shared/store/soldiers";
 import { Home } from "./home";
 import { MenuContainer } from "./menu-container";
 import { MenuVignette } from "./menu-vignette";
+import { Navigation } from "./navigation/navigation";
 import { Skins } from "./skins";
 import { Support } from "./support";
 
@@ -31,9 +32,9 @@ export function Menu() {
 		<>
 			{showVignette && <MenuVignette />}
 
-			{/* <MenuContainer>
+			<MenuContainer>
 				<Navigation />
-			</MenuContainer> */}
+			</MenuContainer>
 
 			<MenuContainer page={HOME_PAGE}>
 				<Home />
