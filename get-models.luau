@@ -26,7 +26,7 @@ local function createModelsRecursively(instance)
     end
 
     for _, child in ipairs(instance:GetChildren()) do
-        if child:IsA("Model") then
+        if child:IsA("Model") or child:IsA("BasePart") then
             print("Saving model: " .. child.Name)
             local modelPath = targetDir .. "/" .. child.Name .. '.rbxmx'
             fs.writeFile(modelPath, roblox.serializeModel({child}, true))

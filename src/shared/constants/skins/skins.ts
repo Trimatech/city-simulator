@@ -5,7 +5,7 @@ const catppuccinSoldierSkins: readonly SoldierSkin[] = accentList.map((id) => {
 	return {
 		...defaultSoldierSkin,
 		id,
-		tint: [palette[id]],
+		tint: palette[id],
 	};
 });
 
@@ -16,7 +16,14 @@ export const soldierskins: readonly SoldierSkin[] = [
 		...defaultSoldierSkin,
 		id: "silver",
 		price: 100,
-		tint: [palette.text],
+		tint: palette.text,
+	},
+	// Add GradientWall as a purchasable/equippable skin id
+	{
+		...defaultSoldierSkin,
+		id: "GradientWall",
+		price: 0,
+		tint: palette.white,
 	},
 ];
 

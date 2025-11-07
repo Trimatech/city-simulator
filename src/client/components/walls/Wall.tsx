@@ -2,6 +2,7 @@ import { memo, useEffect, useRef } from "@rbxts/react";
 import { Workspace } from "@rbxts/services";
 import { palette } from "shared/constants/palette";
 import { getSoldierSkin } from "shared/constants/skins";
+import { getWallSkin } from "shared/constants/walls/skins";
 
 import {
 	calculateWallTransform,
@@ -21,7 +22,9 @@ interface Appearance {
 	transparency: number;
 }
 
-function resolveAppearance({
+type ResolvedWallSkin = { type: "tint"; appearance: Appearance } | { type: "part"; modelPath: string };
+
+function resolveWallSkin({
 	skinId,
 	fallbackColor,
 	transparency,
@@ -29,12 +32,19 @@ function resolveAppearance({
 	skinId?: string;
 	fallbackColor: Color3;
 	transparency: number;
-}): Appearance {
+}): ResolvedWallSkin {
 	if (skinId !== undefined) {
-		const skin = getSoldierSkin(skinId);
-		return { color: skin.tint[0], material: WALL_MATERIAL, transparency };
+		const wallSkin = getWallSkin(skinId);
+		if (wallSkin && wallSkin.type === "part") {
+			return { type: "part", modelPath: wallSkin.modelPath };
+		}
+		const soldierSkin = getSoldierSkin(skinId);
+		return {
+			type: "tint",
+			appearance: { color: soldierSkin.tint, material: WALL_MATERIAL, transparency },
+		};
 	}
-	return { color: fallbackColor, material: WALL_MATERIAL, transparency };
+	return { type: "tint", appearance: { color: fallbackColor, material: WALL_MATERIAL, transparency } };
 }
 
 function ensureFolder(name: string): Folder {
@@ -77,7 +87,7 @@ function WallComponent({
 	outline = false,
 	zIndex,
 }: Props) {
-	const mainPartRef = useRef<Part>();
+	const mainPartRef = useRef<BasePart>();
 	const cylinderRef = useRef<Part>();
 	const outlineRef = useRef<Highlight>();
 	const hasAnimatedRef = useRef(false);
@@ -91,58 +101,81 @@ function WallComponent({
 	useEffect(() => {
 		if (isCrumbling) return;
 
-		const folder = ensureFolder(folderName);
+		let cancelled = false;
+		(async () => {
+			const folder = ensureFolder(folderName);
 
-		const yOffsetExtra = (zIndex ?? 0) * 0.0001;
-		const { width, center, rotation, startPosition } = calculateWallTransform(
-			[startPoint, endPoint],
-			height,
-			yOffsetExtra,
-		);
+			const yOffsetExtra = (zIndex ?? 0) * 0.0001;
+			const { width, center, rotation, startPosition } = calculateWallTransform(
+				[startPoint, endPoint],
+				height,
+				yOffsetExtra,
+			);
 
-		const wallProperties = resolveAppearance({
-			skinId,
-			fallbackColor: color,
-			transparency,
-		});
+			const resolved = resolveWallSkin({
+				skinId,
+				fallbackColor: color,
+				transparency,
+			});
 
-		const part = createWallPart({
-			folderName,
-			width,
-			height,
-			thickness,
-			center,
-			rotation,
-			color: wallProperties.color,
-			transparency: wallProperties.transparency,
-			material: wallProperties.material,
-		});
-		part.Parent = folder;
+			let part: BasePart;
+			if (resolved.type === "part") {
+				part = await createWallPart({
+					folderName,
+					width,
+					height,
+					thickness,
+					center,
+					rotation,
+					modelPath: resolved.modelPath,
+				});
+			} else {
+				part = await createWallPart({
+					folderName,
+					width,
+					height,
+					thickness,
+					center,
+					rotation,
+					color: resolved.appearance.color,
+					transparency: resolved.appearance.transparency,
+					material: resolved.appearance.material,
+				});
+			}
+			if (cancelled) {
+				part.Destroy();
+				return;
+			}
+			part.Parent = folder;
 
-		const cylinder = createCylinder({
-			folderName,
-			height,
-			thickness,
-			startPosition,
-			color: wallProperties.color,
-			transparency: wallProperties.transparency,
-			material: wallProperties.material,
-		});
-		cylinder.Parent = folder;
+			if (resolved.type === "tint") {
+				const cylinder = createCylinder({
+					folderName,
+					height,
+					thickness,
+					startPosition,
+					color,
+					transparency: 1,
+					material: WALL_MATERIAL,
+				});
+				cylinder.Parent = folder;
+				cylinderRef.current = cylinder;
+			}
 
-		// Start at ground level only if we intend to animate (non-tracer)
-		if (kind !== "tracer") {
-			positionWallAtGround({ part, cylinder, center, rotation, startPosition });
-		}
+			// Start at ground level only if we intend to animate (non-tracer)
+			if (kind !== "tracer") {
+				positionWallAtGround({ part, cylinder: cylinderRef.current, center, rotation, startPosition });
+			}
 
-		if (outline) {
-			outlineRef.current = createWallHighlight(part);
-		}
+			if (outline) {
+				outlineRef.current = createWallHighlight(part);
+			}
 
-		mainPartRef.current = part;
-		cylinderRef.current = cylinder;
+			mainPartRef.current = part;
+		})();
 
 		return () => {
+			cancelled = true;
 			if (tweenCleanupRef.current) tweenCleanupRef.current();
 			if (outlineRef.current) outlineRef.current.Destroy();
 			if (mainPartRef.current) uncollideAndDestroy(mainPartRef.current, math.random(0.5, 2));
@@ -197,19 +230,25 @@ function WallComponent({
 		const cylinder = cylinderRef.current;
 		if (!part || !cylinder) return;
 
-		const wallProperties = resolveAppearance({
+		const resolved = resolveWallSkin({
 			skinId,
 			fallbackColor: color,
 			transparency,
 		});
 
-		part.Color = wallProperties.color;
-		part.Transparency = wallProperties.transparency;
-		part.Material = wallProperties.material;
+		if (resolved.type === "tint") {
+			part.Color = resolved.appearance.color;
+			part.Transparency = resolved.appearance.transparency;
+			part.Material = resolved.appearance.material;
 
-		cylinder.Color = wallProperties.color;
-		cylinder.Transparency = wallProperties.transparency;
-		cylinder.Material = wallProperties.material;
+			cylinder.Color = resolved.appearance.color;
+			cylinder.Transparency = resolved.appearance.transparency;
+			cylinder.Material = resolved.appearance.material;
+			return;
+		}
+
+		// For model-based skins, preserve the part's native look and hide the cylinder
+		cylinder.Transparency = 1;
 	}, [color, transparency, skinId, kind]);
 
 	// Toggle outline without recreating

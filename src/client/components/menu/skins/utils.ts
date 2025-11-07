@@ -24,7 +24,7 @@ export function usePalette(id: string, shuffle?: readonly string[]): SoldierPale
 
 	return {
 		skin,
-		primary: skin.primary || darken(skin.tint[0], 0.5, 0.4),
-		secondary: skin.secondary || darken(skin.tint[0], 0.7, 0.4),
+		primary: darken(skin.tint, 0.5, 0.4),
+		secondary: darken(skin.tint, 0.7, 0.4),
 	};
 }

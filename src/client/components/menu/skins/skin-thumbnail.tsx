@@ -4,6 +4,7 @@ import { CanvasGroup } from "client/ui/canvas-group";
 import { Image } from "client/ui/image";
 import { SoldierSkin } from "shared/constants/skins";
 import { fillArray } from "shared/utils/object-utils";
+import { images } from "shared/assets";
 
 import { SOLDIER_ANGLE_OFFSET } from "../../world/soldiers/constants";
 
@@ -53,38 +54,19 @@ export function SkinThumbnail({ skin, active, transparency }: SkinThumbnailProps
 			<uipadding PaddingTop={offset} PaddingRight={offset} />
 
 			<Image
-				image={skin.headTexture ?? skin.texture[0]}
-				imageColor={skin.tint[0]}
-				scaleType="Slice"
-				sliceCenter={new Rect(skin.size.div(2), skin.size.div(2))}
-				sliceScale={4}
+				image={images.ui.circle}
+				imageColor={skin.tint}
 				anchorPoint={new Vector2(0.5, 0.5)}
 				size={new UDim2(0, rem(TRACER_SIZE), 0, rem(TRACER_SIZE))}
 				position={new UDim2(0.5, 0, 0.5, 0)}
 				rotation={45}
-			>
-				<Image
-					image={skin.eyeTextureRight}
-					size={new UDim2(0.45, 0, 0.45, 0)}
-					position={new UDim2(0.5, 0, 0.1, 0)}
-				/>
-
-				<Image
-					image={skin.eyeTextureLeft}
-					anchorPoint={new Vector2(1, 0)}
-					size={new UDim2(0.45, 0, 0.45, 0)}
-					position={new UDim2(0.5, 0, 0.1, 0)}
-				/>
-			</Image>
+			/>
 
 			{TRACERS.map(({ size, position, rotation }, index) => (
 				<Image
 					key={`tracer-${index}`}
-					image={skin.texture[(index + 1) % skin.texture.size()]}
-					imageColor={skin.tint[(index + 1) % skin.tint.size()]}
-					scaleType="Slice"
-					sliceCenter={new Rect(skin.size.div(2), skin.size.div(2))}
-					sliceScale={4}
+					image={images.ui.circle}
+					imageColor={skin.tint}
 					anchorPoint={new Vector2(0.5, 0.5)}
 					size={new UDim2(size.X, rem(TRACER_SIZE), size.Y, rem(TRACER_SIZE))}
 					position={new UDim2(position.X, 0, position.Y, 0)}

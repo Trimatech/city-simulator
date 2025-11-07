@@ -39,9 +39,9 @@ export async function initRemoteService() {
 
 			remotes.client.alert.fire(player, {
 				emoji: "🌈",
-				color: skin?.primary || skin?.tint[0] || palette.mauve,
-				colorSecondary: skin?.secondary || (skinId === RANDOM_SKIN ? palette.blue : undefined),
-				colorMessage: skin?.primary || skin?.tint[0] || palette.mauve,
+				color: skin?.tint || palette.mauve,
+				colorSecondary: skinId === RANDOM_SKIN ? palette.blue : undefined,
+				colorMessage: skin?.tint || palette.mauve,
 				message:
 					skinId === RANDOM_SKIN
 						? 'You are now wearing a <font color="#fff">random</font> skin!'

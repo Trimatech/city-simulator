@@ -4,7 +4,7 @@ import { waitForPrimaryPart } from "@rbxts/wait-for";
 import { fadeModelOut } from "client/utils/animation.utils";
 import { destroyWelds } from "client/utils/model.utils";
 import { palette } from "shared/constants/palette";
-import { findSharedInstanceByPath } from "shared/SharedModelManager";
+import { loadSharedCloneByPath } from "shared/SharedModelManager";
 import { selectTowerById } from "shared/store/towers/tower-selectors";
 import { TowerEntity } from "shared/store/towers/tower-slice";
 
@@ -38,8 +38,7 @@ export function Tower({ towerId, parentFolder }: TowerProps) {
 		const loadTower = async () => {
 			//warn("loadTower", tower);
 			// Load the tower model
-			const towerRawModel = await findSharedInstanceByPath<Model>("ReplicatedStorage/Models/Gameplay/Tower");
-			const towerModel = towerRawModel.Clone();
+			const towerModel = await loadSharedCloneByPath<Model>("ReplicatedStorage/Models/Gameplay/Tower");
 			const primaryPart = await waitForPrimaryPart(towerModel);
 
 			// Position the model in the world

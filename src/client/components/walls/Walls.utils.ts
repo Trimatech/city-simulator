@@ -1,6 +1,7 @@
 import { Debris, TweenService, Workspace } from "@rbxts/services";
 import { CollisionGroups } from "shared/constants/collision-groups";
 import { sliceArray } from "shared/polybool/poly-utils";
+import { loadSharedCloneByPath } from "shared/SharedModelManager";
 
 export const FORCE_MULTIPLIER = 15;
 export const UPWARD_FORCE_BIAS = 0.3;
@@ -188,7 +189,7 @@ export function startFadeOut(piece: Part) {
 	});
 }
 
-export function calculateDebrisForces(position: Vector3) {
+export function calculateDebrisForces(_position: Vector3) {
 	// Calculate force direction relative to center
 	const horizontalDir = new Vector3(math.random(-1, 1), 0, math.random(-1, 1)).Unit;
 
@@ -317,7 +318,7 @@ export function startCrumbling(pieces: Part[]) {
 	};
 }
 
-export function createWallHighlight(part: Part, color = Color3.fromRGB(255, 255, 255)) {
+export function createWallHighlight(part: BasePart, color = Color3.fromRGB(255, 255, 255)) {
 	const highlight = new Instance("Highlight");
 	highlight.Adornee = part;
 	highlight.FillTransparency = 1;
@@ -334,30 +335,39 @@ interface WallPartOptions {
 	thickness: number;
 	center: Vector3;
 	rotation: CFrame;
-	color: Color3;
-	transparency: number;
-	material: Enum.Material;
+	/**
+	 * Optional: appearance to apply for simple tinted parts.
+	 * Omit when cloning a model-based skin to preserve its original look.
+	 */
+	color?: Color3;
+	transparency?: number;
+	material?: Enum.Material;
+	/**
+	 * Optional: when provided, a BasePart will be cloned from this path
+	 * in ReplicatedStorage instead of creating a plain Part.
+	 */
+	modelPath?: string;
 }
 
-export function createWallPart({
-	folderName,
-	width,
-	height,
-	thickness,
-	center,
-	rotation,
-	color,
-	transparency,
-	material,
-}: WallPartOptions) {
-	const part = new Instance("Part");
+export async function createWallPart(options: WallPartOptions) {
+	const { folderName, width, height, thickness, center, rotation, color, transparency, material, modelPath } =
+		options;
+
+	const part =
+		modelPath !== undefined ? await loadSharedCloneByPath<BasePart>(modelPath) : (new Instance("Part") as BasePart);
+
 	part.Name = `${folderName}_wall`;
 	part.Size = new Vector3(width, height, thickness);
-	part.Color = color;
-	part.Transparency = transparency;
-	part.Material = material;
-	part.TopSurface = Enum.SurfaceType.Smooth;
-	part.BottomSurface = Enum.SurfaceType.Smooth;
+
+	// Only apply appearance overrides for simple tinted walls (no modelPath)
+	if (modelPath === undefined) {
+		if (color !== undefined) part.Color = color;
+		if (transparency !== undefined) part.Transparency = transparency;
+		if (material !== undefined) part.Material = material;
+		part.TopSurface = Enum.SurfaceType.Smooth;
+		part.BottomSurface = Enum.SurfaceType.Smooth;
+	}
+
 	part.Anchored = true;
 	part.CanCollide = false;
 	part.CFrame = new CFrame(center).mul(rotation);
@@ -402,7 +412,7 @@ export function createCylinder({
 	return cylinder;
 }
 
-export function uncollideAndDestroy(part: Part, delay: number) {
+export function uncollideAndDestroy(part: BasePart, delay: number) {
 	part.CanCollide = false;
 	part.Anchored = false;
 	part.Parent = Workspace;
@@ -416,8 +426,8 @@ export function positionWallAtGround({
 	rotation,
 	startPosition,
 }: {
-	part: Part;
-	cylinder: Part;
+	part: BasePart;
+	cylinder?: Part;
 	center: Vector3;
 	rotation: CFrame;
 	startPosition: Vector3;
@@ -427,7 +437,9 @@ export function positionWallAtGround({
 	const groundCylinderCFrame = new CFrame(new Vector3(startPosition.X, 0, startPosition.Z)).mul(
 		CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90)),
 	);
-	cylinder.CFrame = groundCylinderCFrame;
+	if (cylinder) {
+		cylinder.CFrame = groundCylinderCFrame;
+	}
 }
 
 export function tweenWallToTarget({
@@ -437,7 +449,7 @@ export function tweenWallToTarget({
 	targetCylinderCFrame,
 	duration = 0.8,
 }: {
-	part: Part;
+	part: BasePart;
 	cylinder: Part;
 	targetPartCFrame: CFrame;
 	targetCylinderCFrame: CFrame;
