@@ -450,20 +450,20 @@ export function tweenWallToTarget({
 	duration = 0.8,
 }: {
 	part: BasePart;
-	cylinder: Part;
+	cylinder?: Part;
 	targetPartCFrame: CFrame;
 	targetCylinderCFrame: CFrame;
 	duration?: number;
 }) {
 	const info = new TweenInfo(duration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out);
 	const partTween = TweenService.Create(part, info, { CFrame: targetPartCFrame });
-	const cylinderTween = TweenService.Create(cylinder, info, { CFrame: targetCylinderCFrame });
+	const cylinderTween = cylinder ? TweenService.Create(cylinder, info, { CFrame: targetCylinderCFrame }) : undefined;
 
 	partTween.Play();
-	cylinderTween.Play();
+	cylinderTween?.Play();
 
 	return () => {
 		partTween.Cancel();
-		cylinderTween.Cancel();
+		cylinderTween?.Cancel();
 	};
 }

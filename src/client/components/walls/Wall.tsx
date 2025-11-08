@@ -1,8 +1,11 @@
 import { memo, useEffect, useRef } from "@rbxts/react";
+import { useSelector } from "@rbxts/react-reflex";
 import { Workspace } from "@rbxts/services";
 import { palette } from "shared/constants/palette";
 import { getSoldierSkin } from "shared/constants/skins";
 import { getWallSkin } from "shared/constants/walls/skins";
+import { selectGridResolution } from "shared/store/grid/grid-selectors";
+import { getCellAABBFromCoord } from "shared/utils/cell-key";
 
 import {
 	calculateWallTransform,
@@ -59,8 +62,13 @@ function ensureFolder(name: string): Folder {
 
 interface Props {
 	folderName: string;
+	cellKey?: string;
 	startPoint: Vector2;
 	endPoint: Vector2;
+	startMiterFactor?: number;
+	endMiterFactor?: number;
+	startNeighborDir?: Vector2;
+	endNeighborDir?: Vector2;
 	color?: Color3;
 	transparency?: number;
 	height: number;
@@ -75,8 +83,13 @@ interface Props {
 
 function WallComponent({
 	folderName,
+	cellKey,
 	startPoint,
 	endPoint,
+	startMiterFactor,
+	endMiterFactor,
+	startNeighborDir,
+	endNeighborDir,
 	color = palette.white,
 	transparency = 0,
 	height,
@@ -92,10 +105,22 @@ function WallComponent({
 	const outlineRef = useRef<Highlight>();
 	const hasAnimatedRef = useRef(false);
 	const tweenCleanupRef = useRef<() => void>();
+	const gridResolution = useSelector(selectGridResolution);
+
+	function parseCellKeyToCoord(key: string): Vector2 {
+		const parts = key.split(",");
+		const x = tonumber(parts[0]) ?? 0;
+		const y = tonumber(parts[1]) ?? 0;
+		return new Vector2(x, y);
+	}
+
+	function pointInAABB(p: Vector2, min: Vector2, max: Vector2) {
+		return p.X >= min.X && p.X <= max.X && p.Y >= min.Y && p.Y <= max.Y;
+	}
 
 	//print(`rendering wall ${folderName} ${startPoint.X},${startPoint.Y} -> ${endPoint.X},${endPoint.Y}`);
 
-	//	print("rendering properties", wallProperties);
+	print("rendering properties", startMiterFactor, endMiterFactor);
 
 	// Create wall parts once
 	useEffect(() => {
@@ -188,7 +213,29 @@ function WallComponent({
 	useEffect(() => {
 		const part = mainPartRef.current;
 		const cylinder = cylinderRef.current;
-		if (!part || !cylinder) return;
+		if (!part) return;
+
+		function computeExtForEndpoint(
+			isStart: boolean,
+			segmentStart: Vector2,
+			segmentEnd: Vector2,
+			neighborDir?: Vector2,
+		) {
+			if (!neighborDir) return 0;
+			const segDir = isStart ? segmentEnd.sub(segmentStart) : segmentStart.sub(segmentEnd);
+			if (segDir.Magnitude < 1e-6 || neighborDir.Magnitude < 1e-6) return 0;
+			const u = segDir.Unit;
+			const v = neighborDir.Unit;
+			const dot = math.clamp(u.Dot(v), -1, 1);
+			const theta = math.acos(dot);
+			if (theta <= 1e-3 || math.abs(theta - math.pi) <= 1e-3) return 0;
+			const half = theta / 2;
+			const t = math.tan(half);
+			if (math.abs(t) < 1e-6) return 0;
+			const w = thickness / 2;
+			const ext = w / t; // exact miter extension per side
+			return ext > 0 ? ext : 0;
+		}
 
 		const yOffsetExtra = (zIndex ?? 0) * 0.0001;
 		const { width, center, rotation, startPosition } = calculateWallTransform(
@@ -197,14 +244,37 @@ function WallComponent({
 			yOffsetExtra,
 		);
 
-		part.Size = new Vector3(width, height, thickness);
-		cylinder.Size = new Vector3(height, thickness, thickness);
+		// Extend ends using miter factors to close outer corners (applies to all kinds)
+		let extAraw = 0;
+		let extBraw = 0;
+		if (cellKey !== undefined) {
+			const cellCoord = parseCellKeyToCoord(cellKey);
+			const [cellMin, cellMax] = getCellAABBFromCoord(cellCoord, gridResolution);
+			const useA = pointInAABB(startPoint, cellMin, cellMax);
+			const useB = pointInAABB(endPoint, cellMin, cellMax);
+			// Prefer precise neighbor-based computation when available
+			const extAprecise = useA ? computeExtForEndpoint(true, startPoint, endPoint, startNeighborDir) : 0;
+			const extBprecise = useB ? computeExtForEndpoint(false, startPoint, endPoint, endNeighborDir) : 0;
+			const extAfromFactor = useA ? thickness * (startMiterFactor ?? 0) : 0;
+			const extBfromFactor = useB ? thickness * (endMiterFactor ?? 0) : 0;
+			extAraw = extAprecise > 0 ? extAprecise : extAfromFactor;
+			extBraw = extBprecise > 0 ? extBprecise : extBfromFactor;
+		}
+		// Clamp to avoid overshoot on very short segments
+		const cap = width * 0.45;
+		const extA = math.min(extAraw, cap);
+		const extB = math.min(extBraw, cap);
+		const newWidth = width + extA + extB;
+		part.Size = new Vector3(newWidth, height, thickness);
+		if (cylinder) {
+			cylinder.Size = new Vector3(height, thickness, thickness);
+		}
 
 		const targetPartCFrame = new CFrame(center).mul(rotation);
 		const targetCylinderCFrame = new CFrame(startPosition).mul(CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90)));
 
 		const shouldAnimate = !hasAnimatedRef.current && kind !== "tracer";
-		if (shouldAnimate) {
+		if (shouldAnimate && cylinder) {
 			// Position from ground then tween to targets
 			positionWallAtGround({ part, cylinder, center, rotation, startPosition });
 			tweenCleanupRef.current = tweenWallToTarget({
@@ -219,16 +289,52 @@ function WallComponent({
 		}
 
 		// Apply transforms directly (for tracer or subsequent updates)
-		part.CFrame = targetPartCFrame;
-		cylinder.CFrame = targetCylinderCFrame;
+		// Shift center along length to account for unequal extensions
+		{
+			let extAraw2 = 0;
+			let extBraw2 = 0;
+			if (cellKey !== undefined) {
+				const cellCoord = parseCellKeyToCoord(cellKey);
+				const [cellMin, cellMax] = getCellAABBFromCoord(cellCoord, gridResolution);
+				const useA = pointInAABB(startPoint, cellMin, cellMax);
+				const useB = pointInAABB(endPoint, cellMin, cellMax);
+				const extAprecise2 = useA ? computeExtForEndpoint(true, startPoint, endPoint, startNeighborDir) : 0;
+				const extBprecise2 = useB ? computeExtForEndpoint(false, startPoint, endPoint, endNeighborDir) : 0;
+				const extAfromFactor2 = useA ? thickness * (startMiterFactor ?? 0) : 0;
+				const extBfromFactor2 = useB ? thickness * (endMiterFactor ?? 0) : 0;
+				extAraw2 = extAprecise2 > 0 ? extAprecise2 : extAfromFactor2;
+				extBraw2 = extBprecise2 > 0 ? extBprecise2 : extBfromFactor2;
+			}
+			const cap2 = (part.Size.X > 0 ? part.Size.X : 0) * 0.45; // use current width as a reference
+			const extA2 = math.min(extAraw2, cap2);
+			const extB2 = math.min(extBraw2, cap2);
+			const shift = (extB2 - extA2) / 2;
+			part.CFrame = targetPartCFrame.add(targetPartCFrame.RightVector.mul(shift));
+		}
+		if (cylinder) {
+			cylinder.CFrame = targetCylinderCFrame;
+		}
 		hasAnimatedRef.current = true;
-	}, [startPoint.X, startPoint.Y, endPoint.X, endPoint.Y, height, thickness]);
+	}, [
+		startPoint.X,
+		startPoint.Y,
+		endPoint.X,
+		endPoint.Y,
+		height,
+		thickness,
+		startMiterFactor,
+		endMiterFactor,
+		startNeighborDir && startNeighborDir.X,
+		startNeighborDir && startNeighborDir.Y,
+		endNeighborDir && endNeighborDir.X,
+		endNeighborDir && endNeighborDir.Y,
+	]);
 
 	// Update visuals (color/material/transparency) when appearance props change
 	useEffect(() => {
 		const part = mainPartRef.current;
 		const cylinder = cylinderRef.current;
-		if (!part || !cylinder) return;
+		if (!part) return;
 
 		const resolved = resolveWallSkin({
 			skinId,
@@ -241,14 +347,16 @@ function WallComponent({
 			part.Transparency = resolved.appearance.transparency;
 			part.Material = resolved.appearance.material;
 
-			cylinder.Color = resolved.appearance.color;
-			cylinder.Transparency = resolved.appearance.transparency;
-			cylinder.Material = resolved.appearance.material;
+			if (cylinder) {
+				cylinder.Color = resolved.appearance.color;
+				cylinder.Transparency = resolved.appearance.transparency;
+				cylinder.Material = resolved.appearance.material;
+			}
 			return;
 		}
 
 		// For model-based skins, preserve the part's native look and hide the cylinder
-		cylinder.Transparency = 1;
+		if (cylinder) cylinder.Transparency = 1;
 	}, [color, transparency, skinId, kind]);
 
 	// Toggle outline without recreating

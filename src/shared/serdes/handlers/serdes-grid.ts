@@ -35,6 +35,16 @@ export function serializeGrid(state: GridState): string {
 			buffer.WriteUInt(8, l.kind === "tracer" ? 1 : l.kind === "area" ? 2 : 3);
 			writeVector2(buffer, l.a);
 			writeVector2(buffer, l.b);
+			// Write optional miter factors (always present in stream; default 0)
+			buffer.WriteFloat32(l.startMiterFactor ?? 0);
+			buffer.WriteFloat32(l.endMiterFactor ?? 0);
+			// Neighbor dirs (optional): write as two 2D vectors
+			const snd = l.startNeighborDir;
+			const endDir = l.endNeighborDir;
+			buffer.WriteFloat32(snd ? snd.X : 0);
+			buffer.WriteFloat32(snd ? snd.Y : 0);
+			buffer.WriteFloat32(endDir ? endDir.X : 0);
+			buffer.WriteFloat32(endDir ? endDir.Y : 0);
 		}
 	}
 
@@ -57,11 +67,21 @@ export function deserializeGrid(data: string): GridState {
 			const kindByte = buffer.ReadUInt(8);
 			const a = readVector2(buffer);
 			const b = readVector2(buffer);
+			const startMiterFactor = buffer.ReadFloat32();
+			const endMiterFactor = buffer.ReadFloat32();
+			const sndX = buffer.ReadFloat32();
+			const sndY = buffer.ReadFloat32();
+			const endX = buffer.ReadFloat32();
+			const endY = buffer.ReadFloat32();
 			cell[edgeId] = {
 				a,
 				b,
 				ownerId,
 				kind: kindByte === 1 ? "tracer" : kindByte === 2 ? "area" : "area2",
+				startMiterFactor,
+				endMiterFactor,
+				startNeighborDir: new Vector2(sndX, sndY),
+				endNeighborDir: new Vector2(endX, endY),
 			};
 		}
 		cells[cellKey] = cell;
@@ -86,6 +106,12 @@ export function serializeCellLines(lines: GridCellsByEdgeId): string {
 		buffer.WriteUInt(8, l.kind === "tracer" ? 1 : l.kind === "area" ? 2 : 3);
 		writeVector2(buffer, l.a);
 		writeVector2(buffer, l.b);
+		buffer.WriteFloat32(l.startMiterFactor ?? 0);
+		buffer.WriteFloat32(l.endMiterFactor ?? 0);
+		buffer.WriteFloat32(l.startNeighborDir ? l.startNeighborDir.X : 0);
+		buffer.WriteFloat32(l.startNeighborDir ? l.startNeighborDir.Y : 0);
+		buffer.WriteFloat32(l.endNeighborDir ? l.endNeighborDir.X : 0);
+		buffer.WriteFloat32(l.endNeighborDir ? l.endNeighborDir.Y : 0);
 	}
 
 	return buffer.ToString();
@@ -102,11 +128,21 @@ export function deserializeCellLines(data: string): GridCellsByEdgeId {
 		const kindByte = buffer.ReadUInt(8);
 		const a = readVector2(buffer);
 		const b = readVector2(buffer);
+		const startMiterFactor = buffer.ReadFloat32();
+		const endMiterFactor = buffer.ReadFloat32();
+		const sndX = buffer.ReadFloat32();
+		const sndY = buffer.ReadFloat32();
+		const endX = buffer.ReadFloat32();
+		const endY = buffer.ReadFloat32();
 		cell[edgeId] = {
 			a,
 			b,
 			ownerId,
 			kind: kindByte === 1 ? "tracer" : kindByte === 2 ? "area" : "area2",
+			startMiterFactor,
+			endMiterFactor,
+			startNeighborDir: new Vector2(sndX, sndY),
+			endNeighborDir: new Vector2(endX, endY),
 		};
 	}
 

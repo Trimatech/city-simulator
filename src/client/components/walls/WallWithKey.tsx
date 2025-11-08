@@ -27,8 +27,13 @@ function WallWithKeyComponent({ cellKey, edgeId }: { cellKey: string; edgeId: st
 		<Wall
 			key={edgeId}
 			folderName={folderName}
+			cellKey={cellKey}
 			startPoint={edge.a}
 			endPoint={edge.b}
+			startMiterFactor={edge.startMiterFactor}
+			endMiterFactor={edge.endMiterFactor}
+			startNeighborDir={edge.startNeighborDir}
+			endNeighborDir={edge.endNeighborDir}
 			height={height}
 			kind={edge.kind}
 			skinId={skinId}
