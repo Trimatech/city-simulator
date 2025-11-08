@@ -3,7 +3,7 @@
 
 [tools]
 lune = "lune-org/lune@0.10.4"        
-rojo = "rojo-rbx/rojo@7.6.0"
+rojo = "rojo-rbx/rojo@7.6.1"
 tarmac = "rojo-rbx/tarmac@0.7.3"
 run-in-roblox = "rojo-rbx/run-in-roblox@0.3.0"
 mantle = "blake-mealey/mantle@0.11.18"
