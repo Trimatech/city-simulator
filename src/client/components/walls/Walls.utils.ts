@@ -2,6 +2,7 @@ import { Debris, TweenService, Workspace } from "@rbxts/services";
 import { CollisionGroups } from "shared/constants/collision-groups";
 import { sliceArray } from "shared/polybool/poly-utils";
 import { loadSharedCloneByPath } from "shared/SharedModelManager";
+import { getCellAABBFromCoord } from "shared/utils/cell-key";
 
 export const FORCE_MULTIPLIER = 15;
 export const UPWARD_FORCE_BIAS = 0.3;
@@ -466,4 +467,129 @@ export function tweenWallToTarget({
 		partTween.Cancel();
 		cylinderTween?.Cancel();
 	};
+}
+
+// -------- Wall join helpers (miter/fillet) --------
+export interface WallJoinConfig {
+	enableMiter: boolean;
+	enableFillet: boolean;
+	acuteThresholdDeg: number; // fillet if corner angle < threshold
+	maxExtensionRatio: number; // clamp per-end extension to ratio * segment width
+}
+
+export const WALL_JOIN_DEFAULTS: WallJoinConfig = {
+	enableMiter: true,
+	enableFillet: true,
+	acuteThresholdDeg: 90,
+	maxExtensionRatio: 0.45,
+};
+
+export function parseCellCoordFromKey(cellKey: string): Vector2 {
+	const parts = cellKey.split(",");
+	const x = tonumber(parts[0]) ?? 0;
+	const y = tonumber(parts[1]) ?? 0;
+	return new Vector2(x, y);
+}
+
+export function pointInAABB2D(p: Vector2, min: Vector2, max: Vector2) {
+	return p.X >= min.X && p.X <= max.X && p.Y >= min.Y && p.Y <= max.Y;
+}
+
+export function computeCornerAngleDeg(isStart: boolean, a: Vector2, b: Vector2, neighborDir?: Vector2) {
+	if (!neighborDir) return undefined;
+	const segDir = isStart ? b.sub(a) : a.sub(b);
+	if (segDir.Magnitude < 1e-6 || neighborDir.Magnitude < 1e-6) return undefined;
+	const u = segDir.Unit;
+	const v = neighborDir.Unit;
+	const dot = math.clamp(u.Dot(v), -1, 1);
+	const theta = math.acos(dot);
+	return math.deg(theta);
+}
+
+export function computeMiterExtension(
+	isStart: boolean,
+	a: Vector2,
+	b: Vector2,
+	thickness: number,
+	neighborDir?: Vector2,
+) {
+	if (!neighborDir) return 0;
+	const segDir = isStart ? b.sub(a) : a.sub(b);
+	if (segDir.Magnitude < 1e-6 || neighborDir.Magnitude < 1e-6) return 0;
+	const u = segDir.Unit;
+	const v = neighborDir.Unit;
+	const dot = math.clamp(u.Dot(v), -1, 1);
+	const theta = math.acos(dot);
+	if (theta <= 1e-3 || math.abs(theta - math.pi) <= 1e-3) return 0;
+	const half = theta / 2;
+	const t = math.tan(half);
+	if (math.abs(t) < 1e-6) return 0;
+	const w = thickness / 2;
+	const ext = w / t;
+	return ext > 0 ? ext : 0;
+}
+
+export function computeWallJoinForCell({
+	cellKey,
+	gridResolution,
+	thickness,
+	segmentWidth,
+	a,
+	b,
+	startNeighborDir,
+	endNeighborDir,
+	startMiterFactor,
+	endMiterFactor,
+	config = WALL_JOIN_DEFAULTS,
+}: {
+	cellKey?: string;
+	gridResolution: number;
+	thickness: number;
+	segmentWidth: number;
+	a: Vector2;
+	b: Vector2;
+	startNeighborDir?: Vector2;
+	endNeighborDir?: Vector2;
+	startMiterFactor?: number;
+	endMiterFactor?: number;
+	config?: WallJoinConfig;
+}) {
+	let extAraw = 0;
+	let extBraw = 0;
+	let acuteA = false;
+	let acuteB = false;
+
+	if (cellKey !== undefined) {
+		const cellCoord = parseCellCoordFromKey(cellKey);
+		const [cellMin, cellMax] = getCellAABBFromCoord(cellCoord, gridResolution);
+		const useA = pointInAABB2D(a, cellMin, cellMax);
+		const useB = pointInAABB2D(b, cellMin, cellMax);
+		const extAprecise = config.enableMiter
+			? useA
+				? computeMiterExtension(true, a, b, thickness, startNeighborDir)
+				: 0
+			: 0;
+		const extBprecise = config.enableMiter
+			? useB
+				? computeMiterExtension(false, a, b, thickness, endNeighborDir)
+				: 0
+			: 0;
+		const extAfromFactor = config.enableMiter ? (useA ? thickness * (startMiterFactor ?? 0) : 0) : 0;
+		const extBfromFactor = config.enableMiter ? (useB ? thickness * (endMiterFactor ?? 0) : 0) : 0;
+		extAraw = extAprecise > 0 ? extAprecise : extAfromFactor;
+		extBraw = extBprecise > 0 ? extBprecise : extBfromFactor;
+		const angleA = useA ? computeCornerAngleDeg(true, a, b, startNeighborDir) : undefined;
+		const angleB = useB ? computeCornerAngleDeg(false, a, b, endNeighborDir) : undefined;
+		acuteA = !!(config.enableFillet && angleA !== undefined && angleA < config.acuteThresholdDeg);
+		acuteB = !!(config.enableFillet && angleB !== undefined && angleB < config.acuteThresholdDeg);
+	}
+
+	const cap = segmentWidth * config.maxExtensionRatio;
+	const extA = acuteA ? 0 : math.min(extAraw, cap);
+	const extB = acuteB ? 0 : math.min(extBraw, cap);
+	return { extA, extB, acuteA, acuteB };
+}
+
+export function getEndpointWorldPosition(point: Vector2, height: number, yOffsetExtra = 0) {
+	return new Vector3(point.X, height / 2 + Y_OFFSET + yOffsetExtra, point.Y);
 }

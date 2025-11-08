@@ -5,16 +5,19 @@ import { palette } from "shared/constants/palette";
 import { getSoldierSkin } from "shared/constants/skins";
 import { getWallSkin } from "shared/constants/walls/skins";
 import { selectGridResolution } from "shared/store/grid/grid-selectors";
-import { getCellAABBFromCoord } from "shared/utils/cell-key";
 
 import {
 	calculateWallTransform,
+	computeWallJoinForCell,
 	createCylinder,
 	createWallHighlight,
 	createWallPart,
+	getEndpointWorldPosition,
 	positionWallAtGround,
 	tweenWallToTarget,
 	uncollideAndDestroy,
+	WALL_JOIN_DEFAULTS,
+	WallJoinConfig,
 } from "./Walls.utils";
 
 const WALL_MATERIAL = Enum.Material.SmoothPlastic;
@@ -69,6 +72,7 @@ interface Props {
 	endMiterFactor?: number;
 	startNeighborDir?: Vector2;
 	endNeighborDir?: Vector2;
+	joinConfig?: WallJoinConfig;
 	color?: Color3;
 	transparency?: number;
 	height: number;
@@ -90,6 +94,7 @@ function WallComponent({
 	endMiterFactor,
 	startNeighborDir,
 	endNeighborDir,
+	joinConfig,
 	color = palette.white,
 	transparency = 0,
 	height,
@@ -102,25 +107,29 @@ function WallComponent({
 }: Props) {
 	const mainPartRef = useRef<BasePart>();
 	const cylinderRef = useRef<Part>();
+	const filletStartRef = useRef<Part>();
+	const filletEndRef = useRef<Part>();
 	const outlineRef = useRef<Highlight>();
 	const hasAnimatedRef = useRef(false);
 	const tweenCleanupRef = useRef<() => void>();
 	const gridResolution = useSelector(selectGridResolution);
 
-	function parseCellKeyToCoord(key: string): Vector2 {
-		const parts = key.split(",");
-		const x = tonumber(parts[0]) ?? 0;
-		const y = tonumber(parts[1]) ?? 0;
-		return new Vector2(x, y);
-	}
-
-	function pointInAABB(p: Vector2, min: Vector2, max: Vector2) {
-		return p.X >= min.X && p.X <= max.X && p.Y >= min.Y && p.Y <= max.Y;
+	function ensureFilletCylinder(ref: React.MutableRefObject<Part | undefined>, folder: Folder) {
+		if (!ref.current) {
+			const cyl = new Instance("Part");
+			cyl.Name = "wall_fillet";
+			cyl.Shape = Enum.PartType.Cylinder;
+			cyl.Anchored = true;
+			cyl.CanCollide = false;
+			cyl.TopSurface = Enum.SurfaceType.Smooth;
+			cyl.BottomSurface = Enum.SurfaceType.Smooth;
+			cyl.Parent = folder;
+			ref.current = cyl;
+		}
+		return ref.current!;
 	}
 
 	//print(`rendering wall ${folderName} ${startPoint.X},${startPoint.Y} -> ${endPoint.X},${endPoint.Y}`);
-
-	print("rendering properties", startMiterFactor, endMiterFactor);
 
 	// Create wall parts once
 	useEffect(() => {
@@ -205,6 +214,8 @@ function WallComponent({
 			if (outlineRef.current) outlineRef.current.Destroy();
 			if (mainPartRef.current) uncollideAndDestroy(mainPartRef.current, math.random(0.5, 2));
 			if (cylinderRef.current) uncollideAndDestroy(cylinderRef.current, math.random(0.5, 2));
+			if (filletStartRef.current) uncollideAndDestroy(filletStartRef.current, math.random(0.5, 2));
+			if (filletEndRef.current) uncollideAndDestroy(filletEndRef.current, math.random(0.5, 2));
 		};
 		// create once; subsequent updates handled by effects below
 	}, []);
@@ -215,27 +226,7 @@ function WallComponent({
 		const cylinder = cylinderRef.current;
 		if (!part) return;
 
-		function computeExtForEndpoint(
-			isStart: boolean,
-			segmentStart: Vector2,
-			segmentEnd: Vector2,
-			neighborDir?: Vector2,
-		) {
-			if (!neighborDir) return 0;
-			const segDir = isStart ? segmentEnd.sub(segmentStart) : segmentStart.sub(segmentEnd);
-			if (segDir.Magnitude < 1e-6 || neighborDir.Magnitude < 1e-6) return 0;
-			const u = segDir.Unit;
-			const v = neighborDir.Unit;
-			const dot = math.clamp(u.Dot(v), -1, 1);
-			const theta = math.acos(dot);
-			if (theta <= 1e-3 || math.abs(theta - math.pi) <= 1e-3) return 0;
-			const half = theta / 2;
-			const t = math.tan(half);
-			if (math.abs(t) < 1e-6) return 0;
-			const w = thickness / 2;
-			const ext = w / t; // exact miter extension per side
-			return ext > 0 ? ext : 0;
-		}
+		// miter/fillet math lives in Walls.utils
 
 		const yOffsetExtra = (zIndex ?? 0) * 0.0001;
 		const { width, center, rotation, startPosition } = calculateWallTransform(
@@ -244,30 +235,55 @@ function WallComponent({
 			yOffsetExtra,
 		);
 
-		// Extend ends using miter factors to close outer corners (applies to all kinds)
-		let extAraw = 0;
-		let extBraw = 0;
-		if (cellKey !== undefined) {
-			const cellCoord = parseCellKeyToCoord(cellKey);
-			const [cellMin, cellMax] = getCellAABBFromCoord(cellCoord, gridResolution);
-			const useA = pointInAABB(startPoint, cellMin, cellMax);
-			const useB = pointInAABB(endPoint, cellMin, cellMax);
-			// Prefer precise neighbor-based computation when available
-			const extAprecise = useA ? computeExtForEndpoint(true, startPoint, endPoint, startNeighborDir) : 0;
-			const extBprecise = useB ? computeExtForEndpoint(false, startPoint, endPoint, endNeighborDir) : 0;
-			const extAfromFactor = useA ? thickness * (startMiterFactor ?? 0) : 0;
-			const extBfromFactor = useB ? thickness * (endMiterFactor ?? 0) : 0;
-			extAraw = extAprecise > 0 ? extAprecise : extAfromFactor;
-			extBraw = extBprecise > 0 ? extBprecise : extBfromFactor;
-		}
-		// Clamp to avoid overshoot on very short segments
-		const cap = width * 0.45;
-		const extA = math.min(extAraw, cap);
-		const extB = math.min(extBraw, cap);
+		// Compute join deltas using util (configurable)
+		const { extA, extB, acuteA, acuteB } = computeWallJoinForCell({
+			cellKey,
+			gridResolution,
+			thickness,
+			segmentWidth: width,
+			a: startPoint,
+			b: endPoint,
+			startNeighborDir,
+			endNeighborDir,
+			startMiterFactor,
+			endMiterFactor,
+			config: joinConfig ?? WALL_JOIN_DEFAULTS,
+		});
 		const newWidth = width + extA + extB;
 		part.Size = new Vector3(newWidth, height, thickness);
 		if (cylinder) {
 			cylinder.Size = new Vector3(height, thickness, thickness);
+		}
+		// Manage fillet cylinders for acute corners
+		const folder = ensureFolder(folderName);
+		const appearanceColor = part.Color;
+		const appearanceMaterial = part.Material;
+		const appearanceTransparency = part.Transparency;
+		if (acuteA) {
+			const c = ensureFilletCylinder(filletStartRef, folder);
+			c.Size = new Vector3(height, thickness, thickness);
+			c.Color = appearanceColor;
+			c.Material = appearanceMaterial;
+			c.Transparency = appearanceTransparency;
+			const pos = getEndpointWorldPosition(startPoint, height, yOffsetExtra);
+			const cf = new CFrame(pos).mul(CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90)));
+			c.CFrame = cf;
+		} else if (filletStartRef.current) {
+			filletStartRef.current.Destroy();
+			filletStartRef.current = undefined;
+		}
+		if (acuteB) {
+			const c = ensureFilletCylinder(filletEndRef, folder);
+			c.Size = new Vector3(height, thickness, thickness);
+			c.Color = appearanceColor;
+			c.Material = appearanceMaterial;
+			c.Transparency = appearanceTransparency;
+			const pos = getEndpointWorldPosition(endPoint, height, yOffsetExtra);
+			const cf = new CFrame(pos).mul(CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90)));
+			c.CFrame = cf;
+		} else if (filletEndRef.current) {
+			filletEndRef.current.Destroy();
+			filletEndRef.current = undefined;
 		}
 
 		const targetPartCFrame = new CFrame(center).mul(rotation);
@@ -291,23 +307,9 @@ function WallComponent({
 		// Apply transforms directly (for tracer or subsequent updates)
 		// Shift center along length to account for unequal extensions
 		{
-			let extAraw2 = 0;
-			let extBraw2 = 0;
-			if (cellKey !== undefined) {
-				const cellCoord = parseCellKeyToCoord(cellKey);
-				const [cellMin, cellMax] = getCellAABBFromCoord(cellCoord, gridResolution);
-				const useA = pointInAABB(startPoint, cellMin, cellMax);
-				const useB = pointInAABB(endPoint, cellMin, cellMax);
-				const extAprecise2 = useA ? computeExtForEndpoint(true, startPoint, endPoint, startNeighborDir) : 0;
-				const extBprecise2 = useB ? computeExtForEndpoint(false, startPoint, endPoint, endNeighborDir) : 0;
-				const extAfromFactor2 = useA ? thickness * (startMiterFactor ?? 0) : 0;
-				const extBfromFactor2 = useB ? thickness * (endMiterFactor ?? 0) : 0;
-				extAraw2 = extAprecise2 > 0 ? extAprecise2 : extAfromFactor2;
-				extBraw2 = extBprecise2 > 0 ? extBprecise2 : extBfromFactor2;
-			}
-			const cap2 = (part.Size.X > 0 ? part.Size.X : 0) * 0.45; // use current width as a reference
-			const extA2 = math.min(extAraw2, cap2);
-			const extB2 = math.min(extBraw2, cap2);
+			// use same deltas for shift
+			const extA2 = extA;
+			const extB2 = extB;
 			const shift = (extB2 - extA2) / 2;
 			part.CFrame = targetPartCFrame.add(targetPartCFrame.RightVector.mul(shift));
 		}
@@ -393,6 +395,14 @@ function WallComponent({
 		if (cylinderRef.current) {
 			uncollideAndDestroy(cylinderRef.current, math.random(0.5, 2));
 			cylinderRef.current = undefined;
+		}
+		if (filletStartRef.current) {
+			uncollideAndDestroy(filletStartRef.current, math.random(0.5, 2));
+			filletStartRef.current = undefined;
+		}
+		if (filletEndRef.current) {
+			uncollideAndDestroy(filletEndRef.current, math.random(0.5, 2));
+			filletEndRef.current = undefined;
 		}
 	}, [isCrumbling]);
 
