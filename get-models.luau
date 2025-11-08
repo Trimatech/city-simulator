@@ -53,20 +53,21 @@ end
 
 -- Export Lighting children to separate model files for Rojo folder mapping
 local lighting = gamePlace:FindFirstChildOfClass("Lighting")
-local lightingDir = 'assets/lighting'
-if not fs.isDir(lightingDir) then
-    fs.writeDir(lightingDir)
-end
+local lightingDir = 'assets/lighting.rbxmx'
+fs.writeFile(lightingDir, roblox.serializeModel({ lighting }, true))
+-- if not fs.isDir(lightingDir) then
+--     fs.writeDir(lightingDir)
+-- end
 
-if lighting then
-    print("Saving Lighting children separately")
-    for _, child in ipairs(lighting:GetChildren()) do
-        local modelPath = string.format("%s/%s.rbxmx", lightingDir, child.Name)
-        fs.writeFile(modelPath, roblox.serializeModel({ child }, true))
-        print("Saved: " .. modelPath)
-    end
-else
-    print("Warning: Lighting service not found in place file")
-end
+-- if lighting then
+--     print("Saving Lighting children separately")
+--     for _, child in ipairs(lighting:GetChildren()) do
+--         local modelPath = string.format("%s/%s.rbxmx", lightingDir, child.Name)
+--         fs.writeFile(modelPath, roblox.serializeModel({ child }, true))
+--         print("Saved: " .. modelPath)
+--     end
+-- else
+--     print("Warning: Lighting service not found in place file")
+-- end
 
 print("Model extraction complete")

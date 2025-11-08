@@ -75,9 +75,7 @@
 			}
 		},
 		"Lighting": {
-			"$className": "Lighting",
-
-			"$path": "assets/lighting"
+			"$path": "assets/lighting.rbxmx"
 		},
 
 		"TextChatService": {
