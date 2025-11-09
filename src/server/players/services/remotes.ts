@@ -31,7 +31,6 @@ export async function initRemoteService() {
 	});
 
 	remotes.save.setSkin.connect((player, skinId) => {
-		const skin = findSoldierSkin(skinId);
 		const inventory = store.getState(selectPlayerSkins(player.Name));
 
 		if (inventory?.includes(skinId)) {
@@ -39,9 +38,9 @@ export async function initRemoteService() {
 
 			remotes.client.alert.fire(player, {
 				emoji: "🌈",
-				color: skin?.tint || palette.mauve,
+				color: palette.mauve,
 				colorSecondary: skinId === RANDOM_SKIN ? palette.blue : undefined,
-				colorMessage: skin?.tint || palette.mauve,
+				colorMessage: palette.mauve,
 				message:
 					skinId === RANDOM_SKIN
 						? 'You are now wearing a <font color="#fff">random</font> skin!'

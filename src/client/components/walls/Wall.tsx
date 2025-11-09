@@ -2,8 +2,7 @@ import { memo, useEffect, useRef } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { Workspace } from "@rbxts/services";
 import { palette } from "shared/constants/palette";
-import { getSoldierSkin } from "shared/constants/skins";
-import { getWallSkin } from "shared/constants/walls/skins";
+import { getWallSkin } from "shared/constants/skins";
 import { selectGridResolution } from "shared/store/grid/grid-selectors";
 
 import {
@@ -41,14 +40,13 @@ function resolveWallSkin({
 }): ResolvedWallSkin {
 	if (skinId !== undefined) {
 		const wallSkin = getWallSkin(skinId);
-		if (wallSkin && wallSkin.type === "part") {
+		if (wallSkin?.type === "part") {
 			return { type: "part", modelPath: wallSkin.modelPath };
 		}
-		const soldierSkin = getSoldierSkin(skinId);
-		return {
-			type: "tint",
-			appearance: { color: soldierSkin.tint, material: WALL_MATERIAL, transparency },
-		};
+
+		if (wallSkin?.type === "tint") {
+			return { type: "tint", appearance: { color: wallSkin.tint, material: WALL_MATERIAL, transparency } };
+		}
 	}
 	return { type: "tint", appearance: { color: fallbackColor, material: WALL_MATERIAL, transparency } };
 }

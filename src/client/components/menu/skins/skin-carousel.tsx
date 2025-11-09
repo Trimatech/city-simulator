@@ -4,13 +4,13 @@ import { useRem, useStore } from "client/hooks";
 import { selectMenuCurrentSkin } from "client/store/menu";
 import { Group } from "client/ui/layout/group";
 import { USER_NAME } from "shared/constants/core";
-import { soldierskins } from "shared/constants/skins";
+import { allWallSkins } from "shared/constants/skins";
 import { RANDOM_SKIN, selectCurrentPlayerSkin, selectPlayerSkins } from "shared/store/saves";
 
 import { SkinCard } from "./skin-card";
 import { DIRECTIONS } from "./utils";
 
-const SKIN_LIST = [RANDOM_SKIN, ...soldierskins.map((skin) => skin.id)];
+const SKIN_LIST = [RANDOM_SKIN, ...allWallSkins.map((skin) => skin.id)];
 const SKIN_LENGTH = SKIN_LIST.size();
 
 export function SkinCarousel() {

@@ -1,14 +1,10 @@
-import { blend } from "@rbxts/pretty-react-hooks";
-import React, { useEffect } from "@rbxts/react";
+import React, { useEffect, useState } from "@rbxts/react";
 import { useMotion, useRem } from "client/hooks";
-import { Image } from "client/ui/image";
 import { ReactiveButton } from "client/ui/reactive-button";
-import { Shadow } from "client/ui/shadow";
-import { images, playSound, sounds } from "shared/assets";
+import { playSound, sounds } from "shared/assets";
+import { getWallSkin } from "shared/constants/skins";
 
-import { SkinIndicator } from "./skin-indicator";
 import { SkinThumbnail } from "./skin-thumbnail";
-import { DIRECTIONS_TO_HIDE, usePalette } from "./utils";
 
 interface SkinCardProps {
 	readonly id: string;
@@ -37,10 +33,10 @@ function getSize(rem: number, active: boolean) {
 }
 
 export function SkinCard({ id, index, active, shuffle, onClick }: SkinCardProps) {
-	const hidden = DIRECTIONS_TO_HIDE.includes(index);
+	const [skin, setSkin] = useState(getWallSkin(id));
 
 	const rem = useRem();
-	const palette = usePalette(id, shuffle);
+
 	const [position, positionMotion] = useMotion(getPosition(rem(1), math.sign(index) * 3));
 	const [size, sizeMotion] = useMotion(getSize(rem(1), false));
 	const [transparency, transparencyMotion] = useMotion(1);
@@ -52,16 +48,13 @@ export function SkinCard({ id, index, active, shuffle, onClick }: SkinCardProps)
 			mass: 1 + math.abs(index / 2),
 		});
 		sizeMotion.spring(getSize(rem(1), index === 0));
-		transparencyMotion.spring(hidden ? 1 : 0);
 	}, [rem, index]);
 
 	return (
 		<ReactiveButton
 			onClick={() => {
-				if (!hidden) {
-					onClick();
-					playSound(sounds.navigate);
-				}
+				onClick();
+				playSound(sounds.navigate);
 			}}
 			animateSizeStrength={2}
 			animatePositionStrength={1.5}
@@ -72,33 +65,7 @@ export function SkinCard({ id, index, active, shuffle, onClick }: SkinCardProps)
 			position={position}
 			zIndex={-math.abs(index)}
 		>
-			<Shadow
-				shadowColor={palette.secondary}
-				shadowBlur={0.6}
-				shadowSize={rem(7)}
-				shadowPosition={rem(1)}
-				shadowTransparency={transparency}
-			/>
-
-			<Image
-				backgroundColor={palette.primary}
-				backgroundTransparency={transparency}
-				image={images.ui.skin_card_gradient}
-				imageColor={palette.secondary}
-				imageTransparency={transparency}
-				cornerRadius={new UDim(0, rem(2.5))}
-				size={new UDim2(1, 0, 1, 0)}
-			>
-				<uistroke
-					Color={palette.primary}
-					Thickness={rem(0.5)}
-					Transparency={transparency.map((t) => blend(t, 0.8))}
-				/>
-			</Image>
-
-			<SkinThumbnail active={active} skin={palette.skin} transparency={transparency} />
-
-			<SkinIndicator id={id} primary={palette.primary} transparency={transparency} />
+			<SkinThumbnail active={active} skin={skin} transparency={transparency} />
 		</ReactiveButton>
 	);
 }
