@@ -41,7 +41,7 @@ export function SkinThumbnail({ skin, active, transparency }: SkinThumbnailProps
 			if (skin.type === "tint") {
 				const part = new Instance("Part");
 				part.Name = "SkinPreview_Part";
-				part.Size = new Vector3(6, 6, 1.5);
+				part.Size = new Vector3(6, 12.1, 1);
 				part.Color = skin.tint;
 				part.Material = Enum.Material.SmoothPlastic;
 				part.TopSurface = Enum.SurfaceType.Smooth;

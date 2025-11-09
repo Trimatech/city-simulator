@@ -113,7 +113,7 @@ export const freeWallSkins = allWallSkins.filter((skin) => {
 	return skin.price === 0;
 });
 
-const wallSkinsById = new Map(wallPartSkins.map((skin) => [skin.id, skin]));
+const wallSkinsById = new Map(allWallSkins.map((skin) => [skin.id, skin]));
 
 export function getWallSkin(id: string): WallSkin {
 	return wallSkinsById.get(id) || freeWallSkins[0];
