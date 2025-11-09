@@ -33,9 +33,9 @@ export const wallPartSkins: readonly WallSkinPart[] = [
 		tint: Color3.fromRGB(120, 251, 253),
 	},
 	{
-		id: "RustafariGradientWall",
+		id: "RastafariGradientWall",
 		type: "part",
-		modelPath: "ReplicatedStorage/Models/Walls/RustafariGradientWall",
+		modelPath: "ReplicatedStorage/Models/Walls/RastafariGradientWall",
 		price: 10,
 		tint: Color3.fromRGB(87, 186, 56),
 	},

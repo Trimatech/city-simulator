@@ -39,7 +39,7 @@ export function SkinCard({ id, index, active, shuffle, onClick }: SkinCardProps)
 
 	const [position, positionMotion] = useMotion(getPosition(rem(1), math.sign(index) * 3));
 	const [size, sizeMotion] = useMotion(getSize(rem(1), false));
-	const [transparency, transparencyMotion] = useMotion(1);
+	const [transparency, transparencyMotion] = useMotion(0);
 
 	useEffect(() => {
 		positionMotion.spring(getPosition(rem(1), index), {
