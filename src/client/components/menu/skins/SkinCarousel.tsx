@@ -7,7 +7,7 @@ import { USER_NAME } from "shared/constants/core";
 import { allWallSkins } from "shared/constants/skins";
 import { RANDOM_SKIN, selectCurrentPlayerSkin, selectPlayerSkins } from "shared/store/saves";
 
-import { SkinCard } from "./skin-card";
+import { SkinButton } from "./SkinButton";
 import { DIRECTIONS } from "./utils";
 
 const SKIN_LIST = [RANDOM_SKIN, ...allWallSkins.map((skin) => skin.id)];
@@ -36,7 +36,7 @@ export function SkinCarousel() {
 				const skin = SKIN_LIST[index] ?? RANDOM_SKIN;
 
 				return (
-					<SkinCard
+					<SkinButton
 						key={skin}
 						id={skin}
 						index={direction}

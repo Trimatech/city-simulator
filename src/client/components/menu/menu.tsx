@@ -8,7 +8,7 @@ import { Home } from "./home";
 import { MenuContainer } from "./menu-container";
 import { MenuVignette } from "./menu-vignette";
 import { Navigation } from "./navigation/navigation";
-import { Skins } from "./skins";
+import { SkinsPage } from "./skins/SkinsPage";
 import { Support } from "./support";
 
 const HOME_PAGE = "home";
@@ -45,7 +45,7 @@ export function Menu() {
 			</MenuContainer>
 
 			<MenuContainer page={SKINS_PAGE}>
-				<Skins />
+				<SkinsPage />
 			</MenuContainer>
 		</>
 	);

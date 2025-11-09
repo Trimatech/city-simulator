@@ -4,9 +4,9 @@ import { ReactiveButton } from "client/ui/reactive-button";
 import { playSound, sounds } from "shared/assets";
 import { getWallSkin } from "shared/constants/skins";
 
-import { SkinThumbnail } from "./skin-thumbnail";
+import { SkinThumbnail } from "./SkinThumbnail";
 
-interface SkinCardProps {
+interface SkinButtonProps {
 	readonly id: string;
 	readonly index: number;
 	readonly active: boolean;
@@ -32,7 +32,7 @@ function getSize(rem: number, active: boolean) {
 	return active ? sizeActive : sizeInactive;
 }
 
-export function SkinCard({ id, index, active, shuffle, onClick }: SkinCardProps) {
+export function SkinButton({ id, index, active, shuffle, onClick }: SkinButtonProps) {
 	const [skin, setSkin] = useState(getWallSkin(id));
 
 	const rem = useRem();
