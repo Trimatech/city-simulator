@@ -195,3 +195,6 @@ export function getRandomAccent(): Color3 {
 	const values = Object.values(accents);
 	return values[math.random(0, values.size() - 1)];
 }
+
+export const gradientTabActive = new ColorSequence(Color3.fromHex("#1F23F3"), Color3.fromHex("#A265F7"));
+export const gradientTabInactive = new ColorSequence(Color3.fromHex("#1E2229"), Color3.fromHex("#1E2229"));

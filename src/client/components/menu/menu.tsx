@@ -8,7 +8,6 @@ import { Home } from "./home";
 import { MenuContainer } from "./menu-container";
 import { MenuVignette } from "./menu-vignette";
 import { Navigation } from "./navigation/navigation";
-import { SkinsPage } from "./skins/SkinsPage";
 import { Support } from "./support";
 
 const HOME_PAGE = "home";
@@ -42,10 +41,6 @@ export function Menu() {
 
 			<MenuContainer page={SUPPORT_PAGE}>
 				<Support />
-			</MenuContainer>
-
-			<MenuContainer page={SKINS_PAGE}>
-				<SkinsPage />
 			</MenuContainer>
 		</>
 	);

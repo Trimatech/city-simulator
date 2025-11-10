@@ -5,6 +5,7 @@ import { CanvasGroup } from "client/ui/canvas-group";
 import { Outline } from "client/ui/outline";
 import { WallSkin } from "shared/constants/skins";
 import { loadSharedCloneByPath } from "shared/SharedModelManager";
+import { brighten } from "shared/utils/color-utils";
 
 interface SkinThumbnailProps {
 	readonly skin: WallSkin;
@@ -82,17 +83,18 @@ export function SkinThumbnail({ skin, active, transparency }: SkinThumbnailProps
 
 	return (
 		<CanvasGroup
-			backgroundTransparency={1}
+			backgroundTransparency={0.2}
 			cornerRadius={cornerRadius}
 			groupTransparency={transparency}
 			size={new UDim2(1, 0, 1, 0)}
+			backgroundColor={brighten(skin.tint, 2)}
 		>
 			<Outline
 				cornerRadius={cornerRadius}
 				innerTransparency={0}
 				innerThickness={rem(1)}
 				innerColor={skin.tint}
-				outerTransparency={0.5}
+				outerTransparency={1}
 			/>
 			<PartViewer
 				selectedParts={selectedParts}
