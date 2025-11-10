@@ -2,7 +2,7 @@
 
 import { shallowEqual } from "@rbxts/reflex";
 import { HttpService } from "@rbxts/services";
-import { getRandomBaseSoldierSkin } from "shared/constants/skins";
+import { getRandomBotSkin } from "shared/constants/skins";
 import { calculateVector2ArrayBoundingBox } from "shared/polybool/poly-utils";
 import { deserializeSoldiers, serializeSoldiers } from "shared/serdes/handlers/serdes-soldier";
 import { SoldierEntity, SoldiersState } from "shared/store/soldiers";
@@ -20,7 +20,7 @@ export = () => {
 			desiredAngle: math.random() * math.pi * 2,
 			orbs: math.random(0, 10000),
 			tracers: fillArray(10, () => new Vector2(math.random(), math.random())),
-			skin: getRandomBaseSoldierSkin().id,
+			skin: getRandomBotSkin().id,
 			dead: math.random() > 0.5,
 			eliminations: math.random(1, 100),
 			polygon,

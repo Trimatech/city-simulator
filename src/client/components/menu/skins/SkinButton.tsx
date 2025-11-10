@@ -16,6 +16,7 @@ import { palette } from "shared/constants/palette";
 import { getWallSkin } from "shared/constants/skins";
 import { remotes } from "shared/remotes";
 import { RANDOM_SKIN, selectCurrentPlayerSkin, selectPlayerBalance, selectPlayerSkins } from "shared/store/saves";
+import { capitalizeFirst } from "shared/utils/text-utils";
 
 import { SkinThumbnail } from "./SkinThumbnail";
 
@@ -47,12 +48,19 @@ export function SkinButton({ id, index, active, shuffle: _shuffle, cellSize, onC
 
 	const actionLabel = useMemo(() => {
 		if (owns) {
-			return isEquipped ? "Equipped" : "Equip";
+			return isEquipped ? "EQUIPPED" : "EQUIP";
 		}
 
 		const priceText = "$" + formatInteger(skin.price);
-		return canAfford ? `Buy ${priceText}` : `Locked ${priceText}`;
+		return canAfford ? `${priceText}` : `${priceText}`;
 	}, [owns, isEquipped, canAfford, skin.price]);
+
+	const actionColor = useMemo(() => {
+		if (owns) {
+			return isEquipped ? palette.green : palette.blue;
+		}
+		return canAfford ? palette.teal : palette.red;
+	}, [owns, isEquipped, canAfford]);
 
 	const onAction = () => {
 		if (owns) {
@@ -91,8 +99,8 @@ export function SkinButton({ id, index, active, shuffle: _shuffle, cellSize, onC
 				shadowTransparency={0.7}
 			/>
 			<Frame
-				backgroundColor={palette.black}
-				backgroundTransparency={0.7}
+				backgroundColor={skin.tint}
+				backgroundTransparency={0.5}
 				cornerRadius={corner}
 				size={new UDim2(1, 0, 1, 0)}
 			>
@@ -102,18 +110,21 @@ export function SkinButton({ id, index, active, shuffle: _shuffle, cellSize, onC
 			<VStack
 				horizontalAlignment={Enum.HorizontalAlignment.Center}
 				verticalAlignment={Enum.VerticalAlignment.Center}
+				padding={rem(1)}
 			>
 				{/* Title */}
 				<Text
-					text={skin.id}
+					text={capitalizeFirst(skin.id)}
 					textSize={rem(1.5)}
-					textColor={palette.white}
+					textColor={palette.dark}
 					size={new UDim2(1, 0, 0, rem(2))}
 					position={new UDim2(0, 0, 0, 0)}
 					textXAlignment="Center"
 					textYAlignment="Center"
-					font={fonts.inter.regular}
-				/>
+					font={fonts.inter.bold}
+				>
+					<uistroke Color={palette.white} Transparency={0} Thickness={rem(0.2)} />
+				</Text>
 				{/* Thumbnail area */}
 				<Frame size={new UDim2(1, 0, 0.7, 0)} backgroundTransparency={1} position={new UDim2(0, 0, 0, 0)}>
 					<SkinThumbnail active={active} skin={skin} transparency={transparency} />
@@ -123,15 +134,17 @@ export function SkinButton({ id, index, active, shuffle: _shuffle, cellSize, onC
 				<PrimaryButton
 					onClick={onAction}
 					enabled={owns ? !isEquipped : canAfford}
-					size={new UDim2(1, -rem(2), 0, rem(3))}
+					primaryColor={actionColor}
+					cornerRadius={new UDim(1, 0)}
+					size={new UDim2(1, 0, 0, rem(3))}
 				>
 					<Text
 						text={actionLabel}
 						textSize={rem(1.4)}
-						textColor={palette.black}
+						textColor={palette.dark}
 						position={new UDim2(0.5, 0, 0.5, 0)}
 						anchorPoint={new Vector2(0.5, 0.5)}
-						font={fonts.inter.medium}
+						font={fonts.inter.regular}
 					/>
 				</PrimaryButton>
 			</VStack>

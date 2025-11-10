@@ -7,7 +7,7 @@ import { PowerupsPanel } from "client/components/game/right/powerups/PowerupsPan
 import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
 import { USER_NAME } from "shared/constants/core";
-import { getRandomBaseSoldierSkin } from "shared/constants/skins";
+import { getRandomBotSkin } from "shared/constants/skins";
 
 const controls = {
 	orbs: Number(120, 0, 1000, 1),
@@ -18,7 +18,7 @@ function CustomComponent({ orbs }: { orbs: number }) {
 		store.addSoldier(USER_NAME, {
 			name: USER_NAME,
 			position: new Vector2(0, 0),
-			skin: getRandomBaseSoldierSkin().id,
+			skin: getRandomBotSkin().id,
 			orbs,
 		});
 	}, [orbs]);

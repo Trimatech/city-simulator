@@ -8,7 +8,7 @@ import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
 import { USER_NAME } from "shared/constants/core";
 import { getRandomAccent } from "shared/constants/palette";
-import { getRandomBaseSoldierSkin } from "shared/constants/skins";
+import { getRandomBotSkin } from "shared/constants/skins";
 import { selectCandyGridResolution } from "shared/store/candy-grid/candy-grid-selectors";
 import { CandyGridCell } from "shared/store/candy-grid/candy-grid-types";
 import { CandyEntity, CandyType } from "shared/store/candy-grid/candy-types";
@@ -26,7 +26,7 @@ export = hoarcekat(() => {
 			store.addSoldier(id, {
 				name: id,
 				position: new Vector2(math.random(-10, 10), math.random(-10, 10)),
-				skin: getRandomBaseSoldierSkin().id,
+				skin: getRandomBotSkin().id,
 				orbs: math.random(0, 8000),
 			});
 		}

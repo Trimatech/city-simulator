@@ -6,7 +6,7 @@ import { GameUI } from "client/components/game";
 import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
 import { USER_NAME, WORLD_BOUNDS } from "shared/constants/core";
-import { getRandomBaseSoldierSkin } from "shared/constants/skins";
+import { getRandomBotSkin } from "shared/constants/skins";
 import { fillArray } from "shared/utils/object-utils";
 
 import { useMockRemotes } from "../utils/use-mock-remotes";
@@ -27,7 +27,7 @@ export = hoarcekat(() => {
 								math.random(-WORLD_BOUNDS, WORLD_BOUNDS),
 								math.random(-WORLD_BOUNDS, WORLD_BOUNDS),
 							),
-				skin: getRandomBaseSoldierSkin().id,
+				skin: getRandomBotSkin().id,
 				orbs: math.random(0, 5000),
 			});
 		}

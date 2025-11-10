@@ -1,7 +1,9 @@
-import { accentList, palette } from "../palette";
+import Object from "@rbxts/object-utils";
+
+import { accents, botAccents, palette } from "../palette";
 import { defaultWallSkin, SimpleWallSkin, WallSkin, WallSkinPart } from "./skins.types";
 
-const onlyColorWallSkins: readonly SimpleWallSkin[] = accentList.map((id) => {
+const onlyColorWallSkins: readonly SimpleWallSkin[] = Object.keys(accents).map((id) => {
 	return {
 		...defaultWallSkin,
 		id,
@@ -9,38 +11,50 @@ const onlyColorWallSkins: readonly SimpleWallSkin[] = accentList.map((id) => {
 	};
 });
 
+const onlyColorWallSkinsForBots: readonly SimpleWallSkin[] = Object.keys(botAccents).map((id) => {
+	return {
+		...defaultWallSkin,
+		id,
+		tint: botAccents[id],
+	};
+});
+
+export function getRandomBotSkin(): WallSkin {
+	return onlyColorWallSkinsForBots[math.random(0, onlyColorWallSkinsForBots.size() - 1)];
+}
+
 export const wallPartSkins: readonly WallSkinPart[] = [
 	/* Gradient walls */
 	{
-		id: "CosmicShiftGradientWall",
+		id: "CosmicShift",
 		type: "part",
 		modelPath: "ReplicatedStorage/Models/Walls/CosmicShiftGradientWall",
 		price: 10,
 		tint: Color3.fromRGB(38, 19, 213),
 	},
 	{
-		id: "MidNightCityGradientWall",
+		id: "MidNightCity",
 		type: "part",
 		modelPath: "ReplicatedStorage/Models/Walls/MidNightCityGradientWall",
 		price: 10,
 		tint: Color3.fromRGB(24, 26, 30),
 	},
 	{
-		id: "BradyFunGradientWall",
+		id: "BradyFun",
 		type: "part",
 		modelPath: "ReplicatedStorage/Models/Walls/BradyFunGradientWall",
 		price: 10,
 		tint: Color3.fromRGB(120, 251, 253),
 	},
 	{
-		id: "RastafariGradientWall",
+		id: "Rastafari",
 		type: "part",
 		modelPath: "ReplicatedStorage/Models/Walls/RastafariGradientWall",
 		price: 10,
 		tint: Color3.fromRGB(87, 186, 56),
 	},
 	{
-		id: "SweetMorningGradientWall",
+		id: "SweetMorning",
 		type: "part",
 		modelPath: "ReplicatedStorage/Models/Walls/SweetMorningGradientWall",
 		price: 10,
@@ -48,14 +62,14 @@ export const wallPartSkins: readonly WallSkinPart[] = [
 	},
 
 	{
-		id: "JoyShineGradientWall",
+		id: "JoyShine",
 		type: "part",
 		modelPath: "ReplicatedStorage/Models/Walls/JoyShineGradientWall",
 		price: 10,
 		tint: Color3.fromRGB(120, 251, 253),
 	},
 	{
-		id: "SupermanGradientWall",
+		id: "Superman",
 		type: "part",
 		modelPath: "ReplicatedStorage/Models/Walls/SupermanGradientWall",
 		price: 10,
@@ -64,42 +78,42 @@ export const wallPartSkins: readonly WallSkinPart[] = [
 
 	/* Textured walls */
 	{
-		id: "StarsWall",
+		id: "Stars",
 		type: "part",
 		modelPath: "ReplicatedStorage/Models/Walls/StarsWall",
 		price: 10,
 		tint: Color3.fromRGB(245, 205, 48),
 	},
 	{
-		id: "SpiderwebWall",
+		id: "Spiderweb",
 		type: "part",
 		modelPath: "ReplicatedStorage/Models/Walls/SpiderwebWall",
 		price: 10,
 		tint: Color3.fromRGB(91, 93, 105),
 	},
 	{
-		id: "FamousWall",
+		id: "Famous",
 		type: "part",
 		modelPath: "ReplicatedStorage/Models/Walls/FamousWall",
 		price: 10,
 		tint: Color3.fromRGB(196, 40, 28),
 	},
 	{
-		id: "WoodWall",
+		id: "Wood",
 		type: "part",
 		modelPath: "ReplicatedStorage/Models/Walls/WoodWall",
 		price: 10,
 		tint: Color3.fromRGB(81, 62, 26),
 	},
 	{
-		id: "StoneWall",
+		id: "Stone",
 		type: "part",
 		modelPath: "ReplicatedStorage/Models/Walls/StoneWall",
 		price: 10,
 		tint: Color3.fromRGB(20, 28, 48),
 	},
 	{
-		id: "IcyWall",
+		id: "Icy",
 		type: "part",
 		modelPath: "ReplicatedStorage/Models/Walls/IcyWall",
 		price: 10,

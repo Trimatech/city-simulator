@@ -16,7 +16,6 @@ export const accents = {
 	green: Color3.fromRGB(166, 227, 161),
 	teal: Color3.fromRGB(148, 226, 213),
 	sky: Color3.fromRGB(137, 220, 235),
-	sky2: Color3.fromRGB(84, 171, 250),
 	sapphire: Color3.fromRGB(116, 199, 236),
 	blue: Color3.fromRGB(137, 180, 250),
 	lavender: Color3.fromRGB(180, 190, 254),
@@ -105,6 +104,7 @@ const base = {
 	white: Color3.fromRGB(255, 255, 255),
 	offwhite: Color3.fromRGB(234, 238, 253),
 	black: Color3.fromRGB(0, 0, 0),
+	dark: Color3.fromRGB(17, 17, 27),
 };
 
 /**
@@ -113,82 +113,18 @@ const base = {
  */
 export const palette = {
 	...accents,
-	...accentsFrappe,
-	...accentsMacchiato,
-	...accentsLatte,
 	...neutrals,
 	...base,
 } as const;
 
 /**
- * An ordered list of all the accent colors
+ * Bot-only accents (prefixed variants)
  */
-export const accentList = [
-	// Catppuccin Mocha
-	"rosewater",
-	"flamingo",
-	"pink",
-	"mauve",
-	"red",
-	"maroon",
-	"peach",
-	"yellow",
-	"green",
-	"teal",
-	"sky",
-	"sky2",
-	"sapphire",
-	"blue",
-	"lavender",
-
-	// Catppuccin Frappe (prefixed)
-	"frappe_rosewater",
-	"frappe_flamingo",
-	"frappe_pink",
-	"frappe_mauve",
-	"frappe_red",
-	"frappe_maroon",
-	"frappe_peach",
-	"frappe_yellow",
-	"frappe_green",
-	"frappe_teal",
-	"frappe_sky",
-	"frappe_sapphire",
-	"frappe_blue",
-	"frappe_lavender",
-
-	// Catppuccin Macchiato (prefixed)
-	"macchiato_rosewater",
-	"macchiato_flamingo",
-	"macchiato_pink",
-	"macchiato_mauve",
-	"macchiato_red",
-	"macchiato_maroon",
-	"macchiato_peach",
-	"macchiato_yellow",
-	"macchiato_green",
-	"macchiato_teal",
-	"macchiato_sky",
-	"macchiato_sapphire",
-	"macchiato_blue",
-	"macchiato_lavender",
-
-	// Catppuccin Latte (prefixed)
-	"latte_rosewater",
-	"latte_flamingo",
-	"latte_pink",
-	"latte_mauve",
-	"latte_red",
-	"latte_maroon",
-	"latte_peach",
-	"latte_yellow",
-	"latte_green",
-	"latte_teal",
-	"latte_sky",
-	"latte_sapphire",
-	"latte_blue",
-	"latte_lavender",
-] as const;
+export const botAccents = {
+	...accentsFrappe,
+	...accentsMacchiato,
+	...accentsLatte,
+} as const;
 
 export function getRandomAccent(): Color3 {
 	// For candy generation, we use the base accents
