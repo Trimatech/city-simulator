@@ -1,11 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "@rbxts/react";
 import { PartViewer } from "client/components/partViewer/PartViewer";
-import { useMotion, useRem } from "client/hooks";
-import { CanvasGroup } from "client/ui/canvas-group";
-import { Outline } from "client/ui/outline";
 import { WallSkin } from "shared/constants/skins";
 import { loadSharedCloneByPath } from "shared/SharedModelManager";
-import { brighten } from "shared/utils/color-utils";
 
 interface SkinThumbnailProps {
 	readonly skin: WallSkin;
@@ -13,16 +9,10 @@ interface SkinThumbnailProps {
 	readonly transparency: React.Binding<number>;
 }
 
-export function SkinThumbnail({ skin, active, transparency }: SkinThumbnailProps) {
-	const rem = useRem();
-	const [offset, offsetMotion] = useMotion(new UDim());
+export function SkinThumbnail({ skin, active: _active, transparency: _transparency }: SkinThumbnailProps) {
 	const [selectedParts, setSelectedParts] = useState<Instance[]>();
 	const createdPartRef = useRef<Instance>();
 	const loadIdRef = useRef(0);
-
-	useEffect(() => {
-		offsetMotion.spring(active ? new UDim(0, rem(-0.5)) : new UDim(0, rem(2)));
-	}, [active, rem]);
 
 	useEffect(() => {
 		// cancel previous load
@@ -79,34 +69,17 @@ export function SkinThumbnail({ skin, active, transparency }: SkinThumbnailProps
 
 	const viewerSize = useMemo(() => new UDim2(1, 0, 1, 0), []);
 
-	const cornerRadius = useMemo(() => new UDim(0, rem(2.5)), [rem]);
-
 	return (
-		<CanvasGroup
-			backgroundTransparency={0.2}
-			cornerRadius={cornerRadius}
-			groupTransparency={transparency}
-			size={new UDim2(1, 0, 1, 0)}
-			backgroundColor={brighten(skin.tint, 2)}
-		>
-			<Outline
-				cornerRadius={cornerRadius}
-				innerTransparency={0}
-				innerThickness={rem(1)}
-				innerColor={skin.tint}
-				outerTransparency={1}
-			/>
-			<PartViewer
-				selectedParts={selectedParts}
-				size={viewerSize}
-				noBorder
-				showGround={false}
-				orbitEnabled
-				orbitYawDeg={30}
-				orbitPitchDeg={20}
-				orbitDistanceMultiplier={1.1}
-				isLoading={selectedParts === undefined}
-			/>
-		</CanvasGroup>
+		<PartViewer
+			selectedParts={selectedParts}
+			size={viewerSize}
+			noBorder
+			showGround={false}
+			orbitEnabled
+			orbitYawDeg={30}
+			orbitPitchDeg={20}
+			orbitDistanceMultiplier={1.1}
+			isLoading={selectedParts === undefined}
+		/>
 	);
 }
