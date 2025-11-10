@@ -3,6 +3,7 @@ import { useSelectorCreator } from "@rbxts/react-reflex";
 import { fonts } from "client/constants/fonts";
 import { useMotion, useRem } from "client/hooks";
 import { Frame } from "client/ui/layout/frame";
+import { VStack } from "client/ui/layout/VStack";
 import { Outline } from "client/ui/outline";
 import { PrimaryButton } from "client/ui/PrimaryButton";
 import { ReactiveButton } from "client/ui/reactive-button";
@@ -68,61 +69,61 @@ export function SkinButton({ id, index, active, shuffle: _shuffle, cellSize, onC
 	const corner = new UDim(0, rem(1.5));
 
 	return (
-		<Frame size={size} backgroundTransparency={1}>
-			<ReactiveButton
-				onClick={() => {
-					onClick();
-					playSound(sounds.navigate);
-				}}
-				animateSizeStrength={2}
-				animatePositionStrength={1.5}
-				soundVariant="none"
-				backgroundTransparency={1}
-				anchorPoint={new Vector2(0.5, 1)}
-				size={size}
-				zIndex={-math.abs(index)}
+		<ReactiveButton
+			onClick={() => {
+				onClick();
+				playSound(sounds.navigate);
+			}}
+			animateSizeStrength={2}
+			animatePositionStrength={1.5}
+			soundVariant="none"
+			backgroundTransparency={1}
+			anchorPoint={new Vector2(0.5, 1)}
+			size={size}
+			zIndex={-math.abs(index)}
+		>
+			{/* Card background */}
+			<Shadow
+				shadowColor={palette.white}
+				shadowBlur={0.3}
+				shadowPosition={rem(0.5)}
+				shadowSize={rem(2)}
+				shadowTransparency={0.7}
+			/>
+			<Frame
+				backgroundColor={palette.black}
+				backgroundTransparency={0.7}
+				cornerRadius={corner}
+				size={new UDim2(1, 0, 1, 0)}
 			>
-				{/* Card background */}
-				<Shadow
-					shadowColor={palette.white}
-					shadowBlur={0.3}
-					shadowPosition={rem(0.5)}
-					shadowSize={rem(2)}
-					shadowTransparency={0.7}
-				/>
-				<Frame
-					backgroundColor={palette.black}
-					backgroundTransparency={0.7}
-					cornerRadius={corner}
-					size={new UDim2(1, 0, 1, 0)}
-				>
-					<Outline cornerRadius={corner} />
-				</Frame>
+				<Outline cornerRadius={corner} />
+			</Frame>
 
-				{/* Thumbnail area */}
-				<Frame size={new UDim2(1, 0, 1, 0)} backgroundTransparency={1} position={new UDim2(0, 0, 0, 0)}>
-					<SkinThumbnail active={active} skin={skin} transparency={transparency} />
-				</Frame>
-
+			<VStack
+				horizontalAlignment={Enum.HorizontalAlignment.Center}
+				verticalAlignment={Enum.VerticalAlignment.Center}
+			>
 				{/* Title */}
 				<Text
 					text={skin.id}
-					textSize={rem(1.2)}
+					textSize={rem(1.5)}
 					textColor={palette.white}
-					size={new UDim2(1, -rem(2), 0, rem(2))}
-					position={new UDim2(0, rem(1), 0, rem(cellSize - 4))}
-					textXAlignment="Left"
+					size={new UDim2(1, 0, 0, rem(2))}
+					position={new UDim2(0, 0, 0, 0)}
+					textXAlignment="Center"
 					textYAlignment="Center"
 					font={fonts.inter.regular}
 				/>
+				{/* Thumbnail area */}
+				<Frame size={new UDim2(1, 0, 0.7, 0)} backgroundTransparency={1} position={new UDim2(0, 0, 0, 0)}>
+					<SkinThumbnail active={active} skin={skin} transparency={transparency} />
+				</Frame>
 
 				{/* Action */}
 				<PrimaryButton
 					onClick={onAction}
 					enabled={owns ? !isEquipped : canAfford}
 					size={new UDim2(1, -rem(2), 0, rem(3))}
-					position={new UDim2(0, rem(1), 1, -rem(3.5))}
-					anchorPoint={new Vector2(0, 1)}
 				>
 					<Text
 						text={actionLabel}
@@ -133,7 +134,7 @@ export function SkinButton({ id, index, active, shuffle: _shuffle, cellSize, onC
 						font={fonts.inter.medium}
 					/>
 				</PrimaryButton>
-			</ReactiveButton>
-		</Frame>
+			</VStack>
+		</ReactiveButton>
 	);
 }

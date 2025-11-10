@@ -19,7 +19,7 @@ export function SkinsList() {
 	const equippedSkin = useSelectorCreator(selectCurrentPlayerSkin, USER_NAME) ?? RANDOM_SKIN;
 	const currentSkin = useSelector(selectMenuCurrentSkin);
 
-	const cellSize = rem(10);
+	const cellSize = rem(15);
 
 	return (
 		<GridScrolling name="SkinsList" padding={rem(2)} spacing={rem(2)} cellSize={cellSize}>
