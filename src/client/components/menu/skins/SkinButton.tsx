@@ -20,14 +20,10 @@ import { SkinThumbnail } from "./SkinThumbnail";
 
 interface SkinButtonProps {
 	readonly id: string;
-	readonly index: number;
-	readonly active: boolean;
-	readonly shuffle?: readonly string[];
-	readonly onClick: () => void;
 	readonly cellSize: number;
 }
 
-export function SkinButton({ id, index, active, shuffle: _shuffle, cellSize, onClick }: SkinButtonProps) {
+export function SkinButton({ id, cellSize }: SkinButtonProps) {
 	const skin = getWallSkin(id);
 
 	const rem = useRem();
@@ -61,6 +57,7 @@ export function SkinButton({ id, index, active, shuffle: _shuffle, cellSize, onC
 	}, [owns, isEquipped, canAfford]);
 
 	const onAction = () => {
+		playSound(sounds.navigate);
 		if (owns) {
 			if (!isEquipped) {
 				remotes.save.setSkin.fire(id);
@@ -76,17 +73,12 @@ export function SkinButton({ id, index, active, shuffle: _shuffle, cellSize, onC
 
 	return (
 		<ReactiveButton
-			onClick={() => {
-				onClick();
-				playSound(sounds.navigate);
-			}}
 			animateSizeStrength={2}
 			animatePositionStrength={1.5}
 			soundVariant="none"
 			backgroundTransparency={1}
 			anchorPoint={new Vector2(0.5, 1)}
 			size={size}
-			zIndex={-math.abs(index)}
 		>
 			<Frame
 				backgroundColor={skin.tint}
@@ -115,7 +107,7 @@ export function SkinButton({ id, index, active, shuffle: _shuffle, cellSize, onC
 				</Text>
 				{/* Thumbnail area */}
 				<Frame size={new UDim2(1, 0, 0.7, 0)} backgroundTransparency={1} position={new UDim2(0, 0, 0, 0)}>
-					<SkinThumbnail active={active} skin={skin} transparency={transparency} />
+					<SkinThumbnail active={false} skin={skin} transparency={transparency} />
 				</Frame>
 
 				{/* Action */}
