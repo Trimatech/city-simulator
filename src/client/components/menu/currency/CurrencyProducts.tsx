@@ -58,7 +58,7 @@ export function CurrencyProducts() {
 					index={index++}
 					productId={DevProduct.MONEY_100}
 					productTitle={getProductTitle(100)}
-					productSubtitle="🍑  PEACH"
+					productSubtitle="💸"
 					productDiscount={getProductDiscount(100)}
 					primaryColor={palette.yellow}
 					secondaryColor={palette.peach}
@@ -69,7 +69,7 @@ export function CurrencyProducts() {
 					index={index++}
 					productId={DevProduct.MONEY_250}
 					productTitle={getProductTitle(250)}
-					productSubtitle="🍒  MAROON"
+					productSubtitle="🤑"
 					productDiscount={getProductDiscount(250, "20% OFF")}
 					primaryColor={palette.maroon}
 					secondaryColor={palette.red}
@@ -80,7 +80,7 @@ export function CurrencyProducts() {
 					index={index++}
 					productId={DevProduct.MONEY_500}
 					productTitle={getProductTitle(500)}
-					productSubtitle="🍐  GREEN"
+					productSubtitle="💰💰💰💰💰"
 					productDiscount={getProductDiscount(500, "20% OFF")}
 					primaryColor={palette.teal}
 					secondaryColor={palette.green}
@@ -91,7 +91,7 @@ export function CurrencyProducts() {
 					index={index++}
 					productId={DevProduct.MONEY_1000}
 					productTitle={getProductTitle(1000)}
-					productSubtitle="💎  SAPPHIRE"
+					productSubtitle="💵💸🤑💰💲"
 					productDiscount={getProductDiscount(1000, "20% OFF")}
 					primaryColor={palette.sapphire}
 					secondaryColor={palette.blue}
@@ -104,7 +104,7 @@ export function CurrencyProducts() {
 				index={index++}
 				productId={DevProduct.MONEY_5000}
 				productTitle={getProductTitle(5000)}
-				productSubtitle="💜  MAUVE"
+				productSubtitle="👑💎💰🤑🤑🤑"
 				productDiscount={getProductDiscount(5000, "25% OFF")}
 				primaryColor={palette.mauve}
 				secondaryColor={palette.blue}
