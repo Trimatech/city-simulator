@@ -9,7 +9,7 @@ import { palette } from "shared/constants/palette";
 export function SupportPremium() {
 	const rem = useRem();
 	const promptPremiumPurchase = async () => {
-		if (Players.LocalPlayer.MembershipType === Enum.MembershipType.Premium) {
+		if (Players.LocalPlayer?.MembershipType === Enum.MembershipType.Premium) {
 			sendAlert({
 				emoji: "💎",
 				message:
