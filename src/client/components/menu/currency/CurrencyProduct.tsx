@@ -1,14 +1,12 @@
-import { blend, composeBindings, lerpBinding, useTimeout } from "@rbxts/pretty-react-hooks";
+import { lerpBinding, useTimeout } from "@rbxts/pretty-react-hooks";
 import React, { useMemo } from "@rbxts/react";
 import { MarketplaceService, Players } from "@rbxts/services";
 import { fonts } from "client/constants/fonts";
 import { useMotion, useProductPrice, useRem } from "client/hooks";
 import { Frame } from "client/ui/layout/frame";
 import { Group } from "client/ui/layout/group";
-import { Outline } from "client/ui/outline";
 import { PrimaryButton } from "client/ui/PrimaryButton";
 import { ReactiveButton } from "client/ui/reactive-button";
-import { Shadow } from "client/ui/shadow";
 import { Text } from "client/ui/text";
 import { Transition } from "client/ui/transition";
 import { palette } from "shared/constants/palette";
@@ -93,21 +91,6 @@ export function CurrencyProduct({
 				backgroundTransparency={1}
 				size={new UDim2(1, 0, 1, 0)}
 			>
-				<Shadow
-					shadowColor={palette.white}
-					shadowTransparency={composeBindings(lerpBinding(hover, 0.2, 0), lerpBinding(glow, 1, 0), blend)}
-					shadowSize={rem(12)}
-				>
-					<uigradient Color={gradient} Rotation={95} />
-				</Shadow>
-
-				<Shadow
-					shadowSize={rem(2.5)}
-					shadowBlur={0.3}
-					shadowTransparency={lerpBinding(hover, 0.7, 0.25)}
-					shadowPosition={rem(0.5)}
-				/>
-
 				<Frame
 					backgroundColor={palette.white}
 					cornerRadius={new UDim(0, rem(2))}
@@ -133,8 +116,6 @@ export function CurrencyProduct({
 					>
 						<uigradient Transparency={new NumberSequence(1, 0)} Rotation={95} />
 					</Frame>
-
-					<Outline cornerRadius={new UDim(0, rem(2))} />
 				</Frame>
 
 				<Group
