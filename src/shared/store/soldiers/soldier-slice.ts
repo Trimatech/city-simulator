@@ -168,6 +168,7 @@ export const soldiersSlice = createProducer(initialState, {
 		}));
 	},
 
+	// not sending this to client
 	setSoldierPolygon: (state, id: string, polygon: Vector2[], polygonAreaSize: number, resetTracers = false) => {
 		// print(`setSoldierPolygon ${id}`, { polygon, polygonAreaSize });
 		return mapProperty(state, id, (soldier) => {
@@ -175,12 +176,19 @@ export const soldiersSlice = createProducer(initialState, {
 			return {
 				...soldier,
 				polygon,
-				polygonAreaSize,
+				//	polygonAreaSize, // updated separatelly
 				polygonBounds,
 				tracers: resetTracers ? [] : soldier.tracers,
 				lastTracerPoint: resetTracers ? undefined : soldier.lastTracerPoint,
 			};
 		});
+	},
+
+	setSoldierPolygonAreaSize: (state, id: string, polygonAreaSize: number) => {
+		return mapProperty(state, id, (soldier) => ({
+			...soldier,
+			polygonAreaSize,
+		}));
 	},
 
 	clearSoldierTracers: (state, id: string) => {
