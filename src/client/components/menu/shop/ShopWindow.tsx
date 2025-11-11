@@ -2,6 +2,7 @@ import React, { useState } from "@rbxts/react";
 import { SupportProducts } from "client/components/menu/support/support-products";
 import { Tabs } from "client/components/tabs/Tabs";
 import { useRem } from "client/hooks";
+import { CloseButton } from "client/ui/buttons/CloseButton";
 import { Frame } from "client/ui/layout/frame";
 import { Outline } from "client/ui/outline";
 import { palette } from "shared/constants/palette";
@@ -18,7 +19,11 @@ const tabs = [
 	{ text: "Currency", id: ShopTabs.Currency, emoji: "💵" },
 ];
 
-export function ShopWindow() {
+interface ShopWindowProps {
+	readonly onClose?: () => void;
+}
+
+export function ShopWindow({ onClose }: ShopWindowProps) {
 	const rem = useRem();
 	const headerHeight = rem(8);
 
@@ -33,6 +38,12 @@ export function ShopWindow() {
 			position={new UDim2(0.5, 0, 0.5, 0)}
 			anchorPoint={new Vector2(0.5, 0.5)}
 		>
+			<CloseButton
+				onClick={onClose}
+				anchorPoint={new Vector2(1, 0)}
+				position={new UDim2(1, -rem(2), 0, rem(2))}
+			/>
+
 			<Tabs tabs={tabs} activeTabId={activeTabId as number} setActiveTabId={setActiveTabId} />
 
 			<Frame

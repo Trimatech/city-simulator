@@ -55,7 +55,7 @@ export function Home() {
 						zIndex={10}
 					/>
 					<Group zIndex={11} size={new UDim2(1, 0, 1, 0)}>
-						<ShopWindow />
+						<ShopWindow onClose={() => setIsShopOpen(false)} />
 					</Group>
 				</>
 			)}

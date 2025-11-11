@@ -47,7 +47,7 @@ export function Tab({ onClick, emoji, label, active, enabled, order }: Props) {
 		transparencyMotion.spring(enabled ? 0 : 0.75, springs.slow);
 	}, [enabled]);
 
-	const roundness = rem(20);
+	const roundness = rem(50);
 
 	const cornerRadius = new UDim(0, roundness);
 
@@ -78,8 +78,8 @@ export function Tab({ onClick, emoji, label, active, enabled, order }: Props) {
 
 				{/* Icon rounded background */}
 				<Frame
-					backgroundTransparency={0.35}
-					backgroundColor={palette.black}
+					backgroundTransparency={0}
+					backgroundColor={palette.white}
 					cornerRadius={new UDim(0, rem(30))}
 					anchorPoint={new Vector2(0, 0.5)}
 					position={new UDim2(0, rem(CARD_BORDER_WIDTH), 0.5, 0)}
