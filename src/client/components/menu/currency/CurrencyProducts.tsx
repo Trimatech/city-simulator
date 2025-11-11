@@ -7,10 +7,10 @@ import { DevProduct } from "shared/assets";
 import { PREMIUM_BENEFIT } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
 
+import { CurrencyProduct } from "./CurrencyProduct";
 import { SupportHeart } from "./support-heart";
-import { SupportProduct } from "./support-product";
 
-export function SupportProducts() {
+export function CurrencyProducts() {
 	const rem = useRem();
 	const padding = rem(1.5);
 
@@ -54,7 +54,7 @@ export function SupportProducts() {
 			)}
 
 			<Group size={new UDim2(0.6, -padding / 2, 1, 0)}>
-				<SupportProduct
+				<CurrencyProduct
 					index={index++}
 					productId={DevProduct.MONEY_100}
 					productTitle={getProductTitle(100)}
@@ -65,7 +65,7 @@ export function SupportProducts() {
 					size={new UDim2(0.5, -padding / 2, 0.5, -padding / 2)}
 					position={new UDim2(0, 0, 0, 0)}
 				/>
-				<SupportProduct
+				<CurrencyProduct
 					index={index++}
 					productId={DevProduct.MONEY_250}
 					productTitle={getProductTitle(250)}
@@ -76,7 +76,7 @@ export function SupportProducts() {
 					size={new UDim2(0.5, -padding / 2, 0.5, -padding / 2)}
 					position={new UDim2(0, 0, 0.5, padding / 2)}
 				/>
-				<SupportProduct
+				<CurrencyProduct
 					index={index++}
 					productId={DevProduct.MONEY_500}
 					productTitle={getProductTitle(500)}
@@ -87,7 +87,7 @@ export function SupportProducts() {
 					size={new UDim2(0.5, -padding / 2, 0.5, -padding / 2)}
 					position={new UDim2(0.5, padding / 2, 0, 0)}
 				/>
-				<SupportProduct
+				<CurrencyProduct
 					index={index++}
 					productId={DevProduct.MONEY_1000}
 					productTitle={getProductTitle(1000)}
@@ -100,7 +100,7 @@ export function SupportProducts() {
 				/>
 			</Group>
 
-			<SupportProduct
+			<CurrencyProduct
 				index={index++}
 				productId={DevProduct.MONEY_5000}
 				productTitle={getProductTitle(5000)}
@@ -112,7 +112,7 @@ export function SupportProducts() {
 				position={new UDim2(0.6, padding / 2, 0, 0)}
 			>
 				<SupportHeart />
-			</SupportProduct>
+			</CurrencyProduct>
 		</scrollingframe>
 	);
 }

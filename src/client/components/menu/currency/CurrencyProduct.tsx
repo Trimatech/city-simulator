@@ -26,7 +26,7 @@ interface SupportProductProps extends React.PropsWithChildren {
 	readonly position: UDim2;
 }
 
-export function SupportProduct({
+export function CurrencyProduct({
 	index,
 	productId,
 	productTitle,

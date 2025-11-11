@@ -1,13 +1,12 @@
-import React, { useEffect, useMemo } from "@rbxts/react";
+import React, { useMemo } from "@rbxts/react";
 import { fonts } from "client/constants/fonts";
-import { springs } from "client/constants/springs";
 import { useMotion, useRem } from "client/hooks";
 import { Frame } from "client/ui/layout/frame";
 import { Outline } from "client/ui/outline";
 import { ReactiveButton } from "client/ui/reactive-button";
 import { Text } from "client/ui/text";
 import { Transition } from "client/ui/transition";
-import { gradientTabActive, gradientTabInactive, palette } from "shared/constants/palette";
+import { palette } from "shared/constants/palette";
 
 interface Props {
 	readonly onClick?: () => void;
@@ -30,9 +29,8 @@ const CARD_BORDER_WIDTH = 0.2;
 export function Tab({ onClick, emoji, label, active, enabled, order }: Props) {
 	const rem = useRem();
 
-	const gradient = active ? gradientTabActive : gradientTabInactive;
+	const bgColor = active ? palette.blue : palette.sky;
 
-	const [transparency, transparencyMotion] = useMotion(1);
 	const [textWidth, textWidthMotion] = useMotion({ label: 0, value: 0 });
 
 	const size = useMemo(() => {
@@ -43,10 +41,6 @@ export function Tab({ onClick, emoji, label, active, enabled, order }: Props) {
 		});
 	}, [rem]);
 
-	useEffect(() => {
-		transparencyMotion.spring(enabled ? 0 : 0.75, springs.slow);
-	}, [enabled]);
-
 	const roundness = rem(50);
 
 	const cornerRadius = new UDim(0, roundness);
@@ -54,7 +48,6 @@ export function Tab({ onClick, emoji, label, active, enabled, order }: Props) {
 	return (
 		<ReactiveButton onClick={onClick} soundVariant="alt" backgroundTransparency={1} size={size} layoutOrder={order}>
 			<Transition
-				groupTransparency={transparency}
 				size={new UDim2(1, rem(2 * CARD_CANVAS_MARGIN), 1, rem(2 * CARD_CANVAS_MARGIN))}
 				position={new UDim2(0, rem(-CARD_CANVAS_MARGIN), 0, rem(-CARD_CANVAS_MARGIN))}
 			>
@@ -67,13 +60,17 @@ export function Tab({ onClick, emoji, label, active, enabled, order }: Props) {
 
 				{/* Backgroun strip */}
 				<Frame
-					backgroundTransparency={active ? 0.1 : 0.5}
-					backgroundColor={palette.white}
+					backgroundTransparency={0}
+					backgroundColor={bgColor}
 					cornerRadius={cornerRadius}
 					size={new UDim2(1, 0, 1, 0)}
 				>
-					<uigradient Color={gradient} Rotation={71} />
-					<Outline cornerRadius={cornerRadius} innerTransparency={0} outerTransparency={1} />
+					<Outline
+						cornerRadius={cornerRadius}
+						innerTransparency={0}
+						outerTransparency={1}
+						innerThickness={rem(CARD_BORDER_WIDTH)}
+					/>
 				</Frame>
 
 				{/* Icon rounded background */}

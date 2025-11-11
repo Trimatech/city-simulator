@@ -6,7 +6,7 @@ import { PrimaryButton } from "client/ui/PrimaryButton";
 import { Text } from "client/ui/text";
 import { palette } from "shared/constants/palette";
 
-export function SupportPremium() {
+export function CurrencyPremium() {
 	const rem = useRem();
 	const promptPremiumPurchase = async () => {
 		if (Players.LocalPlayer?.MembershipType === Enum.MembershipType.Premium) {

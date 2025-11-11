@@ -1,5 +1,5 @@
 import React, { useState } from "@rbxts/react";
-import { SupportProducts } from "client/components/menu/support/support-products";
+import { CurrencyProducts } from "client/components/menu/currency/CurrencyProducts";
 import { Tabs } from "client/components/tabs/Tabs";
 import { useRem } from "client/hooks";
 import { CloseButton } from "client/ui/buttons/CloseButton";
@@ -60,9 +60,10 @@ export function ShopWindow({ onClose }: ShopWindowProps) {
 					innerTransparency={0}
 					outerTransparency={1}
 					innerColor={palette.blue}
+					innerThickness={rem(0.4)}
 				/>
 				{activeTabId === ShopTabs.Skins && <SkinsList />}
-				{activeTabId === ShopTabs.Currency && <SupportProducts />}
+				{activeTabId === ShopTabs.Currency && <CurrencyProducts />}
 			</Frame>
 		</Frame>
 	);
