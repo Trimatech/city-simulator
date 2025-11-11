@@ -3,14 +3,9 @@ import React, { memo, useEffect, useRef } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { ContentProvider, Players, SoundService } from "@rbxts/services";
 import { useCharacter } from "client/hooks/use-character";
-import {
-	selectWorldSubjectDead,
-	selectWorldSubjectOrbs,
-	selectWorldSubjectPolygonAreaSize,
-	selectWorldSubjectTracersSize,
-} from "client/store/world";
+import { selectWorldSubjectDead, selectWorldSubjectOrbs, selectWorldSubjectPolygonAreaSize } from "client/store/world";
 import { playSound, sounds } from "shared/assets";
-import { selectHasLocalSoldier } from "shared/store/soldiers";
+import { selectHasLocalSoldier, selectLocalLastTracerPoint } from "shared/store/soldiers";
 
 const ERROR_SOUNDS = [sounds.error_1, sounds.error_2, sounds.error_3];
 
@@ -20,12 +15,13 @@ const TOTAL_STEPS = 10; // 10 pre-made sounds (0.5 -> 1.0)
 function WorldSoundsComponent() {
 	const dead = useSelector(selectWorldSubjectDead);
 	const orbs = useSelector(selectWorldSubjectOrbs);
-	const tracersSize = useSelector(selectWorldSubjectTracersSize);
+
+	const lastTracerPoint = useSelector(selectLocalLastTracerPoint);
+	const previousLastTracerPoint = usePrevious(lastTracerPoint);
 	const polygonAreaSize = useSelector(selectWorldSubjectPolygonAreaSize);
 
 	const hasLocalSoldier = useSelector(selectHasLocalSoldier);
 	const previousOrbs = usePrevious(orbs);
-	const previousTracerLength = usePrevious(tracersSize);
 	const previousPolygonAreaSize = usePrevious(polygonAreaSize);
 
 	// Mute default Roblox footstep sounds from the character
@@ -181,24 +177,16 @@ function WorldSoundsComponent() {
 
 	// Tracer placement sound with cycling pitch
 	useEffect(() => {
-		const currentLength = tracersSize;
-		const prevLength = previousTracerLength;
-
-		print(`currentLength=${currentLength}, prevLength=${prevLength}`);
-
-		if (currentLength === undefined) return;
-
-		// Reset pitch cycle when tracers cleared
-		if (currentLength === 0) {
+		if (lastTracerPoint === undefined) {
 			pitchIndexRef.current = 0;
 			return;
 		}
 
 		// Attempt on each newly added segment; throttle via useThrottleCallback
-		if (prevLength !== undefined && currentLength > prevLength) {
+		if (lastTracerPoint !== previousLastTracerPoint) {
 			onTracerSound.run();
 		}
-	}, [tracersSize]);
+	}, [lastTracerPoint, previousLastTracerPoint]);
 
 	return <></>;
 }
