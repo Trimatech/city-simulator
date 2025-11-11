@@ -1,7 +1,7 @@
 import "client/app/react-config";
 
-import { hoarcekat } from "@rbxts/pretty-react-hooks";
 import React from "@rbxts/react";
+import ReactRoblox from "@rbxts/react-roblox";
 import { sendAlert } from "client/alerts";
 import { Alerts } from "client/components/alerts";
 import { Backdrop } from "client/components/world/backdrop";
@@ -9,7 +9,7 @@ import { RootProvider } from "client/providers/root-provider";
 import { InputCapture } from "client/ui/input-capture";
 import { palette } from "shared/constants/palette";
 
-export = hoarcekat(() => {
+function AlertsStoryContent() {
 	const modes = ["info", "success", "warning", "error", "awesome"] as const;
 
 	const alert = () => {
@@ -18,16 +18,16 @@ export = hoarcekat(() => {
 		switch (mode) {
 			case "info":
 				sendAlert({ emoji: "ℹ️", color: palette.blue, message: "This is an info alert." });
-				break;
+				return;
 			case "success":
 				sendAlert({ emoji: "✅", color: palette.green, message: "This is a success alert." });
-				break;
+				return;
 			case "warning":
 				sendAlert({ emoji: "⚠️", color: palette.yellow, message: "This is a warning alert." });
-				break;
+				return;
 			case "error":
 				sendAlert({ emoji: "🚨", color: palette.red, message: "This is an error alert." });
-				break;
+				return;
 			case "awesome":
 				sendAlert({
 					emoji: "🎉",
@@ -35,7 +35,7 @@ export = hoarcekat(() => {
 					colorSecondary: palette.blue,
 					message: "This is an awesome alert.",
 				});
-				break;
+				return;
 		}
 	};
 
@@ -52,4 +52,12 @@ export = hoarcekat(() => {
 			/>
 		</RootProvider>
 	);
-});
+}
+
+const story = {
+	react: React,
+	reactRoblox: ReactRoblox,
+	story: () => <AlertsStoryContent />,
+};
+
+export = story;

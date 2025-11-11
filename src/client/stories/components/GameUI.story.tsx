@@ -1,7 +1,8 @@
 import "client/app/react-config";
 
-import { hoarcekat, useInterval, useTimeout } from "@rbxts/pretty-react-hooks";
+import { useInterval, useTimeout } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
+import ReactRoblox from "@rbxts/react-roblox";
 import { GameUI } from "client/components/game/GameUI";
 import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
@@ -13,7 +14,7 @@ import { useMockRemotes } from "../utils/use-mock-remotes";
 
 const IDS = [USER_NAME, ...fillArray(10, (index) => `${index}`)];
 
-export = hoarcekat(() => {
+function GameUIStoryContent() {
 	useMockRemotes();
 
 	useEffect(() => {
@@ -64,4 +65,12 @@ export = hoarcekat(() => {
 			<GameUI />
 		</RootProvider>
 	);
-});
+}
+
+const story = {
+	react: React,
+	reactRoblox: ReactRoblox,
+	story: () => <GameUIStoryContent />,
+};
+
+export = story;

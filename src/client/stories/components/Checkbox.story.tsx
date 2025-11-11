@@ -1,8 +1,10 @@
-import { hoarcekat } from "@rbxts/pretty-react-hooks";
+import "client/app/react-config";
+
 import React, { useState } from "@rbxts/react";
+import ReactRoblox from "@rbxts/react-roblox";
 import { Checkbox } from "client/ui/Checkbox";
 
-export = hoarcekat(() => {
+function CheckboxStoryContent() {
 	const [checked1, setChecked1] = useState(false);
 	const [checked2, setChecked2] = useState(true);
 	const [checked3, setChecked3] = useState(false);
@@ -23,4 +25,12 @@ export = hoarcekat(() => {
 			<Checkbox checked={checked3} onChecked={setChecked3} text="Disabled Checkbox" disabled={true} />
 		</frame>
 	);
-});
+}
+
+const story = {
+	react: React,
+	reactRoblox: ReactRoblox,
+	story: () => <CheckboxStoryContent />,
+};
+
+export = story;

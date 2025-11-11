@@ -1,7 +1,8 @@
 import "client/app/react-config";
 
-import { hoarcekat, useMountEffect } from "@rbxts/pretty-react-hooks";
+import { useMountEffect } from "@rbxts/pretty-react-hooks";
 import React from "@rbxts/react";
+import ReactRoblox from "@rbxts/react-roblox";
 import { Home } from "client/components/menu/home/home";
 import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
@@ -10,7 +11,7 @@ import { defaultPlayerSave } from "shared/store/saves";
 
 import { useMockRemotes } from "../utils/use-mock-remotes";
 
-export = hoarcekat(() => {
+function HomeStoryContent() {
 	useMockRemotes();
 
 	useMountEffect(() => {
@@ -22,6 +23,12 @@ export = hoarcekat(() => {
 			<Home />
 		</RootProvider>
 	);
-});
+}
 
+const story = {
+	react: React,
+	reactRoblox: ReactRoblox,
+	story: () => <HomeStoryContent />,
+};
 
+export = story;
