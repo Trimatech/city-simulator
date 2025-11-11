@@ -1,14 +1,14 @@
 import { createProducer } from "@rbxts/reflex";
 
-export interface MenuState {
+export interface SettingsState {
 	readonly music: boolean;
 }
 
-const initialState: MenuState = {
+const initialState: SettingsState = {
 	music: true,
 };
 
-export const menuSlice = createProducer(initialState, {
+export const settingsSlice = createProducer(initialState, {
 	setMenuMusic: (state, music: boolean) => ({
 		...state,
 		music,

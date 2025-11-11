@@ -1,7 +1,7 @@
 import { useEventListener } from "@rbxts/pretty-react-hooks";
 import React, { useEffect, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { selectMusicEnabled } from "client/store/menu";
+import { selectMusicEnabled } from "client/store/settings/settingsSelectors";
 import { createSound } from "shared/assets";
 import { shuffle } from "shared/utils/object-utils";
 
