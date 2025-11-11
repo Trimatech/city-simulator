@@ -83,12 +83,6 @@ export function Stats() {
 			/>
 
 			<StatsCard
-				onClick={() => {
-					if (currentBalance === undefined) {
-						// Only show the support page if the user is not playing
-						store.setMenuPage("support");
-					}
-				}}
 				emoji="💵"
 				label="Cash"
 				value={`$${formatInteger(balance)}`}

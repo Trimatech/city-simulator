@@ -82,6 +82,11 @@ export const selectSoldierLastTracerPoint = (id: string) => {
 		return soldier.lastTracerPoint;
 	};
 };
+
+export const selectLocalLastTracerPoint = (state: SharedState) => {
+	return state.soldiers[USER_NAME]?.lastTracerPoint;
+};
+
 export const selectLocalSoldierId = (state: SharedState) => {
 	return state.soldiers[USER_NAME]?.id;
 };

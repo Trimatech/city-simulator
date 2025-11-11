@@ -1,6 +1,8 @@
 import { Debris, TweenService, Workspace } from "@rbxts/services";
 import { CollisionGroups } from "shared/constants/collision-groups";
 import { sliceArray } from "shared/polybool/poly-utils";
+import { loadSharedCloneByPath } from "shared/SharedModelManager";
+import { getCellAABBFromCoord } from "shared/utils/cell-key";
 
 export const FORCE_MULTIPLIER = 15;
 export const UPWARD_FORCE_BIAS = 0.3;
@@ -188,7 +190,7 @@ export function startFadeOut(piece: Part) {
 	});
 }
 
-export function calculateDebrisForces(position: Vector3) {
+export function calculateDebrisForces(_position: Vector3) {
 	// Calculate force direction relative to center
 	const horizontalDir = new Vector3(math.random(-1, 1), 0, math.random(-1, 1)).Unit;
 
@@ -317,7 +319,7 @@ export function startCrumbling(pieces: Part[]) {
 	};
 }
 
-export function createWallHighlight(part: Part, color = Color3.fromRGB(255, 255, 255)) {
+export function createWallHighlight(part: BasePart, color = Color3.fromRGB(255, 255, 255)) {
 	const highlight = new Instance("Highlight");
 	highlight.Adornee = part;
 	highlight.FillTransparency = 1;
@@ -334,30 +336,39 @@ interface WallPartOptions {
 	thickness: number;
 	center: Vector3;
 	rotation: CFrame;
-	color: Color3;
-	transparency: number;
-	material: Enum.Material;
+	/**
+	 * Optional: appearance to apply for simple tinted parts.
+	 * Omit when cloning a model-based skin to preserve its original look.
+	 */
+	color?: Color3;
+	transparency?: number;
+	material?: Enum.Material;
+	/**
+	 * Optional: when provided, a BasePart will be cloned from this path
+	 * in ReplicatedStorage instead of creating a plain Part.
+	 */
+	modelPath?: string;
 }
 
-export function createWallPart({
-	folderName,
-	width,
-	height,
-	thickness,
-	center,
-	rotation,
-	color,
-	transparency,
-	material,
-}: WallPartOptions) {
-	const part = new Instance("Part");
+export async function createWallPart(options: WallPartOptions) {
+	const { folderName, width, height, thickness, center, rotation, color, transparency, material, modelPath } =
+		options;
+
+	const part =
+		modelPath !== undefined ? await loadSharedCloneByPath<BasePart>(modelPath) : (new Instance("Part") as BasePart);
+
 	part.Name = `${folderName}_wall`;
 	part.Size = new Vector3(width, height, thickness);
-	part.Color = color;
-	part.Transparency = transparency;
-	part.Material = material;
-	part.TopSurface = Enum.SurfaceType.Smooth;
-	part.BottomSurface = Enum.SurfaceType.Smooth;
+
+	// Only apply appearance overrides for simple tinted walls (no modelPath)
+	if (modelPath === undefined) {
+		if (color !== undefined) part.Color = color;
+		if (transparency !== undefined) part.Transparency = transparency;
+		if (material !== undefined) part.Material = material;
+		part.TopSurface = Enum.SurfaceType.Smooth;
+		part.BottomSurface = Enum.SurfaceType.Smooth;
+	}
+
 	part.Anchored = true;
 	part.CanCollide = false;
 	part.CFrame = new CFrame(center).mul(rotation);
@@ -402,7 +413,7 @@ export function createCylinder({
 	return cylinder;
 }
 
-export function uncollideAndDestroy(part: Part, delay: number) {
+export function uncollideAndDestroy(part: BasePart, delay: number) {
 	part.CanCollide = false;
 	part.Anchored = false;
 	part.Parent = Workspace;
@@ -416,8 +427,8 @@ export function positionWallAtGround({
 	rotation,
 	startPosition,
 }: {
-	part: Part;
-	cylinder: Part;
+	part: BasePart;
+	cylinder?: Part;
 	center: Vector3;
 	rotation: CFrame;
 	startPosition: Vector3;
@@ -427,7 +438,9 @@ export function positionWallAtGround({
 	const groundCylinderCFrame = new CFrame(new Vector3(startPosition.X, 0, startPosition.Z)).mul(
 		CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90)),
 	);
-	cylinder.CFrame = groundCylinderCFrame;
+	if (cylinder) {
+		cylinder.CFrame = groundCylinderCFrame;
+	}
 }
 
 export function tweenWallToTarget({
@@ -437,21 +450,146 @@ export function tweenWallToTarget({
 	targetCylinderCFrame,
 	duration = 0.8,
 }: {
-	part: Part;
-	cylinder: Part;
+	part: BasePart;
+	cylinder?: Part;
 	targetPartCFrame: CFrame;
 	targetCylinderCFrame: CFrame;
 	duration?: number;
 }) {
 	const info = new TweenInfo(duration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out);
 	const partTween = TweenService.Create(part, info, { CFrame: targetPartCFrame });
-	const cylinderTween = TweenService.Create(cylinder, info, { CFrame: targetCylinderCFrame });
+	const cylinderTween = cylinder ? TweenService.Create(cylinder, info, { CFrame: targetCylinderCFrame }) : undefined;
 
 	partTween.Play();
-	cylinderTween.Play();
+	cylinderTween?.Play();
 
 	return () => {
 		partTween.Cancel();
-		cylinderTween.Cancel();
+		cylinderTween?.Cancel();
 	};
+}
+
+// -------- Wall join helpers (miter/fillet) --------
+export interface WallJoinConfig {
+	enableMiter: boolean;
+	enableFillet: boolean;
+	acuteThresholdDeg: number; // fillet if corner angle < threshold
+	maxExtensionRatio: number; // clamp per-end extension to ratio * segment width
+}
+
+export const WALL_JOIN_DEFAULTS: WallJoinConfig = {
+	enableMiter: true,
+	enableFillet: true,
+	acuteThresholdDeg: 90,
+	maxExtensionRatio: 0.45,
+};
+
+export function parseCellCoordFromKey(cellKey: string): Vector2 {
+	const parts = cellKey.split(",");
+	const x = tonumber(parts[0]) ?? 0;
+	const y = tonumber(parts[1]) ?? 0;
+	return new Vector2(x, y);
+}
+
+export function pointInAABB2D(p: Vector2, min: Vector2, max: Vector2) {
+	return p.X >= min.X && p.X <= max.X && p.Y >= min.Y && p.Y <= max.Y;
+}
+
+export function computeCornerAngleDeg(isStart: boolean, a: Vector2, b: Vector2, neighborDir?: Vector2) {
+	if (!neighborDir) return undefined;
+	const segDir = isStart ? b.sub(a) : a.sub(b);
+	if (segDir.Magnitude < 1e-6 || neighborDir.Magnitude < 1e-6) return undefined;
+	const u = segDir.Unit;
+	const v = neighborDir.Unit;
+	const dot = math.clamp(u.Dot(v), -1, 1);
+	const theta = math.acos(dot);
+	return math.deg(theta);
+}
+
+export function computeMiterExtension(
+	isStart: boolean,
+	a: Vector2,
+	b: Vector2,
+	thickness: number,
+	neighborDir?: Vector2,
+) {
+	if (!neighborDir) return 0;
+	const segDir = isStart ? b.sub(a) : a.sub(b);
+	if (segDir.Magnitude < 1e-6 || neighborDir.Magnitude < 1e-6) return 0;
+	const u = segDir.Unit;
+	const v = neighborDir.Unit;
+	const dot = math.clamp(u.Dot(v), -1, 1);
+	const theta = math.acos(dot);
+	if (theta <= 1e-3 || math.abs(theta - math.pi) <= 1e-3) return 0;
+	const half = theta / 2;
+	const t = math.tan(half);
+	if (math.abs(t) < 1e-6) return 0;
+	const w = thickness / 2;
+	const ext = w / t;
+	return ext > 0 ? ext : 0;
+}
+
+export function computeWallJoinForCell({
+	cellKey,
+	gridResolution,
+	thickness,
+	segmentWidth,
+	a,
+	b,
+	startNeighborDir,
+	endNeighborDir,
+	startMiterFactor,
+	endMiterFactor,
+	config = WALL_JOIN_DEFAULTS,
+}: {
+	cellKey?: string;
+	gridResolution: number;
+	thickness: number;
+	segmentWidth: number;
+	a: Vector2;
+	b: Vector2;
+	startNeighborDir?: Vector2;
+	endNeighborDir?: Vector2;
+	startMiterFactor?: number;
+	endMiterFactor?: number;
+	config?: WallJoinConfig;
+}) {
+	let extAraw = 0;
+	let extBraw = 0;
+	let acuteA = false;
+	let acuteB = false;
+
+	if (cellKey !== undefined) {
+		const cellCoord = parseCellCoordFromKey(cellKey);
+		const [cellMin, cellMax] = getCellAABBFromCoord(cellCoord, gridResolution);
+		const useA = pointInAABB2D(a, cellMin, cellMax);
+		const useB = pointInAABB2D(b, cellMin, cellMax);
+		const extAprecise = config.enableMiter
+			? useA
+				? computeMiterExtension(true, a, b, thickness, startNeighborDir)
+				: 0
+			: 0;
+		const extBprecise = config.enableMiter
+			? useB
+				? computeMiterExtension(false, a, b, thickness, endNeighborDir)
+				: 0
+			: 0;
+		const extAfromFactor = config.enableMiter ? (useA ? thickness * (startMiterFactor ?? 0) : 0) : 0;
+		const extBfromFactor = config.enableMiter ? (useB ? thickness * (endMiterFactor ?? 0) : 0) : 0;
+		extAraw = extAprecise > 0 ? extAprecise : extAfromFactor;
+		extBraw = extBprecise > 0 ? extBprecise : extBfromFactor;
+		const angleA = useA ? computeCornerAngleDeg(true, a, b, startNeighborDir) : undefined;
+		const angleB = useB ? computeCornerAngleDeg(false, a, b, endNeighborDir) : undefined;
+		acuteA = !!(config.enableFillet && angleA !== undefined && angleA < config.acuteThresholdDeg);
+		acuteB = !!(config.enableFillet && angleB !== undefined && angleB < config.acuteThresholdDeg);
+	}
+
+	const cap = segmentWidth * config.maxExtensionRatio;
+	const extA = acuteA ? 0 : math.min(extAraw, cap);
+	const extB = acuteB ? 0 : math.min(extBraw, cap);
+	return { extA, extB, acuteA, acuteB };
+}
+
+export function getEndpointWorldPosition(point: Vector2, height: number, yOffsetExtra = 0) {
+	return new Vector3(point.X, height / 2 + Y_OFFSET + yOffsetExtra, point.Y);
 }

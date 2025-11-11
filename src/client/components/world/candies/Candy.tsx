@@ -11,16 +11,31 @@ interface Props {
 	eatenAt?: Vector2;
 }
 
+const CONTAINER_NAME = "Candies";
+let candiesFolder: Folder | undefined;
+
+function ensureCandiesFolder(): Folder {
+	if (candiesFolder && candiesFolder.Parent) return candiesFolder;
+	let folder = Workspace.FindFirstChild(CONTAINER_NAME) as Folder | undefined;
+	if (!folder) {
+		folder = new Instance("Folder");
+		folder.Name = CONTAINER_NAME;
+		folder.Parent = Workspace;
+	}
+	candiesFolder = folder;
+	return folder;
+}
+
 const ANIMATION_DURATION = 1;
 const FROM_GROUND = 4;
 const FLOAT_HEIGHT = 15;
 const FINAL_SIZE = 0.1;
 
-function CandyComponent({ position, color = palette.white, transparency = 0, size = 2, name, eatenAt }: Props) {
+function CandyComponent({ position, color = palette.white, transparency = 0.25, size = 2, name, eatenAt }: Props) {
 	const sphereRef = useRef<Part>();
 	const cleanupRef = useRef<() => void>();
 
-	print(`render candy, eatenAt=${eatenAt}`);
+	//print(`render candy, eatenAt=${eatenAt}`);
 
 	useEffect(() => {
 		// Create candy sphere
@@ -36,7 +51,7 @@ function CandyComponent({ position, color = palette.white, transparency = 0, siz
 		sphere.BottomSurface = Enum.SurfaceType.Smooth;
 		sphere.Anchored = true;
 		sphere.CanCollide = false;
-		sphere.Parent = Workspace;
+		sphere.Parent = ensureCandiesFolder();
 		sphere.CastShadow = false;
 
 		sphereRef.current = sphere;

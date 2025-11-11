@@ -1,5 +1,5 @@
 import { t } from "@rbxts/t";
-import { baseSoldierSkins } from "shared/constants/skins";
+import { freeWallSkins } from "shared/constants/skins";
 
 export interface PlayerSave {
 	readonly balance: number;
@@ -11,7 +11,7 @@ export const RANDOM_SKIN = "__random__";
 
 export const defaultPlayerSave: PlayerSave = {
 	balance: 100,
-	skins: [RANDOM_SKIN, ...baseSoldierSkins.map((skin) => skin.id)],
+	skins: [RANDOM_SKIN, ...freeWallSkins.map((skin) => skin.id)],
 	skin: RANDOM_SKIN,
 };
 

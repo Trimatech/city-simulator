@@ -344,6 +344,7 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[]) {
 					);
 
 					store.setSoldierPolygon(soldierId as string, updatedPolygon, updatedArea);
+					store.setSoldierPolygonAreaSize(soldierId as string, updatedArea);
 
 					// Kill soldier if area becomes too small
 					if (updatedArea < SOLDIER_MIN_AREA) {
@@ -356,6 +357,7 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[]) {
 						`[DEBUG] No valid difference region for soldier ${soldierId} - fully covered, killing and clearing area`,
 					);
 					store.setSoldierPolygon(soldierId as string, [], 0, true);
+					store.setSoldierPolygonAreaSize(soldierId as string, 0);
 					killSoldier(soldierId as string);
 					store.playerKilledSoldier("system", soldierId as string);
 				}
@@ -365,6 +367,7 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[]) {
 				);
 				// Fully covered by damage area: clear polygon immediately, then kill
 				store.setSoldierPolygon(soldierId as string, [], 0, true);
+				store.setSoldierPolygonAreaSize(soldierId as string, 0);
 				killSoldier(soldierId as string);
 				store.playerKilledSoldier("system", soldierId as string);
 			}

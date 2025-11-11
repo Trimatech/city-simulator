@@ -1,19 +1,20 @@
 import "client/app/react-config";
 
-import { hoarcekat, useInterval, useTimeout } from "@rbxts/pretty-react-hooks";
+import { useInterval, useTimeout } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
-import { GameUI } from "client/components/game";
+import ReactRoblox from "@rbxts/react-roblox";
+import { GameUI } from "client/components/game/GameUI";
 import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
 import { USER_NAME, WORLD_BOUNDS } from "shared/constants/core";
-import { getRandomBaseSoldierSkin } from "shared/constants/skins";
+import { getRandomBotSkin } from "shared/constants/skins";
 import { fillArray } from "shared/utils/object-utils";
 
 import { useMockRemotes } from "../utils/use-mock-remotes";
 
 const IDS = [USER_NAME, ...fillArray(10, (index) => `${index}`)];
 
-export = hoarcekat(() => {
+function GameUIStoryContent() {
 	useMockRemotes();
 
 	useEffect(() => {
@@ -27,7 +28,7 @@ export = hoarcekat(() => {
 								math.random(-WORLD_BOUNDS, WORLD_BOUNDS),
 								math.random(-WORLD_BOUNDS, WORLD_BOUNDS),
 							),
-				skin: getRandomBaseSoldierSkin().id,
+				skin: getRandomBotSkin().id,
 				orbs: math.random(0, 5000),
 			});
 		}
@@ -64,4 +65,12 @@ export = hoarcekat(() => {
 			<GameUI />
 		</RootProvider>
 	);
-});
+}
+
+const story = {
+	react: React,
+	reactRoblox: ReactRoblox,
+	story: () => <GameUIStoryContent />,
+};
+
+export = story;

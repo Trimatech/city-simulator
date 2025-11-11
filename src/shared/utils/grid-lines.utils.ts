@@ -1,4 +1,5 @@
 import { GridCellsByEdgeId, GridLine } from "shared/store/grid/grid-types";
+import { isPointInPolygon } from "shared/polybool/poly-utils";
 import { getCellAABBFromCoord, getCellCoordFromPos, getCellKeyFromCoord } from "shared/utils/cell-key";
 import { getEdgeId, quantizeVector2 } from "shared/utils/edge-id";
 import { segmentIntersectsRect } from "shared/utils/geometry-utils";
@@ -45,13 +46,92 @@ export function shallowEqualCell(a?: GridCellsByEdgeId, b?: GridCellsByEdgeId) {
 	return matchCount === countA;
 }
 
+function signedArea(points: Vector2[]) {
+	let sum = 0;
+	for (let i = 0; i < points.size(); i++) {
+		const p = points[i];
+		const q = points[i + 1] || points[0];
+		sum += p.X * q.Y - q.X * p.Y;
+	}
+	return 0.5 * sum;
+}
+
+function turnSign(prev: Vector2, curr: Vector2, nextPoint: Vector2) {
+	const v1 = curr.sub(prev);
+	const v2 = nextPoint.sub(curr);
+	const z = v1.X * v2.Y - v1.Y * v2.X;
+	return z; // >0 left turn, <0 right turn
+}
+
+function angleBetween(prev: Vector2, curr: Vector2, nextPoint: Vector2) {
+	const v1 = curr.sub(prev);
+	const v2 = nextPoint.sub(curr);
+	if (v1.Magnitude < 1e-6 || v2.Magnitude < 1e-6) return 0;
+	const dot = math.clamp(v1.Unit.Dot(v2.Unit), -1, 1);
+	return math.acos(dot);
+}
+
+function computeMiterMagnitude(prev: Vector2, curr: Vector2, nextPoint: Vector2) {
+	const theta = angleBetween(prev, curr, nextPoint);
+	// Colinear or nearly straight
+	if (theta <= 1e-3 || math.abs(theta - math.pi) <= 1e-3) return 0;
+
+	// miterFactor = 0.5 * cot(theta/2) = 0.5 / tan(theta/2)
+	const half = theta / 2;
+	const t = math.tan(half);
+	if (math.abs(t) < 1e-6) return 0;
+	let factor = 0.5 / t;
+	// Clamp to avoid extreme spikes on tiny angles
+	const MAX_FACTOR = 3;
+	if (factor > MAX_FACTOR) factor = MAX_FACTOR;
+	return factor;
+}
+
+function rotateCW90(v: Vector2) {
+	return new Vector2(v.Y, -v.X);
+}
+
+function unit(v: Vector2) {
+	const m = v.Magnitude;
+	if (m < 1e-6) return new Vector2(0, 0);
+	return v.div(m);
+}
+
 export function buildAreaLinesByCell(points: Vector2[], resolution: number, kind: "area" | "area2" = "area") {
 	const areaLinesByCell = new Map<string, Map<string, GridLine>>();
 	const quantQ = getQuantizationStep(resolution);
+	const asPoints = points.map((p) => [p.X, p.Y] as [number, number]);
 
 	for (let i = 0; i < points.size(); i++) {
 		const a = points[i];
 		const b = points[i + 1] || points[0];
+		const prev = points[i - 1] || points[points.size() - 1];
+		const next2 = points[(i + 2) % points.size()];
+
+		// Only extend outer boundary lines; inner offset (area2) uses zero
+		let startMiterFactor = 0;
+		let endMiterFactor = 0;
+		let startNeighborDir: Vector2 | undefined = undefined;
+		let endNeighborDir: Vector2 | undefined = undefined;
+		if (kind === "area" || kind === "area2") {
+			// Determine outward via point-in-polygon test along bisector normal
+			const u1 = unit(a.sub(prev));
+			const u2 = unit(b.sub(a));
+			startNeighborDir = unit(prev.sub(a));
+			endNeighborDir = unit(next2.sub(b));
+			const n1 = rotateCW90(u1);
+			const n2 = rotateCW90(u2);
+			const nbStart = unit(n1.add(n2));
+			const nbEnd = unit(rotateCW90(u2).add(rotateCW90(unit(next2.sub(b)))));
+			const EPS = math.max(0.05, resolution / 200);
+			// sample near corner
+			const sampleStart = [a.X + nbStart.X * EPS, a.Y + nbStart.Y * EPS] as [number, number];
+			const sampleEnd = [b.X + nbEnd.X * EPS, b.Y + nbEnd.Y * EPS] as [number, number];
+			const isStartOutside = !isPointInPolygon(sampleStart, asPoints);
+			const isEndOutside = !isPointInPolygon(sampleEnd, asPoints);
+			startMiterFactor = isStartOutside ? computeMiterMagnitude(prev, a, b) : 0;
+			endMiterFactor = isEndOutside ? computeMiterMagnitude(a, b, next2) : 0;
+		}
 
 		const minX = math.min(a.X, b.X);
 		const maxX = math.max(a.X, b.X);
@@ -75,7 +155,16 @@ export function buildAreaLinesByCell(points: Vector2[], resolution: number, kind
 				const qb = quantizeVector2(b, quantQ);
 				const edgeId = getEdgeId({ a: qa, b: qb });
 				// Store original geometry; use quantized only for stable ids
-				cell.set(edgeId, { a, b, ownerId: "", kind });
+				cell.set(edgeId, {
+					a,
+					b,
+					ownerId: "",
+					kind,
+					startMiterFactor,
+					endMiterFactor,
+					startNeighborDir,
+					endNeighborDir,
+				});
 			}
 		}
 	}
@@ -103,6 +192,23 @@ function buildSegmentLinesByCell(
 		const minC = getCellCoordFromPos(new Vector2(minX, minY), resolution);
 		const maxC = getCellCoordFromPos(new Vector2(maxX, maxY), resolution);
 
+		const prev = segments[i - 1];
+		const next2 = segments[i + 2];
+		let startMiterFactor = 0;
+		let endMiterFactor = 0;
+		let startNeighborDir: Vector2 | undefined = undefined;
+		let endNeighborDir: Vector2 | undefined = undefined;
+		if (kind === "tracer") {
+			if (prev !== undefined) {
+				startNeighborDir = unit(prev.sub(a));
+				startMiterFactor = computeMiterMagnitude(prev, a, b);
+			}
+			if (next2 !== undefined) {
+				endNeighborDir = unit(next2.sub(b));
+				endMiterFactor = computeMiterMagnitude(a, b, next2);
+			}
+		}
+
 		for (const ix of $range(minC.X, maxC.X)) {
 			for (const iy of $range(minC.Y, maxC.Y)) {
 				const key = getCellKeyFromCoord(new Vector2(ix, iy));
@@ -118,7 +224,16 @@ function buildSegmentLinesByCell(
 				const qb = quantizeVector2(b, quantQ);
 				const edgeId = getEdgeId({ a: qa, b: qb });
 				// Store original geometry; use quantized only for stable ids
-				cell.set(edgeId, { a, b, ownerId, kind });
+				cell.set(edgeId, {
+					a,
+					b,
+					ownerId,
+					kind,
+					startMiterFactor,
+					endMiterFactor,
+					startNeighborDir,
+					endNeighborDir,
+				});
 			}
 		}
 	}

@@ -102,26 +102,26 @@ target:
         products:
             money-100:
                 price: 10
-                name: 💛 $100
+                name: 💰 $100
                 description: Buy $100 to spend on skins and more!
                 icon: assets/marketing/game_icon.png
             money-250:
                 price: 20
-                name: ❤️ $250
+                name: 💰 $250
                 description: Buy $250 to spend on skins and more!
                 icon: assets/marketing/game_icon.png
             money-500:
                 price: 40
-                name: 💚 $500
+                name: 💰 $500
                 description: Buy $500 to spend on skins and more!
                 icon: assets/marketing/game_icon.png
             money-1000:
                 price: 80
-                name: 💙 $1,000
+                name: 💰 $1,000
                 description: Buy $1,000 to spend on skins and more!
                 icon: assets/marketing/game_icon.png
             money-5000:
                 price: 375
-                name: 💜 $5,000
+                name: 💰 $5,000
                 description: Buy $5,000 to spend on skins and more!
                 icon: assets/marketing/game_icon.png

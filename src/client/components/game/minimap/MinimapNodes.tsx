@@ -5,7 +5,7 @@ import { CanvasGroup } from "client/ui/canvas-group";
 import { Image } from "client/ui/image";
 import { images } from "shared/assets";
 import { palette } from "shared/constants/palette";
-import { getSoldierSkin } from "shared/constants/skins";
+import { getWallSkin } from "shared/constants/skins";
 import { selectLocalSoldierId, selectSoldiersById, selectSoldierSkin } from "shared/store/soldiers";
 
 import { normalizeToWorldBounds } from "./utils";
@@ -26,7 +26,7 @@ export function MinimapNodes() {
 		for (const [, soldier] of pairs(soldiers)) {
 			const pos = normalizeToWorldBounds(soldier.position);
 			const skinId = store.getState(selectSoldierSkin(soldier.id));
-			const color = skinId !== undefined ? getSoldierSkin(skinId).tint[0] : palette.offwhite;
+			const color = skinId !== undefined ? getWallSkin(skinId).tint : palette.offwhite;
 			const isLocal = soldier.id === localId;
 			const sizePx = isLocal ? 5 : 3;
 
@@ -61,7 +61,7 @@ export function MinimapNodes() {
 				const localId = store.getState(selectLocalSoldierId);
 				if (localId === undefined) return undefined;
 				const skinId = store.getState(selectSoldierSkin(localId));
-				const color = skinId !== undefined ? getSoldierSkin(skinId).tint[0] : palette.offwhite;
+				const color = skinId !== undefined ? getWallSkin(skinId).tint : palette.offwhite;
 				const current = observerPosition;
 				if (current === undefined) return undefined;
 				const pos = normalizeToWorldBounds(current);

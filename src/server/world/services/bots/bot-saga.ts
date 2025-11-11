@@ -3,7 +3,7 @@ import { store } from "server/store";
 import { DEFAULT_ORBS, IS_TESTING_STUFF, SOLDIER_TICK_PHASE } from "server/world/constants";
 import { getSafePointOutsideSoldierPolygons, killSoldier } from "server/world/world.utils";
 import { SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
-import { getRandomBaseSoldierSkin } from "shared/constants/skins";
+import { getRandomBotSkin } from "shared/constants/skins";
 import { selectAliveSoldiersById } from "shared/store/soldiers";
 import { createScheduler } from "shared/utils/scheduler";
 
@@ -14,7 +14,7 @@ import { setSoldierSpeed } from "../soldiers/soldiers.utils";
 import { botStopped } from "./bot-events";
 import { buildBotMovementPath } from "./buildBotMovementPath";
 
-const MAX_BOTS = 20;
+const MAX_BOTS = 0;
 const BOT_RESPAWN_DELAY = 2; // seconds to wait before replacing a dead bot
 
 interface BotController {
@@ -65,7 +65,7 @@ async function spawnBot(botId: string) {
 	}
 
 	// create soldier entity in store
-	const randomSkinId = getRandomBaseSoldierSkin().id;
+	const randomSkinId = getRandomBotSkin().id;
 	print(`Bot ${botId} using skin ${randomSkinId}`);
 	store.addSoldier(botId, {
 		name: `Bot ${botId}`,

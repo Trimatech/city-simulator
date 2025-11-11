@@ -1,0 +1,23 @@
+import React from "@rbxts/react";
+import { useRem } from "client/hooks";
+import { GridScrolling } from "client/ui/layout/GridScrolling";
+import { allWallSkins } from "shared/constants/skins";
+import { RANDOM_SKIN } from "shared/store/saves";
+
+import { SkinButton } from "./SkinButton";
+
+const SKIN_LIST = [RANDOM_SKIN, ...allWallSkins.map((skin) => skin.id)];
+
+export function SkinsList() {
+	const rem = useRem();
+
+	const cellSize = rem(15);
+
+	return (
+		<GridScrolling name="SkinsList" padding={rem(2)} spacing={rem(2)} cellSize={cellSize}>
+			{SKIN_LIST.map((skin) => {
+				return <SkinButton key={skin} id={skin} cellSize={cellSize} />;
+			})}
+		</GridScrolling>
+	);
+}

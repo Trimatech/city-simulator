@@ -40,6 +40,8 @@ export function cutOthersByNewArea(ownerId: string, newCutPolygon: Polygon) {
 				const updatedPolygon = pointsToVectors(bestRegion);
 				const updatedArea = calculatePolygonArea(updatedPolygon);
 				store.setSoldierPolygon(otherId, updatedPolygon, updatedArea);
+				store.setSoldierPolygonAreaSize(otherId, updatedArea);
+
 				updateAreaGridForPolygon({
 					ownerId: otherId,
 					polygon: updatedPolygon as Vector2[],
@@ -54,6 +56,7 @@ export function cutOthersByNewArea(ownerId: string, newCutPolygon: Polygon) {
 		} else {
 			updateAreaGridForPolygon({ ownerId: otherId, polygon: [] as Vector2[], dropTracers: false });
 			store.setSoldierPolygon(otherId, [], 0, true);
+			store.setSoldierPolygonAreaSize(otherId, 0);
 			killSoldier(otherId);
 			store.playerKilledSoldier(ownerId, otherId);
 			store.incrementSoldierEliminations(ownerId);
@@ -82,6 +85,7 @@ export function processNewAreaClaim(ownerId: string, newCutPolygon: Polygon) {
 	const polygonAreaSize = calculatePolygonArea(updatedOwnerPolygon);
 
 	store.setSoldierPolygon(ownerId, updatedOwnerPolygon, polygonAreaSize, true);
+	store.setSoldierPolygonAreaSize(ownerId, polygonAreaSize);
 	updateAreaGridForPolygon({ ownerId, polygon: updatedOwnerPolygon as Vector2[] });
 
 	const newCutPoints = newCutPolygon.regions[0] as Point[];

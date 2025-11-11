@@ -26,3 +26,12 @@ export async function findSharedInstanceByPath<T extends Instance>(path: string)
 
 	return currentInstance as T;
 }
+
+export async function loadSharedCloneByPath<T extends Instance>(path: string): Promise<T> {
+	const source = await findSharedInstanceByPath<T>(path);
+	const prev = source.Archivable;
+	source.Archivable = true;
+	const clone = source.Clone() as T;
+	source.Archivable = prev;
+	return clone;
+}

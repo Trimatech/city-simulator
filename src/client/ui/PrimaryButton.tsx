@@ -12,6 +12,7 @@ interface PrimaryButtonProps extends React.PropsWithChildren {
 	readonly onClick?: () => void;
 	readonly onHover?: (hovered: boolean) => void;
 	readonly enabled?: boolean;
+	readonly primaryColor?: Color3;
 	readonly size?: UDim2 | React.Binding<UDim2>;
 	readonly position?: UDim2 | React.Binding<UDim2>;
 	readonly anchorPoint?: Vector2 | React.Binding<Vector2>;
@@ -19,15 +20,18 @@ interface PrimaryButtonProps extends React.PropsWithChildren {
 	readonly overlayTransparency?: number | React.Binding<number>;
 	readonly overlayRotation?: number | React.Binding<number>;
 	readonly layoutOrder?: number | React.Binding<number>;
+	readonly cornerRadius?: UDim | React.Binding<UDim>;
 }
 
 export function PrimaryButton({
+	cornerRadius: cornerRadiusProp,
 	onClick,
 	onHover,
 	enabled = true,
 	size,
 	position,
 	anchorPoint,
+	primaryColor: primaryColorProp,
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	overlayGradient: _overlayGradient,
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -45,10 +49,9 @@ export function PrimaryButton({
 	const [hasMouseSample, setHasMouseSample] = useState(false);
 	const [offset, setOffset] = useState(defaultOffset);
 
-	const cornerRadius = new UDim(0, rem(1));
+	const cornerRadius = cornerRadiusProp ?? new UDim(0, rem(1));
 
-	const primaryColor = palette.sky;
-
+	const primaryColor = primaryColorProp ?? palette.sky;
 	const brighterBlue = brighten(primaryColor, 0.5);
 
 	const gradientColor = new ColorSequence([
@@ -81,7 +84,7 @@ export function PrimaryButton({
 		>
 			<Frame
 				backgroundColor={palette.white}
-				cornerRadius={new UDim(0, rem(1))}
+				cornerRadius={cornerRadius}
 				size={new UDim2(1, 0, 1, 0)}
 				backgroundTransparency={0}
 				ref={uiRef}
