@@ -32,6 +32,18 @@ export function Home() {
 			/>
 			<GameVersion />
 
+			<Group anchorPoint={new Vector2(0, 1)} size={new UDim2()} position={new UDim2(0, rem(3), 1, rem(-3))}>
+				<uilistlayout
+					Padding={new UDim(0, rem(1))}
+					VerticalAlignment="Bottom"
+					HorizontalAlignment="Left"
+					FillDirection="Horizontal"
+				/>
+				<PrimaryButton onClick={() => setIsShopOpen(true)} size={new UDim2(0, rem(10), 0, rem(4))}>
+					<Text font={fonts.inter.medium} text={"🛒 Shop"} textSize={rem(1.6)} size={new UDim2(1, 0, 1, 0)} />
+				</PrimaryButton>
+			</Group>
+
 			<Group anchorPoint={new Vector2(1, 1)} size={new UDim2()} position={new UDim2(1, rem(-3), 1, rem(-3))}>
 				<uilistlayout
 					Padding={new UDim(0, rem(1))}
@@ -40,9 +52,6 @@ export function Home() {
 					FillDirection="Horizontal"
 				/>
 				<MuteButton />
-				<PrimaryButton onClick={() => setIsShopOpen(true)} size={new UDim2(0, rem(10), 0, rem(4))}>
-					<Text font={fonts.inter.medium} text={"🛒 Shop"} textSize={rem(1.6)} size={new UDim2(1, 0, 1, 0)} />
-				</PrimaryButton>
 			</Group>
 
 			{isShopOpen && (
