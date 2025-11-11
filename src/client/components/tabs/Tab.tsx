@@ -5,7 +5,6 @@ import { useMotion, useRem } from "client/hooks";
 import { Frame } from "client/ui/layout/frame";
 import { Outline } from "client/ui/outline";
 import { ReactiveButton } from "client/ui/reactive-button";
-import { Shadow } from "client/ui/shadow";
 import { Text } from "client/ui/text";
 import { Transition } from "client/ui/transition";
 import { gradientTabActive, gradientTabInactive, palette } from "shared/constants/palette";
@@ -50,6 +49,8 @@ export function Tab({ onClick, emoji, label, active, enabled, order }: Props) {
 
 	const roundness = rem(20);
 
+	const cornerRadius = new UDim(0, roundness);
+
 	return (
 		<ReactiveButton onClick={onClick} soundVariant="alt" backgroundTransparency={1} size={size} layoutOrder={order}>
 			<Transition
@@ -64,25 +65,15 @@ export function Tab({ onClick, emoji, label, active, enabled, order }: Props) {
 					PaddingRight={new UDim(0, rem(CARD_CANVAS_MARGIN))}
 				/>
 
-				<Shadow
-					shadowColor={palette.white}
-					shadowBlur={0.3}
-					shadowPosition={rem(0.5)}
-					shadowSize={active ? rem(6) : rem(1)}
-					shadowTransparency={0.7}
-				>
-					<uigradient Color={gradient} Rotation={71} />
-				</Shadow>
-
 				{/* Backgroun strip */}
 				<Frame
-					backgroundTransparency={active ? 0.1 : 0.9}
+					backgroundTransparency={active ? 0.1 : 0.5}
 					backgroundColor={palette.white}
-					cornerRadius={new UDim(0, roundness)}
+					cornerRadius={cornerRadius}
 					size={new UDim2(1, 0, 1, 0)}
 				>
 					<uigradient Color={gradient} Rotation={71} />
-					<Outline cornerRadius={new UDim(0, roundness)} />
+					<Outline cornerRadius={cornerRadius} innerTransparency={0} outerTransparency={1} />
 				</Frame>
 
 				{/* Icon rounded background */}
@@ -93,7 +84,7 @@ export function Tab({ onClick, emoji, label, active, enabled, order }: Props) {
 					anchorPoint={new Vector2(0, 0.5)}
 					position={new UDim2(0, rem(CARD_BORDER_WIDTH), 0.5, 0)}
 					size={new UDim2(0, rem(CARD_HEIGHT - CARD_BORDER_WIDTH), 0, rem(CARD_HEIGHT - CARD_BORDER_WIDTH))}
-				></Frame>
+				/>
 
 				<Text
 					text={emoji}
@@ -119,7 +110,7 @@ export function Tab({ onClick, emoji, label, active, enabled, order }: Props) {
 							textWidthMotion.spring({ label: rbx.TextBounds.X });
 						},
 					}}
-				></Text>
+				/>
 			</Transition>
 		</ReactiveButton>
 	);

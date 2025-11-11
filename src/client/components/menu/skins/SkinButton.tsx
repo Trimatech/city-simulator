@@ -4,10 +4,8 @@ import { fonts } from "client/constants/fonts";
 import { useMotion, useRem } from "client/hooks";
 import { Frame } from "client/ui/layout/frame";
 import { VStack } from "client/ui/layout/VStack";
-import { Outline } from "client/ui/outline";
 import { PrimaryButton } from "client/ui/PrimaryButton";
 import { ReactiveButton } from "client/ui/reactive-button";
-import { Shadow } from "client/ui/shadow";
 import { Text } from "client/ui/text";
 import { formatInteger } from "client/utils/format-integer";
 import { playSound, sounds } from "shared/assets";
@@ -90,22 +88,12 @@ export function SkinButton({ id, index, active, shuffle: _shuffle, cellSize, onC
 			size={size}
 			zIndex={-math.abs(index)}
 		>
-			{/* Card background */}
-			<Shadow
-				shadowColor={palette.white}
-				shadowBlur={0.3}
-				shadowPosition={rem(0.5)}
-				shadowSize={rem(2)}
-				shadowTransparency={0.7}
-			/>
 			<Frame
 				backgroundColor={skin.tint}
-				backgroundTransparency={0.5}
+				backgroundTransparency={0.7}
 				cornerRadius={corner}
 				size={new UDim2(1, 0, 1, 0)}
-			>
-				<Outline cornerRadius={corner} />
-			</Frame>
+			/>
 
 			<VStack
 				horizontalAlignment={Enum.HorizontalAlignment.Center}

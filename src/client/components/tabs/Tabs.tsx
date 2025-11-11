@@ -23,11 +23,13 @@ interface Props {
 export function Tabs({ tabs, activeTabId, setActiveTabId }: Props) {
 	const rem = useRem();
 
-	const height = rem(10);
+	const height = rem(8);
+
+	const padding = rem(2);
 
 	return (
 		<Frame key="Tabs" size={new UDim2(1, 0, 0, height)} position={new UDim2(0, 0, 0, 0)}>
-			<uipadding key="uipadding" PaddingLeft={new UDim(0, rem(3))} PaddingRight={new UDim(0, rem(3))} />
+			<uipadding key="uipadding" PaddingLeft={new UDim(0, padding)} PaddingRight={new UDim(0, padding)} />
 			<HStack key="TabButtons" size={new UDim2(1, 0, 1, 0)} spacing={rem(1)}>
 				{tabs.map((tab, index) => (
 					<Tab

@@ -3,6 +3,8 @@ import { SupportProducts } from "client/components/menu/support/support-products
 import { Tabs } from "client/components/tabs/Tabs";
 import { useRem } from "client/hooks";
 import { Frame } from "client/ui/layout/frame";
+import { Outline } from "client/ui/outline";
+import { palette } from "shared/constants/palette";
 
 import { SkinsList } from "../skins/SkinsList";
 
@@ -18,21 +20,36 @@ const tabs = [
 
 export function ShopWindow() {
 	const rem = useRem();
-	const headerHeight = rem(10);
+	const headerHeight = rem(8);
 
 	const [activeTabId, setActiveTabId] = useState(ShopTabs.Skins);
 
+	const cornerRadius = new UDim(0, rem(2));
+
 	return (
-		<Frame size={new UDim2(1, 0, 1, 0)} backgroundTransparency={1} name="ShopWindow">
+		<Frame
+			size={new UDim2(0.9, 0, 0.9, 0)}
+			name="ShopWindow"
+			position={new UDim2(0.5, 0, 0.5, 0)}
+			anchorPoint={new Vector2(0.5, 0.5)}
+		>
 			<Tabs tabs={tabs} activeTabId={activeTabId as number} setActiveTabId={setActiveTabId} />
 
 			<Frame
 				size={new UDim2(1, 0, 1, -headerHeight)}
 				position={new UDim2(0, 0, 0, headerHeight)}
-				backgroundTransparency={1}
-				name="ShopContent"
 				clipsDescendants={true}
+				backgroundTransparency={0}
+				name="ShopContent"
+				cornerRadius={cornerRadius}
+				backgroundColor={palette.white}
 			>
+				<Outline
+					cornerRadius={cornerRadius}
+					innerTransparency={0}
+					outerTransparency={1}
+					innerColor={palette.blue}
+				/>
 				{activeTabId === ShopTabs.Skins && <SkinsList />}
 				{activeTabId === ShopTabs.Currency && <SupportProducts />}
 			</Frame>
