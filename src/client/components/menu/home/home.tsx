@@ -1,19 +1,27 @@
 import React, { useState } from "@rbxts/react";
+import { useSelector } from "@rbxts/react-reflex";
+import { fonts } from "client/constants/fonts";
 import { useRem } from "client/hooks";
 import { Group } from "client/ui/layout/group";
 import { PrimaryButton } from "client/ui/PrimaryButton";
-import { Text } from "client/ui/text";
-import { fonts } from "client/constants/fonts";
 import { ReactiveButton } from "client/ui/reactive-button/reactive-button";
+import { Text } from "client/ui/text";
+import { selectHasLocalSoldier } from "shared/store/soldiers";
 
-import { GameVersion } from "./GameVersion";
-import { MuteButton } from "./mute-button";
-import { PlayButton } from "./PlayButton";
 import { ShopWindow } from "../shop/ShopWindow";
+import { GameVersion } from "./GameVersion";
+import { MuteButton } from "./MuteButton";
+import { PlayButton } from "./PlayButton";
 
 export function Home() {
 	const rem = useRem();
 	const [isShopOpen, setIsShopOpen] = useState(false);
+
+	const spawned = useSelector(selectHasLocalSoldier);
+
+	if (spawned) {
+		return undefined;
+	}
 
 	return (
 		<>
@@ -33,12 +41,7 @@ export function Home() {
 				/>
 				<MuteButton />
 				<PrimaryButton onClick={() => setIsShopOpen(true)} size={new UDim2(0, rem(10), 0, rem(4))}>
-					<Text
-						font={fonts.inter.medium}
-						text={"🛒 Shop"}
-						textSize={rem(1.6)}
-						size={new UDim2(1, 0, 1, 0)}
-					/>
+					<Text font={fonts.inter.medium} text={"🛒 Shop"} textSize={rem(1.6)} size={new UDim2(1, 0, 1, 0)} />
 				</PrimaryButton>
 			</Group>
 

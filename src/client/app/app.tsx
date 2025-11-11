@@ -1,11 +1,11 @@
 import React from "@rbxts/react";
+import { Home } from "client/components/menu/home/home";
 
 import { Alerts } from "../components/alerts";
 import { BirdCamera } from "../components/camera/BirdCamera";
 import { Controller } from "../components/controller";
 import { ErrorHandler } from "../components/error-handler";
-import { GameUI } from "../components/game";
-import { Menu } from "../components/menu";
+import { GameUI } from "../components/game/GameUI";
 import { Music } from "../components/music";
 import { Preloader } from "../components/preloader";
 import { World } from "../components/world/World";
@@ -26,7 +26,7 @@ export function App() {
 			</Layer>
 
 			<Layer>
-				<Menu />
+				<Home />
 			</Layer>
 
 			<Layer>

@@ -2,7 +2,7 @@ import "client/app/react-config";
 
 import { hoarcekat, useInterval, useTimeout } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
-import { GameUI } from "client/components/game";
+import { GameUI } from "client/components/game/GameUI";
 import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
 import { USER_NAME, WORLD_BOUNDS } from "shared/constants/core";
