@@ -149,8 +149,10 @@ function WorldSoundsComponent() {
 
 	// Candy eat sound
 	useEffect(() => {
+		print("orbs changed.......");
 		if (orbs > (previousOrbs ?? 0)) {
 			const speed = random.NextNumber(0.87, 1);
+			print("playing whoosh.......");
 			playSound(sounds.whoosh, { volume: 0.6 * volume, speed });
 		}
 	}, [orbs]);
@@ -167,7 +169,7 @@ function WorldSoundsComponent() {
 
 		const sound = thudRef.current;
 		if (!sound) {
-			//playSound(sounds.POL_organic_thud_02, { volume: volume * 0.5 });
+			playSound(sounds.POL_organic_thud_02, { volume: volume * 0.5 });
 			return;
 		}
 
