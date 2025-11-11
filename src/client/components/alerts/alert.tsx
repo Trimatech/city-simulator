@@ -1,12 +1,11 @@
 import { composeBindings, lerpBinding, useMountEffect } from "@rbxts/pretty-react-hooks";
 import React, { useEffect, useMemo } from "@rbxts/react";
-import { useSelector, useSelectorCreator } from "@rbxts/react-reflex";
+import { useSelectorCreator } from "@rbxts/react-reflex";
 import { dismissAlert } from "client/alerts";
 import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
 import { useMotion, useRem } from "client/hooks";
 import { Alert, selectAlertIndex } from "client/store/alert";
-import { selectIsMenuOpen } from "client/store/menu";
 import { Image } from "client/ui/image";
 import { Frame } from "client/ui/layout/frame";
 import { Outline } from "client/ui/outline";
@@ -33,7 +32,6 @@ const LIST_PADDING = 1;
 
 export function Alert({ alert, index }: AlertProps) {
 	const rem = useRem();
-	const menuOpen = useSelector(selectIsMenuOpen);
 	const visibleIndex = useSelectorCreator(selectAlertIndex, alert.id);
 
 	const [transition, transitionMotion] = useMotion(0);
@@ -65,14 +63,14 @@ export function Alert({ alert, index }: AlertProps) {
 
 	useEffect(() => {
 		const position = (ALERT_HEIGHT + LIST_PADDING) * index;
-		const offset = menuOpen ? 10 : 5;
+		const offset = 5;
 
 		positionMotion.spring(new UDim2(0.5, 0, 0, rem(position + offset)), {
 			tension: 180,
 			friction: 12,
 			mass: mapStrict(index, 0, MAX_VISIBLE_ALERTS, 1, 2),
 		});
-	}, [index, menuOpen, rem]);
+	}, [index, rem]);
 
 	useEffect(() => {
 		// Alerts that are dismissed are still in the list, but are invisible.
