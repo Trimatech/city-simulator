@@ -28,7 +28,7 @@ const MUSIC = [
 	"rbxassetid://9047104411", // Beach Cushions
 ];
 
-export function Music() {
+export function BackgroundMusic() {
 	const enabled = useSelector(selectMusicEnabled);
 
 	const [queue, setQueue] = useState(() => shuffle(MUSIC));

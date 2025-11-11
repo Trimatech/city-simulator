@@ -6,7 +6,7 @@ import { BirdCamera } from "../components/camera/BirdCamera";
 import { Controller } from "../components/controller";
 import { ErrorHandler } from "../components/error-handler";
 import { GameUI } from "../components/game/GameUI";
-import { Music } from "../components/music";
+import { BackgroundMusic } from "../components/music/BackgroundMusic";
 import { Preloader } from "../components/preloader";
 import { World } from "../components/world/World";
 import { Layer } from "../ui/layout/layer";
@@ -14,7 +14,7 @@ import { Layer } from "../ui/layout/layer";
 export function App() {
 	return (
 		<ErrorHandler>
-			<Music />
+			<BackgroundMusic />
 			<Preloader />
 			{/* <Voice /> */}
 
