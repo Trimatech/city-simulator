@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useRef } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { Players, RunService } from "@rbxts/services";
 import { WORLD_BOUNDS } from "shared/constants/core";
-import { selectLocalIsSpawned } from "shared/store/soldiers";
+import { selectLocalIsSpawned, selectLocalSoldier } from "shared/store/soldiers";
 import { clampToCircle } from "shared/utils/world-bounds";
 
 function noiseDirection(t: number, seedX: number, seedY: number) {
@@ -49,6 +49,7 @@ function rotateTowards(current: Vector2, target: Vector2, maxAngleRadians: numbe
 export function BirdCamera() {
 	const camera = useCamera();
 	const isSpawned = useSelector(selectLocalIsSpawned);
+	const localSoldier = useSelector(selectLocalSoldier);
 
 	warn("BirdCamera rendering");
 
@@ -94,7 +95,12 @@ export function BirdCamera() {
 			return;
 		}
 
-		// Entering spectate: clear subject and take script control
+		const startPosition = localSoldier?.position;
+		if (startPosition) {
+			const clamped = clampToCircle({ position: startPosition, radius: WORLD_BOUNDS - 5 });
+			position2DRef.current = clamped;
+		}
+
 		camera.CameraSubject = undefined;
 		camera.CameraType = Enum.CameraType.Scriptable;
 		return () => {
