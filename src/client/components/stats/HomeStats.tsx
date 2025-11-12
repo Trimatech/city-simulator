@@ -1,0 +1,41 @@
+import React from "@rbxts/react";
+import { useSelectorCreator } from "@rbxts/react-reflex";
+import { useDefined, useRem } from "client/hooks";
+import { Group } from "client/ui/layout/group";
+import { formatInteger } from "client/utils/format-integer";
+import { USER_NAME } from "shared/constants/core";
+import { ROOT_PADDING } from "shared/constants/theme";
+import { selectPlayerBalance } from "shared/store/saves";
+
+import { StatsCard } from "./StatsCard";
+
+export function HomeStats() {
+	const rem = useRem();
+
+	const currentBalance = useSelectorCreator(selectPlayerBalance, USER_NAME);
+
+	const balance = useDefined(currentBalance, 0);
+
+	return (
+		<Group name="Stats">
+			<uipadding PaddingBottom={new UDim(0, rem(ROOT_PADDING))} PaddingLeft={new UDim(0, rem(ROOT_PADDING))} />
+			<uilistlayout
+				FillDirection="Vertical"
+				HorizontalAlignment="Left"
+				VerticalAlignment="Bottom"
+				Padding={new UDim(0, rem(1))}
+				SortOrder="LayoutOrder"
+			/>
+
+			<StatsCard
+				emoji="💵"
+				label="Cash"
+				value={`$${formatInteger(balance)}`}
+				primary={Color3.fromRGB(111, 158, 79)}
+				secondary={Color3.fromRGB(153, 181, 107)}
+				enabled={currentBalance !== undefined}
+				order={2}
+			/>
+		</Group>
+	);
+}

@@ -51,8 +51,8 @@ This project is based on and heavily inspired by:
 
 Current part skin prices:
 
--   Gradient: CosmicShift 200, MidNightCity 250, BradyFun 300, Rastafari 350, SweetMorning 400, JoyShine 450, Superman 500
--   Textured: Stars 600, Spiderweb 700, Famous 800, Wood 900, Stone 1000, Icy 1200
+-   Gradient: CosmicShift 300, MidNightCity 450, BradyFun 600, Rastafari 750, SweetMorning 900, JoyShine 1050, Superman 1200
+-   Textured: Stars 1400, Spiderweb 1600, Famous 1800, Wood 2000, Stone 2300, Icy 2600
 
 ### Pricing strategy
 

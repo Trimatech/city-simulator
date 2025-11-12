@@ -1,9 +1,10 @@
 import React from "@rbxts/react";
 import { useSelector, useSelectorCreator } from "@rbxts/react-reflex";
-import { useDefined, useRem, useStore } from "client/hooks";
+import { useDefined, useRem } from "client/hooks";
 import { Group } from "client/ui/layout/group";
 import { formatInteger } from "client/utils/format-integer";
 import { USER_NAME } from "shared/constants/core";
+import { ROOT_PADDING } from "shared/constants/theme";
 import { selectPlayerBalance } from "shared/store/saves";
 import {
 	selectLocalEliminations,
@@ -16,7 +17,6 @@ import { StatsCard } from "./StatsCard";
 
 export function Stats() {
 	const rem = useRem();
-	const store = useStore();
 
 	const currentEliminations = useSelector(selectLocalEliminations);
 	const currentOrbs = useSelector(selectLocalOrbs);
@@ -32,7 +32,7 @@ export function Stats() {
 
 	return (
 		<Group name="Stats">
-			<uipadding PaddingBottom={new UDim(0, rem(3))} PaddingLeft={new UDim(0, rem(3))} />
+			<uipadding PaddingBottom={new UDim(0, rem(ROOT_PADDING))} PaddingLeft={new UDim(0, rem(ROOT_PADDING))} />
 
 			<uilistlayout
 				FillDirection="Vertical"
