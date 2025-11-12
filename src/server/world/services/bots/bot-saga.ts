@@ -2,7 +2,7 @@ import Object from "@rbxts/object-utils";
 import { store } from "server/store";
 import { DEFAULT_ORBS, IS_TESTING_STUFF, SOLDIER_TICK_PHASE } from "server/world/constants";
 import { getSafePointOutsideSoldierPolygons, killSoldier } from "server/world/world.utils";
-import { SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
+import { IS_LOCAL, SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
 import { getRandomBotSkin } from "shared/constants/skins";
 import { selectAliveSoldiersById } from "shared/store/soldiers";
 import { createScheduler } from "shared/utils/scheduler";
@@ -14,7 +14,7 @@ import { setSoldierSpeed } from "../soldiers/soldiers.utils";
 import { botStopped } from "./bot-events";
 import { buildBotMovementPath } from "./buildBotMovementPath";
 
-const MAX_BOTS = 0;
+const MAX_BOTS = IS_LOCAL ? 0 : 15;
 const BOT_RESPAWN_DELAY = 2; // seconds to wait before replacing a dead bot
 
 interface BotController {
