@@ -14,7 +14,7 @@ import { setSoldierSpeed } from "../soldiers/soldiers.utils";
 import { botStopped } from "./bot-events";
 import { buildBotMovementPath } from "./buildBotMovementPath";
 
-const MAX_BOTS = IS_LOCAL ? 0 : 15;
+const MAX_BOTS = IS_LOCAL ? 15 : 15;
 const BOT_RESPAWN_DELAY = 2; // seconds to wait before replacing a dead bot
 
 interface BotController {

@@ -15,6 +15,7 @@ import {
 	computeCellsFromNew,
 	shallowEqualCell,
 } from "shared/utils/grid-lines.utils";
+import { clearOwnerWallParts, syncCellWallParts } from "./wall-part-manager";
 
 // Local debug/visualization grid (kept for soldier-grid-visualizer)
 export const soldierGrid = new Grid<{ id: string; tracers?: Vector2[] }>(20);
@@ -34,6 +35,7 @@ export function updateTracerGridForOwner({ ownerId, positions }: { ownerId: stri
 		const merged = buildMergedCellContentUnionKind(existing, newLines, ownerId, "tracer");
 		if (!shallowEqualCell(existing, merged)) {
 			store.setCellLines(cellKey, merged);
+			syncCellWallParts(cellKey, merged);
 		}
 	});
 
@@ -141,6 +143,7 @@ export function updateAreaGridForPolygon({
 		const merged = buildMergedCellContent(base, newLines, ownerId);
 		if (!shallowEqualCell(existing, merged)) {
 			store.setCellLines(cellKey, merged);
+			syncCellWallParts(cellKey, merged);
 		}
 	});
 }
@@ -149,6 +152,9 @@ export function updateAreaGridForPolygon({
 export function clearOwnerFromGrid(ownerId: string) {
 	const state = store.getState();
 	const currentCells = selectGridCells({ grid: state.grid });
+
+	// Clear all wall parts for this owner first
+	clearOwnerWallParts(ownerId);
 
 	for (const [cellKey, existing] of pairs(currentCells)) {
 		if (!existing) continue;
@@ -159,6 +165,7 @@ export function clearOwnerFromGrid(ownerId: string) {
 		const noOwner = buildMergedCellContentReplaceKind(cleaned, undefined, ownerId, "tracer");
 		if (!shallowEqualCell(existing, noOwner)) {
 			store.setCellLines(cellKey as string, noOwner);
+			syncCellWallParts(cellKey as string, noOwner);
 		}
 	}
 }
@@ -173,6 +180,7 @@ export function clearOwnerTracersFromGrid(ownerId: string) {
 		const noTracers = buildMergedCellContentReplaceKind(existing, undefined, ownerId, "tracer");
 		if (!shallowEqualCell(existing, noTracers)) {
 			store.setCellLines(cellKey as string, noTracers);
+			syncCellWallParts(cellKey as string, noTracers);
 		}
 	}
 }

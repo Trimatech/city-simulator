@@ -194,10 +194,8 @@ function WallComponent({
 				cylinderRef.current = cylinder;
 			}
 
-			// Start at ground level only if we intend to animate (non-tracer)
-			if (kind !== "tracer") {
-				positionWallAtGround({ part, cylinder: cylinderRef.current, center, rotation, startPosition });
-			}
+			// Start at ground level for animation (all wall types including tracers)
+			positionWallAtGround({ part, cylinder: cylinderRef.current, center, rotation, startPosition });
 
 			if (outline) {
 				outlineRef.current = createWallHighlight(part);
@@ -287,8 +285,8 @@ function WallComponent({
 		const targetPartCFrame = new CFrame(center).mul(rotation);
 		const targetCylinderCFrame = new CFrame(startPosition).mul(CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90)));
 
-		const shouldAnimate = !hasAnimatedRef.current && kind !== "tracer";
-		if (shouldAnimate && cylinder) {
+		const shouldAnimate = !hasAnimatedRef.current;
+		if (shouldAnimate) {
 			// Position from ground then tween to targets
 			positionWallAtGround({ part, cylinder, center, rotation, startPosition });
 			tweenCleanupRef.current = tweenWallToTarget({
