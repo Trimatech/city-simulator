@@ -94,8 +94,17 @@ export function checkCollisionWithTracers(headPosition: Vector2, tracers: Vector
 // }
 
 export function isInsidePolygon(soldier: SoldierEntity) {
-	const polygon = vectorsToPoints(soldier.polygon as Vector2[]);
+	// Early exit: Check bounding box first (cheap AABB check)
+	const bounds = soldier.polygonBounds;
+	if (bounds) {
+		const pos = soldier.position;
+		if (pos.X < bounds.min.X || pos.X > bounds.max.X || pos.Y < bounds.min.Y || pos.Y > bounds.max.Y) {
+			return false;
+		}
+	}
 
+	// Only do expensive point-in-polygon check if inside bounding box
+	const polygon = vectorsToPoints(soldier.polygon as Vector2[]);
 	return isPointInPolygon(vector2ToPoint(soldier.position), polygon);
 }
 
