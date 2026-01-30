@@ -1,5 +1,5 @@
 name: "Roblox Build"
-description: "Compile and build Lobby and Game, uploading artifacts"
+description: "Compile and build Game, uploading artifacts"
 inputs:
     node_env:
         description: "NODE_ENV to use (dev|prod)"
