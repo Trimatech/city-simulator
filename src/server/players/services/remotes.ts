@@ -55,4 +55,14 @@ export async function initRemoteService() {
 			});
 		}
 	});
+
+	// Handle bird camera position updates for streaming
+	remotes.camera.updateBirdPosition.connect((player, position2D) => {
+		// Convert 2D position to 3D (bird is at ground level for streaming purposes)
+		const position3D = new Vector3(position2D.X, 0, position2D.Y);
+
+		// Request streaming around the bird's position
+		player.RequestStreamAroundAsync(position3D);
+		print(`Streaming around bird position: ${position2D}`);
+	});
 }

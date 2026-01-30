@@ -70,8 +70,8 @@
 			},
 			"$properties": {
 				"StreamingEnabled": true,
-				"StreamingMinRadius": 64,
-				"StreamingTargetRadius": 128,
+				"StreamingMinRadius": 120,
+				"StreamingTargetRadius": 300,
 				"SignalBehavior2": {
 					"Enum": 2
 				}
