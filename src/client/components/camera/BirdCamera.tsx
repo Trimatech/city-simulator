@@ -51,8 +51,6 @@ export function BirdCamera() {
 	const isSpawned = useSelector(selectLocalIsSpawned);
 	const localSoldier = useSelector(selectLocalSoldier);
 
-	warn("BirdCamera rendering");
-
 	const timeRef = useRef(0);
 	const position2DRef = useRef(new Vector2(0, 0));
 	const velocityRef = useRef(new Vector2(1, 0));
