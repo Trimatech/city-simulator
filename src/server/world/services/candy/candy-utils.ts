@@ -42,6 +42,8 @@ export function createCandy(patch?: Partial<CandyEntity>): CandyEntity {
 		...patch,
 	};
 
+	print(`[DEBUG] Creating candy ID: ${candy.id}, Position: (${candy.position.X}, ${candy.position.Y}), Type: ${candy.type}`);
+
 	candyGrid.insert(candy.position, { id: candy.id });
 	addCandyLocal(candy);
 
@@ -97,8 +99,11 @@ export function removeCandy(id: string, eatenAt?: Vector2) {
 	const candy = getCandyLocal(id);
 
 	if (!candy) {
+		print(`[DEBUG] removeCandy: Candy ${id} not found in local store`);
 		return;
 	}
+
+	print(`[DEBUG] Removing candy ID: ${candy.id}, Position: (${candy.position.X}, ${candy.position.Y})`);
 
 	setCandyEatenAtLocal(id, eatenAt ?? candy.position);
 	candyGrid.remove(candy.position);
@@ -117,6 +122,7 @@ export function removeCandy(id: string, eatenAt?: Vector2) {
 		removeCandyLocal(id);
 		// Remove the server-side Part
 		removeCandyPart(id);
+		print(`[DEBUG] Candy ${id} fully removed after timeout`);
 	}, TIMEOUT_DELAY);
 }
 
@@ -342,6 +348,9 @@ export function dropCandyOnDeath(id: string): void {
 		}
 	}
 	// Add created candies to in-memory and replicated grid
+	print(`[DEBUG] dropCandyOnDeath: Created ${candies.size()} candies for soldier ${id}`);
+	print(`[DEBUG] Candy IDs: ${candies.map((c) => c.id).join(", ")}`);
+
 	addCandies(candies);
 	const state = store.getState();
 	const resolution = selectCandyGridResolution({ candyGrid: state.candyGrid });
