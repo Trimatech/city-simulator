@@ -98,27 +98,12 @@ function createWallPart(cellKey: string, edgeId: string, line: GridLine): BasePa
 	part.SetAttribute(WALL_ATTR_TARGET_Y, targetY);
 	part.SetAttribute(WALL_ATTR_SKIN_ID, skinId);
 
+	part.Parent = ensureWallsFolder();
+
 	// Add tag for CollectionService
 	CollectionService.AddTag(part, WALL_TAG);
 
-	part.Parent = ensureWallsFolder();
-
 	return part;
-}
-
-function updateWallPart(part: BasePart, line: GridLine): void {
-	const height = getHeightForKind(line.kind);
-	const { width, center, rotation } = calculateWallTransform(line.a, line.b, height, true);
-	const targetY = height / 2 - 1;
-
-	// Update size and position (keep underground since client handles animation)
-	part.Size = new Vector3(width, height, WALL_THICKNESS);
-	part.CFrame = new CFrame(center).mul(rotation);
-
-	// Update attributes
-	part.SetAttribute(WALL_ATTR_KIND, line.kind);
-	part.SetAttribute(WALL_ATTR_OWNER_ID, line.ownerId);
-	part.SetAttribute(WALL_ATTR_TARGET_Y, targetY);
 }
 
 function destroyWallPart(compositeKey: string): void {
@@ -131,7 +116,8 @@ function destroyWallPart(compositeKey: string): void {
 
 /**
  * Syncs wall parts for a given cell based on the new cell content.
- * Creates, updates, or destroys parts as needed.
+ * Creates or destroys parts as needed. Never updates - existing walls keep their position
+ * (client handles animation and we don't want to reset them to underground).
  */
 export function syncCellWallParts(cellKey: string, newContent: GridCellsByEdgeId | undefined): void {
 	// Get all existing parts for this cell
@@ -150,12 +136,9 @@ export function syncCellWallParts(cellKey: string, newContent: GridCellsByEdgeId
 			const compositeKey = getCompositeKey(cellKey, edgeId as string);
 			existingKeys.delete(compositeKey);
 
-			const existingPart = wallParts.get(compositeKey);
-			if (existingPart) {
-				// Update existing part
-				updateWallPart(existingPart, line);
-			} else {
-				// Create new part
+			// Only create if doesn't exist - never update existing walls
+			// (updating would reset CFrame to underground, breaking client animation)
+			if (!wallParts.has(compositeKey)) {
 				const part = createWallPart(cellKey, edgeId as string, line);
 				wallParts.set(compositeKey, part);
 			}

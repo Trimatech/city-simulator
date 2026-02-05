@@ -1,4 +1,5 @@
 import { CollectionService, TweenService, Workspace } from "@rbxts/services";
+import { getObserverPosition2D } from "client/utils/camera-position.utils";
 import {
 	WALL_ANIMATION_THRESHOLD,
 	WALL_ATTR_SKIN_ID,
@@ -7,7 +8,6 @@ import {
 	WALL_TAG,
 } from "shared/constants/core";
 import { getWallSkin } from "shared/constants/skins";
-import { getObserverPosition2D } from "client/utils/camera-position.utils";
 
 const ANIMATION_DURATION = 0.8;
 const WALL_ANIMATION_DISTANCE_THRESHOLD = 150; // Don't animate walls farther than this
@@ -19,8 +19,23 @@ const processedParts = new Set<BasePart>();
 const activeTweens = new Map<BasePart, Tween>();
 
 function getTargetCFrame(part: BasePart): CFrame {
-	const targetY = part.GetAttribute(WALL_ATTR_TARGET_Y) as number | undefined;
-	if (targetY === undefined) return part.CFrame;
+	let targetY = part.GetAttribute(WALL_ATTR_TARGET_Y) as number | undefined;
+
+	// Check for streaming/replication issues
+	if (targetY === undefined) {
+		warn(`[WallAnimator] Missing WALL_ATTR_TARGET_Y on part "${part.Name}", using fallback`);
+	}
+
+	// Check if Size seems invalid (streaming issue - part not fully loaded)
+	if (part.Size.Y <= 0 || part.Size.Y > 100) {
+		warn(`[WallAnimator] Suspicious Size.Y=${part.Size.Y} on part "${part.Name}"`);
+	}
+
+	// Fallback: calculate targetY from part height if attribute is missing
+	// Uses the same formula as the server: height / 2 - 1
+	if (targetY === undefined) {
+		targetY = part.Size.Y / 2 - 1;
+	}
 
 	const currentPos = part.Position;
 	return new CFrame(new Vector3(currentPos.X, targetY, currentPos.Z)).mul(
@@ -56,6 +71,19 @@ function animateWallUp(part: BasePart): void {
 function setWallToTarget(part: BasePart): void {
 	const targetCFrame = getTargetCFrame(part);
 	part.CFrame = targetCFrame;
+
+	// Verify the CFrame took effect after a short delay (replication might overwrite)
+	task.delay(0.1, () => {
+		const expectedY = targetCFrame.Position.Y;
+		const actualY = part.Position.Y;
+		// If replication overwrote our change, re-apply
+		if (math.abs(actualY - expectedY) > 1) {
+			warn(
+				`[WallAnimator] Part "${part.Name}" was reset by replication (expected Y=${expectedY}, got Y=${actualY}), re-applying`,
+			);
+			part.CFrame = targetCFrame;
+		}
+	});
 }
 
 function isWallTooFar(part: BasePart): boolean {
@@ -74,12 +102,18 @@ function processWallPart(part: BasePart): void {
 	if (processedParts.has(part)) return;
 	processedParts.add(part);
 
+	// Check if part is properly streamed in
+	if (!part.IsDescendantOf(Workspace)) {
+		warn(`[WallAnimator] Part "${part.Name}" is not in Workspace yet (streaming issue?)`);
+	}
+
 	// Apply skin color
 	applySkin(part);
 
 	const timeAdded = part.GetAttribute(WALL_ATTR_TIME_ADDED) as number | undefined;
 	if (timeAdded === undefined) {
-		// No time attribute, just set to target
+		// No time attribute - could be streaming issue or old part
+		warn(`[WallAnimator] Missing WALL_ATTR_TIME_ADDED on part "${part.Name}", setting to target directly`);
 		setWallToTarget(part);
 		return;
 	}
@@ -97,8 +131,30 @@ function processWallPart(part: BasePart): void {
 }
 
 function handlePartAdded(part: Instance): void {
-	if (!part.IsA("BasePart")) return;
-	processWallPart(part);
+	if (!part.IsA("BasePart")) {
+		warn(`[WallAnimator] Tagged instance "${part.Name}" is not a BasePart (got ${part.ClassName})`);
+		return;
+	}
+
+	// Defer processing to next frame to ensure part is fully replicated
+	// With streaming, the tag might fire before the part is fully set up
+	task.defer(() => {
+		// Wait for part to be in Workspace if it isn't yet
+		if (!part.IsDescendantOf(Workspace)) {
+			// Part not in workspace yet, wait for it
+			const conn = part.AncestryChanged.Connect((_, newParent) => {
+				if (newParent && part.IsDescendantOf(Workspace)) {
+					conn.Disconnect();
+					// Defer again to let properties settle
+					task.defer(() => processWallPart(part));
+				}
+			});
+			// Timeout cleanup - if part never enters workspace, disconnect
+			task.delay(5, () => conn.Disconnect());
+		} else {
+			processWallPart(part);
+		}
+	});
 }
 
 function handlePartRemoving(part: Instance): void {
