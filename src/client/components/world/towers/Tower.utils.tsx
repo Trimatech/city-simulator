@@ -20,12 +20,46 @@ export function createRangeIndicator(range: number, position: Vector3) {
 }
 
 export function createAttackBeam(model: Model, targetId: string) {
+	print("Tower.utils.createAttackBeam", model, targetId);
 	// Find the Orb part in the tower model
 	const orbPart = model.FindFirstChild("Orb") as BasePart;
 	if (!orbPart) {
 		warn("Orb part not found in tower model");
 		return;
 	}
+
+	// Find the startAttachment in the Orb
+	const startAttachment = orbPart.FindFirstChild("startAttachment") as Attachment;
+	if (!startAttachment) {
+		warn("startAttachment not found in Orb");
+		return;
+	}
+
+	// Find the endAttachment in the Orb
+	const endAttachment = orbPart.FindFirstChild("endAttachment") as Attachment;
+	if (!endAttachment) {
+		warn("endAttachment not found in Orb");
+		return;
+	}
+
+	// Find all beams in startAttachment
+	const pulseBeam = startAttachment.FindFirstChild("pulseBeam") as Beam;
+	const middleBeam = startAttachment.FindFirstChild("middleBeam") as Beam;
+	const thickBeam = startAttachment.FindFirstChild("thickBeam") as Beam;
+
+	// Find specsEffect in endAttachment
+	const specsEffect = endAttachment.FindFirstChild("specsEffect") as Beam;
+
+	if (!pulseBeam) {
+		warn("pulseBeam not found in startAttachment");
+		return;
+	}
+
+	// Disable all beams initially on load
+	pulseBeam.Enabled = false;
+	if (middleBeam) middleBeam.Enabled = false;
+	if (thickBeam) thickBeam.Enabled = false;
+	if (specsEffect) specsEffect.Enabled = false;
 
 	// Resolve target (player or bot model in Workspace)
 	let targetPart: BasePart | undefined;
@@ -52,66 +86,81 @@ export function createAttackBeam(model: Model, targetId: string) {
 		return;
 	}
 
-	// Create attachment points for the beam
-	const attachment0 = new Instance("Attachment");
-	attachment0.Parent = orbPart;
+	// Create attachment on the target
+	const targetAttachment = new Instance("Attachment");
+	targetAttachment.Parent = targetPart;
 
-	const attachment1 = new Instance("Attachment");
-	attachment1.Parent = targetPart;
+	// Configure the beams to point at the target
+	pulseBeam.Attachment0 = startAttachment;
+	pulseBeam.Attachment1 = targetAttachment;
 
-	// Create the beam
-	const beam = new Instance("Beam");
-	beam.Attachment0 = attachment0;
-	beam.Attachment1 = attachment1;
-	beam.Width0 = 0.3;
-	beam.Width1 = 0.1;
-	beam.FaceCamera = true;
-	beam.Transparency = new NumberSequence([new NumberSequenceKeypoint(0, 0), new NumberSequenceKeypoint(1, 0.5)]);
-	beam.Color = new ColorSequence([
-		new ColorSequenceKeypoint(0, new Color3(1, 0, 0)),
-		new ColorSequenceKeypoint(1, new Color3(1, 0.5, 0)),
-	]);
-	beam.Parent = model;
+	if (middleBeam) {
+		middleBeam.Attachment0 = startAttachment;
+		middleBeam.Attachment1 = targetAttachment;
+	}
 
-	// Optional: looped laser sound attached to the orb part
+	if (thickBeam) {
+		thickBeam.Attachment0 = startAttachment;
+		thickBeam.Attachment1 = targetAttachment;
+	}
+
+	// Enable all beams - we're always attacking while target exists
+	pulseBeam.Enabled = true;
+	if (middleBeam) middleBeam.Enabled = true;
+	if (thickBeam) thickBeam.Enabled = true;
+	if (specsEffect) specsEffect.Enabled = true;
+
+	// Play continuous laser sound
 	const sound = playSound(sounds.laser_beam, { parent: orbPart, looped: true, volume: 0.35, pitchOctave: 0.5 });
 
-	// Auto-destroy beam if the target goes away or leaves Workspace
+	// Auto-destroy beam attachments if the target goes away or leaves Workspace
 	const connections: RBXScriptConnection[] = [];
+	let isCleanedUp = false;
+
+	const cleanup = () => {
+		print("Tower.utils.createAttackBeam.cleanup");
+		if (isCleanedUp) return;
+		isCleanedUp = true;
+
+		// Disable all beams
+		pulseBeam.Enabled = false;
+		if (middleBeam) middleBeam.Enabled = false;
+		if (thickBeam) thickBeam.Enabled = false;
+		if (specsEffect) specsEffect.Enabled = false;
+
+		// Stop and destroy sound
+		if (sound) {
+			sound.Stop();
+			sound.Destroy();
+		}
+
+		targetAttachment.Destroy();
+		for (const connection of connections) {
+			connection.Disconnect();
+		}
+	};
+
 	connections.push(
 		targetPart.Destroying.Connect(() => {
-			if (beam && beam.Parent) beam.Destroy();
+			cleanup();
 		}),
 	);
 	connections.push(
 		targetPart.AncestryChanged.Connect(() => {
 			if (!targetPart.IsDescendantOf(Workspace)) {
-				if (beam && beam.Parent) beam.Destroy();
+				cleanup();
 			}
 		}),
 	);
 
-	// If target is a Player's character, remove beam when their character is removed
+	// If target is a Player's character, cleanup when their character is removed
 	if (player) {
 		connections.push(
 			player.CharacterRemoving.Connect(() => {
-				if (beam && beam.Parent) beam.Destroy();
+				cleanup();
 			}),
 		);
 	}
 
-	// Clean up attachments, sound, and event connections when beam is destroyed
-	beam.Destroying.Connect(() => {
-		attachment0.Destroy();
-		attachment1.Destroy();
-		if (sound) {
-			sound.Stop();
-			sound.Destroy();
-		}
-		for (const connection of connections) {
-			connection.Disconnect();
-		}
-	});
-
-	return beam;
+	return { cleanup };
 }

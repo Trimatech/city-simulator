@@ -122,3 +122,11 @@ _Goal: Prep for a stable and polished launch._
 -   [ ] Polish UI transitions and responsiveness
 -   [ ] Add quick tutorial for new players
 -   [ ] Bug tracking & crash testing
+
+
+
+
+- [ ] Should not be able to put towers outside of my area
+- [ ] Tower should be destroyed when area dissapears
+- [ ] make Tower laser better
+- [ ] make Tower area a bit bigger

@@ -32,7 +32,7 @@ export function Tower({ towerId, parentFolder }: TowerProps) {
 
 	const modelRef = useRef<Model>();
 	const rangeIndicatorRef = useRef<Part>();
-	const beamRef = useRef<Beam>();
+	const beamControllerRef = useRef<{ cleanup: () => void }>();
 
 	useEffect(() => {
 		const loadTower = async () => {
@@ -65,7 +65,7 @@ export function Tower({ towerId, parentFolder }: TowerProps) {
 				destroyWelds(modelRef.current);
 				fadeModelOut(modelRef.current);
 			}
-			beamRef.current?.Destroy();
+			beamControllerRef.current?.cleanup();
 		};
 	}, [parentFolder]);
 
@@ -84,16 +84,17 @@ export function Tower({ towerId, parentFolder }: TowerProps) {
 
 	print("currentTargetId", tower.currentTargetId);
 
-	// Persistent beam while a target exists
+	// Continuous beam while a target exists
 	useEffect(() => {
 		if (!modelRef.current) return;
 		const targetId = tower.currentTargetId;
 
-		beamRef.current?.Destroy();
+		beamControllerRef.current?.cleanup();
+		beamControllerRef.current = undefined;
 
 		if (targetId !== undefined) {
-			const beam = createAttackBeam(modelRef.current, targetId);
-			beamRef.current = beam;
+			const controller = createAttackBeam(modelRef.current, targetId);
+			beamControllerRef.current = controller;
 		}
 	}, [tower.currentTargetId]);
 

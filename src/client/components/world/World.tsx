@@ -3,6 +3,7 @@ import { RemProvider } from "client/rem/rem-provider";
 import { Group } from "client/ui/layout/group";
 
 import { Bots } from "./bots/Bots";
+import { Towers } from "./towers/Towers";
 import { WorldSounds } from "./WorldSounds";
 import { WorldSubject } from "./WorldSubject";
 
@@ -20,7 +21,7 @@ export function World() {
 
 				{/* Candies are now created server-side and animated via CollectionService */}
 
-				{/*<Towers /> */}
+				<Towers />
 			</Group>
 		</RemProvider>
 	);
