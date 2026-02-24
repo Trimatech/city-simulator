@@ -25,4 +25,7 @@ export const sounds = {
 	laser_beam: "rbxgameasset://Audio/laser_beam",
 	explosion_effect: "rbxgameasset://Audio/explosion_effect",
 	bong_001: "rbxgameasset://Audio/bong_001",
+	bg_013_Another_August: "rbxgameasset://Audio/bg_013_Another_August",
+	bg_beautiful_day: "rbxassetid://1839849859",
+	bg_bugmintide: "rbxgameasset://Audio/bg_bugmintide",
 };

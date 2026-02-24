@@ -243,6 +243,20 @@ export const selectSoldierRanking = (id: string) => {
 
 export const selectLocalSoldierRanking = selectSoldierRanking(USER_NAME);
 
+export type MusicContext = "lobby" | "inside-area" | "outside-area";
+
+export const selectLocalMusicContext = (state: SharedState): MusicContext => {
+	const soldier = state.soldiers[USER_NAME];
+	if (!soldier || soldier.dead) {
+		return "lobby";
+	}
+	if (soldier.isInside) {
+		return "inside-area";
+	}
+
+	return "outside-area";
+};
+
 export const selectRankForDisplay = (state: SharedState) => {
 	const ranking = selectLocalSoldierRanking(state);
 

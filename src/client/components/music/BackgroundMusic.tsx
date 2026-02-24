@@ -1,65 +1,70 @@
 import { useEventListener } from "@rbxts/pretty-react-hooks";
-import React, { useEffect, useState } from "@rbxts/react";
+import React, { useEffect, useRef, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { selectMusicEnabled } from "client/store/settings/settingsSelectors";
-import { createSound } from "shared/assets";
+import { createSound, sounds } from "shared/assets";
+import { type MusicContext, selectLocalMusicContext } from "shared/store/soldiers";
 import { shuffle } from "shared/utils/object-utils";
 
-const MUSIC = [
-	"rbxassetid://9046863253", // Poolside
-	"rbxassetid://9046863960", // Beachwave
-	"rbxassetid://9039767824", // Confession
-	"rbxassetid://9039769202", // Santa Ervilio
-	"rbxassetid://9039768724", // Friends
-	"rbxassetid://9047050075", // Lo Fi Dreams Hip Hop
-	"rbxassetid://9039771403", // Opportunity
-	"rbxassetid://9039770227", // It s For Me
-	"rbxassetid://9047105000", // I'll Show Ya
-	"rbxassetid://9046863579", // City Lights
-	"rbxassetid://9047105308", // Dusk To Dawn
-	"rbxassetid://9047105702", // Light Dreamer
-	"rbxassetid://9047105533", // No Smoking
-	"rbxassetid://1848354536", // Relaxed Scene
-	"rbxassetid://9043887091", // Lo-fi Chill A
-	"rbxassetid://9044565954", // Smooth Vibes (c)
-	"rbxassetid://1839841807", // Relax (c)
-	"rbxassetid://1838979278", // Early Morning
-	"rbxassetid://1841998846", // Lobby Soirée (c)
-	"rbxassetid://9047104411", // Beach Cushions
-];
+// Playlists per context. All use rbxassetid from Roblox audio library.
+const LOBBY: readonly string[] = [sounds.bg_013_Another_August];
+
+const INSIDE_AREA: readonly string[] = [sounds.bg_beautiful_day];
+
+const OUTSIDE_AREA: readonly string[] = [sounds.bg_bugmintide];
+
+const PLAYLISTS: Record<MusicContext, readonly string[]> = {
+	lobby: LOBBY,
+	"inside-area": INSIDE_AREA,
+	"outside-area": OUTSIDE_AREA,
+};
+
+const DEFAULT_VOLUME = 0.2;
 
 export function BackgroundMusic() {
 	const enabled = useSelector(selectMusicEnabled);
+	const context = useSelector(selectLocalMusicContext);
 
-	const [queue, setQueue] = useState(() => shuffle(MUSIC));
+	const [contextQueue, setContextQueue] = useState<readonly string[]>(() => shuffle([...PLAYLISTS[context]]));
 	const [index, setIndex] = useState(0);
 	const [sound, setSound] = useState<Sound>();
+	const previousContextRef = useRef<MusicContext>(context);
 
 	// Advance the queue when the song ends
 	useEventListener(sound?.Ended, () => {
-		setIndex(index + 1);
+		setIndex((idx) => idx + 1);
 	});
 
-	// Create the next song when the index changes
+	// When context changes, switch to the new playlist and reset
 	useEffect(() => {
+		if (context !== previousContextRef.current) {
+			previousContextRef.current = context;
+			const playlist = PLAYLISTS[context];
+			setContextQueue(shuffle([...playlist]));
+			setIndex(0);
+		}
+	}, [context]);
+
+	// Create the next song when the index or queue changes
+	useEffect(() => {
+		const queue = contextQueue;
 		if (index >= queue.size()) {
-			// Shuffle the queue if we've reached the end
-			setQueue(shuffle(MUSIC));
+			const shuffled = shuffle([...PLAYLISTS[context]]);
+			setContextQueue(shuffled);
 			setIndex(0);
 			return;
 		}
 
-		const newSound = createSound(queue[index], { volume: 0.2 });
+		const newSound = createSound(queue[index], { volume: DEFAULT_VOLUME });
 
 		setSound(newSound);
 
 		return () => {
 			newSound.Destroy();
 		};
-	}, [index]);
+	}, [index, contextQueue, context]);
 
-	// Pause/resume the sound when the enabled state changes
-	// or when the sound changes
+	// Pause/resume when enabled or sound changes
 	useEffect(() => {
 		if (enabled) {
 			sound?.Resume();
@@ -68,7 +73,7 @@ export function BackgroundMusic() {
 		}
 	}, [enabled, sound]);
 
-	// Destroy sounds not in use
+	// Destroy sounds on unmount
 	useEffect(() => {
 		return () => {
 			sound?.Destroy();
