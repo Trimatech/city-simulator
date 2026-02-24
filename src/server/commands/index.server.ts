@@ -320,11 +320,11 @@ createCommand("/scenario", (player, argument) => {
 	const sub = parts[0] ? string.lower(parts[0]) : "";
 	if (sub === "tower") {
 		const n = tonumber(parts[1]) ?? 3;
-		runScenarioTower(player.Name, n);
+		runScenarioTower(player, n);
 	} else if (sub === "narrow") {
-		runScenarioNarrow(player.Name);
+		runScenarioNarrow(player);
 	} else if (sub === "crowd") {
-		runScenarioCrowd(player.Name);
+		runScenarioCrowd(player);
 	}
 });
 

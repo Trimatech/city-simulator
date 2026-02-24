@@ -72,7 +72,7 @@ Predefined setups for testing. Each scenario purges other soldiers and towers, t
 
 | Command | Args | Description |
 | ------- | ---- | ----------- |
-| `/scenario tower [n]` | `n` (number, optional, default 3) | Purge all. Give 500 orbs. Place tower at origin. Spawn `n` bots near you. Use to test tower attacking behavior. |
+| `/scenario tower [n]` | `n` (number, optional, default 3) | Purge all. Give 500 orbs. Place enemy tower at origin (attacks you). Spawn `n` bots near you. Use to test tower attacking behavior. |
 | `/scenario narrow` | - | Purge all. Set your polygon to a narrow rectangle (10×160). Spawn 1 bot with narrow polygon. Use to test area cutting. |
 | `/scenario crowd` | - | Purge all. Set your polygon to a large circle (diameter 200). Spawn 10 bots. Use to test with many bots nearby. |
 
