@@ -1,3 +1,4 @@
+import Object from "@rbxts/object-utils";
 import { usePrevious, useThrottleCallback } from "@rbxts/pretty-react-hooks";
 import React, { memo, useEffect, useRef } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
@@ -6,6 +7,7 @@ import { useCharacter } from "client/hooks/use-character";
 import { selectWorldSubjectDead, selectWorldSubjectOrbs, selectWorldSubjectPolygonAreaSize } from "client/store/world";
 import { playSound, sounds } from "shared/assets";
 import { selectHasLocalSoldier, selectLocalLastTracerPoint } from "shared/store/soldiers";
+import { selectTowersById } from "shared/store/towers/tower-selectors";
 
 const ERROR_SOUNDS = [sounds.error_1, sounds.error_2, sounds.error_3];
 
@@ -23,6 +25,10 @@ function WorldSoundsComponent() {
 	const hasLocalSoldier = useSelector(selectHasLocalSoldier);
 	const previousOrbs = usePrevious(orbs);
 	const previousPolygonAreaSize = usePrevious(polygonAreaSize);
+
+	const towers = useSelector(selectTowersById);
+	const towerCount = Object.keys(towers).size();
+	const previousTowerCount = usePrevious(towerCount);
 
 	// Mute default Roblox footstep sounds from the character
 	const localPlayer = Players.LocalPlayer;
@@ -187,6 +193,14 @@ function WorldSoundsComponent() {
 			onTracerSound.run();
 		}
 	}, [lastTracerPoint, previousLastTracerPoint]);
+
+	// Tower placement sound
+	useEffect(() => {
+		if (previousTowerCount === undefined) return;
+		if (towerCount > previousTowerCount) {
+			playSound(sounds.bong_001, { volume: 0.7 * volume });
+		}
+	}, [towerCount, previousTowerCount]);
 
 	return <></>;
 }

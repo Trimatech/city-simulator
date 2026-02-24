@@ -18,7 +18,7 @@ import { setSoldierSpeed } from "../soldiers/soldiers.utils";
 import { botStopped } from "./bot-events";
 import { buildBotMovementPath } from "./buildBotMovementPath";
 
-const MAX_BOTS_PER_PLAYER = 2;
+const MAX_BOTS_PER_PLAYER = 20;
 const BOT_RESPAWN_DELAY = 2; // seconds to wait before replacing a dead bot
 
 // Track which player each bot is assigned to
