@@ -3,9 +3,6 @@ import { findSharedInstanceByPath } from "shared/SharedModelManager";
 
 const GROUND_TAG = "ground";
 
-const DEFAULT_RUN_R6 = "rbxassetid://180426354";
-const DEFAULT_RUN_R15 = "rbxassetid://507767714";
-
 export function sampleGroundYAt(position: Vector2): number {
 	const origin = new Vector3(position.X, 2048, position.Y);
 	const direction = new Vector3(0, -8192, 0);
