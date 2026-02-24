@@ -10,7 +10,7 @@ interface SchedulerOptions {
 
 const connected = new Set<RBXScriptConnection>();
 
-export function createScheduler({ name, tick, phase, onTick, onRender }: SchedulerOptions) {
+export function createScheduler({ tick, phase, onTick }: SchedulerOptions) {
 	let timer = phase ?? 0;
 
 	const connection = RunService.Heartbeat.Connect((deltaTime) => {

@@ -1,5 +1,5 @@
-import { GridCellsByEdgeId, GridLine } from "shared/store/grid/grid-types";
 import { isPointInPolygon } from "shared/polybool/poly-utils";
+import { GridCellsByEdgeId, GridLine } from "shared/store/grid/grid-types";
 import { getCellAABBFromCoord, getCellCoordFromPos, getCellKeyFromCoord } from "shared/utils/cell-key";
 import { getEdgeId, quantizeVector2 } from "shared/utils/edge-id";
 import { segmentIntersectsRect } from "shared/utils/geometry-utils";
@@ -46,22 +46,22 @@ export function shallowEqualCell(a?: GridCellsByEdgeId, b?: GridCellsByEdgeId) {
 	return matchCount === countA;
 }
 
-function signedArea(points: Vector2[]) {
-	let sum = 0;
-	for (let i = 0; i < points.size(); i++) {
-		const p = points[i];
-		const q = points[i + 1] || points[0];
-		sum += p.X * q.Y - q.X * p.Y;
-	}
-	return 0.5 * sum;
-}
+// function signedArea(points: Vector2[]) {
+// 	let sum = 0;
+// 	for (let i = 0; i < points.size(); i++) {
+// 		const p = points[i];
+// 		const q = points[i + 1] || points[0];
+// 		sum += p.X * q.Y - q.X * p.Y;
+// 	}
+// 	return 0.5 * sum;
+// }
 
-function turnSign(prev: Vector2, curr: Vector2, nextPoint: Vector2) {
-	const v1 = curr.sub(prev);
-	const v2 = nextPoint.sub(curr);
-	const z = v1.X * v2.Y - v1.Y * v2.X;
-	return z; // >0 left turn, <0 right turn
-}
+// function turnSign(prev: Vector2, curr: Vector2, nextPoint: Vector2) {
+// 	const v1 = curr.sub(prev);
+// 	const v2 = nextPoint.sub(curr);
+// 	const z = v1.X * v2.Y - v1.Y * v2.X;
+// 	return z; // >0 left turn, <0 right turn
+// }
 
 function angleBetween(prev: Vector2, curr: Vector2, nextPoint: Vector2) {
 	const v1 = curr.sub(prev);

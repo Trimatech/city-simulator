@@ -30,10 +30,6 @@ interface Props {
 }
 
 const MARGIN_Y = 0;
-
-const PADDING_LEFT = 2;
-const PADDING_RIGHT = 2;
-
 const INTERNAL_PADDING = 1;
 
 export function IconRoundButton({

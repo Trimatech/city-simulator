@@ -133,7 +133,6 @@ export function PartViewer({
 			// Only calculate bounding box if there are valid children
 			if (tempModel.GetChildren().size() > 0) {
 				const boundingInfo = tempModel.GetBoundingBox();
-				const boundingCFrame = boundingInfo[0];
 				const boundingSize = boundingInfo[1];
 				maxDimension = math.max(boundingSize.X, boundingSize.Y, boundingSize.Z);
 				partHeightOffset = boundingSize.Y / 2;

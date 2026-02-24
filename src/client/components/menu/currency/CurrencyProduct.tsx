@@ -46,7 +46,6 @@ export function CurrencyProduct({
 	const [hover, hoverMotion] = useMotion(0);
 	const [transition, transitionMotion] = useMotion(0);
 	const [visible, visibleMotion] = useMotion(0);
-	const [glow, glowMotion] = useMotion(0);
 
 	const promptPurchase = async () => {
 		MarketplaceService.PromptProductPurchase(Players.LocalPlayer, productId);
@@ -67,16 +66,6 @@ export function CurrencyProduct({
 			friction: 30,
 		});
 	}, 0.07 * index);
-
-	useTimeout(
-		() => {
-			glowMotion.spring(1, {
-				tension: 50,
-				friction: 20,
-			});
-		},
-		1.5 + 0.07 * index,
-	);
 
 	return (
 		<Transition

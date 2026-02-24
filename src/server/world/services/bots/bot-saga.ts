@@ -1,8 +1,12 @@
 import Object from "@rbxts/object-utils";
 import { store } from "server/store";
-import { DEFAULT_ORBS, IS_TESTING_STUFF, SOLDIER_TICK_PHASE } from "server/world/constants";
-import { getSafePointOutsideSoldierPolygons, killSoldier } from "server/world/world.utils";
-import { IS_LOCAL, SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
+import { DEFAULT_ORBS, SOLDIER_TICK_PHASE } from "server/world/constants";
+import {
+	getAliveRealPlayers,
+	getSafePointOutsideSoldierPolygons,
+	getSpawnPointNearPlayer,
+} from "server/world/world.utils";
+import { SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
 import { getRandomBotSkin } from "shared/constants/skins";
 import { selectAliveSoldiersById } from "shared/store/soldiers";
 import { createScheduler } from "shared/utils/scheduler";
@@ -14,8 +18,11 @@ import { setSoldierSpeed } from "../soldiers/soldiers.utils";
 import { botStopped } from "./bot-events";
 import { buildBotMovementPath } from "./buildBotMovementPath";
 
-const MAX_BOTS = IS_LOCAL ? 0 : 15;
+const MAX_BOTS_PER_PLAYER = 20;
 const BOT_RESPAWN_DELAY = 2; // seconds to wait before replacing a dead bot
+
+// Track which player each bot is assigned to
+const botToPlayerMap = new Map<string, string>();
 
 interface BotController {
 	readonly id: string;
@@ -40,28 +47,67 @@ function getActiveCooldownIds(): string[] {
 	return active;
 }
 
-async function spawnBot(botId: string) {
-	const spawnPoint = getSafePointOutsideSoldierPolygons();
+/**
+ * Get the count of bots assigned to each player
+ */
+function getBotsPerPlayer(): Map<string, number> {
+	const counts = new Map<string, number>();
+	const aliveBotIds = getAliveBotIds();
 
-	if (IS_TESTING_STUFF) {
-		// const sourcePlayer = chooseRandomPlayer();
-		// if (!sourcePlayer || !sourcePlayer.Character) {
-		// 	warn(`No source player or character found for bot ${botId}`);
-		// 	return;
-		// }
-		// const sourceCharacter = sourcePlayer.Character;
-		// const primaryPart2 = await waitForPrimaryPart(sourceCharacter);
-		// const pos = primaryPart2?.Position;
-		// if (!pos) {
-		// 	warn(`No position found for bot ${botId}`);
-		// 	return;
-		// }
-		// spawnPoint = new Vector2(pos.X, pos.Z);
-		// //characterClone.PivotTo(new CFrame(pos.X, 10, pos.Z));
-		// warn(`Bot ${botId} pivoted to primary part position`, pos);
+	for (const botId of aliveBotIds) {
+		const playerId = botToPlayerMap.get(botId);
+		if (playerId !== undefined) {
+			counts.set(playerId, (counts.get(playerId) ?? 0) + 1);
+		}
+	}
+
+	return counts;
+}
+
+/**
+ * Find a player that has fewer than MAX_BOTS_PER_PLAYER bots assigned
+ */
+function findPlayerWithAvailableSlot(): string | undefined {
+	const realPlayers = getAliveRealPlayers();
+	if (realPlayers.size() === 0) return undefined;
+
+	const botsPerPlayer = getBotsPerPlayer();
+
+	// Find players with available slots, prefer players with fewer bots
+	const playersWithSlots = realPlayers
+		.map((playerId) => ({
+			playerId,
+			botCount: botsPerPlayer.get(playerId) ?? 0,
+		}))
+		.filter((p) => p.botCount < MAX_BOTS_PER_PLAYER)
+		.sort((a, b) => a.botCount < b.botCount);
+
+	return playersWithSlots.size() > 0 ? playersWithSlots[0].playerId : undefined;
+}
+
+async function spawnBot(botId: string) {
+	// Find a player to spawn near
+	const targetPlayerId = findPlayerWithAvailableSlot();
+
+	let spawnPoint: Vector2;
+
+	if (targetPlayerId !== undefined) {
+		// Try to spawn near the target player (60-200 studs from their polygon bounding box)
+		const nearPlayerSpawn = getSpawnPointNearPlayer(targetPlayerId);
+		if (nearPlayerSpawn !== undefined) {
+			spawnPoint = nearPlayerSpawn;
+			botToPlayerMap.set(botId, targetPlayerId);
+			print(`Bot ${botId} spawning near player ${targetPlayerId} at`, spawnPoint);
+		} else {
+			// Fallback to safe point if couldn't find valid spawn near player
+			spawnPoint = getSafePointOutsideSoldierPolygons();
+			botToPlayerMap.set(botId, targetPlayerId);
+			print(`Bot ${botId} fallback spawn (couldn't find spot near player) at`, spawnPoint);
+		}
 	} else {
-		//characterClone.PivotTo(new CFrame(spawnPoint.X, 10, spawnPoint.Y));
-		print(`Bot ${botId} pivoted to spawn point`, spawnPoint);
+		// No players with available slots, use regular spawn
+		spawnPoint = getSafePointOutsideSoldierPolygons();
+		print(`Bot ${botId} spawning at random point (no players available)`, spawnPoint);
 	}
 
 	// create soldier entity in store
@@ -129,6 +175,7 @@ function advanceBot(bot: BotController) {
 
 function cleanupBot(botId: string) {
 	botControllers.delete(botId);
+	botToPlayerMap.delete(botId);
 }
 
 function getAliveBotIds(): string[] {
@@ -195,7 +242,7 @@ export async function initBotService() {
 		}
 	});
 
-	// Maintain dynamic bot count: max bots = 20 - alive non-bot soldiers
+	// Maintain dynamic bot count: max 2 bots per real player
 	store.subscribe(
 		selectAliveSoldiersById,
 		() => true,
@@ -205,13 +252,18 @@ export async function initBotService() {
 			const aliveNonBots = getAliveNonBotCount();
 
 			// No humans alive -> remove all bots (conserve resources)
-			// if (aliveNonBots <= 0) {
-			// 	if (aliveBots > 0) removeBots(aliveBotIds);
+			// if (aliveNonBots === 0) {
+			// 	if (aliveBots > 0) {
+			// 		for (const id of aliveBotIds) {
+			// 			print(`Killing bot ${id} because no players are alive`);
+			// 			killSoldier(id);
+			// 		}
+			// 	}
 			// 	return;
 			// }
 
-			// Target bots is capped by available slots: 20 - players
-			const targetBots = math.max(0, MAX_BOTS - aliveNonBots);
+			// Target bots = MAX_BOTS_PER_PLAYER * number of real players
+			const targetBots = aliveNonBots * MAX_BOTS_PER_PLAYER;
 
 			if (aliveBots < targetBots) {
 				const activeCooldowns = getActiveCooldownIds();
@@ -223,15 +275,15 @@ export async function initBotService() {
 				return;
 			}
 
-			if (aliveBots > targetBots) {
-				const extras = aliveBots - targetBots;
-				const start = aliveBotIds.size() - extras;
-				const toKill = aliveBotIds.move(start, aliveBotIds.size() - 1, 0, [] as string[]);
-				for (const id of toKill) {
-					print(`Killing bot ${id} because there are too many bots`);
-					killSoldier(id);
-				}
-			}
+			// if (aliveBots > targetBots) {
+			// 	const extras = aliveBots - targetBots;
+			// 	const start = aliveBotIds.size() - extras;
+			// 	const toKill = aliveBotIds.move(start, aliveBotIds.size() - 1, 0, [] as string[]);
+			// 	for (const id of toKill) {
+			// 		print(`Killing bot ${id} because there are too many bots`);
+			// 		killSoldier(id);
+			// 	}
+			// }
 		},
 	);
 

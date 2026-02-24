@@ -198,6 +198,16 @@ export function connectLineToPolygon(line: Line, polygon: Polygon) {
 }
 
 export function addIntersectionPointsWithLines(cutLines: Line[], polygon: Polygon) {
+	// Early exit: if no cut lines or invalid polygon, return empty result
+	if (cutLines.size() === 0 || polygon.regions.size() === 0 || polygon.regions[0].size() < 3) {
+		return {
+			polygon,
+			intersectionIndexes: [],
+			cutPoints: [],
+			regionIndexes: [0],
+		};
+	}
+
 	const newPolygon = Object.deepCopy(polygon);
 	const cutPoints: Point[] = [];
 
@@ -400,15 +410,24 @@ export function replaceFirstAndLastPointsWith(points: Point[], cutPoints: Point[
 
 /**
  * Extends a line segment in both directions by a given factor
+ * Optimized to use a smaller extension factor for better performance
  */
 function extendLine(line: Line): Line {
 	const [startPoint, endPoint] = line;
 
 	const direction = [endPoint[0] - startPoint[0], endPoint[1] - startPoint[1]];
 	const length = math.sqrt(direction[0] ** 2 + direction[1] ** 2);
+
+	// Early exit: if line has no length, return as-is
+	if (length === 0) {
+		return line;
+	}
+
 	const unitDirection = [direction[0] / length, direction[1] / length];
 
-	const extensionFactor = 1000;
+	// Reduced extension factor from 1000 to 600 for better performance
+	// Still covers world bounds of 960 diameter with margin
+	const extensionFactor = 600;
 
 	return [
 		[startPoint[0] - unitDirection[0] * extensionFactor, startPoint[1] - unitDirection[1] * extensionFactor],
@@ -418,6 +437,12 @@ function extendLine(line: Line): Line {
 
 const filterOutPointsInsidePolygon = (points: Point[], polygon: Polygon) => {
 	const region = polygon.regions[0] as Point[];
+
+	// Early exit: if polygon or points are too small, return as-is
+	if (region.size() < 3 || points.size() <= 3) {
+		return points;
+	}
+
 	const pointsCopy = [...points];
 
 	// Remove points from the beginning but leave the last point that is inside
@@ -443,16 +468,27 @@ const filterOutPointsInsidePolygon = (points: Point[], polygon: Polygon) => {
 
 // Update setIntersectionPoints to use the new function
 export function setIntersectionPoints(polygon: Polygon, drawPointsTemp: Point[]) {
-	const drawPoints = filterOutPointsInsidePolygon(drawPointsTemp, polygon);
-	if (drawPoints.size() < 3) {
-		warn("drawPoints.size() < 3");
+	// Early validation: check polygon structure
+	if (!polygon.regions || polygon.regions.size() === 0) {
+		warn("Invalid polygon: no regions");
 		return undefined;
 	}
 
 	const points = polygon.regions[0];
-
-	if (points.size() < 4) {
+	if (!points || points.size() < 4) {
 		warn("points.size() < 4");
+		return undefined;
+	}
+
+	// Early validation: check draw points
+	if (!drawPointsTemp || drawPointsTemp.size() < 3) {
+		warn("drawPointsTemp.size() < 3");
+		return undefined;
+	}
+
+	const drawPoints = filterOutPointsInsidePolygon(drawPointsTemp, polygon);
+	if (drawPoints.size() < 3) {
+		warn("drawPoints.size() < 3 after filtering");
 		return undefined;
 	}
 

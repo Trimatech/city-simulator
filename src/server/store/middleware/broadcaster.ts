@@ -6,7 +6,20 @@ import { serializeState, SharedStateSerialized } from "shared/serdes";
 import { serializeCellLines } from "shared/serdes/handlers/serdes-grid";
 import { SharedState, slices } from "shared/store";
 
-const excludedActions = ["setSoldierPolygon", "setSoldierTracers", "clearSoldierTracers", "soldierTick"];
+const excludedActions = [
+	"setSoldierPolygon",
+	"setSoldierTracers",
+	"clearSoldierTracers",
+	"soldierTick",
+	"setSoldierLastTracerPoint",
+	"incrementSoldierOrbs",
+	// Grid data is now server-side only; walls are rendered via server-created Parts
+	"setCellLines",
+	"clearGrid",
+	// Candy grid data is now server-side only; candies are rendered via server-created Parts
+	"setCandyCell",
+	"clearCandyGrid",
+];
 
 export function broadcasterMiddleware(): ProducerMiddleware {
 	if (IS_EDITOR) {
@@ -48,13 +61,19 @@ export function broadcasterMiddleware(): ProducerMiddleware {
 
 			if (isInitialHydrate) {
 				hydrated.add(player.UserId);
-				return serialized;
+				// Exclude grid and candyGrid from initial hydrate - rendered via server-created Parts
+				return {
+					...serialized,
+					grid: undefined,
+					candyGrid: undefined,
+				};
 			}
 
-			// exclude candy to reduce network traffic
+			// exclude candy and grid to reduce network traffic
 			return {
 				...serialized,
 				candyGrid: undefined,
+				grid: undefined,
 			};
 		},
 	});

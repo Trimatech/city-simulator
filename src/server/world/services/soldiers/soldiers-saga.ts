@@ -17,6 +17,10 @@ import { clearOwnerTracersFromGrid } from "./soldier-grid";
 import { deleteSoldierInput, onSoldierTick, registerSoldierInput } from "./soldier-tick";
 import { setSoldierSpeed } from "./soldiers.utils";
 
+// Debounce map to prevent rapid-fire area claims
+const lastAreaClaimTime = new Map<string, number>();
+const AREA_CLAIM_COOLDOWN_MS = 100; // Cooldown in milliseconds
+
 export async function initSoldierService() {
 	createScheduler({
 		name: "soldier",
@@ -90,8 +94,27 @@ export async function initSoldierService() {
 		debug.profilebegin("SOLDIER_IS_INSIDE");
 		print(`Soldier ${id} is ${isInside ? "inside" : "outside"}--------------------`);
 
+		// Early exit: Check minimum tracer requirement
 		if (tracers.size() < 2) {
 			print(`Soldier ${id} has less than 2 tracers, skipping`);
+			debug.profileend();
+			return;
+		}
+
+		// Early exit: Debounce rapid area claims to prevent performance spikes
+		const now = os.clock() * 1000;
+		const lastClaim = lastAreaClaimTime.get(id);
+		if (lastClaim !== undefined && now - lastClaim < AREA_CLAIM_COOLDOWN_MS) {
+			print(`Soldier ${id} area claim on cooldown, skipping`);
+			debug.profileend();
+			return;
+		}
+		lastAreaClaimTime.set(id, now);
+
+		// Early exit: Check if polygon exists and has enough points
+		if (!polygon || polygon.size() < 3) {
+			print(`Soldier ${id} has invalid polygon, skipping`);
+			debug.profileend();
 			return;
 		}
 
@@ -116,6 +139,8 @@ export async function initSoldierService() {
 		}
 		return () => {
 			print(`Soldier ${id} is no longer inside--------------------`);
+			// Clean up debounce entry when soldier is no longer inside
+			lastAreaClaimTime.delete(id);
 		};
 	});
 

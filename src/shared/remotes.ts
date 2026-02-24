@@ -32,4 +32,8 @@ export const remotes = createRemotes({
 	powerups: namespace({
 		use: remote<Server, [id: string]>(t.string),
 	}),
+
+	camera: namespace({
+		updateBirdPosition: remote<Server, [position: Vector2]>(t.Vector2),
+	}),
 });

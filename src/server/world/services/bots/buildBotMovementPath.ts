@@ -1,4 +1,3 @@
-import { Debris, Workspace } from "@rbxts/services";
 import { store } from "server/store";
 import { IS_TESTING_STUFF } from "server/world/constants";
 // import { vector2ToPoint } from "shared/polybool/poly-utils";
@@ -27,31 +26,31 @@ function closestPointOnPolygonEdge(polygonVectors: Vector2[], point: Vector2) {
 }
 
 // Debug: render waypoints as parts and auto clean with DebrisService
-function visualizeWaypoints(botId: string, waypoints: Vector2[]) {
-	const container = new Instance("Folder");
-	container.Name = `DebugPath_${botId}`;
-	container.Parent = Workspace;
+// function visualizeWaypoints(botId: string, waypoints: Vector2[]) {
+// 	const container = new Instance("Folder");
+// 	container.Name = `DebugPath_${botId}`;
+// 	container.Parent = Workspace;
 
-	for (let i = 0; i < waypoints.size(); i++) {
-		const p2 = waypoints[i];
-		const part = new Instance("Part");
-		part.Name = `wp_${i + 1}`;
-		part.Anchored = true;
-		part.CanCollide = false;
-		part.Size = new Vector3(0.6, 0.6, 0.6);
-		part.Shape = Enum.PartType.Ball;
-		part.Color =
-			i === 0
-				? Color3.fromRGB(0, 255, 0)
-				: i === waypoints.size() - 1
-					? Color3.fromRGB(255, 0, 0)
-					: Color3.fromRGB(255, 255, 255);
-		part.Position = new Vector3(p2.X, 50, p2.Y);
-		part.Parent = container;
-	}
+// 	for (let i = 0; i < waypoints.size(); i++) {
+// 		const p2 = waypoints[i];
+// 		const part = new Instance("Part");
+// 		part.Name = `wp_${i + 1}`;
+// 		part.Anchored = true;
+// 		part.CanCollide = false;
+// 		part.Size = new Vector3(0.6, 0.6, 0.6);
+// 		part.Shape = Enum.PartType.Ball;
+// 		part.Color =
+// 			i === 0
+// 				? Color3.fromRGB(0, 255, 0)
+// 				: i === waypoints.size() - 1
+// 					? Color3.fromRGB(255, 0, 0)
+// 					: Color3.fromRGB(255, 255, 255);
+// 		part.Position = new Vector3(p2.X, 50, p2.Y);
+// 		part.Parent = container;
+// 	}
 
-	Debris.AddItem(container, 10);
-}
+// 	Debris.AddItem(container, 10);
+// }
 
 // Helper: extend the path by one extra point continuing the last segment by a fixed distance
 function appendEndpointExtension(waypoints: Vector2[], extensionStuds = 2) {

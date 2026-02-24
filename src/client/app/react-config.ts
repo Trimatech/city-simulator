@@ -7,5 +7,7 @@ declare const _G: {
 
 if (RunService.IsStudio()) {
 	_G.__DEV__ = true;
-	_G.__REACT_MICROPROFILER_LEVEL = 10;
+	// Lowered from 10 to 0 to avoid "No active profile annotation" warnings
+	// The level 10 was too aggressive and caused imbalanced profiling calls during render cycles
+	_G.__REACT_MICROPROFILER_LEVEL = 0;
 }

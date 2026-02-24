@@ -224,3 +224,116 @@ export function getSafePointOutsideSoldierPolygons(maxTries = 25) {
 	// As a last resort, return any random point in world
 	return getRandomPointInWorld(RANDOM_POINT_MARGIN);
 }
+
+/**
+ * Get bounding box of a polygon
+ */
+function getPolygonBoundingBox(polygon: ReadonlyArray<Vector2>): { min: Vector2; max: Vector2 } {
+	let minX = math.huge;
+	let minY = math.huge;
+	let maxX = -math.huge;
+	let maxY = -math.huge;
+
+	for (const point of polygon) {
+		minX = math.min(minX, point.X);
+		minY = math.min(minY, point.Y);
+		maxX = math.max(maxX, point.X);
+		maxY = math.max(maxY, point.Y);
+	}
+
+	return {
+		min: new Vector2(minX, minY),
+		max: new Vector2(maxX, maxY),
+	};
+}
+
+const BOT_SPAWN_MIN_DISTANCE = 60;
+const BOT_SPAWN_MAX_DISTANCE = 200;
+
+/**
+ * Returns a spawn point near a player's polygon bounding box (60-200 studs away)
+ * Ensures the point is within world bounds and doesn't overlap existing polygons
+ */
+export function getSpawnPointNearPlayer(soldierId: string, maxTries = 25): Vector2 | undefined {
+	const soldier = getSoldier(soldierId);
+	if (!soldier) return undefined;
+
+	const polygon = soldier.polygon as ReadonlyArray<Vector2> | undefined;
+	if (!polygon || polygon.size() < 3) {
+		// Fallback to position-based spawn if no polygon
+		const center = soldier.position;
+		return getSpawnPointNearPosition(center, maxTries);
+	}
+
+	const bbox = getPolygonBoundingBox(polygon);
+	const bboxCenter = bbox.min.add(bbox.max).div(2);
+	const random = new Random();
+
+	for (const _ of $range(1, maxTries)) {
+		// Random angle around the bounding box center
+		const angle = random.NextNumber(0, math.pi * 2);
+		// Random distance between min and max spawn distance
+		const distance = random.NextNumber(BOT_SPAWN_MIN_DISTANCE, BOT_SPAWN_MAX_DISTANCE);
+
+		// Calculate spawn point from bounding box edge
+		const bboxHalfWidth = (bbox.max.X - bbox.min.X) / 2;
+		const bboxHalfHeight = (bbox.max.Y - bbox.min.Y) / 2;
+
+		// Direction vector
+		const direction = new Vector2(math.cos(angle), math.sin(angle));
+
+		// Start from the edge of bounding box in that direction, then add distance
+		const edgeOffset = new Vector2(direction.X * bboxHalfWidth, direction.Y * bboxHalfHeight);
+		const candidate = bboxCenter.add(edgeOffset).add(direction.mul(distance));
+
+		// Check if within world bounds (circular world)
+		if (candidate.Magnitude > WORLD_BOUNDS) continue;
+
+		// Check if not inside any soldier polygon and doesn't intersect
+		if (!isInsideAnySoldierPolygon(candidate) && !intersectsAnySoldierPolygon(candidate)) {
+			return candidate;
+		}
+	}
+
+	return undefined;
+}
+
+/**
+ * Returns a spawn point near a position (60-200 studs away)
+ */
+function getSpawnPointNearPosition(center: Vector2, maxTries = 25): Vector2 | undefined {
+	const random = new Random();
+
+	for (const _ of $range(1, maxTries)) {
+		const angle = random.NextNumber(0, math.pi * 2);
+		const distance = random.NextNumber(BOT_SPAWN_MIN_DISTANCE, BOT_SPAWN_MAX_DISTANCE);
+		const direction = new Vector2(math.cos(angle), math.sin(angle));
+		const candidate = center.add(direction.mul(distance));
+
+		if (candidate.Magnitude > WORLD_BOUNDS) continue;
+
+		if (!isInsideAnySoldierPolygon(candidate) && !intersectsAnySoldierPolygon(candidate)) {
+			return candidate;
+		}
+	}
+
+	return undefined;
+}
+
+/**
+ * Get all alive real players (non-bots)
+ */
+export function getAliveRealPlayers(): string[] {
+	const aliveById = store.getState(selectAliveSoldiersById);
+	const ids: string[] = [];
+	for (const rawId of pairs(aliveById)) {
+		const id = tostring(rawId[0]);
+		if (string.sub(id, 1, 4) !== "BOT_") {
+			const soldier = rawId[1];
+			if (!(soldier as { dead?: boolean }).dead) {
+				ids.push(id);
+			}
+		}
+	}
+	return ids;
+}

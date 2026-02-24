@@ -8,11 +8,6 @@ import { Shadow } from "client/ui/shadow";
 import { palette } from "shared/constants/palette";
 import { selectLocalHealth, selectLocalMaxHealth } from "shared/store/soldiers";
 
-const defaultSoldier = {
-	health: 100,
-	maxHealth: 100,
-};
-
 export function HealthBar() {
 	const rem = useRem();
 	const health = useSelector(selectLocalHealth) ?? 0;

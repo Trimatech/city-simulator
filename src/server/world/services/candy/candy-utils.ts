@@ -13,6 +13,7 @@ import { SOLDIER_RADIUS_BASE } from "shared/store/soldiers";
 import { Grid, GridPoint } from "shared/utils/grid";
 import { fillArray } from "shared/utils/object-utils";
 
+import { createCandyPart, markCandyEaten, removeCandyPart } from "./candy-part-manager";
 import {
 	addCandies,
 	addCandy as addCandyLocal,
@@ -41,8 +42,15 @@ export function createCandy(patch?: Partial<CandyEntity>): CandyEntity {
 		...patch,
 	};
 
+	print(
+		`[DEBUG] Creating candy ID: ${candy.id}, Position: (${candy.position.X}, ${candy.position.Y}), Type: ${candy.type}`,
+	);
+
 	candyGrid.insert(candy.position, { id: candy.id });
 	addCandyLocal(candy);
+
+	// Create server-side Part for this candy
+	createCandyPart(candy);
 
 	return candy;
 }
@@ -93,8 +101,11 @@ export function removeCandy(id: string, eatenAt?: Vector2) {
 	const candy = getCandyLocal(id);
 
 	if (!candy) {
+		print(`[DEBUG] removeCandy: Candy ${id} not found in local store`);
 		return;
 	}
+
+	print(`[DEBUG] Removing candy ID: ${candy.id}, Position: (${candy.position.X}, ${candy.position.Y})`);
 
 	setCandyEatenAtLocal(id, eatenAt ?? candy.position);
 	candyGrid.remove(candy.position);
@@ -102,12 +113,18 @@ export function removeCandy(id: string, eatenAt?: Vector2) {
 	// Immediately mark as eaten in replicated grid so clients animate
 	markCandyEatenInGrid(id, eatenAt ?? candy.position);
 
+	// Mark the server-side Part as eaten (client will animate)
+	markCandyEaten(id);
+
 	setTimeout(() => {
 		const cellKeyToRemove = getCandyCellKeyForPosition(candy.position);
 		patchCandyCell(cellKeyToRemove, (cell) => {
 			cell[id] = undefined;
 		});
 		removeCandyLocal(id);
+		// Remove the server-side Part
+		removeCandyPart(id);
+		print(`[DEBUG] Candy ${id} fully removed after timeout`);
 	}, TIMEOUT_DELAY);
 }
 
@@ -158,6 +175,11 @@ export function eatCandies(candyPoints: GridPoint<{ id: string }>[], soldierId: 
 	// Immediately mark as eaten in replicated grid so clients animate
 	markCandiesEatenInGrid(eatenPositions);
 
+	// Mark server-side Parts as eaten (client will animate)
+	for (const { id } of eatenPositions) {
+		markCandyEaten(id);
+	}
+
 	// Schedule removal from replicated candy grid and state
 	setTimeout(() => {
 		const state = store.getState();
@@ -179,6 +201,8 @@ export function eatCandies(candyPoints: GridPoint<{ id: string }>[], soldierId: 
 			for (const candyId of ids as unknown as string[]) {
 				current[candyId] = undefined;
 				removeCandyLocal(candyId);
+				// Remove the server-side Part
+				removeCandyPart(candyId);
 			}
 			store.setCandyCell(cellKey as string, current);
 		}
@@ -326,6 +350,9 @@ export function dropCandyOnDeath(id: string): void {
 		}
 	}
 	// Add created candies to in-memory and replicated grid
+	print(`[DEBUG] dropCandyOnDeath: Created ${candies.size()} candies for soldier ${id}`);
+	print(`[DEBUG] Candy IDs: ${candies.map((c) => c.id).join(", ")}`);
+
 	addCandies(candies);
 	const state = store.getState();
 	const resolution = selectCandyGridResolution({ candyGrid: state.candyGrid });

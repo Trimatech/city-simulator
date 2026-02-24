@@ -69,6 +69,9 @@
 				"$path": "./GamePlaceTemp.rbxmx"
 			},
 			"$properties": {
+				"StreamingEnabled": true,
+				"StreamingMinRadius": 120,
+				"StreamingTargetRadius": 300,
 				"SignalBehavior2": {
 					"Enum": 2
 				}

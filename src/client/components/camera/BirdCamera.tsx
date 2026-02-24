@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useRef } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { Players, RunService } from "@rbxts/services";
 import { WORLD_BOUNDS } from "shared/constants/core";
+import { remotes } from "shared/remotes";
 import { selectLocalIsSpawned, selectLocalSoldier } from "shared/store/soldiers";
 import { clampToCircle } from "shared/utils/world-bounds";
 
@@ -51,12 +52,11 @@ export function BirdCamera() {
 	const isSpawned = useSelector(selectLocalIsSpawned);
 	const localSoldier = useSelector(selectLocalSoldier);
 
-	warn("BirdCamera rendering");
-
 	const timeRef = useRef(0);
 	const position2DRef = useRef(new Vector2(0, 0));
 	const velocityRef = useRef(new Vector2(1, 0));
 	const turnHandRef = useRef(math.random() < 0.5 ? 1 : -1); // 1: CCW, -1: CW
+	const lastStreamUpdateRef = useRef(0); // Track when we last sent position to server
 
 	const settings = useMemo(() => {
 		return {
@@ -103,6 +103,10 @@ export function BirdCamera() {
 
 		camera.CameraSubject = undefined;
 		camera.CameraType = Enum.CameraType.Scriptable;
+
+		// Send initial bird position to server for streaming
+		remotes.camera.updateBirdPosition.fire(position2DRef.current);
+		lastStreamUpdateRef.current = os.clock();
 		return () => {
 			camera.CameraType = Enum.CameraType.Custom;
 		};
@@ -113,6 +117,13 @@ export function BirdCamera() {
 
 		// Ensure we keep control of the camera while spectating
 		camera.CameraType = Enum.CameraType.Scriptable;
+
+		// Update server with bird position every 10 seconds for streaming
+		const now = os.clock();
+		if (now - lastStreamUpdateRef.current >= 5) {
+			lastStreamUpdateRef.current = now;
+			remotes.camera.updateBirdPosition.fire(position2DRef.current);
+		}
 
 		// Advance time for noise steering (slower noise progression for straighter flight)
 		timeRef.current += dt * 0.05;
