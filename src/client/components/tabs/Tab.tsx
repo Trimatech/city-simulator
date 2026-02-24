@@ -12,7 +12,6 @@ interface Props {
 	readonly onClick?: () => void;
 	readonly emoji: string;
 	readonly label: string;
-	readonly enabled: boolean;
 	readonly active: boolean;
 	readonly order: number;
 }
@@ -26,7 +25,7 @@ const CARD_CANVAS_MARGIN = 3;
 
 const CARD_BORDER_WIDTH = 0.2;
 
-export function Tab({ onClick, emoji, label, active, enabled, order }: Props) {
+export function Tab({ onClick, emoji, label, active, order }: Props) {
 	const rem = useRem();
 
 	const bgColor = active ? palette.blue : palette.sky;

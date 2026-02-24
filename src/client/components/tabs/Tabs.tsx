@@ -39,7 +39,6 @@ export function Tabs({ tabs, activeTabId, setActiveTabId }: Props) {
 						onClick={() => setActiveTabId(tab.id)}
 						order={index}
 						emoji={tab.emoji}
-						enabled
 					/>
 				))}
 			</HStack>

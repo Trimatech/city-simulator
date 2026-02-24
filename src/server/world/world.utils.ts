@@ -283,10 +283,7 @@ export function getSpawnPointNearPlayer(soldierId: string, maxTries = 25): Vecto
 		const direction = new Vector2(math.cos(angle), math.sin(angle));
 
 		// Start from the edge of bounding box in that direction, then add distance
-		const edgeOffset = new Vector2(
-			direction.X * bboxHalfWidth,
-			direction.Y * bboxHalfHeight,
-		);
+		const edgeOffset = new Vector2(direction.X * bboxHalfWidth, direction.Y * bboxHalfHeight);
 		const candidate = bboxCenter.add(edgeOffset).add(direction.mul(distance));
 
 		// Check if within world bounds (circular world)

@@ -1,8 +1,6 @@
 import { CollectionService, TweenService, Workspace } from "@rbxts/services";
 import {
 	CANDY_ATTR_EATEN,
-	CANDY_ATTR_ID,
-	CANDY_ATTR_SIZE,
 	CANDY_ATTR_TARGET_Y,
 	CANDY_ATTR_TIME_ADDED,
 	CANDY_EAT_ANIMATION_DURATION,

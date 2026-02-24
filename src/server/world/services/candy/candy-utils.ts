@@ -13,7 +13,7 @@ import { SOLDIER_RADIUS_BASE } from "shared/store/soldiers";
 import { Grid, GridPoint } from "shared/utils/grid";
 import { fillArray } from "shared/utils/object-utils";
 
-import { createCandyPart, createCandyParts, markCandyEaten, removeCandyPart } from "./candy-part-manager";
+import { createCandyPart, markCandyEaten, removeCandyPart } from "./candy-part-manager";
 import {
 	addCandies,
 	addCandy as addCandyLocal,
@@ -42,7 +42,9 @@ export function createCandy(patch?: Partial<CandyEntity>): CandyEntity {
 		...patch,
 	};
 
-	print(`[DEBUG] Creating candy ID: ${candy.id}, Position: (${candy.position.X}, ${candy.position.Y}), Type: ${candy.type}`);
+	print(
+		`[DEBUG] Creating candy ID: ${candy.id}, Position: (${candy.position.X}, ${candy.position.Y}), Type: ${candy.type}`,
+	);
 
 	candyGrid.insert(candy.position, { id: candy.id });
 	addCandyLocal(candy);

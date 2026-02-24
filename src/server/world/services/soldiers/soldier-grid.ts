@@ -15,6 +15,7 @@ import {
 	computeCellsFromNew,
 	shallowEqualCell,
 } from "shared/utils/grid-lines.utils";
+
 import { clearOwnerWallParts, syncCellWallParts } from "./wall-part-manager";
 
 // Local debug/visualization grid (kept for soldier-grid-visualizer)
