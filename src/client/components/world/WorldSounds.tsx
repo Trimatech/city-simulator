@@ -5,7 +5,7 @@ import { useSelector } from "@rbxts/react-reflex";
 import { ContentProvider, Players, SoundService } from "@rbxts/services";
 import { useCharacter } from "client/hooks/use-character";
 import { selectWorldSubjectDead, selectWorldSubjectOrbs, selectWorldSubjectPolygonAreaSize } from "client/store/world";
-import { playSound, sounds } from "shared/assets";
+import { playSound, sounds } from "shared/assetsFolder";
 import { selectHasLocalSoldier, selectLocalLastTracerPoint } from "shared/store/soldiers";
 import { selectTowersById } from "shared/store/towers/tower-selectors";
 

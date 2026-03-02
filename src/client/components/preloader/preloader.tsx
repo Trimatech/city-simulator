@@ -1,7 +1,7 @@
 import { useAsyncEffect, useDeferState } from "@rbxts/pretty-react-hooks";
 import React, { useMemo } from "@rbxts/react";
 import { ContentProvider } from "@rbxts/services";
-import { images, sounds } from "shared/assets";
+import { images, sounds } from "shared/assetsFolder";
 
 import { useRem } from "../../hooks";
 import { Text } from "../../ui/text";

@@ -1,6 +1,6 @@
 import { composeBindings } from "@rbxts/pretty-react-hooks";
 import React from "@rbxts/react";
-import { images } from "shared/assets";
+import assets from "shared/assets";
 
 import { useRem } from "../hooks";
 import { Image } from "./image";
@@ -32,7 +32,7 @@ export function Shadow({
 
 	return (
 		<Image
-			image={images.ui.blur}
+			image={assets.ui.blur}
 			imageTransparency={shadowTransparency}
 			imageColor={shadowColor}
 			anchorPoint={new Vector2(0.5, 0.5)}

@@ -2,7 +2,7 @@ import { useEventListener } from "@rbxts/pretty-react-hooks";
 import React, { useEffect, useRef, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { selectMusicEnabled } from "client/store/settings/settingsSelectors";
-import { createSound, sounds } from "shared/assets";
+import { createSound, sounds } from "shared/assetsFolder";
 import { type MusicContext, selectLocalMusicContext } from "shared/store/soldiers";
 import { shuffle } from "shared/utils/object-utils";
 

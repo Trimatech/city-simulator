@@ -1,5 +1,5 @@
 import { store } from "server/store";
-import { sounds } from "shared/assets";
+import { sounds } from "shared/assetsFolder";
 import { palette } from "shared/constants/palette";
 import { findSoldierSkin } from "shared/constants/skins";
 import { remotes } from "shared/remotes";

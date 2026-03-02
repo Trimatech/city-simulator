@@ -4,7 +4,7 @@ import { setTimeout } from "@rbxts/set-timeout";
 import { springs } from "client/constants/springs";
 import { useMotion, useRem } from "client/hooks";
 import { Image } from "client/ui/image";
-import { images } from "shared/assets";
+import assets from "shared/assets";
 
 export function SupportHeart() {
 	const rem = useRem();
@@ -33,7 +33,7 @@ export function SupportHeart() {
 	return (
 		<>
 			<Image
-				image={images.ui.heart_glow}
+				image={assets.ui.heart_glow}
 				imageTransparency={lerpBinding(transition, 0.5, 0)}
 				anchorPoint={new Vector2(0.5, 0.5)}
 				size={new UDim2(0, rem(16), 0, rem(16))}
@@ -41,7 +41,7 @@ export function SupportHeart() {
 			/>
 
 			<Image
-				image={images.ui.heart_glow}
+				image={assets.ui.heart_glow}
 				imageTransparency={lerpBinding(pulse, 0, 1)}
 				anchorPoint={new Vector2(0.5, 0.5)}
 				size={lerpBinding(pulse, new UDim2(0, rem(6), 0, rem(6)), new UDim2(0, rem(28), 0, rem(28)))}
@@ -49,7 +49,7 @@ export function SupportHeart() {
 			/>
 
 			<Image
-				image={images.ui.heart}
+				image={assets.ui.heart}
 				anchorPoint={new Vector2(0.5, 0.5)}
 				size={lerpBinding(transition, new UDim2(0, rem(16), 0, rem(16)), new UDim2(0, rem(18), 0, rem(18)))}
 				position={new UDim2(0.5, 0, 0.5, 0)}

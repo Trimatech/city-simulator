@@ -1,0 +1,18 @@
+#:schema https://raw.githubusercontent.com/jackTabsCode/asphalt/refs/heads/main/schema.json
+
+[creator]
+type = "group"
+id = 34579161
+
+[codegen]
+typescript = true
+style = "nested"
+strip_extensions = true
+
+[inputs.assets]
+path = "assets/images/**/*"
+output_path = "src/shared"
+
+[inputs.assets.web]
+"some_sound_on_roblox.ogg" = { id = 123456789 }
+"some_image_on_roblox.png" = { id = 987654321 }

@@ -3,7 +3,7 @@ import React, { Element, useState } from "@rbxts/react";
 import { useObserverPosition, useStore } from "client/hooks";
 import { CanvasGroup } from "client/ui/canvas-group";
 import { Image } from "client/ui/image";
-import { images } from "shared/assets";
+import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 import { getWallSkin } from "shared/constants/skins";
 import { selectLocalSoldierId, selectSoldiersById, selectSoldierSkin } from "shared/store/soldiers";
@@ -34,7 +34,7 @@ export function MinimapNodes() {
 				nodes.push(
 					<Image
 						key={`soldier-${soldier.id}`}
-						image={images.ui.circle}
+						image={assets.ui.circle}
 						imageColor={color}
 						anchorPoint={new Vector2(0.5, 0.5)}
 						size={new UDim2(0, sizePx, 0, sizePx)}
@@ -68,7 +68,7 @@ export function MinimapNodes() {
 				return (
 					<Image
 						key={`soldier-${localId}`}
-						image={images.ui.circle}
+						image={assets.ui.circle}
 						imageColor={color}
 						anchorPoint={new Vector2(0.5, 0.5)}
 						size={new UDim2(0, 5, 0, 5)}

@@ -1,6 +1,6 @@
 import { Workspace } from "@rbxts/services";
-import { sounds } from "shared/assets";
-import { playSound } from "shared/assets/sounds/play-sound";
+import { sounds } from "shared/assetsFolder";
+import { playSound } from "shared/assetsFolder/sounds/play-sound";
 import { palette } from "shared/constants/palette";
 import { getPlayerByName } from "shared/utils/player-utils";
 

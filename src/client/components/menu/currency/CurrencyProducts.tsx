@@ -3,7 +3,7 @@ import React from "@rbxts/react";
 import { useOrientation, usePremium, useRem } from "client/hooks";
 import { Group } from "client/ui/layout/group";
 import { formatInteger } from "client/utils/format-integer";
-import { DevProduct } from "shared/assets";
+import { DevProduct } from "shared/assetsFolder";
 import { PREMIUM_BENEFIT } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
 
