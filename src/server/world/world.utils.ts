@@ -1,12 +1,22 @@
 import { Players } from "@rbxts/services";
 import { setTimeout } from "@rbxts/set-timeout";
 import { store } from "server/store";
-import { clearOwnerFromGrid } from "server/world/services/soldiers/soldier-grid";
-import { INITIAL_POLYGON_DIAMETER, INITIAL_POLYGON_ITEMS, WORLD_BOUNDS } from "shared/constants/core";
+import { dropCandyOnDeath } from "server/world/services/candy/candy-utils";
+import { getRandomPointInWorld, getSoldier } from "server/world/world-query.utils";
+import {
+	clearOwnerFromGrid,
+	clearOwnerTracersFromGrid,
+} from "server/world/services/soldiers/soldier-grid";
+import {
+	DEATH_CHOICE_TIMEOUT_SEC,
+	INITIAL_POLYGON_DIAMETER,
+	INITIAL_POLYGON_ITEMS,
+	WORLD_BOUNDS,
+} from "shared/constants/core";
 import { calculatePolygonOperation, isPointInPolygon, vector2ToPoint } from "shared/polybool/poly-utils";
 import { pointsToPolygon } from "shared/polybool/polybool";
-import { createPolygonAroundPosition } from "shared/polygon-extra.utils";
-import { selectAliveSoldiersById, selectSoldierById } from "shared/store/soldiers";
+import { createPolygonAroundPosition, getPolygonCentroid } from "shared/polygon-extra.utils";
+import { selectAliveSoldiersById } from "shared/store/soldiers";
 
 import { getBotHumanoid } from "./services/bots/bot-registry";
 import { getCandy as getCandyLocal } from "./services/candy/candy-store";
@@ -29,9 +39,7 @@ function getNearestAliveSoldierDistance(point: Vector2): number {
 	return nearest;
 }
 
-export function getSoldier(soldierId: string) {
-	return store.getState(selectSoldierById(soldierId));
-}
+export { getRandomPointInWorld, getSoldier } from "server/world/world-query.utils";
 
 export function getCandy(candyId: string) {
 	return getCandyLocal(candyId);
@@ -86,7 +94,61 @@ export function removeForceFieldFromPlayerName(playerName: string) {
 	if (humanoid) removeForceFieldFromHumanoid(humanoid);
 }
 
+const deathChoiceTimers = new Map<string, thread>();
+
+export function cancelDeathChoiceTimer(soldierId: string) {
+	const timer = deathChoiceTimers.get(soldierId);
+	if (timer) {
+		task.cancel(timer);
+		deathChoiceTimers.delete(soldierId);
+	}
+}
+
+export function onPlayerDeath(soldierId: string) {
+	store.setSoldierIsDead(soldierId);
+
+	const player = Players.FindFirstChild(soldierId);
+	if (player?.IsA("Player") && player.Character) {
+		player.Character.Destroy();
+	}
+
+	store.clearSoldierTracers(soldierId);
+	clearOwnerTracersFromGrid(soldierId);
+
+	const deadline = tick() + DEATH_CHOICE_TIMEOUT_SEC;
+	store.setSoldierDeathChoiceDeadline(soldierId, deadline);
+
+	const timer = task.delay(DEATH_CHOICE_TIMEOUT_SEC, () => {
+		deathChoiceTimers.delete(soldierId);
+		const soldier = getSoldier(soldierId);
+		if (soldier?.dead) {
+			killSoldier(soldierId);
+		}
+	});
+	deathChoiceTimers.set(soldierId, timer);
+}
+
+export function getPolygonCenterInside(soldierId: string): Vector2 | undefined {
+	const soldier = getSoldier(soldierId);
+	if (!soldier) return undefined;
+
+	const polygon = soldier.polygon as ReadonlyArray<Vector2>;
+	if (!polygon || polygon.size() < 3) return undefined;
+
+	const centroid = getPolygonCentroid(polygon);
+	if (!centroid) return undefined;
+
+	const testPoint = vector2ToPoint(centroid);
+	const polygonPoints = polygon.map(vector2ToPoint);
+	if (isPointInPolygon(testPoint, polygonPoints as unknown as [number, number][])) {
+		return centroid;
+	}
+
+	return polygon[0];
+}
+
 export function killSoldier(soldierId: string) {
+	cancelDeathChoiceTimer(soldierId);
 	// if (IS_LOCAL) {
 	// 	warn(`[DEBUG] Killing soldier ${soldierId} in local mode`);
 	// 	return;
@@ -107,6 +169,8 @@ export function killSoldier(soldierId: string) {
 	// Clear all grid lines owned by this soldier
 	clearOwnerFromGrid(soldierId);
 
+	dropCandyOnDeath(soldierId);
+
 	setTimeout(() => {
 		store.removeSoldier(soldierId);
 	}, 2);
@@ -121,23 +185,6 @@ export function takeDamageByPlayerName(playerName: string, amount: number) {
 
 export function playerIsSpawned(player: Player) {
 	return getSoldier(player.Name) !== undefined;
-}
-
-/**
- * Returns a random point in the world. If the margin is specified,
- * the point will be within this percentage of the world bounds.
- */
-export function getRandomPointInWorld(margin = 1) {
-	const random = new Random();
-	let position = new Vector2();
-
-	do {
-		const x = random.NextNumber(-margin, margin);
-		const y = random.NextNumber(-margin, margin);
-		position = new Vector2(x, y).mul(WORLD_BOUNDS);
-	} while (position.Magnitude > WORLD_BOUNDS);
-
-	return position;
 }
 
 /**

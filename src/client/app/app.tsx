@@ -5,6 +5,7 @@ import { Alerts } from "../components/alerts";
 import { BirdCamera } from "../components/camera/BirdCamera";
 import { Controller } from "../components/controller";
 import { ErrorHandler } from "../components/error-handler";
+import { DeathScreen } from "../components/game/death/DeathScreen";
 import { GameUI } from "../components/game/GameUI";
 import { BackgroundMusic } from "../components/music/BackgroundMusic";
 import { Preloader } from "../components/preloader";
@@ -23,6 +24,7 @@ export function App() {
 				<Controller />
 				<World />
 				<GameUI />
+				<DeathScreen />
 			</Layer>
 
 			<Layer>

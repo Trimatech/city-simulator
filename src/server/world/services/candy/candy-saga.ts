@@ -7,7 +7,7 @@ import { identifySoldier, selectAliveSoldiersById } from "shared/store/soldiers"
 import { createScheduler } from "shared/utils/scheduler";
 
 import { onCandyTick } from "./candy-tick";
-import { dropCandyOnDeath, populateCandy, removeCandyIfAtLimit } from "./candy-utils";
+import { populateCandy, removeCandyIfAtLimit } from "./candy-utils";
 
 export async function initCandyService() {
 	createScheduler({
@@ -39,11 +39,9 @@ export async function initCandyService() {
 		() => removeCandyIfAtLimit(CandyType.Dropping),
 	);
 
-	store.observe(selectAliveSoldiersById, identifySoldier, ({ id }) => {
-		// when the soldier dies, create candy on the soldier's tracers
+	store.observe(selectAliveSoldiersById, identifySoldier, () => {
 		return () => {
-			// HERE WE DIE AND DROP STUFF
-			dropCandyOnDeath(id);
+			// Candy is dropped in killSoldier (full death only), not on soft death
 		};
 	});
 

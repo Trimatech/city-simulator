@@ -34,6 +34,13 @@ export const saveSlice = createProducer(initialState, {
 		}));
 	},
 
+	spendPlayerCrystals: (state, player: string, amount: number) => {
+		return mapProperty(state, player, (save) => ({
+			...save,
+			crystals: math.max((save.crystals ?? 0) - amount, 0),
+		}));
+	},
+
 	givePlayerSkin: (state, player: string, skin: string) => {
 		return mapProperty(state, player, (save) => ({
 			...save,

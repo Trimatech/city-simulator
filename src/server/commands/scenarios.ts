@@ -1,16 +1,12 @@
 import Object from "@rbxts/object-utils";
 import { store } from "server/store";
 import { spawnBotsNearPlayer } from "server/world/services/bots/bot-saga";
-import {
-	createPolygonAroundPosition,
-	createRectanglePolygon,
-	calculatePolygonArea,
-} from "shared/polygon-extra.utils";
+import { updateAreaGridForPolygon } from "server/world/services/soldiers/soldier-grid";
+import { getSafePointOutsideSoldierPolygons, killSoldier } from "server/world/world.utils";
 import { INITIAL_POLYGON_DIAMETER, INITIAL_POLYGON_ITEMS } from "shared/constants/core";
+import { calculatePolygonArea, createPolygonAroundPosition, createRectanglePolygon } from "shared/polygon-extra.utils";
 import { selectSoldiersById } from "shared/store/soldiers";
 import { selectTowersById } from "shared/store/towers/tower-selectors";
-import { getSafePointOutsideSoldierPolygons, killSoldier } from "server/world/world.utils";
-import { updateAreaGridForPolygon } from "server/world/services/soldiers/soldier-grid";
 import { findCharacterPrimaryPart } from "shared/utils/player-utils";
 
 const CHARACTER_SPAWN_Y = 100;

@@ -1,13 +1,29 @@
 import { Players } from "@rbxts/services";
 import { store } from "server/store";
 import { DEFAULT_ORBS, SOLDIER_TICK_PHASE } from "server/world/constants";
-import { getSafePointOutsideSoldierPolygons, killSoldier, playerIsSpawned } from "server/world/world.utils";
-import { SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
+import {
+	cancelDeathChoiceTimer,
+	getPolygonCenterInside,
+	getSafePointOutsideSoldierPolygons,
+	killSoldier,
+	playerIsSpawned,
+} from "server/world/world.utils";
+import { REVIVE_CRYSTAL_COST, SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
 import { setIntersectionPoints, vectorsToPoints } from "shared/polybool/poly-utils";
 import { pointsToPolygon } from "shared/polybool/polybool";
 import { remotes } from "shared/remotes";
-import { defaultPlayerSave, RANDOM_SKIN, selectPlayerSave } from "shared/store/saves";
-import { identifySoldier, selectAliveSoldiersById, selectIsInsideBySoldierById } from "shared/store/soldiers";
+import {
+	defaultPlayerSave,
+	RANDOM_SKIN,
+	selectPlayerCrystals,
+	selectPlayerSave,
+} from "shared/store/saves";
+import {
+	identifySoldier,
+	selectAliveSoldiersById,
+	selectIsInsideBySoldierById,
+	selectSoldierById,
+} from "shared/store/soldiers";
 // grid-lines utils imported in soldier-grid helpers
 import { findCharacterPrimaryPart, reloadCharacterAsync } from "shared/utils/player-utils";
 import { createScheduler } from "shared/utils/scheduler";
@@ -80,6 +96,47 @@ export async function initSoldierService() {
 	});
 
 	remotes.soldier.kill.connect((player) => {
+		killSoldier(player.Name);
+	});
+
+	remotes.soldier.continue.connect(async (player) => {
+		const soldierId = player.Name;
+		const soldier = store.getState(selectSoldierById(soldierId));
+		if (!soldier || !soldier.dead) return;
+
+		const crystals = store.getState(selectPlayerCrystals(soldierId)) ?? 0;
+		if (crystals < REVIVE_CRYSTAL_COST) return;
+
+		const deadline = soldier.deathChoiceDeadline;
+		if (deadline === undefined || tick() > deadline) return;
+
+		cancelDeathChoiceTimer(soldierId);
+
+		const center = getPolygonCenterInside(soldierId);
+		if (!center) {
+			warn(`Cannot revive ${soldierId}: no valid polygon center`);
+			killSoldier(soldierId);
+			return;
+		}
+
+		store.spendPlayerCrystals(soldierId, REVIVE_CRYSTAL_COST);
+		await reloadCharacterAsync(player);
+
+		const character = player.Character as Model;
+		if (character) {
+			character.PivotTo(new CFrame(center.X, 100, center.Y));
+		}
+
+		store.patchSoldier(soldierId, {
+			dead: false,
+			position: center,
+			health: soldier.maxHealth,
+			deathChoiceDeadline: undefined,
+		});
+	});
+
+	remotes.soldier.startOver.connect((player) => {
+		cancelDeathChoiceTimer(player.Name);
 		killSoldier(player.Name);
 	});
 

@@ -42,6 +42,7 @@ export interface SoldierEntity {
 	readonly health: number;
 	readonly maxHealth: number;
 	readonly zIndex: number;
+	readonly deathChoiceDeadline?: number;
 }
 
 const defaultEntity: SoldierEntity = {
@@ -65,6 +66,7 @@ const defaultEntity: SoldierEntity = {
 	health: 100,
 	maxHealth: 100,
 	zIndex: 0,
+	deathChoiceDeadline: undefined,
 };
 
 const initialState: SoldiersState = {};
@@ -226,6 +228,13 @@ export const soldiersSlice = createProducer(initialState, {
 		return mapProperty(state, id, (soldier) => ({
 			...soldier,
 			dead: true,
+		}));
+	},
+
+	setSoldierDeathChoiceDeadline: (state, id: string, deadline?: number) => {
+		return mapProperty(state, id, (soldier) => ({
+			...soldier,
+			deathChoiceDeadline: deadline,
 		}));
 	},
 

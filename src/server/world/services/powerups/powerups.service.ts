@@ -10,6 +10,7 @@ import {
 } from "server/world/world.utils";
 import { SOLDIER_MIN_AREA, SOLDIER_SPEED } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
+import type { PowerupId } from "shared/constants/powerups";
 import { POWERUP_DURATIONS, POWERUP_EXPLOSIONS, POWERUP_PRICES, POWERUP_TURBO_SPEED } from "shared/constants/powerups";
 import {
 	calculatePolygonOperation,
@@ -24,7 +25,6 @@ import { selectSoldierById, selectSoldierOrbs, selectSoldiersById } from "shared
 import { selectTowersById } from "shared/store/towers/tower-selectors";
 import { findCharacterPrimaryPart } from "shared/utils/player-utils";
 
-import type { PowerupId } from "shared/constants/powerups";
 import { placeTower } from "./placeTower";
 
 interface Edge {

@@ -12,6 +12,10 @@ export const selectPlayerBalance = (id: string) => {
 	return (state: SharedState) => state.saves[id]?.balance;
 };
 
+export const selectPlayerCrystals = (id: string) => {
+	return (state: SharedState) => state.saves[id]?.crystals ?? 0;
+};
+
 export const selectPlayerSkins = (id: string) => {
 	return (state: SharedState) => state.saves[id]?.skins;
 };
