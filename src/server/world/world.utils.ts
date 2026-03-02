@@ -2,11 +2,8 @@ import { Players } from "@rbxts/services";
 import { setTimeout } from "@rbxts/set-timeout";
 import { store } from "server/store";
 import { dropCandyOnDeath } from "server/world/services/candy/candy-utils";
+import { clearOwnerFromGrid, clearOwnerTracersFromGrid } from "server/world/services/soldiers/soldier-grid";
 import { getRandomPointInWorld, getSoldier } from "server/world/world-query.utils";
-import {
-	clearOwnerFromGrid,
-	clearOwnerTracersFromGrid,
-} from "server/world/services/soldiers/soldier-grid";
 import {
 	DEATH_CHOICE_TIMEOUT_SEC,
 	INITIAL_POLYGON_DIAMETER,

@@ -34,31 +34,35 @@ export const ProgressBar = ({ current, target, height = 0.5 }: ProgressBarProps)
 	const rem = useRem();
 	const style = style1;
 
+	//print(".....", { current, progress, target });
+
 	return (
-		<Frame
-			name="ProgressBar"
-			size={new UDim2(1, 0, 0, height)}
-			backgroundColor={style.progressBar.backgroundColor}
-			backgroundTransparency={style.progressBar.backgroundTransparency}
+		<canvasgroup
+			key="ProgressBar"
+			Size={new UDim2(1, 0, 0, height)}
+			BackgroundColor3={style.progressBar.backgroundColor}
+			BackgroundTransparency={style.progressBar.backgroundTransparency}
+			GroupTransparency={0}
 		>
 			<uicorner CornerRadius={new UDim(1, 0)} />
 			<uistroke
 				Color={style.progressBar.borderColor}
 				Transparency={style.progressBar.borderTransparency}
 				Thickness={rem(style.progressBar.borderThickness, "pixel")}
-				BorderStrokePosition={Enum.BorderStrokePosition.Inner}
+				ApplyStrokeMode={Enum.ApplyStrokeMode.Border}
 			/>
 
-			{/* Filled portion */}
+			{/* Filled portion — full size, slides via Position so roundness is preserved */}
 			<Frame
 				name="ProgressFill"
-				size={new UDim2(progress, 0, 1, 0)}
+				position={new UDim2(progress - 1, 0, 0, 0)}
+				size={UDim2.fromScale(1, 1)}
 				backgroundColor={style.progressFill.backgroundColor}
 				backgroundTransparency={style.progressFill.backgroundTransparency}
 			>
 				<uicorner CornerRadius={new UDim(1, 0)} />
 				<uigradient Color={style.progressFill.gradient} Rotation={0} />
 			</Frame>
-		</Frame>
+		</canvasgroup>
 	);
 };

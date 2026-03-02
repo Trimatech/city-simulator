@@ -6,20 +6,18 @@ import { InferFusionProps, Number } from "@rbxts/ui-labs";
 import { DeathScreen } from "client/components/game/death/DeathScreen";
 import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
-import { USER_NAME } from "shared/constants/core";
+import { DEATH_CHOICE_TIMEOUT_SEC, USER_NAME } from "shared/constants/core";
 import { defaultPlayerSave } from "shared/store/saves";
 
 const controls = {
 	crystals: Number(3, 0, 10, 1),
-	secondsLeft: Number(10, 0, 15, 1),
 };
 
 interface StoryProps {
 	crystals: number;
-	secondsLeft: number;
 }
 
-function DeathScreenStoryContent({ crystals, secondsLeft }: StoryProps) {
+function DeathScreenStoryContent({ crystals }: StoryProps) {
 	useEffect(() => {
 		store.setPlayerSave(USER_NAME, { ...defaultPlayerSave, crystals });
 	}, [crystals]);
@@ -29,16 +27,12 @@ function DeathScreenStoryContent({ crystals, secondsLeft }: StoryProps) {
 			name: USER_NAME,
 			position: new Vector2(0, 0),
 			dead: true,
-			deathChoiceDeadline: tick() + secondsLeft,
+			deathChoiceDeadline: tick() + DEATH_CHOICE_TIMEOUT_SEC,
 		});
 		return () => {
 			store.removeSoldier(USER_NAME);
 		};
 	}, []);
-
-	useEffect(() => {
-		store.setSoldierDeathChoiceDeadline(USER_NAME, tick() + secondsLeft);
-	}, [secondsLeft]);
 
 	return (
 		<RootProvider>
@@ -54,8 +48,8 @@ const story = {
 	reactRoblox: ReactRoblox,
 	controls,
 	story: (props: InferFusionProps<typeof controls>) => {
-		const { crystals, secondsLeft } = props.controls;
-		return <DeathScreenStoryContent crystals={crystals as number} secondsLeft={secondsLeft as number} />;
+		const { crystals } = props.controls;
+		return <DeathScreenStoryContent crystals={crystals as number} />;
 	},
 };
 
