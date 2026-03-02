@@ -79,12 +79,14 @@ export function DeathScreen() {
 			<uicorner CornerRadius={new UDim(0, rem(2))} />
 			<uistroke Color={palette.white} Transparency={0} Thickness={rem(0.5)} />
 			<Text
-				font={fonts.inter.bold}
+				font={fonts.mplus.bold}
 				text="You Died"
 				automaticSize={Enum.AutomaticSize.XY}
-				textColor={palette.red}
+				textColor={palette.black}
 				textSize={rem(6)}
-			/>
+			>
+				<uistroke Color={palette.white} Transparency={0} Thickness={rem(0.3)} />
+			</Text>
 
 			<VStack
 				spacing={rem(1)}
@@ -173,14 +175,14 @@ export function DeathScreen() {
 
 				<PrimaryButton
 					onClick={() => remotes.soldier.startOver.fire()}
-					primaryColor={palette.red}
+					primaryColor={isTimerActive ? palette.black : palette.blue}
 					size={buttonSize}
 					layoutOrder={3}
 				>
 					<Text
 						font={fonts.inter.medium}
 						text="Start Over"
-						textColor={palette.base}
+						textColor={isTimerActive ? palette.white : palette.black}
 						textSize={rem(1.6)}
 						size={new UDim2(1, 0, 1, 0)}
 					/>
