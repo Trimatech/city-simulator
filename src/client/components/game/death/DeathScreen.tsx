@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "@rbxts/react";
 import { useSelector, useSelectorCreator } from "@rbxts/react-reflex";
 import { ProgressBarTimer } from "client/components/ProgressBarTimer";
 import { fonts } from "client/constants/fonts";
-import { useRem } from "client/hooks";
+import { springs } from "client/constants/springs";
+import { useMotion, useRem } from "client/hooks";
 import { Image } from "client/ui/image";
 import { Frame } from "client/ui/layout/frame";
 import { HStack } from "client/ui/layout/HStack";
@@ -35,11 +36,23 @@ export function DeathScreen() {
 		}
 	}, [deathChoiceDeadline]);
 
+	const isTimerActive = deathChoiceDeadline !== undefined && !isExpired;
+
+	const [buttonSize, buttonSizeMotion] = useMotion(
+		new UDim2(0, rem(isTimerActive ? 9 : 18), 0, rem(isTimerActive ? 3 : 4)),
+	);
+
+	useEffect(() => {
+		buttonSizeMotion.spring(
+			new UDim2(0, rem(isTimerActive ? 9 : 18), 0, rem(isTimerActive ? 3 : 4)),
+			springs.responsive,
+		);
+	}, [isTimerActive]);
+
 	if (!soldier || !soldier.dead) {
 		return undefined;
 	}
 
-	const isTimerActive = deathChoiceDeadline !== undefined && !isExpired;
 	const canRevive = crystals >= 1 && isTimerActive;
 
 	const smallTextProps = {
@@ -161,7 +174,7 @@ export function DeathScreen() {
 				<PrimaryButton
 					onClick={() => remotes.soldier.startOver.fire()}
 					primaryColor={palette.red}
-					size={new UDim2(0, rem(isTimerActive ? 9 : 18), 0, rem(isTimerActive ? 3 : 4))}
+					size={buttonSize}
 					layoutOrder={3}
 				>
 					<Text
