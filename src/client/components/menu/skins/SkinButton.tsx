@@ -8,7 +8,7 @@ import { PrimaryButton } from "client/ui/PrimaryButton";
 import { ReactiveButton } from "client/ui/reactive-button";
 import { Text } from "client/ui/text";
 import { formatInteger } from "client/utils/format-integer";
-import { playSound, sounds } from "shared/assets";
+import { playSound, sounds } from "shared/assetsFolder";
 import { USER_NAME } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
 import { getWallSkin } from "shared/constants/skins";

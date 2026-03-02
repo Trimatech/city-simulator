@@ -7,7 +7,7 @@ import {
 	selectMilestones,
 } from "server/store/milestones";
 import { ScoreMilestone } from "server/store/milestones/milestone-utils";
-import { Badge } from "shared/assets";
+import { Badge } from "shared/assetsFolder";
 import { getPlayerByName } from "shared/utils/player-utils";
 
 import { shouldGrantBadge } from "../utils";

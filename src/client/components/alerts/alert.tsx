@@ -12,7 +12,8 @@ import { Outline } from "client/ui/outline";
 import { ReactiveButton } from "client/ui/reactive-button";
 import { Shadow } from "client/ui/shadow";
 import { Text } from "client/ui/text";
-import { images, playSound, sounds } from "shared/assets";
+import assets from "shared/assets";
+import { playSound, sounds } from "shared/assetsFolder";
 import { palette } from "shared/constants/palette";
 import { brightenIfDark, darken } from "shared/utils/color-utils";
 import { mapStrict } from "shared/utils/math-utils";
@@ -161,7 +162,7 @@ export function Alert({ alert, index }: AlertProps) {
 			/>
 
 			<Image
-				image={images.ui.alert_dismiss}
+				image={assets.ui.alert_dismiss}
 				imageColor={brightenIfDark(alert.colorSecondary || alert.colorMessage || alert.color)}
 				imageTransparency={lerpBinding(transition, 1, 0)}
 				anchorPoint={new Vector2(1, 0.5)}

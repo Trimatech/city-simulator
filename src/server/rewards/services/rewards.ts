@@ -9,7 +9,7 @@ import {
 } from "server/store/milestones";
 import { ScoreMilestone } from "server/store/milestones/milestone-utils";
 import { getSoldier } from "server/world";
-import { sounds } from "shared/assets";
+import { sounds } from "shared/assetsFolder";
 import { palette } from "shared/constants/palette";
 import { remotes } from "shared/remotes";
 import { selectSoldierRanking } from "shared/store/soldiers";

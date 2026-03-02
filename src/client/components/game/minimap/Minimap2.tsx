@@ -6,7 +6,7 @@ import { Frame } from "client/ui/layout/frame";
 import { Group } from "client/ui/layout/group";
 import { Outline } from "client/ui/outline";
 import { Shadow } from "client/ui/shadow";
-import { images } from "shared/assets";
+import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 
 import { MinimapNodes } from "./MinimapNodes";
@@ -61,7 +61,7 @@ export function Minimap() {
 				</Frame>
 
 				<Image
-					image={images.ui.map_crosshair}
+					image={assets.ui.map_crosshair}
 					anchorPoint={new Vector2(0.5, 0.5)}
 					size={new UDim2(0, rem(1), 0, rem(1))}
 					position={new UDim2(0.5, 0, 0.5, 0)}

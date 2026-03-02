@@ -6,7 +6,7 @@ import { selectWorldSubjectPosition } from "client/store/world";
 import { Image } from "client/ui/image";
 import { Group } from "client/ui/layout/group";
 import { Text } from "client/ui/text";
-import { images } from "shared/assets";
+import assets from "shared/assets";
 
 import { useLeaderPosition } from "./utils";
 
@@ -75,7 +75,7 @@ export function Compass() {
 
 				<Group rotation={style.rotation}>
 					<Image
-						image={images.ui.leader_pointer}
+						image={assets.ui.leader_pointer}
 						imageTransparency={lerpBinding(visible, 1, 0)}
 						anchorPoint={new Vector2(0.5, 0.5)}
 						size={new UDim2(0, rem(1.5), 0, rem(1.5))}
