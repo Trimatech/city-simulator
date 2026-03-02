@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "@rbxts/react";
 import { useSelector, useSelectorCreator } from "@rbxts/react-reflex";
-import { RunService } from "@rbxts/services";
-import { ProgressBar } from "client/components/ProgressBar";
+import { ProgressBarTimer } from "client/components/ProgressBarTimer";
 import { fonts } from "client/constants/fonts";
 import { useRem } from "client/hooks";
 import { Image } from "client/ui/image";
@@ -23,30 +22,25 @@ export function DeathScreen() {
 	const deathChoiceDeadline = useSelector(selectLocalDeathChoiceDeadline);
 	const crystals = useSelectorCreator(selectPlayerCrystals, USER_NAME) ?? 0;
 
-	const [secondsLeft, setSecondsLeft] = useState(0);
-	const [remainingSeconds, setRemainingSeconds] = useState(0);
+	const [isExpired, setIsExpired] = useState(() => {
+		if (deathChoiceDeadline === undefined) return true;
+		return deathChoiceDeadline - tick() <= 0;
+	});
 
 	useEffect(() => {
-		if (deathChoiceDeadline === undefined) {
-			setSecondsLeft(0);
-			setRemainingSeconds(0);
-			return;
+		if (deathChoiceDeadline !== undefined) {
+			setIsExpired(deathChoiceDeadline - tick() <= 0);
+		} else {
+			setIsExpired(true);
 		}
-		const update = () => {
-			const remaining = math.max(0, deathChoiceDeadline - tick());
-			setSecondsLeft(math.ceil(remaining));
-			setRemainingSeconds(remaining);
-		};
-		update();
-		const connection = RunService.Heartbeat.Connect(update);
-		return () => connection.Disconnect();
 	}, [deathChoiceDeadline]);
 
 	if (!soldier || !soldier.dead) {
 		return undefined;
 	}
 
-	const canRevive = crystals >= 1 && secondsLeft > 0;
+	const isTimerActive = deathChoiceDeadline !== undefined && !isExpired;
+	const canRevive = crystals >= 1 && isTimerActive;
 
 	const smallTextProps = {
 		font: fonts.inter.regular,
@@ -54,8 +48,6 @@ export function DeathScreen() {
 		textSize: rem(1),
 		automaticSize: Enum.AutomaticSize.XY,
 	};
-
-	const isTimerActive = secondsLeft > 0;
 
 	return (
 		<VStack
@@ -96,19 +88,26 @@ export function DeathScreen() {
 						horizontalAlignment={Enum.HorizontalAlignment.Center}
 					>
 						<Frame size={new UDim2(0, rem(18), 0, rem(0.75))} automaticSize={Enum.AutomaticSize.Y}>
-							<Text
-								font={fonts.inter.bold}
-								text={`${secondsLeft}`}
-								automaticSize={Enum.AutomaticSize.XY}
-								textColor={palette.white}
-								textSize={rem(1.5)}
-								zIndex={100}
-								position={new UDim2(0.5, 0, 0.5, 0)}
-								anchorPoint={new Vector2(0.5, 0.5)}
-							>
-								<uistroke Color={palette.blue1} Transparency={0} Thickness={2} />
-							</Text>
-							<ProgressBar current={remainingSeconds} target={DEATH_CHOICE_TIMEOUT_SEC} height={rem(2)} />
+							<ProgressBarTimer
+								deadlineTime={deathChoiceDeadline!}
+								totalDuration={DEATH_CHOICE_TIMEOUT_SEC}
+								height={rem(2)}
+								onExpired={() => setIsExpired(true)}
+								renderOverlay={(secondsLeft) => (
+									<Text
+										font={fonts.inter.bold}
+										text={secondsLeft}
+										automaticSize={Enum.AutomaticSize.XY}
+										textColor={palette.white}
+										textSize={rem(1.5)}
+										zIndex={100}
+										position={new UDim2(0.5, 0, 0.5, 0)}
+										anchorPoint={new Vector2(0.5, 0.5)}
+									>
+										<uistroke Color={palette.blue1} Transparency={0} Thickness={2} />
+									</Text>
+								)}
+							/>
 						</Frame>
 						<PrimaryButton
 							onClick={() => remotes.soldier.continue.fire()}

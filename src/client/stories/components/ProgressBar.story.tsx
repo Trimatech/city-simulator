@@ -10,17 +10,16 @@ import { Frame } from "client/ui/layout/frame";
 import { VStack } from "client/ui/layout/VStack";
 
 const controls = {
-	current: Number(65, 0, 100, 1),
-	target: Number(100, 1, 200, 1),
+	progress: Number(0.65, 0, 1, 0.01),
 };
 
-function ProgressBarStoryContent({ current, target }: { current: number; target: number }) {
+function ProgressBarStoryContent({ progress }: { progress: number }) {
 	const rem = useRem();
 	return (
 		<RootProvider>
 			<VStack size={new UDim2(1, 0, 1, 0)}>
 				<Frame size={new UDim2(0, 300, 0, 20)}>
-					<ProgressBar current={current} target={target} height={rem(2)} />
+					<ProgressBar progress={progress} height={rem(2)} />
 				</Frame>
 			</VStack>
 		</RootProvider>
@@ -32,8 +31,8 @@ const story = {
 	reactRoblox: ReactRoblox,
 	controls,
 	story: (props: InferFusionProps<typeof controls>) => {
-		const { current, target } = props.controls;
-		return <ProgressBarStoryContent current={current as number} target={target as number} />;
+		const { progress } = props.controls;
+		return <ProgressBarStoryContent progress={progress as number} />;
 	},
 };
 

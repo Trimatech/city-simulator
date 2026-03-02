@@ -1,3 +1,4 @@
+import { composeBindings } from "@rbxts/pretty-react-hooks";
 import React from "@rbxts/react";
 import { useRem } from "client/hooks";
 import { Frame } from "client/ui/layout/frame";
@@ -6,11 +7,9 @@ import { palette } from "shared/constants/palette";
 const progressBarGradient = new ColorSequence(Color3.fromHex("#4FACFE"), Color3.fromHex("#00F2FE"));
 
 export interface ProgressBarProps {
-	/** Current value */
-	current: number;
-	/** Target value */
-	target: number;
-	/** Height in rem units (default 0.5) */
+	/** Progress value from 0 to 1 */
+	progress: number | React.Binding<number>;
+	/** Height in pixels */
 	height?: number;
 }
 
@@ -29,12 +28,13 @@ const style1 = {
 	},
 };
 
-export const ProgressBar = ({ current, target, height = 0.5 }: ProgressBarProps) => {
-	const progress = math.clamp(current / target, 0, 1);
+export const ProgressBar = ({ progress, height = 0.5 }: ProgressBarProps) => {
 	const rem = useRem();
 	const style = style1;
 
-	//print(".....", { current, progress, target });
+	const fillPosition = composeBindings(progress, (p: number) => {
+		return new UDim2(math.clamp(p, 0, 1) - 1, 0, 0, 0);
+	});
 
 	return (
 		<canvasgroup
@@ -55,7 +55,7 @@ export const ProgressBar = ({ current, target, height = 0.5 }: ProgressBarProps)
 			{/* Filled portion — full size, slides via Position so roundness is preserved */}
 			<Frame
 				name="ProgressFill"
-				position={new UDim2(progress - 1, 0, 0, 0)}
+				position={fillPosition}
 				size={UDim2.fromScale(1, 1)}
 				backgroundColor={style.progressFill.backgroundColor}
 				backgroundTransparency={style.progressFill.backgroundTransparency}
