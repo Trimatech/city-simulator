@@ -24,6 +24,7 @@ import { selectSoldierById, selectSoldierOrbs, selectSoldiersById } from "shared
 import { selectTowersById } from "shared/store/towers/tower-selectors";
 import { findCharacterPrimaryPart } from "shared/utils/player-utils";
 
+import type { PowerupId } from "shared/constants/powerups";
 import { placeTower } from "./placeTower";
 
 interface Edge {
@@ -508,6 +509,127 @@ function triggerNuclearExplosion(player: Player) {
 	remotes.client.powerupNuclear.fireAll(nuclearCFrame, size);
 
 	alertMessage(player, "Nuclear Explosion detonated!", palette.green);
+}
+
+export function executePowerupForSoldier(
+	soldierId: string,
+	powerupId: PowerupId,
+	options?: { skipCost?: boolean; directionToward?: Vector2 },
+) {
+	const soldier = store.getState(selectSoldierById(soldierId));
+	if (!soldier || soldier.dead) return;
+
+	const skipCost = options?.skipCost ?? false;
+	const directionToward = options?.directionToward ?? new Vector2(1, 0);
+
+	if (!skipCost) {
+		const cost = POWERUP_PRICES[powerupId];
+		if (!trySpendOrbs(soldierId, cost)) return;
+	}
+
+	const center = soldier.position;
+
+	switch (powerupId) {
+		case "turbo": {
+			const humanoid = getPlayerHumanoidByName(soldierId);
+			if (humanoid) {
+				humanoid.WalkSpeed = POWERUP_TURBO_SPEED;
+				setTimeout(() => {
+					const again = getPlayerHumanoidByName(soldierId);
+					if (again) again.WalkSpeed = SOLDIER_SPEED;
+				}, POWERUP_DURATIONS.turbo);
+			}
+			break;
+		}
+		case "shield": {
+			store.setSoldierShieldActive(soldierId, true);
+			ensureForceFieldOnPlayerName(soldierId, true);
+			setTimeout(() => {
+				store.setSoldierShieldActive(soldierId, false);
+				removeForceFieldFromPlayerName(soldierId);
+			}, POWERUP_DURATIONS.shield);
+			break;
+		}
+		case "tower": {
+			const dir = directionToward.Magnitude > 0.001 ? directionToward.Unit : new Vector2(0, 1);
+			const towerPos = center.add(dir.mul(10));
+			const towerId = `tower_${tick()}`;
+			store.placeTower({
+				id: towerId,
+				position: towerPos,
+				ownerId: soldierId,
+				damage: 15,
+				range: 50,
+				lastAttackTime: 0,
+				lastAttackPlayerName: undefined,
+				currentTargetId: undefined,
+				hasEnemyInRange: false,
+			});
+			break;
+		}
+		case "laserBeam": {
+			const cfg = POWERUP_EXPLOSIONS.laserBeam;
+			const dirUnit = directionToward.Magnitude > 0.001 ? directionToward.Unit : new Vector2(0, 1);
+			const bombCenter2D = center.add(dirUnit.mul(cfg.length / 2));
+			const forwardUnit = new Vector3(dirUnit.X, 0, dirUnit.Y);
+			const cframe = CFrame.lookAt(
+				new Vector3(bombCenter2D.X, 0.5, bombCenter2D.Y),
+				new Vector3(bombCenter2D.X, 0.5, bombCenter2D.Y).add(forwardUnit),
+			);
+			const size = new Vector3(cfg.width, 5, cfg.length);
+
+			const soldiers = store.getState(selectSoldiersById);
+			for (const [, s] of Object.entries(soldiers)) {
+				if (!s || s.dead || s.id === soldierId) continue;
+				if (isPointInRectangleWithCFrame(s.position, cframe, size)) {
+					const h = getPlayerHumanoidByName(s.id);
+					if (h) {
+						pushHumanoidAway(h, new Vector3(bombCenter2D.X, 0, bombCenter2D.Y), 80);
+					}
+					const h2 = getPlayerHumanoidByName(s.id);
+					if (h2) h2.TakeDamage(cfg.damage);
+				}
+			}
+
+			const towers = store.getState(selectTowersById);
+			for (const [id, t] of Object.entries(towers)) {
+				if (!t || t.ownerId === soldierId) continue;
+				if (isPointInRectangleWithCFrame(t.position, cframe, size)) {
+					store.removeTower(`${id}`);
+				}
+			}
+
+			const damagePolygon = createExplosionPolygonFromPart(bombCenter2D, cfg.length, cfg.width, cframe);
+			cutDamageAreaFromSoldiers(damagePolygon);
+			remotes.client.powerupCarpet.fireAll(cframe, size);
+			break;
+		}
+		case "nuclearExplosion": {
+			const cfg = POWERUP_EXPLOSIONS.nuclearExplosion;
+			const soldiers = store.getState(selectSoldiersById);
+			for (const [, s] of Object.entries(soldiers)) {
+				if (!s || s.dead || s.id === soldierId) continue;
+				if (magnitude2D(s.position, center) <= cfg.radius) {
+					killSoldier(s.id);
+				}
+			}
+			const towers = store.getState(selectTowersById);
+			for (const [id, t] of Object.entries(towers)) {
+				if (!t || t.ownerId === soldierId) continue;
+				if (magnitude2D(t.position, center) <= cfg.radius) {
+					store.removeTower(`${id}`);
+				}
+			}
+			const damagePolygon = createCircularExplosionPolygonFromPart(center, cfg.radius);
+			cutDamageAreaFromSoldiers(damagePolygon);
+			const nuclearCFrame = new CFrame(center.X, 0.5, center.Y);
+			const size = new Vector3(5, cfg.radius * 2, cfg.radius * 2);
+			remotes.client.powerupNuclear.fireAll(nuclearCFrame, size);
+			break;
+		}
+		default:
+			warn(`Unknown powerup id ${powerupId}`);
+	}
 }
 
 export async function initPowerupService() {

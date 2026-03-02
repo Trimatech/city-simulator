@@ -43,16 +43,6 @@ export function Stats() {
 			/>
 
 			<StatsCard
-				emoji="🗺️"
-				label="Area"
-				value={`${formatInteger(area)} studs²`}
-				primary={Color3.fromRGB(186, 250, 255)}
-				secondary={Color3.fromRGB(8, 89, 255)}
-				enabled={currentArea !== undefined}
-				order={0}
-			/>
-
-			<StatsCard
 				emoji="☠️"
 				label="KOs"
 				value={`${formatInteger(eliminations)}`}
@@ -90,6 +80,15 @@ export function Stats() {
 				secondary={Color3.fromRGB(153, 181, 107)}
 				enabled={currentBalance !== undefined}
 				order={2}
+			/>
+			<StatsCard
+				emoji="🗺️"
+				label="Area"
+				value={`${formatInteger(area)} studs²`}
+				primary={Color3.fromRGB(186, 250, 255)}
+				secondary={Color3.fromRGB(8, 89, 255)}
+				enabled={currentArea !== undefined}
+				order={0}
 			/>
 		</Group>
 	);

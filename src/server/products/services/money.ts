@@ -1,5 +1,5 @@
 import { grantMoney } from "server/rewards";
-import { DevProduct, sounds } from "shared/assets";
+import { DevProduct, sounds } from "shared/assetsFolder";
 import { palette } from "shared/constants/palette";
 import { remotes } from "shared/remotes";
 

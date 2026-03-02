@@ -5,7 +5,7 @@ import { useSelector } from "@rbxts/react-reflex";
 import { ContentProvider, Players, SoundService } from "@rbxts/services";
 import { useCharacter } from "client/hooks/use-character";
 import { selectWorldSubjectDead, selectWorldSubjectOrbs, selectWorldSubjectPolygonAreaSize } from "client/store/world";
-import { playSound, sounds } from "shared/assets";
+import { playSound, sounds } from "shared/assetsFolder";
 import { selectHasLocalSoldier, selectLocalLastTracerPoint } from "shared/store/soldiers";
 import { selectTowersById } from "shared/store/towers/tower-selectors";
 
@@ -129,7 +129,6 @@ function WorldSoundsComponent() {
 			}
 
 			pitchIndexRef.current = (step + 1) % TOTAL_STEPS;
-			print(`step=${step}`);
 		},
 		{ wait: 0.2 },
 	);
@@ -181,18 +180,21 @@ function WorldSoundsComponent() {
 		sound.Play();
 	}, [polygonAreaSize]);
 
-	// Tracer placement sound with cycling pitch
+	// Tracer/trail wall placement sound (local player only)
 	useEffect(() => {
+		if (!hasLocalSoldier) {
+			warn("no local soldier");
+			return;
+		}
 		if (lastTracerPoint === undefined) {
 			pitchIndexRef.current = 0;
 			return;
 		}
 
-		// Attempt on each newly added segment; throttle via useThrottleCallback
 		if (lastTracerPoint !== previousLastTracerPoint) {
 			onTracerSound.run();
 		}
-	}, [lastTracerPoint, previousLastTracerPoint]);
+	}, [hasLocalSoldier, lastTracerPoint, previousLastTracerPoint]);
 
 	// Tower placement sound
 	useEffect(() => {

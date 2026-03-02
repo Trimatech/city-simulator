@@ -11,7 +11,6 @@ const excludedActions = [
 	"setSoldierTracers",
 	"clearSoldierTracers",
 	"soldierTick",
-	"setSoldierLastTracerPoint",
 	"incrementSoldierOrbs",
 	// Grid data is now server-side only; walls are rendered via server-created Parts
 	"setCellLines",
@@ -20,6 +19,18 @@ const excludedActions = [
 	"setCandyCell",
 	"clearCandyGrid",
 ];
+
+/** Actions sent only to the player they target (arg[0] = player/soldier name) */
+const PLAYER_ONLY_ACTIONS = new Set(["setSoldierLastTracerPoint"]);
+
+function shouldSendActionToPlayer(action: { name: string; arguments: unknown[] }, player: Player): boolean {
+	if (excludedActions.includes(action.name)) return false;
+	if (PLAYER_ONLY_ACTIONS.has(action.name)) {
+		const targetPlayerName = action.arguments[0] as string;
+		return targetPlayerName === player.Name;
+	}
+	return true;
+}
 
 export function broadcasterMiddleware(): ProducerMiddleware {
 	if (IS_EDITOR) {
@@ -47,10 +58,8 @@ export function broadcasterMiddleware(): ProducerMiddleware {
 			return action;
 		},
 		dispatch: (player, actions) => {
-			remotes.store.dispatch.fire(
-				player,
-				actions.filter((action) => !excludedActions.includes(action.name)),
-			);
+			const actionsForPlayer = actions.filter((action) => shouldSendActionToPlayer(action, player));
+			remotes.store.dispatch.fire(player, actionsForPlayer);
 		},
 		hydrate: (player, state) => {
 			remotes.store.hydrate.fire(player, state as unknown as SharedStateSerialized);

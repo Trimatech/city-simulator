@@ -18,7 +18,7 @@ import { setSoldierSpeed } from "../soldiers/soldiers.utils";
 import { botStopped } from "./bot-events";
 import { buildBotMovementPath } from "./buildBotMovementPath";
 
-const MAX_BOTS_PER_PLAYER = 20;
+const MAX_BOTS_PER_PLAYER = 2;
 const BOT_RESPAWN_DELAY = 2; // seconds to wait before replacing a dead bot
 
 // Track which player each bot is assigned to
@@ -36,6 +36,7 @@ interface BotController {
 
 const botControllers = new Map<string, BotController>();
 const botRespawnCooldowns = new Map<string, number>();
+const botPausedIds = new Set<string>();
 
 function getActiveCooldownIds(): string[] {
 	const now = tick();
@@ -85,9 +86,9 @@ function findPlayerWithAvailableSlot(): string | undefined {
 	return playersWithSlots.size() > 0 ? playersWithSlots[0].playerId : undefined;
 }
 
-async function spawnBot(botId: string) {
+async function spawnBot(botId: string, forceTargetPlayerId?: string) {
 	// Find a player to spawn near
-	const targetPlayerId = findPlayerWithAvailableSlot();
+	const targetPlayerId = forceTargetPlayerId ?? findPlayerWithAvailableSlot();
 
 	let spawnPoint: Vector2;
 
@@ -176,6 +177,7 @@ function advanceBot(bot: BotController) {
 function cleanupBot(botId: string) {
 	botControllers.delete(botId);
 	botToPlayerMap.delete(botId);
+	botPausedIds.delete(botId);
 }
 
 function getAliveBotIds(): string[] {
@@ -219,6 +221,49 @@ async function spawnBots(amount: number) {
 	}
 }
 
+export async function spawnBotsNearPlayer(playerName: string, count: number) {
+	let remaining = math.max(1, count);
+	while (remaining > 0) {
+		const existing = [...getAliveBotIds(), ...getActiveCooldownIds()];
+		const id = nextBotId(existing);
+		await spawnBot(id, playerName);
+		remaining -= 1;
+	}
+}
+
+export function pauseBot(botId: string) {
+	botPausedIds.add(botId);
+	const controller = botControllers.get(botId);
+	if (controller) {
+		controller.waypoints = [];
+		controller.waypointIndex = 0;
+	}
+}
+
+export function unpauseBot(botId: string) {
+	botPausedIds.delete(botId);
+	botStopped.Fire(botId);
+}
+
+export function setBotMoveToward(botId: string, targetPosition: Vector2) {
+	botPausedIds.delete(botId);
+	const controller = botControllers.get(botId);
+	if (!controller) return;
+	const currentPos = store.getState((s) => s.soldiers[botId]?.position ?? controller.position);
+	controller.waypoints = [currentPos, targetPosition];
+	controller.waypointIndex = 1;
+}
+
+export function setBotFaceToward(botId: string, targetPosition: Vector2) {
+	const soldier = store.getState((s) => s.soldiers[botId]);
+	if (!soldier) return;
+	const pos = soldier.position;
+	const dy = targetPosition.Y - pos.Y;
+	const dx = targetPosition.X - pos.X;
+	const desiredAngle = math.atan2(dy, dx);
+	store.patchSoldier(botId, { desiredAngle });
+}
+
 export async function initBotService() {
 	// React to inside-state changes
 	soldierIsInsideChanged.Connect((id, isInside) => {
@@ -233,12 +278,12 @@ export async function initBotService() {
 	});
 
 	botStopped.Connect((id) => {
+		if (botPausedIds.has(id)) return;
 		const bot = botControllers.get(id);
 		if (bot && bot.waypoints.size() === 0) {
 			const waypoints = buildBotMovementPath(bot.id, bot.position);
 			bot.waypoints = waypoints;
 			bot.waypointIndex = 1;
-			// botMove.Fire(id, waypoints);
 		}
 	});
 

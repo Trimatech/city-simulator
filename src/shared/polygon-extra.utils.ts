@@ -23,3 +23,30 @@ export const calculatePolygonArea = (polygon: readonly Vector2[]) => {
 
 	return math.round(math.abs(area) / 2);
 };
+
+export function createRectanglePolygon(center: Vector2, halfWidth: number, halfHeight: number): Vector2[] {
+	return [
+		center.add(new Vector2(-halfWidth, -halfHeight)),
+		center.add(new Vector2(halfWidth, -halfHeight)),
+		center.add(new Vector2(halfWidth, halfHeight)),
+		center.add(new Vector2(-halfWidth, halfHeight)),
+	];
+}
+
+export function scalePolygonFromCentroid(polygon: readonly Vector2[], factor: number): Vector2[] {
+	if (polygon.size() < 3) return [...polygon];
+
+	let sumX = 0;
+	let sumY = 0;
+	for (const p of polygon) {
+		sumX += p.X;
+		sumY += p.Y;
+	}
+	const n = polygon.size();
+	const centroid = new Vector2(sumX / n, sumY / n);
+
+	return polygon.map((p) => {
+		const delta = p.sub(centroid);
+		return centroid.add(delta.mul(factor));
+	});
+}

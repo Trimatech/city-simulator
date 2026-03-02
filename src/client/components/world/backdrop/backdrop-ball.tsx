@@ -7,7 +7,7 @@ import { springs } from "client/constants/springs";
 import { useMotion, useSeed } from "client/hooks";
 import { selectWorldCamera } from "client/store/world";
 import { Image } from "client/ui/image";
-import { images } from "shared/assets";
+import assets from "shared/assets";
 import { accents } from "shared/constants/palette";
 
 /**
@@ -69,7 +69,7 @@ export function BackdropBall() {
 
 	return (
 		<Image
-			image={images.ui.blur}
+			image={assets.ui.blur}
 			imageColor={color}
 			imageTransparency={style.transparency}
 			scaleType="Fit"

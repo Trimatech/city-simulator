@@ -1,5 +1,5 @@
 import { TweenService } from "@rbxts/services";
-import { playSound, sounds } from "shared/assets";
+import { playSound, sounds } from "shared/assetsFolder";
 import { remotes } from "shared/remotes";
 
 import { cleanupEffects, createCarpetBombExplosionWithCFrame, createNuclearExplosion } from "./ExplosionUtils";

@@ -42,7 +42,7 @@ export function HealthBar() {
 				cornerRadius={cornerRadius}
 				size={new UDim2(1, 0, 1, 0)}
 			>
-				<uigradient Color={gradientColor} Rotation={90} Transparency={new NumberSequence(0.2)} />
+				<uigradient Color={gradientColor} Rotation={90} Transparency={new NumberSequence(0.8)} />
 			</Frame>
 
 			<Frame
