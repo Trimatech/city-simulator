@@ -19,7 +19,7 @@
 	},
 	"devDependencies": {
 		"@rbxts/compiler-types": "3.0.0-types.0",
-		"@rbxts/types": "^1.0.813",
+		"@rbxts/types": "^1.0.909",
 		"@typescript-eslint/eslint-plugin": "^8.8.1",
 		"@typescript-eslint/parser": "^8.8.1",
 		"cross-env": "^7.0.3",
