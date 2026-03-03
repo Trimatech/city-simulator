@@ -1,14 +1,13 @@
 import React from "@rbxts/react";
-import { Home } from "client/components/menu/home/home";
 
 import { Alerts } from "../components/alerts";
 import { BirdCamera } from "../components/camera/BirdCamera";
 import { Controller } from "../components/controller";
 import { ErrorHandler } from "../components/error-handler";
-import { DeathScreen } from "../components/game/death/DeathScreen";
 import { GameUI } from "../components/game/GameUI";
 import { BackgroundMusic } from "../components/music/BackgroundMusic";
 import { Preloader } from "../components/preloader";
+import { Screens } from "../components/Screens";
 import { World } from "../components/world/World";
 import { Layer } from "../ui/layout/layer";
 
@@ -24,11 +23,10 @@ export function App() {
 				<Controller />
 				<World />
 				<GameUI />
-				<DeathScreen />
 			</Layer>
 
 			<Layer>
-				<Home />
+				<Screens />
 			</Layer>
 
 			<Layer>

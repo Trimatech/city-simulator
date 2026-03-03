@@ -18,26 +18,16 @@ interface StoryProps {
 }
 
 function DeathScreenStoryContent({ crystals }: StoryProps) {
+	const [deadline] = React.useState(() => tick() + DEATH_CHOICE_TIMEOUT_SEC);
+
 	useEffect(() => {
 		store.setPlayerSave(USER_NAME, { ...defaultPlayerSave, crystals });
 	}, [crystals]);
 
-	useEffect(() => {
-		store.addSoldier(USER_NAME, {
-			name: USER_NAME,
-			position: new Vector2(0, 0),
-			dead: true,
-			deathChoiceDeadline: tick() + DEATH_CHOICE_TIMEOUT_SEC,
-		});
-		return () => {
-			store.removeSoldier(USER_NAME);
-		};
-	}, []);
-
 	return (
 		<RootProvider>
 			<frame BackgroundTransparency={1} Size={new UDim2(1, 0, 1, 0)}>
-				<DeathScreen />
+				<DeathScreen activeDeadline={deadline} onDismiss={() => {}} />
 			</frame>
 		</RootProvider>
 	);

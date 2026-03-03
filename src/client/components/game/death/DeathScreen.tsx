@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "@rbxts/react";
-import { useSelector, useSelectorCreator } from "@rbxts/react-reflex";
+import { useSelectorCreator } from "@rbxts/react-reflex";
 import { ProgressBarTimer } from "client/components/ProgressBarTimer";
 import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
@@ -16,36 +16,26 @@ import { DEATH_CHOICE_TIMEOUT_SEC, USER_NAME } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
 import { remotes } from "shared/remotes";
 import { selectPlayerCrystals } from "shared/store/saves";
-import { selectLocalDeathChoiceDeadline, selectLocalSoldier } from "shared/store/soldiers";
 
-export function DeathScreen() {
+interface DeathScreenProps {
+	activeDeadline: number | undefined;
+	onDismiss: () => void;
+}
+
+export function DeathScreen({ activeDeadline, onDismiss }: DeathScreenProps) {
 	const rem = useRem();
-	const soldier = useSelector(selectLocalSoldier);
-	const deathChoiceDeadline = useSelector(selectLocalDeathChoiceDeadline);
 	const crystals = useSelectorCreator(selectPlayerCrystals, USER_NAME) ?? 0;
 
-	// Cache deadline locally so the screen persists even if soldier is removed from store mid-timer
-	const [cachedDeadline, setCachedDeadline] = useState<number | undefined>();
-	const activeDeadline = cachedDeadline;
-
 	const [isExpired, setIsExpired] = useState(() => {
-		if (deathChoiceDeadline === undefined) return false;
-		return deathChoiceDeadline - tick() <= 0;
+		if (activeDeadline === undefined) return false;
+		return activeDeadline - tick() <= 0;
 	});
 
 	useEffect(() => {
-		if (deathChoiceDeadline !== undefined) {
-			setCachedDeadline(deathChoiceDeadline);
-			setIsExpired(deathChoiceDeadline - tick() <= 0);
+		if (activeDeadline !== undefined) {
+			setIsExpired(activeDeadline - tick() <= 0);
 		}
-	}, [deathChoiceDeadline]);
-
-	// If soldier is alive (revived), clear cache to hide screen immediately
-	useEffect(() => {
-		if (soldier && !soldier.dead) {
-			setCachedDeadline(undefined);
-		}
-	}, [soldier, soldier?.dead]);
+	}, [activeDeadline]);
 
 	const [position, positionMotion] = useMotion(new UDim2(0.5, 0, 2.5, 0));
 
@@ -59,7 +49,7 @@ export function DeathScreen() {
 	useEffect(() => {
 		if (isExpired) {
 			positionMotion.spring(new UDim2(0.5, 0, 2.5, 0), springs.responsive);
-			const thread = task.delay(1, () => setCachedDeadline(undefined));
+			const thread = task.delay(1, () => onDismiss());
 			return () => task.cancel(thread);
 		}
 	}, [isExpired]);
