@@ -62,7 +62,7 @@ function GameUIStoryContent() {
 
 	return (
 		<RootProvider>
-			<GameUI />
+			<GameUI visible />
 		</RootProvider>
 	);
 }

@@ -20,7 +20,7 @@ function HomeStoryContent() {
 
 	return (
 		<RootProvider>
-			<Home />
+			<Home visible />
 		</RootProvider>
 	);
 }
