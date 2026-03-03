@@ -24,6 +24,10 @@ export function DeathScreen() {
 	const deathChoiceDeadline = useSelector(selectLocalDeathChoiceDeadline);
 	const crystals = useSelectorCreator(selectPlayerCrystals, USER_NAME) ?? 0;
 
+	// Cache deadline locally so the screen persists even if soldier is removed from store mid-timer
+	const [cachedDeadline, setCachedDeadline] = useState<number | undefined>();
+	const activeDeadline = cachedDeadline;
+
 	const [isExpired, setIsExpired] = useState(() => {
 		if (deathChoiceDeadline === undefined) return false;
 		return deathChoiceDeadline - tick() <= 0;
@@ -31,39 +35,42 @@ export function DeathScreen() {
 
 	useEffect(() => {
 		if (deathChoiceDeadline !== undefined) {
+			setCachedDeadline(deathChoiceDeadline);
 			setIsExpired(deathChoiceDeadline - tick() <= 0);
 		}
 	}, [deathChoiceDeadline]);
 
-	const isTimerActive = !isExpired;
-
-	const [buttonSize, buttonSizeMotion] = useMotion(
-		new UDim2(0, rem(isTimerActive ? 9 : 18), 0, rem(isTimerActive ? 3 : 4)),
-	);
+	// If soldier is alive (revived), clear cache to hide screen immediately
+	useEffect(() => {
+		if (soldier && !soldier.dead) {
+			setCachedDeadline(undefined);
+		}
+	}, [soldier, soldier?.dead]);
 
 	const [position, positionMotion] = useMotion(new UDim2(0.5, 0, 2.5, 0));
 
 	useEffect(() => {
-		if (deathChoiceDeadline !== undefined) {
+		if (activeDeadline !== undefined && !isExpired) {
 			positionMotion.set(new UDim2(0.5, 0, 2.5, 0));
 			positionMotion.spring(new UDim2(0.5, 0, 0.5, 0), springs.responsive);
 		}
-	}, [deathChoiceDeadline]);
+	}, [activeDeadline]);
 
 	useEffect(() => {
-		buttonSizeMotion.spring(
-			new UDim2(0, rem(isTimerActive ? 9 : 18), 0, rem(isTimerActive ? 3 : 4)),
-			springs.responsive,
-		);
-	}, [isTimerActive]);
+		if (isExpired) {
+			positionMotion.spring(new UDim2(0.5, 0, 2.5, 0), springs.responsive);
+			const thread = task.delay(1, () => setCachedDeadline(undefined));
+			return () => task.cancel(thread);
+		}
+	}, [isExpired]);
 
-	if (!soldier || !soldier.dead || deathChoiceDeadline === undefined) {
+	if (activeDeadline === undefined) {
 		return undefined;
 	}
 
 	const [contentSize, setContentSize] = React.createBinding(new Vector2(0, 0));
 
-	const canRevive = crystals >= 1 && isTimerActive;
+	const canRevive = crystals >= 1 && !isExpired;
 
 	const smallTextProps = {
 		font: fonts.inter.regular,
@@ -127,99 +134,75 @@ export function DeathScreen() {
 					automaticSize={Enum.AutomaticSize.Y}
 					horizontalAlignment={Enum.HorizontalAlignment.Center}
 				>
-					{isTimerActive && (
-						<VStack
-							spacing={rem(1)}
-							size={new UDim2(1, 0, 0, 0)}
-							automaticSize={Enum.AutomaticSize.Y}
-							horizontalAlignment={Enum.HorizontalAlignment.Center}
-						>
-							<Frame size={new UDim2(0, rem(18), 0, rem(0.75))} automaticSize={Enum.AutomaticSize.Y}>
-								<ProgressBarTimer
-									deadlineTime={deathChoiceDeadline!}
-									totalDuration={DEATH_CHOICE_TIMEOUT_SEC}
-									height={rem(2)}
-									onExpired={() => setIsExpired(true)}
-									renderOverlay={(secondsLeft) => (
-										<Text
-											font={fonts.inter.bold}
-											text={secondsLeft}
-											automaticSize={Enum.AutomaticSize.XY}
-											textColor={palette.white}
-											textSize={rem(1.5)}
-											zIndex={100}
-											position={new UDim2(0.5, 0, 0.5, 0)}
-											anchorPoint={new Vector2(0.5, 0.5)}
-										>
-											<uistroke Color={palette.blue1} Transparency={0} Thickness={2} />
-										</Text>
-									)}
-								/>
-							</Frame>
-							<PrimaryButton
-								onClick={() => remotes.soldier.continue.fire()}
-								primaryColor={palette.sky}
-								enabled={canRevive}
-								size={new UDim2(0, rem(18), 0, rem(4))}
-							>
-								<HStack
-									horizontalAlignment={Enum.HorizontalAlignment.Center}
-									automaticSize={Enum.AutomaticSize.XY}
-								>
-									<Text
-										font={fonts.inter.medium}
-										text="Revive"
-										textColor={palette.base}
-										textSize={rem(2)}
-										automaticSize={Enum.AutomaticSize.XY}
-									/>
-
-									<Image
-										image={assets.ui.shards_icon_color}
-										size={new UDim2(0, rem(2), 0, rem(2.5))}
-										scaleType="Crop"
-									/>
-								</HStack>
-							</PrimaryButton>
-							<HStack
-								horizontalAlignment={Enum.HorizontalAlignment.Center}
-								automaticSize={Enum.AutomaticSize.XY}
-							>
-								<uiflexitem FlexMode={Enum.UIFlexMode.Shrink} />
-								<Text text={`You have `} {...smallTextProps} />
+					<Frame size={new UDim2(0, rem(18), 0, rem(0.75))} automaticSize={Enum.AutomaticSize.Y}>
+						<ProgressBarTimer
+							deadlineTime={activeDeadline!}
+							totalDuration={DEATH_CHOICE_TIMEOUT_SEC}
+							height={rem(2)}
+							onExpired={() => setIsExpired(true)}
+							renderOverlay={(secondsLeft) => (
 								<Text
 									font={fonts.inter.bold}
-									text={`${crystals}`}
+									text={secondsLeft}
 									automaticSize={Enum.AutomaticSize.XY}
-									textColor={palette.sapphire}
+									textColor={palette.white}
 									textSize={rem(1.5)}
-								/>
-								<Image
-									image={assets.ui.shards_icon}
-									size={new UDim2(0, rem(1), 0, rem(1.5))}
-									imageColor={palette.sapphire}
-									scaleType="Crop"
-								/>
-
-								<Text text={`left`} {...smallTextProps} />
-							</HStack>
-						</VStack>
-					)}
-
-					<PrimaryButton
-						onClick={() => remotes.soldier.startOver.fire()}
-						primaryColor={isTimerActive ? palette.black : palette.sky}
-						size={buttonSize}
-						layoutOrder={3}
-					>
-						<Text
-							font={fonts.inter.medium}
-							text="Start Over"
-							textColor={isTimerActive ? palette.white : palette.black}
-							textSize={rem(1.6)}
-							size={new UDim2(1, 0, 1, 0)}
+									zIndex={100}
+									position={new UDim2(0.5, 0, 0.5, 0)}
+									anchorPoint={new Vector2(0.5, 0.5)}
+								>
+									<uistroke Color={palette.blue1} Transparency={0} Thickness={2} />
+								</Text>
+							)}
 						/>
+					</Frame>
+					<PrimaryButton
+						onClick={() => remotes.soldier.continue.fire()}
+						primaryColor={palette.sky}
+						enabled={canRevive}
+						size={new UDim2(0, rem(18), 0, rem(4))}
+					>
+						<HStack
+							horizontalAlignment={Enum.HorizontalAlignment.Center}
+							automaticSize={Enum.AutomaticSize.XY}
+						>
+							<Text
+								font={fonts.inter.medium}
+								text="Revive"
+								textColor={palette.base}
+								textSize={rem(2)}
+								automaticSize={Enum.AutomaticSize.XY}
+							/>
+
+							<Image
+								image={assets.ui.shards_icon_color}
+								size={new UDim2(0, rem(2), 0, rem(2.5))}
+								scaleType="Crop"
+							/>
+						</HStack>
 					</PrimaryButton>
+					<HStack
+						horizontalAlignment={Enum.HorizontalAlignment.Center}
+						automaticSize={Enum.AutomaticSize.XY}
+					>
+						<uiflexitem FlexMode={Enum.UIFlexMode.Shrink} />
+						<Text text={`You have `} {...smallTextProps} />
+						<Text
+							font={fonts.inter.bold}
+							text={`${crystals}`}
+							automaticSize={Enum.AutomaticSize.XY}
+							textColor={palette.sapphire}
+							textSize={rem(1.5)}
+						/>
+						<Image
+							image={assets.ui.shards_icon}
+							size={new UDim2(0, rem(1), 0, rem(1.5))}
+							imageColor={palette.sapphire}
+							scaleType="Crop"
+						/>
+
+						<Text text={`left`} {...smallTextProps} />
+					</HStack>
 				</VStack>
 			</VStack>
 		</Frame>
