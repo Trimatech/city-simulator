@@ -44,7 +44,7 @@ export function DeathScreen({ activeDeadline, onDismiss }: DeathScreenProps) {
 			positionMotion.set(new UDim2(0.5, 0, 2.5, 0));
 			positionMotion.spring(new UDim2(0.5, 0, 0.5, 0), springs.responsive);
 		}
-	}, [activeDeadline]);
+	}, [activeDeadline, isExpired]);
 
 	useEffect(() => {
 		if (isExpired) {
