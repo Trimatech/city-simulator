@@ -26,6 +26,7 @@ export function DeathScreen({ activeDeadline, onDismiss }: DeathScreenProps) {
 	const rem = useRem();
 	const crystals = useSelectorCreator(selectPlayerCrystals, USER_NAME) ?? 0;
 
+	const [isReviving, setIsReviving] = useState(false);
 	const [isExpired, setIsExpired] = useState(() => {
 		if (activeDeadline === undefined) return false;
 		return activeDeadline - tick() <= 0;
@@ -47,12 +48,12 @@ export function DeathScreen({ activeDeadline, onDismiss }: DeathScreenProps) {
 	}, [activeDeadline, isExpired]);
 
 	useEffect(() => {
-		if (isExpired) {
+		if (isExpired || isReviving) {
 			positionMotion.spring(new UDim2(0.5, 0, 2.5, 0), springs.responsive);
 			const thread = task.delay(1, () => onDismiss());
 			return () => task.cancel(thread);
 		}
-	}, [isExpired]);
+	}, [isExpired, isReviving]);
 
 	if (activeDeadline === undefined) {
 		return undefined;
@@ -60,7 +61,7 @@ export function DeathScreen({ activeDeadline, onDismiss }: DeathScreenProps) {
 
 	const [contentSize, setContentSize] = React.createBinding(new Vector2(0, 0));
 
-	const canRevive = crystals >= 1 && !isExpired;
+	const canRevive = crystals >= 1 && !isExpired && !isReviving;
 
 	const smallTextProps = {
 		font: fonts.inter.regular,
@@ -147,7 +148,10 @@ export function DeathScreen({ activeDeadline, onDismiss }: DeathScreenProps) {
 						/>
 					</Frame>
 					<PrimaryButton
-						onClick={() => remotes.soldier.continue.fire()}
+						onClick={() => {
+							setIsReviving(true);
+							remotes.soldier.continue.fire();
+						}}
 						primaryColor={palette.sky}
 						enabled={canRevive}
 						size={new UDim2(0, rem(18), 0, rem(4))}

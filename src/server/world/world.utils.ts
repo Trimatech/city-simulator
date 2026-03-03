@@ -102,6 +102,9 @@ export function cancelDeathChoiceTimer(soldierId: string) {
 }
 
 export function onPlayerDeath(soldierId: string) {
+	const existing = getSoldier(soldierId);
+	if (!existing || existing.dead) return;
+
 	store.setSoldierIsDead(soldierId);
 
 	const player = Players.FindFirstChild(soldierId);

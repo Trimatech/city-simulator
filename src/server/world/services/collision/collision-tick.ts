@@ -1,5 +1,5 @@
 import { store } from "server/store";
-import { killSoldier } from "server/world/world.utils";
+import { killSoldier, onPlayerDeath } from "server/world/world.utils";
 import { selectSoldiers, selectSoldiersById } from "shared/store/soldiers";
 
 import { soldierIsInsideChanged } from "../soldiers/soldier-events";
@@ -72,12 +72,12 @@ export function onCollisionTick() {
 			const owner = store.getState(selectSoldiersById)[enemyId];
 			if (owner && owner.shieldActive) {
 				print(`Collided with enemy tracer while owner shielded, kill collider ${soldier.id}`);
-				killSoldier(soldier.id);
+				onPlayerDeath(soldier.id);
 				store.playerKilledSoldier(enemyId, soldier.id);
 				store.incrementSoldierEliminations(enemyId);
 			} else {
 				print(`Collided with enemy tracer, kill owner ${enemyId}`);
-				killSoldier(enemyId);
+				onPlayerDeath(enemyId);
 				store.playerKilledSoldier(soldier.id, enemyId);
 				store.incrementSoldierEliminations(soldier.id);
 			}
@@ -89,7 +89,7 @@ export function onCollisionTick() {
 
 		if (!soldier.isInside && isCollidingWithOwnTracers(soldier)) {
 			print(`Collided with own tracer, kill soldier ${soldier.id}`);
-			killSoldier(soldier.id);
+			onPlayerDeath(soldier.id);
 			continue;
 		}
 		debug.profileend();
@@ -99,7 +99,7 @@ export function onCollisionTick() {
 		const enemy = isCollidingWithSoldier(soldier);
 		if (enemy) {
 			print(`Collided with enemy, kill soldier ${enemy.id}`);
-			killSoldier(enemy.id);
+			onPlayerDeath(enemy.id);
 			store.playerKilledSoldier(soldier.id, enemy.id);
 			store.incrementSoldierEliminations(soldier.id);
 		}
