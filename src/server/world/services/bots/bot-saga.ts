@@ -6,9 +6,9 @@ import {
 	getSafePointOutsideSoldierPolygons,
 	getSpawnPointNearPlayer,
 } from "server/world/world.utils";
-import { SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
+import { DEATH_CHOICE_TIMEOUT_SEC, SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
 import { getRandomBotSkin } from "shared/constants/skins";
-import { selectAliveSoldiersById } from "shared/store/soldiers";
+import { selectAliveSoldiersById, selectSoldiersById } from "shared/store/soldiers";
 import { createScheduler } from "shared/utils/scheduler";
 
 import { applyInitialPolygonClaim } from "../soldiers/soldier-claims";
@@ -201,6 +201,16 @@ function getAliveNonBotCount(): number {
 	return count;
 }
 
+function getDeadBotCount(): number {
+	const soldiersById = store.getState(selectSoldiersById);
+	let count = 0;
+	for (const rawId of Object.keys(soldiersById as unknown as { [id: string]: unknown })) {
+		const id = tostring(rawId);
+		if (string.sub(id, 1, 4) === "BOT_" && soldiersById[id]?.dead) count += 1;
+	}
+	return count;
+}
+
 function nextBotId(existing: ReadonlyArray<string>): string {
 	let index = existing.size() > 0 ? tonumber(string.sub(existing[existing.size() - 1], 5))! + 1 : 1;
 	let id = `BOT_${index}`;
@@ -311,9 +321,11 @@ export async function initBotService() {
 			const targetBots = aliveNonBots * MAX_BOTS_PER_PLAYER;
 
 			if (aliveBots < targetBots) {
+				// Dead bots still in the store (waiting for revive timeout) count as occupied slots
+				const deadBots = getDeadBotCount();
 				const activeCooldowns = getActiveCooldownIds();
 				const shortage = targetBots - aliveBots;
-				const allowedToSpawn = math.max(0, shortage - activeCooldowns.size());
+				const allowedToSpawn = math.max(0, shortage - deadBots - activeCooldowns.size());
 				if (allowedToSpawn > 0) {
 					spawnBots(allowedToSpawn);
 				}
@@ -341,8 +353,8 @@ export async function initBotService() {
 			for (const [, controller] of botControllers) {
 				const entity = store.getState((state) => state.soldiers[controller.id]);
 				if (!entity || entity.dead) {
-					// mark cooldown and clean up; respawn will be delayed by subscriber logic
-					botRespawnCooldowns.set(controller.id, tick() + BOT_RESPAWN_DELAY);
+					// Keep bot around for the full revive duration like players, then add respawn delay
+					botRespawnCooldowns.set(controller.id, tick() + DEATH_CHOICE_TIMEOUT_SEC + BOT_RESPAWN_DELAY);
 					cleanupBot(controller.id);
 					continue;
 				}
