@@ -99,7 +99,8 @@ export function createRewardPart(data: RewardPartData): Model | undefined {
 		beam.Width0 = REWARD_BEAM_WIDTH;
 		beam.Width1 = REWARD_BEAM_WIDTH_TOP;
 		beam.Transparency = new NumberSequence([
-			new NumberSequenceKeypoint(0, 0.2),
+			new NumberSequenceKeypoint(0, 1),
+			new NumberSequenceKeypoint(0.15, 0.2),
 			new NumberSequenceKeypoint(0.5, 0.5),
 			new NumberSequenceKeypoint(1, 1),
 		]);
