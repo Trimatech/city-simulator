@@ -4,6 +4,7 @@ import { ProgressBarTimer } from "client/components/ProgressBarTimer";
 import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
 import { useMotion, useRem } from "client/hooks";
+import { CanvasGroup } from "client/ui/canvas-group";
 import { Image } from "client/ui/image";
 import { Frame } from "client/ui/layout/frame";
 import { HStack } from "client/ui/layout/HStack";
@@ -53,6 +54,8 @@ export function DeathScreen() {
 		return undefined;
 	}
 
+	const [contentSize, setContentSize] = React.createBinding(new Vector2(0, 0));
+
 	const canRevive = crystals >= 1 && isTimerActive;
 
 	const smallTextProps = {
@@ -63,131 +66,154 @@ export function DeathScreen() {
 	};
 
 	return (
-		<VStack
-			backgroundColor={palette.black}
-			backgroundTransparency={0.5}
+		<Frame
 			position={new UDim2(0.5, 0, 0.5, 0)}
 			anchorPoint={new Vector2(0.5, 0.5)}
-			size={new UDim2(0, 0, 0, 0)}
-			automaticSize={Enum.AutomaticSize.XY}
-			horizontalAlignment={Enum.HorizontalAlignment.Center}
-			verticalAlignment={Enum.VerticalAlignment.Center}
-			spacing={rem(2)}
-			padding={rem(5)}
+			size={contentSize.map((s) => new UDim2(0, s.X, 0, s.Y))}
 			layoutOrder={100}
 		>
-			<uicorner CornerRadius={new UDim(0, rem(2))} />
-			<uistroke Color={palette.white} Transparency={0} Thickness={rem(0.5)} />
-			<Text
-				font={fonts.mplus.bold}
-				text="You Died"
-				automaticSize={Enum.AutomaticSize.XY}
-				textColor={palette.red1}
-				textSize={rem(6)}
+			{/* Background */}
+			<CanvasGroup
+				backgroundColor={palette.black}
+				backgroundTransparency={0.5}
+				size={new UDim2(1, 0, 1, 0)}
+				cornerRadius={new UDim(0, rem(2))}
 			>
-				<uistroke Color={palette.white} Transparency={0} Thickness={rem(0.3)} />
-			</Text>
+				<Image
+					image={assets.ui.diagonal_stripes}
+					scaleType="Tile"
+					tileSize={new UDim2(0, rem(8), 0, rem(8))}
+					imageTransparency={0.85}
+					size={new UDim2(1, 0, 1, 0)}
+				>
+					<uigradient Color={new ColorSequence(palette.red1, palette.black)} Rotation={90} />
+				</Image>
+			</CanvasGroup>
 
+			<uistroke Color={palette.white} Transparency={0} Thickness={rem(0.5)} />
+			<uicorner CornerRadius={new UDim(0, rem(2))} />
+
+			{/* Content */}
 			<VStack
-				spacing={rem(1)}
-				layoutOrder={1}
-				size={new UDim2(1, 0, 0, 0)}
-				automaticSize={Enum.AutomaticSize.Y}
+				size={new UDim2(0, 0, 0, 0)}
+				automaticSize={Enum.AutomaticSize.XY}
 				horizontalAlignment={Enum.HorizontalAlignment.Center}
+				verticalAlignment={Enum.VerticalAlignment.Center}
+				spacing={rem(2)}
+				padding={rem(5)}
+				change={{ AbsoluteSize: (rbx) => setContentSize(rbx.AbsoluteSize) }}
 			>
-				{isTimerActive && (
-					<VStack
-						spacing={rem(1)}
-						size={new UDim2(1, 0, 0, 0)}
-						automaticSize={Enum.AutomaticSize.Y}
-						horizontalAlignment={Enum.HorizontalAlignment.Center}
-					>
-						<Frame size={new UDim2(0, rem(18), 0, rem(0.75))} automaticSize={Enum.AutomaticSize.Y}>
-							<ProgressBarTimer
-								deadlineTime={deathChoiceDeadline!}
-								totalDuration={DEATH_CHOICE_TIMEOUT_SEC}
-								height={rem(2)}
-								onExpired={() => setIsExpired(true)}
-								renderOverlay={(secondsLeft) => (
-									<Text
-										font={fonts.inter.bold}
-										text={secondsLeft}
-										automaticSize={Enum.AutomaticSize.XY}
-										textColor={palette.white}
-										textSize={rem(1.5)}
-										zIndex={100}
-										position={new UDim2(0.5, 0, 0.5, 0)}
-										anchorPoint={new Vector2(0.5, 0.5)}
-									>
-										<uistroke Color={palette.blue1} Transparency={0} Thickness={2} />
-									</Text>
-								)}
-							/>
-						</Frame>
-						<PrimaryButton
-							onClick={() => remotes.soldier.continue.fire()}
-							enabled={canRevive}
-							size={new UDim2(0, rem(18), 0, rem(4))}
+				<Text
+					font={fonts.mplus.bold}
+					text="You Died"
+					automaticSize={Enum.AutomaticSize.XY}
+					textColor={palette.red1}
+					textSize={rem(6)}
+				>
+					<uistroke Color={palette.white} Transparency={0} Thickness={rem(0.3)} />
+				</Text>
+
+				<VStack
+					spacing={rem(1)}
+					layoutOrder={1}
+					size={new UDim2(1, 0, 0, 0)}
+					automaticSize={Enum.AutomaticSize.Y}
+					horizontalAlignment={Enum.HorizontalAlignment.Center}
+				>
+					{isTimerActive && (
+						<VStack
+							spacing={rem(1)}
+							size={new UDim2(1, 0, 0, 0)}
+							automaticSize={Enum.AutomaticSize.Y}
+							horizontalAlignment={Enum.HorizontalAlignment.Center}
 						>
+							<Frame size={new UDim2(0, rem(18), 0, rem(0.75))} automaticSize={Enum.AutomaticSize.Y}>
+								<ProgressBarTimer
+									deadlineTime={deathChoiceDeadline!}
+									totalDuration={DEATH_CHOICE_TIMEOUT_SEC}
+									height={rem(2)}
+									onExpired={() => setIsExpired(true)}
+									renderOverlay={(secondsLeft) => (
+										<Text
+											font={fonts.inter.bold}
+											text={secondsLeft}
+											automaticSize={Enum.AutomaticSize.XY}
+											textColor={palette.white}
+											textSize={rem(1.5)}
+											zIndex={100}
+											position={new UDim2(0.5, 0, 0.5, 0)}
+											anchorPoint={new Vector2(0.5, 0.5)}
+										>
+											<uistroke Color={palette.blue1} Transparency={0} Thickness={2} />
+										</Text>
+									)}
+								/>
+							</Frame>
+							<PrimaryButton
+								onClick={() => remotes.soldier.continue.fire()}
+								enabled={canRevive}
+								size={new UDim2(0, rem(18), 0, rem(4))}
+							>
+								<HStack
+									horizontalAlignment={Enum.HorizontalAlignment.Center}
+									automaticSize={Enum.AutomaticSize.XY}
+								>
+									<Text
+										font={fonts.inter.medium}
+										text="Revive"
+										textColor={palette.base}
+										textSize={rem(2)}
+										automaticSize={Enum.AutomaticSize.XY}
+									/>
+
+									<Image
+										image={assets.ui.shards_icon_color}
+										size={new UDim2(0, rem(2), 0, rem(2.5))}
+										scaleType="Crop"
+									/>
+								</HStack>
+							</PrimaryButton>
 							<HStack
 								horizontalAlignment={Enum.HorizontalAlignment.Center}
 								automaticSize={Enum.AutomaticSize.XY}
 							>
+								<uiflexitem FlexMode={Enum.UIFlexMode.Shrink} />
+								<Text text={`You have `} {...smallTextProps} />
 								<Text
-									font={fonts.inter.medium}
-									text="Revive"
-									textColor={palette.base}
-									textSize={rem(2)}
+									font={fonts.inter.bold}
+									text={`${crystals}`}
 									automaticSize={Enum.AutomaticSize.XY}
+									textColor={palette.sapphire}
+									textSize={rem(1.5)}
 								/>
-
 								<Image
-									image={assets.ui.shards_icon_color}
-									size={new UDim2(0, rem(2), 0, rem(2.5))}
+									image={assets.ui.shards_icon}
+									size={new UDim2(0, rem(1), 0, rem(1.5))}
+									imageColor={palette.sapphire}
 									scaleType="Crop"
 								/>
+
+								<Text text={`left`} {...smallTextProps} />
 							</HStack>
-						</PrimaryButton>
-						<HStack
-							horizontalAlignment={Enum.HorizontalAlignment.Center}
-							automaticSize={Enum.AutomaticSize.XY}
-						>
-							<uiflexitem FlexMode={Enum.UIFlexMode.Shrink} />
-							<Text text={`You have `} {...smallTextProps} />
-							<Text
-								font={fonts.inter.bold}
-								text={`${crystals}`}
-								automaticSize={Enum.AutomaticSize.XY}
-								textColor={palette.sapphire}
-								textSize={rem(1.5)}
-							/>
-							<Image
-								image={assets.ui.shards_icon}
-								size={new UDim2(0, rem(1), 0, rem(1.5))}
-								imageColor={palette.sapphire}
-								scaleType="Crop"
-							/>
+						</VStack>
+					)}
 
-							<Text text={`left`} {...smallTextProps} />
-						</HStack>
-					</VStack>
-				)}
-
-				<PrimaryButton
-					onClick={() => remotes.soldier.startOver.fire()}
-					primaryColor={isTimerActive ? palette.black : palette.blue}
-					size={buttonSize}
-					layoutOrder={3}
-				>
-					<Text
-						font={fonts.inter.medium}
-						text="Start Over"
-						textColor={isTimerActive ? palette.white : palette.black}
-						textSize={rem(1.6)}
-						size={new UDim2(1, 0, 1, 0)}
-					/>
-				</PrimaryButton>
+					<PrimaryButton
+						onClick={() => remotes.soldier.startOver.fire()}
+						primaryColor={isTimerActive ? palette.black : palette.blue}
+						size={buttonSize}
+						layoutOrder={3}
+					>
+						<Text
+							font={fonts.inter.medium}
+							text="Start Over"
+							textColor={isTimerActive ? palette.white : palette.black}
+							textSize={rem(1.6)}
+							size={new UDim2(1, 0, 1, 0)}
+						/>
+					</PrimaryButton>
+				</VStack>
 			</VStack>
-		</VStack>
+		</Frame>
 	);
 }

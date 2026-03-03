@@ -9,6 +9,7 @@ local assets = {
 		blur = "rbxassetid://108121237220095",
 		button_glow_top = "rbxassetid://95372204523717",
 		circle = "rbxassetid://99378336767827",
+		diagonal_stripes = "rbxassetid://79238839735749",
 		heart = "rbxassetid://140385836727829",
 		heart_glow = "rbxassetid://98749324115035",
 		leader_pointer = "rbxassetid://119911225006035",

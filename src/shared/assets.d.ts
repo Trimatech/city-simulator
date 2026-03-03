@@ -9,6 +9,7 @@ declare const assets: {
 		blur: string
 		button_glow_top: string
 		circle: string
+		diagonal_stripes: string
 		heart: string
 		heart_glow: string
 		leader_pointer: string
