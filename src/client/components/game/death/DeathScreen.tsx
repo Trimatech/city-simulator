@@ -80,7 +80,7 @@ export function DeathScreen({ activeDeadline, onDismiss }: DeathScreenProps) {
 			{/* Background */}
 			<CanvasGroup
 				backgroundColor={palette.black}
-				backgroundTransparency={0.2}
+				backgroundTransparency={0.5}
 				size={new UDim2(1, 0, 1, 0)}
 				cornerRadius={new UDim(0, rem(2))}
 			>
@@ -175,10 +175,7 @@ export function DeathScreen({ activeDeadline, onDismiss }: DeathScreenProps) {
 							/>
 						</HStack>
 					</PrimaryButton>
-					<HStack
-						horizontalAlignment={Enum.HorizontalAlignment.Center}
-						automaticSize={Enum.AutomaticSize.XY}
-					>
+					<HStack horizontalAlignment={Enum.HorizontalAlignment.Center} automaticSize={Enum.AutomaticSize.XY}>
 						<uiflexitem FlexMode={Enum.UIFlexMode.Shrink} />
 						<Text text={`You have `} {...smallTextProps} />
 						<Text

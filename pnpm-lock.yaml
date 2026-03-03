@@ -14,6 +14,9 @@ importers:
       '@rbxts/bitbuffer2':
         specifier: 1.0.0-ts.0
         version: 1.0.0-ts.0
+      '@rbxts/falldown':
+        specifier: ^1.0.3
+        version: 1.0.3
       '@rbxts/flipper':
         specifier: ^2.0.1
         version: 2.0.1
@@ -173,6 +176,9 @@ packages:
   '@rbxts/compiler-types@3.0.0-types.0':
     resolution: {integrity: sha512-VGOHJPoL7+56NTatMGqQj3K7xWuzEV+aP4QD5vZiHu+bcff3kiTmtoadaF6NkJrmwfFAvbsd4Dg764ZjWNceag==}
 
+  '@rbxts/falldown@1.0.3':
+    resolution: {integrity: sha512-bzD4YfTUFjIJp4FYLYxQDCiz0eM4jq6PU+ps4vuWc6mhG7J7GEjS+WPUmh3LSaHs8/7V++y7J0t5s4mv8zEQgg==}
+
   '@rbxts/flipper@2.0.1':
     resolution: {integrity: sha512-kxb5AZizP05XSmo3waS/QkcfNMD5b6HX4gGwyHOyBow260R5MIT4L/ZUPLvleXXyb9b67X4NVmHoac1tPXOLNA==}
 
@@ -213,6 +219,9 @@ packages:
 
   '@rbxts/services@1.5.5':
     resolution: {integrity: sha512-Hu7QH2ecefS60zpakKG3T2vgABydoOJqpSG7nXr59wFAbPk/cA+OcsntYPHUWyHAat0VFGZ5jNZLTLdiqfssvg==}
+
+  '@rbxts/services@1.6.0':
+    resolution: {integrity: sha512-YH02E1/tGHeMXB0Mam8qPdAZa2fjQWdylEscSL4Zn0RIaQeByYImA2qUsXM3nBdhcyKHDwltzSznDKyCGfFEWA==}
 
   '@rbxts/set-timeout@1.1.2':
     resolution: {integrity: sha512-P/A0IiH9wuZdSJYr4Us0MDFm61nvIFR0acfKFHLkcOsgvIgELC90Up9ugiSsaMEHRIcIcO5UjE39LuS3xTzQHw==}
@@ -1068,6 +1077,11 @@ snapshots:
 
   '@rbxts/compiler-types@3.0.0-types.0': {}
 
+  '@rbxts/falldown@1.0.3':
+    dependencies:
+      '@rbxts/beacon': 2.1.1
+      '@rbxts/services': 1.6.0
+
   '@rbxts/flipper@2.0.1': {}
 
   '@rbxts/lapis@0.3.6(@rbxts/t@3.1.1)':
@@ -1107,6 +1121,8 @@ snapshots:
   '@rbxts/ripple@0.9.1': {}
 
   '@rbxts/services@1.5.5': {}
+
+  '@rbxts/services@1.6.0': {}
 
   '@rbxts/set-timeout@1.1.2':
     dependencies:

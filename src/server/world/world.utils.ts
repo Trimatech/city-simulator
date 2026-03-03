@@ -1,3 +1,4 @@
+import { Falldown } from "@rbxts/falldown";
 import { Players } from "@rbxts/services";
 import { setTimeout } from "@rbxts/set-timeout";
 import { store } from "server/store";
@@ -14,6 +15,7 @@ import { calculatePolygonOperation, isPointInPolygon, vector2ToPoint } from "sha
 import { pointsToPolygon } from "shared/polybool/polybool";
 import { createPolygonAroundPosition, getPolygonCentroid } from "shared/polygon-extra.utils";
 import { selectAliveSoldiersById } from "shared/store/soldiers";
+import { RAGDOLL_DURATION_SEC } from "shared/utils/ragdoll";
 
 import { getBotHumanoid } from "./services/bots/bot-registry";
 import { getCandy as getCandyLocal } from "./services/candy/candy-store";
@@ -109,7 +111,16 @@ export function onPlayerDeath(soldierId: string) {
 
 	const player = Players.FindFirstChild(soldierId);
 	if (player?.IsA("Player") && player.Character) {
-		player.Character.Destroy();
+		const character = player.Character;
+		const ragdoll = Falldown.RagdollCharacter(character, 0);
+		if (ragdoll) {
+			ragdoll.AddRandomVelocity(50);
+		}
+		task.delay(RAGDOLL_DURATION_SEC, () => {
+			if (character.Parent) {
+				character.Destroy();
+			}
+		});
 	}
 
 	store.clearSoldierTracers(soldierId);

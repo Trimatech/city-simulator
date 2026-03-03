@@ -52,6 +52,10 @@ export function BirdCamera() {
 	const isSpawned = useSelector(selectLocalIsSpawned);
 	const localSoldier = useSelector(selectLocalSoldier);
 
+	// While the soldier is dead (death choice period), keep camera on the ragdolling
+	// character instead of immediately entering fly mode
+	const isDead = localSoldier?.dead === true;
+
 	const timeRef = useRef(0);
 	const position2DRef = useRef(new Vector2(0, 0));
 	const velocityRef = useRef(new Vector2(1, 0));
@@ -95,6 +99,11 @@ export function BirdCamera() {
 			return;
 		}
 
+		// During death choice period, keep camera on the ragdolling character
+		if (isDead) {
+			return;
+		}
+
 		const startPosition = localSoldier?.position;
 		if (startPosition) {
 			const clamped = clampToCircle({ position: startPosition, radius: WORLD_BOUNDS - 5 });
@@ -110,10 +119,10 @@ export function BirdCamera() {
 		return () => {
 			camera.CameraType = Enum.CameraType.Custom;
 		};
-	}, [isSpawned]);
+	}, [isSpawned, isDead]);
 
 	useEventListener(RunService.RenderStepped, (dt) => {
-		if (isSpawned) return;
+		if (isSpawned || isDead) return;
 
 		// Ensure we keep control of the camera while spectating
 		camera.CameraType = Enum.CameraType.Scriptable;
