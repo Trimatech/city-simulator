@@ -42,7 +42,6 @@ export function ProgressBarTimer({
 			onExpired?.();
 		}
 	});
-	print("..........", secondsLeft.getValue());
 
 	return (
 		<>

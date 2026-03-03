@@ -82,7 +82,7 @@ export function DeathScreen() {
 				font={fonts.mplus.bold}
 				text="You Died"
 				automaticSize={Enum.AutomaticSize.XY}
-				textColor={palette.black}
+				textColor={palette.red1}
 				textSize={rem(6)}
 			>
 				<uistroke Color={palette.white} Transparency={0} Thickness={rem(0.3)} />
