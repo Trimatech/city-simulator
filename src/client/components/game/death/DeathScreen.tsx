@@ -41,6 +41,15 @@ export function DeathScreen() {
 		new UDim2(0, rem(isTimerActive ? 9 : 18), 0, rem(isTimerActive ? 3 : 4)),
 	);
 
+	const [position, positionMotion] = useMotion(new UDim2(0.5, 0, 2.5, 0));
+
+	useEffect(() => {
+		if (deathChoiceDeadline !== undefined) {
+			positionMotion.set(new UDim2(0.5, 0, 2.5, 0));
+			positionMotion.spring(new UDim2(0.5, 0, 0.5, 0), springs.responsive);
+		}
+	}, [deathChoiceDeadline]);
+
 	useEffect(() => {
 		buttonSizeMotion.spring(
 			new UDim2(0, rem(isTimerActive ? 9 : 18), 0, rem(isTimerActive ? 3 : 4)),
@@ -65,7 +74,7 @@ export function DeathScreen() {
 
 	return (
 		<Frame
-			position={new UDim2(0.5, 0, 0.5, 0)}
+			position={position}
 			anchorPoint={new Vector2(0.5, 0.5)}
 			size={contentSize.map((s) => new UDim2(0, s.X, 0, s.Y))}
 			layoutOrder={100}
@@ -73,7 +82,7 @@ export function DeathScreen() {
 			{/* Background */}
 			<CanvasGroup
 				backgroundColor={palette.black}
-				backgroundTransparency={0.5}
+				backgroundTransparency={0.2}
 				size={new UDim2(1, 0, 1, 0)}
 				cornerRadius={new UDim(0, rem(2))}
 			>
