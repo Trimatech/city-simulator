@@ -117,6 +117,24 @@
         <float name="Threshold">2</float>
       </Properties>
     </Item>
+    <Item class="Clouds" referent="5">
+      <Properties>
+        <string name="Name">Clouds</string>
+        <BinaryString name="AttributesSerialize"></BinaryString>
+        <SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+        <Color3 name="Color">
+          <R>1</R>
+          <G>1</G>
+          <B>1</B>
+        </Color3>
+        <float name="Cover">0.5</float>
+        <float name="Density">0.7</float>
+        <bool name="Enabled">false</bool>
+        <bool name="DefinesCapabilities">false</bool>
+        <int64 name="SourceAssetId">-1</int64>
+        <BinaryString name="Tags"></BinaryString>
+      </Properties>
+    </Item>
     <Item class="SunRaysEffect" referent="6">
       <Properties>
         <string name="Name">SunRays</string>
