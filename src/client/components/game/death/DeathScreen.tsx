@@ -25,19 +25,17 @@ export function DeathScreen() {
 	const crystals = useSelectorCreator(selectPlayerCrystals, USER_NAME) ?? 0;
 
 	const [isExpired, setIsExpired] = useState(() => {
-		if (deathChoiceDeadline === undefined) return true;
+		if (deathChoiceDeadline === undefined) return false;
 		return deathChoiceDeadline - tick() <= 0;
 	});
 
 	useEffect(() => {
 		if (deathChoiceDeadline !== undefined) {
 			setIsExpired(deathChoiceDeadline - tick() <= 0);
-		} else {
-			setIsExpired(true);
 		}
 	}, [deathChoiceDeadline]);
 
-	const isTimerActive = deathChoiceDeadline !== undefined && !isExpired;
+	const isTimerActive = !isExpired;
 
 	const [buttonSize, buttonSizeMotion] = useMotion(
 		new UDim2(0, rem(isTimerActive ? 9 : 18), 0, rem(isTimerActive ? 3 : 4)),
@@ -50,7 +48,7 @@ export function DeathScreen() {
 		);
 	}, [isTimerActive]);
 
-	if (!soldier || !soldier.dead) {
+	if (!soldier || !soldier.dead || deathChoiceDeadline === undefined) {
 		return undefined;
 	}
 
@@ -151,6 +149,7 @@ export function DeathScreen() {
 							</Frame>
 							<PrimaryButton
 								onClick={() => remotes.soldier.continue.fire()}
+								primaryColor={palette.sky}
 								enabled={canRevive}
 								size={new UDim2(0, rem(18), 0, rem(4))}
 							>
@@ -200,7 +199,7 @@ export function DeathScreen() {
 
 					<PrimaryButton
 						onClick={() => remotes.soldier.startOver.fire()}
-						primaryColor={isTimerActive ? palette.black : palette.blue}
+						primaryColor={isTimerActive ? palette.black : palette.sky}
 						size={buttonSize}
 						layoutOrder={3}
 					>
