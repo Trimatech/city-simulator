@@ -18,7 +18,7 @@ export interface RewardEntity {
 const rewardsById = new Map<string, RewardEntity>();
 let nextRewardId = 0;
 
-const REMOVAL_DELAY = 2;
+const REMOVAL_DELAY = 0.1;
 
 export function getActiveRewardCount(rewardType: RewardType): number {
 	let count = 0;

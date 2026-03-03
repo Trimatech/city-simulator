@@ -1,9 +1,10 @@
 import { CollectionService, RunService, TweenService, Workspace } from "@rbxts/services";
+import { playSound } from "shared/assetsFolder/sounds/play-sound";
+import { sounds } from "shared/assetsFolder/sounds/sounds";
+import { palette } from "shared/constants/palette";
 import {
 	REWARD_ATTR_COLLECTED,
 	REWARD_ATTR_TIME_ADDED,
-	REWARD_COLLECT_ANIMATION_DURATION,
-	REWARD_COLLECT_FLOAT_HEIGHT,
 	REWARD_SPAWN_ANIMATION_DURATION,
 	REWARD_TAG,
 	REWARD_TARGET_Y,
@@ -88,57 +89,106 @@ function stopIdleAnimation(part: BasePart): void {
 	}
 }
 
+function hideModel(part: BasePart): void {
+	const model = getModel(part);
+	if (model) {
+		for (const desc of model.GetDescendants()) {
+			if (desc.IsA("BasePart")) {
+				desc.Transparency = 1;
+			}
+			if (desc.IsA("Beam")) {
+				desc.Enabled = false;
+			}
+		}
+	} else {
+		part.Transparency = 1;
+	}
+}
+
+const SPARKLE_COUNT = 8;
+const SPARKLE_DURATION = 0.35;
+const SPARKLE_DISTANCE = 7;
+const FLASH_DURATION = 0.25;
+
+function spawnStarFlash(position: Vector3): void {
+	// Central flash sphere
+	const flash = new Instance("Part");
+	flash.Shape = Enum.PartType.Ball;
+	flash.Material = Enum.Material.Neon;
+	flash.Color = palette.white;
+	flash.Size = new Vector3(1.5, 1.5, 1.5);
+	flash.Position = position;
+	flash.Anchored = true;
+	flash.CanCollide = false;
+	flash.CastShadow = false;
+	flash.Transparency = 0.2;
+	flash.Parent = Workspace;
+
+	const light = new Instance("PointLight");
+	light.Color = palette.sapphire;
+	light.Brightness = 4;
+	light.Range = 16;
+	light.Parent = flash;
+
+	const flashTween = TweenService.Create(
+		flash,
+		new TweenInfo(FLASH_DURATION, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		{ Size: new Vector3(5, 5, 5), Transparency: 1 },
+	);
+	const lightTween = TweenService.Create(
+		light,
+		new TweenInfo(FLASH_DURATION, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		{ Brightness: 0 },
+	);
+	flashTween.Play();
+	lightTween.Play();
+	flashTween.Completed.Once(() => flash.Destroy());
+
+	// Sparkle particles shooting outward
+	for (let i = 0; i < SPARKLE_COUNT; i++) {
+		const angle = (i / SPARKLE_COUNT) * math.pi * 2;
+		const sparkle = new Instance("Part");
+		sparkle.Shape = Enum.PartType.Ball;
+		sparkle.Material = Enum.Material.Neon;
+		sparkle.Color = palette.sapphire;
+		sparkle.Size = new Vector3(0.5, 0.5, 0.5);
+		sparkle.Position = position;
+		sparkle.Anchored = true;
+		sparkle.CanCollide = false;
+		sparkle.CastShadow = false;
+		sparkle.Parent = Workspace;
+
+		const dx = math.cos(angle) * SPARKLE_DISTANCE;
+		const dy = math.random() * 3 - 0.5;
+		const dz = math.sin(angle) * SPARKLE_DISTANCE;
+		const endPos = position.add(new Vector3(dx, dy, dz));
+
+		const moveTween = TweenService.Create(
+			sparkle,
+			new TweenInfo(SPARKLE_DURATION, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+			{ Position: endPos, Size: new Vector3(0.1, 0.1, 0.1), Transparency: 1 },
+		);
+		moveTween.Play();
+		moveTween.Completed.Once(() => sparkle.Destroy());
+	}
+}
+
 function animateRewardCollected(part: BasePart): void {
 	if (collectedParts.has(part)) return;
 	collectedParts.add(part);
 
 	stopIdleAnimation(part);
 
-	const model = getModel(part);
+	const position = part.Position.sub(new Vector3(0, 2, 0));
 
-	const endPosition = part.Position.add(new Vector3(0, REWARD_COLLECT_FLOAT_HEIGHT, 0));
+	// Instantly hide the model
+	hideModel(part);
 
-	const positionTweenInfo = new TweenInfo(
-		REWARD_COLLECT_ANIMATION_DURATION,
-		Enum.EasingStyle.Quad,
-		Enum.EasingDirection.Out,
-	);
-	const transparencyTweenInfo = new TweenInfo(
-		REWARD_COLLECT_ANIMATION_DURATION,
-		Enum.EasingStyle.Quad,
-		Enum.EasingDirection.In,
-	);
+	// Star flash effect at model center
+	spawnStarFlash(position);
 
-	const positionTween = TweenService.Create(part, positionTweenInfo, { Position: endPosition });
-	storeTween(part, positionTween);
-	positionTween.Play();
-
-	// Fade all parts in the model
-	if (model) {
-		for (const desc of model.GetDescendants()) {
-			if (desc.IsA("BasePart")) {
-				const fadeTween = TweenService.Create(desc, transparencyTweenInfo, { Transparency: 1 });
-				fadeTween.Play();
-			}
-		}
-	} else {
-		const fadeTween = TweenService.Create(part, transparencyTweenInfo, { Transparency: 1 });
-		storeTween(part, fadeTween);
-		fadeTween.Play();
-	}
-
-	// Disable the beam and fade the light (on the BeamAnchor sibling part)
-	const beamAnchor = model?.FindFirstChild("RewardBeamAnchor");
-	if (beamAnchor) {
-		const beam = beamAnchor.FindFirstChild("RewardBeam") as Beam | undefined;
-		if (beam) beam.Enabled = false;
-
-		const pointLight = beamAnchor.FindFirstChild("RewardGlow") as PointLight | undefined;
-		if (pointLight) {
-			const lightTween = TweenService.Create(pointLight, transparencyTweenInfo, { Brightness: 0 });
-			lightTween.Play();
-		}
-	}
+	// Pickup sound
+	playSound(sounds.bong_001, { volume: 0.7, pitchOctave: 1.3 });
 }
 
 function setRewardToTarget(part: BasePart): void {
