@@ -1,5 +1,6 @@
 import { TweenService } from "@rbxts/services";
-import { playSound, sounds } from "shared/assetsFolder";
+import assets from "shared/assets";
+import { playSound } from "shared/assetsFolder";
 import { remotes } from "shared/remotes";
 
 import { cleanupEffects, createCarpetBombExplosionWithCFrame, createNuclearExplosion } from "./ExplosionUtils";
@@ -14,7 +15,7 @@ function handleCarpetExplosion(cframe: CFrame, size: Vector3) {
 
 	const root = effects[0];
 	if (root) {
-		playSound(sounds.laser3, { volume: 1, parent: root });
+		playSound(assets.sounds.laser3, { volume: 1, parent: root });
 		const fadeTween = TweenService.Create(
 			root,
 			new TweenInfo(FADE_DURATION, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
@@ -32,7 +33,7 @@ function handleNuclearExplosion(cframe: CFrame, size: Vector3) {
 
 	const root = effects[0];
 	if (root) {
-		playSound(sounds.explosion_effect, { volume: 1, parent: root });
+		playSound(assets.sounds.explosion_effect, { volume: 1, parent: root });
 		const fadeTween = TweenService.Create(
 			root,
 			new TweenInfo(NUCLEAR_FADE_DURATION, Enum.EasingStyle.Quad, Enum.EasingDirection.In),

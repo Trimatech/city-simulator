@@ -8,7 +8,8 @@ import { Layer } from "client/ui/layout/layer";
 import { PrimaryButton } from "client/ui/PrimaryButton";
 import { Text } from "client/ui/text";
 import { TextField } from "client/ui/text-field";
-import { playSound, sounds } from "shared/assetsFolder";
+import assets from "shared/assets";
+import { playSound } from "shared/assetsFolder";
 import { palette } from "shared/constants/palette";
 
 interface ErrorPageProps {
@@ -21,7 +22,7 @@ export function ErrorPage({ message }: ErrorPageProps) {
 	let index = 0;
 
 	useEffect(() => {
-		playSound(sounds.alert_bad);
+		playSound(assets.sounds.alert_bad);
 	}, []);
 
 	return (

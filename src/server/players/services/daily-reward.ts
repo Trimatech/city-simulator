@@ -1,6 +1,6 @@
 import { Players } from "@rbxts/services";
 import { store } from "server/store";
-import { sounds } from "shared/assetsFolder";
+import assets from "shared/assets";
 import {
 	DAILY_REWARD_CYCLE,
 	DAILY_STREAK_WINDOW,
@@ -71,6 +71,6 @@ function processClaim(player: Player) {
 		emoji: "🎁",
 		color: palette.yellow,
 		message: `Day ${newStreak}: +${rewardAmount} crystal${rewardAmount > 1 ? "s" : ""}!`,
-		sound: sounds.alert_money,
+		sound: assets.sounds.alert_money,
 	});
 }

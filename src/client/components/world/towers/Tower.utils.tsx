@@ -1,5 +1,5 @@
 import { Workspace } from "@rbxts/services";
-import { sounds } from "shared/assetsFolder";
+import assets from "shared/assets";
 import { playSound } from "shared/assetsFolder/sounds/play-sound";
 import { palette } from "shared/constants/palette";
 import { getPlayerByName } from "shared/utils/player-utils";
@@ -111,7 +111,7 @@ export function createAttackBeam(model: Model, targetId: string) {
 	if (specsEffect) specsEffect.Enabled = true;
 
 	// Play continuous laser sound
-	const sound = playSound(sounds.laser_beam, { parent: orbPart, looped: true, volume: 0.35, pitchOctave: 0.5 });
+	const sound = playSound(assets.sounds.laser_beam, { parent: orbPart, looped: true, volume: 0.35, pitchOctave: 0.5 });
 
 	// Auto-destroy beam attachments if the target goes away or leaves Workspace
 	const connections: RBXScriptConnection[] = [];

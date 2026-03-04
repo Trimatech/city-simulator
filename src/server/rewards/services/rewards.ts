@@ -9,7 +9,7 @@ import {
 } from "server/store/milestones";
 import { ScoreMilestone } from "server/store/milestones/milestone-utils";
 import { getSoldier } from "server/world";
-import { sounds } from "shared/assetsFolder";
+import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 import { remotes } from "shared/remotes";
 import { selectSoldierRanking } from "shared/store/soldiers";
@@ -129,7 +129,7 @@ function grantMoneyReward(id: string, amount: number, reason: string, immediate 
 			emoji: "💵",
 			color: palette.green,
 			message: `You got <font color="#fff">$${amount}</font> for ${reason}!`,
-			sound: sounds.alert_money,
+			sound: assets.sounds.alert_money,
 		});
 	});
 }

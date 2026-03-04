@@ -2,16 +2,17 @@ import { useEventListener } from "@rbxts/pretty-react-hooks";
 import React, { useEffect, useRef, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { selectMusicEnabled } from "client/store/settings/settingsSelectors";
-import { createSound, sounds } from "shared/assetsFolder";
+import assets from "shared/assets";
+import { createSound } from "shared/assetsFolder";
 import { type MusicContext, selectLocalMusicContext } from "shared/store/soldiers";
 import { shuffle } from "shared/utils/object-utils";
 
 // Playlists per context. All use rbxassetid from Roblox audio library.
-const LOBBY: readonly string[] = [sounds.bg_013_Another_August];
+const LOBBY: readonly string[] = [assets.sounds.bg_013_Another_August];
 
-const INSIDE_AREA: readonly string[] = [sounds.bg_beautiful_day];
+const INSIDE_AREA: readonly string[] = [assets.sounds.bg_beautiful_day];
 
-const OUTSIDE_AREA: readonly string[] = [sounds.bg_bugmintide];
+const OUTSIDE_AREA: readonly string[] = [assets.sounds.bg_bugmintide];
 
 const PLAYLISTS: Record<MusicContext, readonly string[]> = {
 	lobby: LOBBY,

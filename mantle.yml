@@ -66,8 +66,6 @@ target:
                         Follow 🔔 to be notified of new updates!
 
                     maxPlayerCount: 25
-        assets:
-            - assets/sounds/*
         badges:
             1-area-25000:
                 name: ✨ 25,000 studs² area

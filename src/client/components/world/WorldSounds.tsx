@@ -5,11 +5,12 @@ import { useSelector } from "@rbxts/react-reflex";
 import { ContentProvider, Players, SoundService } from "@rbxts/services";
 import { useCharacter } from "client/hooks/use-character";
 import { selectWorldSubjectDead, selectWorldSubjectOrbs, selectWorldSubjectPolygonAreaSize } from "client/store/world";
-import { playSound, sounds } from "shared/assetsFolder";
+import assets from "shared/assets";
+import { playSound } from "shared/assetsFolder";
 import { selectHasLocalSoldier, selectLocalLastTracerPoint } from "shared/store/soldiers";
 import { selectTowersById } from "shared/store/towers/tower-selectors";
 
-const ERROR_SOUNDS = [sounds.error_1, sounds.error_2, sounds.error_3];
+const ERROR_SOUNDS = [assets.sounds.error_1, assets.sounds.error_2, assets.sounds.error_3];
 
 const random = new Random();
 const TOTAL_STEPS = 10; // 10 pre-made sounds (0.5 -> 1.0)
@@ -64,7 +65,7 @@ function WorldSoundsComponent() {
 		const created: Sound[] = [];
 		for (let step = 0; step < TOTAL_STEPS; step++) {
 			const sound = new Instance("Sound");
-			sound.SoundId = sounds.thump_sound;
+			sound.SoundId = assets.sounds.thump_sound;
 			sound.Volume = 0; // will set on play
 			sound.Looped = false;
 			sound.Parent = SoundService;
@@ -95,7 +96,7 @@ function WorldSoundsComponent() {
 	// Pre-create a single organic thud sound to avoid initial playback delay
 	useEffect(() => {
 		const sound = new Instance("Sound");
-		sound.SoundId = sounds.POL_organic_thud_02;
+		sound.SoundId = assets.sounds.POL_organic_thud_02;
 		sound.Volume = 0; // set on play
 		sound.Looped = false;
 		sound.Parent = SoundService;
@@ -144,7 +145,7 @@ function WorldSoundsComponent() {
 	// Spawn sound
 	useEffect(() => {
 		if (hasLocalSoldier) {
-			playSound(sounds.start_game);
+			playSound(assets.sounds.start_game);
 		}
 	}, [hasLocalSoldier]);
 
@@ -154,7 +155,7 @@ function WorldSoundsComponent() {
 		if (orbs > (previousOrbs ?? 0)) {
 			const speed = random.NextNumber(0.87, 1);
 			print("playing whoosh.......");
-			playSound(sounds.whoosh, { volume: 0.6 * volume, speed });
+			playSound(assets.sounds.whoosh, { volume: 0.6 * volume, speed });
 		}
 	}, [orbs]);
 
@@ -170,7 +171,7 @@ function WorldSoundsComponent() {
 
 		const sound = thudRef.current;
 		if (!sound) {
-			playSound(sounds.POL_organic_thud_02, { volume: volume * 0.5 });
+			playSound(assets.sounds.POL_organic_thud_02, { volume: volume * 0.5 });
 			return;
 		}
 
@@ -200,7 +201,7 @@ function WorldSoundsComponent() {
 	useEffect(() => {
 		if (previousTowerCount === undefined) return;
 		if (towerCount > previousTowerCount) {
-			playSound(sounds.bong_001, { volume: 0.7 * volume });
+			playSound(assets.sounds.bong_001, { volume: 0.7 * volume });
 		}
 	}, [towerCount, previousTowerCount]);
 

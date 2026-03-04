@@ -1,6 +1,6 @@
 import { CollectionService, RunService, TweenService, Workspace } from "@rbxts/services";
+import assets from "shared/assets";
 import { playSound } from "shared/assetsFolder/sounds/play-sound";
-import { sounds } from "shared/assetsFolder/sounds/sounds";
 import { palette } from "shared/constants/palette";
 import {
 	REWARD_ATTR_COLLECTED,
@@ -188,7 +188,7 @@ function animateRewardCollected(part: BasePart): void {
 	spawnStarFlash(position);
 
 	// Pickup sound
-	playSound(sounds.bong_001, { volume: 0.7, pitchOctave: 1.3 });
+	playSound(assets.sounds.bong_001, { volume: 0.7, pitchOctave: 1.3 });
 }
 
 function setRewardToTarget(part: BasePart): void {

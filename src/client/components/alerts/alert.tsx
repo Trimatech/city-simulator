@@ -13,7 +13,7 @@ import { ReactiveButton } from "client/ui/reactive-button";
 import { Shadow } from "client/ui/shadow";
 import { Text } from "client/ui/text";
 import assets from "shared/assets";
-import { playSound, sounds } from "shared/assetsFolder";
+import { playSound } from "shared/assetsFolder";
 import { palette } from "shared/constants/palette";
 import { brightenIfDark, darken } from "shared/utils/color-utils";
 import { mapStrict } from "shared/utils/math-utils";
@@ -83,14 +83,14 @@ export function Alert({ alert, index }: AlertProps) {
 	}, [visibleIndex]);
 
 	useMountEffect(() => {
-		playSound(alert.sound ?? sounds.bong_001);
+		playSound(alert.sound ?? assets.sounds.bong_001);
 	});
 
 	return (
 		<ReactiveButton
 			onClick={() => {
 				dismissAlert(alert.id);
-				playSound(sounds.alert_dismiss);
+				playSound(assets.sounds.alert_dismiss);
 			}}
 			onHover={(hovered) => hoverMotion.spring(hovered ? 1 : 0, springs.responsive)}
 			soundVariant="none"

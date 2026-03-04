@@ -8,7 +8,8 @@ import { PrimaryButton } from "client/ui/PrimaryButton";
 import { ReactiveButton } from "client/ui/reactive-button";
 import { Text } from "client/ui/text";
 import { formatInteger } from "client/utils/format-integer";
-import { playSound, sounds } from "shared/assetsFolder";
+import assets from "shared/assets";
+import { playSound } from "shared/assetsFolder";
 import { USER_NAME } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
 import { getWallSkin } from "shared/constants/skins";
@@ -57,7 +58,7 @@ export function SkinButton({ id, cellSize }: SkinButtonProps) {
 	}, [owns, isEquipped, canAfford]);
 
 	const onAction = () => {
-		playSound(sounds.navigate);
+		playSound(assets.sounds.navigate);
 		if (owns) {
 			if (!isEquipped) {
 				remotes.save.setSkin.fire(id);

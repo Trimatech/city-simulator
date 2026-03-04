@@ -1,7 +1,7 @@
 import { createCollection } from "@rbxts/lapis";
 import { Players } from "@rbxts/services";
 import { store } from "server/store";
-import { sounds } from "shared/assetsFolder";
+import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 import { remotes } from "shared/remotes";
 import { defaultPlayerSave, playerSaveSchema, selectPlayerSave } from "shared/store/saves";
@@ -56,6 +56,6 @@ async function fallbackPlayerSave(player: Player) {
 		color: palette.red,
 		message: "Roblox may be having issues with your save data. Sorry for the inconvenience!",
 		duration: 10,
-		sound: sounds.alert_bad,
+		sound: assets.sounds.alert_bad,
 	});
 }

@@ -10,9 +10,8 @@ style = "nested"
 strip_extensions = true
 
 [inputs.assets]
-path = "assets/images/**/*"
+path = "assets/asphalt/**/*"
 output_path = "src/shared"
 
 [inputs.assets.web]
-"some_sound_on_roblox.ogg" = { id = 123456789 }
-"some_image_on_roblox.png" = { id = 987654321 }
+"sounds/bg_beautiful_day.ogg" = { id = 1839849859 }
