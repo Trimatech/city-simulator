@@ -31,3 +31,11 @@ export const selectPlayerOwnsSkin = (id: string, skinId: string) => {
 export const selectPlayerEquippedSkin = (id: string, skinId: string) => {
 	return (state: SharedState) => state.saves[id]?.skin === skinId;
 };
+
+export const selectPlayerDailyStreak = (id: string) => {
+	return (state: SharedState) => state.saves[id]?.dailyStreak ?? 0;
+};
+
+export const selectPlayerLastDailyRewardClaim = (id: string) => {
+	return (state: SharedState) => state.saves[id]?.lastDailyRewardClaim ?? 0;
+};

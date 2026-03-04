@@ -61,4 +61,13 @@ export const saveSlice = createProducer(initialState, {
 			skin,
 		}));
 	},
+
+	claimDailyReward: (state, player: string, streak: number, crystals: number, claimTime: number) => {
+		return mapProperty(state, player, (save) => ({
+			...save,
+			dailyStreak: streak,
+			lastDailyRewardClaim: claimTime,
+			crystals: (save.crystals ?? 0) + math.max(crystals, 0),
+		}));
+	},
 });

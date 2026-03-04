@@ -1,4 +1,5 @@
 import React, { useState } from "@rbxts/react";
+import { useSelectorCreator } from "@rbxts/react-reflex";
 import { HomeStats } from "client/components/stats/HomeStats";
 import { fonts } from "client/constants/fonts";
 import { useRem } from "client/hooks";
@@ -8,13 +9,27 @@ import { PrimaryButton } from "client/ui/PrimaryButton";
 import { ReactiveButton } from "client/ui/reactive-button/reactive-button";
 import { SlideIn } from "client/ui/slide-in";
 import { Text } from "client/ui/text";
+import { USER_NAME } from "shared/constants/core";
+import {
+	DAILY_REWARD_CYCLE,
+	DAILY_STREAK_WINDOW,
+	getDailyRewardAmount,
+	SECONDS_PER_DAY,
+} from "shared/constants/daily-rewards";
 import { palette } from "shared/constants/palette";
 import { ROOT_PADDING } from "shared/constants/theme";
+import { selectPlayerDailyStreak, selectPlayerLastDailyRewardClaim } from "shared/store/saves";
 
+import { DailyRewardScreen } from "../daily-reward/DailyRewardScreen";
 import { ShopWindow } from "../shop/ShopWindow";
 import { GameVersion } from "./GameVersion";
 import { MuteButton } from "./MuteButton";
 import { PlayButton } from "./PlayButton";
+
+interface DailyRewardInfo {
+	readonly streakDay: number;
+	readonly crystalAmount: number;
+}
 
 interface HomeProps {
 	visible: boolean;
@@ -23,6 +38,25 @@ interface HomeProps {
 export function Home({ visible }: HomeProps) {
 	const rem = useRem();
 	const [isShopOpen, setIsShopOpen] = useState(false);
+	const [dailyReward, setDailyReward] = useState<DailyRewardInfo | undefined>();
+	const currentStreak = useSelectorCreator(selectPlayerDailyStreak, USER_NAME);
+	const lastClaim = useSelectorCreator(selectPlayerLastDailyRewardClaim, USER_NAME);
+
+	const openDailyReward = () => {
+		const now = os.time();
+		const elapsed = now - lastClaim;
+
+		let streakDay: number;
+		if (lastClaim === 0 || elapsed >= DAILY_STREAK_WINDOW) {
+			streakDay = 1;
+		} else if (elapsed >= SECONDS_PER_DAY) {
+			streakDay = (currentStreak % DAILY_REWARD_CYCLE) + 1;
+		} else {
+			streakDay = currentStreak;
+		}
+
+		setDailyReward({ streakDay, crystalAmount: getDailyRewardAmount(streakDay) });
+	};
 
 	return (
 		<>
@@ -30,9 +64,22 @@ export function Home({ visible }: HomeProps) {
 				<HStack
 					position={new UDim2(0, rem(ROOT_PADDING), 0, rem(ROOT_PADDING) + rem(4))}
 					verticalAlignment={Enum.VerticalAlignment.Top}
+					spacing={rem(1)}
 				>
 					<PrimaryButton onClick={() => setIsShopOpen(true)} size={new UDim2(0, rem(10), 0, rem(4))}>
 						<Text font={fonts.inter.medium} text={"🛒 Shop"} textSize={rem(1.6)} size={new UDim2(1, 0, 1, 0)} />
+					</PrimaryButton>
+					<PrimaryButton
+						onClick={openDailyReward}
+						primaryColor={palette.yellow}
+						size={new UDim2(0, rem(13), 0, rem(4))}
+					>
+						<Text
+							font={fonts.inter.medium}
+							text={"🎁 Daily Reward"}
+							textSize={rem(1.6)}
+							size={new UDim2(1, 0, 1, 0)}
+						/>
 					</PrimaryButton>
 				</HStack>
 			</SlideIn>
@@ -83,6 +130,14 @@ export function Home({ visible }: HomeProps) {
 
 					<ShopWindow onClose={() => setIsShopOpen(false)} />
 				</>
+			)}
+
+			{dailyReward && (
+				<DailyRewardScreen
+					streakDay={dailyReward.streakDay}
+					crystalAmount={dailyReward.crystalAmount}
+					onDismiss={() => setDailyReward(undefined)}
+				/>
 			)}
 		</>
 	);

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { selectLocalDeathChoiceDeadline, selectLocalSoldier, selectHasLocalSoldier } from "shared/store/soldiers";
+import { selectHasLocalSoldier, selectLocalDeathChoiceDeadline, selectLocalSoldier } from "shared/store/soldiers";
 
 import { DeathScreen } from "./game/death/DeathScreen";
 import { GameUI } from "./game/GameUI";
