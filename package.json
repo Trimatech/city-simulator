@@ -19,7 +19,7 @@
 	},
 	"devDependencies": {
 		"@rbxts/compiler-types": "3.0.0-types.0",
-		"@rbxts/types": "^1.0.813",
+		"@rbxts/types": "^1.0.909",
 		"@typescript-eslint/eslint-plugin": "^8.8.1",
 		"@typescript-eslint/parser": "^8.8.1",
 		"cross-env": "^7.0.3",
@@ -37,6 +37,7 @@
 	"dependencies": {
 		"@rbxts/beacon": "^2.1.1",
 		"@rbxts/bitbuffer2": "1.0.0-ts.0",
+		"@rbxts/falldown": "^1.0.3",
 		"@rbxts/flipper": "^2.0.1",
 		"@rbxts/lapis": "^0.3.6",
 		"@rbxts/object-utils": "^1.0.4",

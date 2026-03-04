@@ -1,4 +1,4 @@
-import { killSoldier } from "server/world";
+import { onPlayerDeath } from "server/world";
 import { CollisionGroups } from "shared/constants/collision-groups";
 import { SOLDIER_SPEED } from "shared/constants/core";
 import { Character, onPlayerAdded, promiseCharacter, promisePlayerDisconnected } from "shared/utils/player-utils";
@@ -31,7 +31,7 @@ export async function initCharacterService() {
 		character.Humanoid.Died.Connect(() => {
 			print(`Player ${character.Name}'s humanoid has died`);
 
-			killSoldier(player.Name);
+			onPlayerDeath(player.Name);
 		});
 	}
 

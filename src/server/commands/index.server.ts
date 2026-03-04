@@ -3,25 +3,24 @@ import { store } from "server/store";
 import { killSoldier } from "server/world";
 import {
 	pauseBot,
-	spawnBotsNearPlayer,
 	setBotFaceToward,
 	setBotMoveToward,
+	spawnBotsNearPlayer,
 	unpauseBot,
 } from "server/world/services/bots/bot-saga";
 import { executePowerupForSoldier } from "server/world/services/powerups/powerups.service";
 import { updateAreaGridForPolygon } from "server/world/services/soldiers/soldier-grid";
-import { selectSoldierById, selectSoldiers, selectSoldiersById } from "shared/store/soldiers";
-import { selectTowersById } from "shared/store/towers/tower-selectors";
-import { defaultPlayerSave } from "shared/store/saves";
+import { palette } from "shared/constants/palette";
+import type { PowerupId } from "shared/constants/powerups";
 import {
 	calculatePolygonArea,
 	createPolygonAroundPosition,
 	createRectanglePolygon,
 	scalePolygonFromCentroid,
 } from "shared/polygon-extra.utils";
-import { palette } from "shared/constants/palette";
-import type { PowerupId } from "shared/constants/powerups";
 import { remotes } from "shared/remotes";
+import { defaultPlayerSave } from "shared/store/saves";
+import { selectSoldierById, selectSoldiers, selectSoldiersById } from "shared/store/soldiers";
 
 import { createCommand } from "./create-command";
 import { runScenarioCrowd, runScenarioNarrow, runScenarioTower } from "./scenarios";

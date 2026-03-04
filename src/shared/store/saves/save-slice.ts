@@ -34,6 +34,20 @@ export const saveSlice = createProducer(initialState, {
 		}));
 	},
 
+	spendPlayerCrystals: (state, player: string, amount: number) => {
+		return mapProperty(state, player, (save) => ({
+			...save,
+			crystals: math.max((save.crystals ?? 0) - amount, 0),
+		}));
+	},
+
+	givePlayerCrystals: (state, player: string, amount: number) => {
+		return mapProperty(state, player, (save) => ({
+			...save,
+			crystals: (save.crystals ?? 0) + math.max(amount, 0),
+		}));
+	},
+
 	givePlayerSkin: (state, player: string, skin: string) => {
 		return mapProperty(state, player, (save) => ({
 			...save,
@@ -45,6 +59,15 @@ export const saveSlice = createProducer(initialState, {
 		return mapProperty(state, player, (save) => ({
 			...save,
 			skin,
+		}));
+	},
+
+	claimDailyReward: (state, player: string, streak: number, crystals: number, claimTime: number) => {
+		return mapProperty(state, player, (save) => ({
+			...save,
+			dailyStreak: streak,
+			lastDailyRewardClaim: claimTime,
+			crystals: (save.crystals ?? 0) + math.max(crystals, 0),
 		}));
 	},
 });

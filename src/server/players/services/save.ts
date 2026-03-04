@@ -36,7 +36,8 @@ async function loadPlayerSave(player: Player) {
 			document.close();
 		});
 
-		store.setPlayerSave(player.Name, document.read());
+		const data = document.read();
+		store.setPlayerSave(player.Name, { ...defaultPlayerSave, ...data });
 	} catch (e) {
 		warn(`Failed to load data for ${player.Name}: ${e}`);
 		fallbackPlayerSave(player);

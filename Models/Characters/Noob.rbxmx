@@ -711,6 +711,7 @@
             <null>
             </null>
           </Content>
+          <float name="Rotation">0</float>
           <Content name="RoughnessMapContent">
             <null>
             </null>
@@ -6057,6 +6058,7 @@
           <bool name="DefinesCapabilities">false</bool>
           <int64 name="Shirt">0</int64>
           <int64 name="SourceAssetId">-1</int64>
+          <bool name="StaticFacialAnimation">false</bool>
           <int64 name="SwimAnimation">0</int64>
           <BinaryString name="Tags"></BinaryString>
           <bool name="UseAvatarSettings">false</bool>

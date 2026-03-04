@@ -1,7 +1,7 @@
 import { setTimeout } from "@rbxts/set-timeout";
 import { store } from "server/store";
 import { CANDY_LIMITS } from "server/world/constants";
-import { getRandomPointInWorld, getSoldier } from "server/world/world.utils";
+import { getRandomPointInWorld, getSoldier } from "server/world/world-query.utils";
 import { getRandomAccent } from "shared/constants/palette";
 import {
 	selectCandyGridCells,

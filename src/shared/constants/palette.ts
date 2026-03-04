@@ -107,6 +107,12 @@ const base = {
 	dark: Color3.fromRGB(17, 17, 27),
 };
 
+const otherColors = {
+	blue1: Color3.fromRGB(19, 52, 92),
+	blue2: Color3.fromRGB(42, 101, 160),
+	red1: Color3.fromRGB(244, 0, 27),
+} as const;
+
 /**
  * Catppuccin Mocha Palette
  * @see https://github.com/catppuccin/catppuccin
@@ -115,6 +121,7 @@ export const palette = {
 	...accents,
 	...neutrals,
 	...base,
+	...otherColors,
 } as const;
 
 /**

@@ -12,6 +12,10 @@ export const selectPlayerBalance = (id: string) => {
 	return (state: SharedState) => state.saves[id]?.balance;
 };
 
+export const selectPlayerCrystals = (id: string) => {
+	return (state: SharedState) => state.saves[id]?.crystals ?? 0;
+};
+
 export const selectPlayerSkins = (id: string) => {
 	return (state: SharedState) => state.saves[id]?.skins;
 };
@@ -26,4 +30,12 @@ export const selectPlayerOwnsSkin = (id: string, skinId: string) => {
 
 export const selectPlayerEquippedSkin = (id: string, skinId: string) => {
 	return (state: SharedState) => state.saves[id]?.skin === skinId;
+};
+
+export const selectPlayerDailyStreak = (id: string) => {
+	return (state: SharedState) => state.saves[id]?.dailyStreak ?? 0;
+};
+
+export const selectPlayerLastDailyRewardClaim = (id: string) => {
+	return (state: SharedState) => state.saves[id]?.lastDailyRewardClaim ?? 0;
 };

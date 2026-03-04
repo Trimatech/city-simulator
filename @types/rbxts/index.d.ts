@@ -1,8 +1,5 @@
 declare module "@rbxts/services" {
-	// @ts-ignore
+	// @ts-expect-error - module re-export
 	export * from "@rbxts/services/index";
-}
-
-declare module "@rbxts/services" {
 	export const GeometryService: GeometryService;
 }

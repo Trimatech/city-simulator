@@ -33,6 +33,18 @@ export function createRectanglePolygon(center: Vector2, halfWidth: number, halfH
 	];
 }
 
+export function getPolygonCentroid(polygon: readonly Vector2[]): Vector2 | undefined {
+	if (polygon.size() < 3) return undefined;
+	let sumX = 0;
+	let sumY = 0;
+	for (const p of polygon) {
+		sumX += p.X;
+		sumY += p.Y;
+	}
+	const n = polygon.size();
+	return new Vector2(sumX / n, sumY / n);
+}
+
 export function scalePolygonFromCentroid(polygon: readonly Vector2[], factor: number): Vector2[] {
 	if (polygon.size() < 3) return [...polygon];
 

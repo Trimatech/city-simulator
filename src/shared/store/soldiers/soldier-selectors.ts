@@ -116,6 +116,10 @@ export const selectLocalPolygonAreaSize = (state: SharedState) => {
 	return state.soldiers[USER_NAME]?.polygonAreaSize;
 };
 
+export const selectLocalDeathChoiceDeadline = (state: SharedState) => {
+	return state.soldiers[USER_NAME]?.deathChoiceDeadline;
+};
+
 export const selectHasLocalSoldier = (state: SharedState) => {
 	return USER_NAME in state.soldiers;
 };

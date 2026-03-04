@@ -6,6 +6,7 @@ import { Players } from "@rbxts/services";
 import { initializeWallAnimator } from "client/components/walls/wall-animator";
 import { initializeCandyAnimator } from "client/components/world/candies/candy-animator";
 import { initializeExplosionEffects } from "client/components/world/explosions/explosion-events";
+import { initializeRewardAnimator } from "client/components/world/rewards/reward-animator";
 import { RootProvider } from "client/providers/root-provider";
 import { IS_LOCAL } from "shared/constants/core";
 
@@ -36,3 +37,6 @@ initializeWallAnimator();
 
 // Initialize server-side candy animation (CollectionService-based)
 initializeCandyAnimator();
+
+// Initialize server-side reward animation (CollectionService-based)
+initializeRewardAnimator();

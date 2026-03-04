@@ -16,6 +16,8 @@ export const remotes = createRemotes({
 		spawn: remote<Server>(),
 		kill: remote<Server>(),
 		move: remote<Server, [position: Vector2]>(t.Vector2),
+		continue: remote<Server>(),
+		startOver: remote<Server>(),
 	}),
 
 	save: namespace({
@@ -35,5 +37,10 @@ export const remotes = createRemotes({
 
 	camera: namespace({
 		updateBirdPosition: remote<Server, [position: Vector2]>(t.Vector2),
+	}),
+
+	dailyReward: namespace({
+		notify: remote<Client, [streakDay: number, crystalAmount: number]>(),
+		claim: remote<Server>(),
 	}),
 });

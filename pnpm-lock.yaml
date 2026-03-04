@@ -14,6 +14,9 @@ importers:
       '@rbxts/bitbuffer2':
         specifier: 1.0.0-ts.0
         version: 1.0.0-ts.0
+      '@rbxts/falldown':
+        specifier: ^1.0.3
+        version: 1.0.3
       '@rbxts/flipper':
         specifier: ^2.0.1
         version: 2.0.1
@@ -73,8 +76,8 @@ importers:
         specifier: 3.0.0-types.0
         version: 3.0.0-types.0
       '@rbxts/types':
-        specifier: ^1.0.813
-        version: 1.0.813
+        specifier: ^1.0.909
+        version: 1.0.909
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.8.1
         version: 8.8.1(@typescript-eslint/parser@8.8.1(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2)
@@ -173,6 +176,9 @@ packages:
   '@rbxts/compiler-types@3.0.0-types.0':
     resolution: {integrity: sha512-VGOHJPoL7+56NTatMGqQj3K7xWuzEV+aP4QD5vZiHu+bcff3kiTmtoadaF6NkJrmwfFAvbsd4Dg764ZjWNceag==}
 
+  '@rbxts/falldown@1.0.3':
+    resolution: {integrity: sha512-bzD4YfTUFjIJp4FYLYxQDCiz0eM4jq6PU+ps4vuWc6mhG7J7GEjS+WPUmh3LSaHs8/7V++y7J0t5s4mv8zEQgg==}
+
   '@rbxts/flipper@2.0.1':
     resolution: {integrity: sha512-kxb5AZizP05XSmo3waS/QkcfNMD5b6HX4gGwyHOyBow260R5MIT4L/ZUPLvleXXyb9b67X4NVmHoac1tPXOLNA==}
 
@@ -214,6 +220,9 @@ packages:
   '@rbxts/services@1.5.5':
     resolution: {integrity: sha512-Hu7QH2ecefS60zpakKG3T2vgABydoOJqpSG7nXr59wFAbPk/cA+OcsntYPHUWyHAat0VFGZ5jNZLTLdiqfssvg==}
 
+  '@rbxts/services@1.6.0':
+    resolution: {integrity: sha512-YH02E1/tGHeMXB0Mam8qPdAZa2fjQWdylEscSL4Zn0RIaQeByYImA2qUsXM3nBdhcyKHDwltzSznDKyCGfFEWA==}
+
   '@rbxts/set-timeout@1.1.2':
     resolution: {integrity: sha512-P/A0IiH9wuZdSJYr4Us0MDFm61nvIFR0acfKFHLkcOsgvIgELC90Up9ugiSsaMEHRIcIcO5UjE39LuS3xTzQHw==}
 
@@ -223,8 +232,8 @@ packages:
   '@rbxts/testez@0.4.2-ts.0':
     resolution: {integrity: sha512-8Q+OG9ddTD2P3aARCuRKpPqUBvuifgSnHvQMZ6jBMqUzxhIysnb0l4c3vnnaQnvdyZ1OW9tKxcdEHMGTb67uOw==}
 
-  '@rbxts/types@1.0.813':
-    resolution: {integrity: sha512-Qpsmqnl+TNdl5AYqKFkYHyUrv652r30qK6A3GObOyDz+cvn8i+HE61mO021oq0nu1FcA4pMHbYqLSbv2CMF9Ig==}
+  '@rbxts/types@1.0.909':
+    resolution: {integrity: sha512-jl/3uDQXlfCBpp4N/T0P+ZbKYQHQ9wbCLJI6MePnVj+b3soJKqnhR0JCh1WsxFuDKY4C7uFLm5H8iGA+UXZUYg==}
 
   '@rbxts/ui-labs@2.4.1':
     resolution: {integrity: sha512-CoXsH3WVZij1Uiq0SlIrqFZ8UDW0fDSSUJu1bOSBPOiBDORON3V6qYWLjjSsFrX5q+WHkVOTcKCPb6AhV/Q0/A==}
@@ -1068,6 +1077,11 @@ snapshots:
 
   '@rbxts/compiler-types@3.0.0-types.0': {}
 
+  '@rbxts/falldown@1.0.3':
+    dependencies:
+      '@rbxts/beacon': 2.1.1
+      '@rbxts/services': 1.6.0
+
   '@rbxts/flipper@2.0.1': {}
 
   '@rbxts/lapis@0.3.6(@rbxts/t@3.1.1)':
@@ -1108,6 +1122,8 @@ snapshots:
 
   '@rbxts/services@1.5.5': {}
 
+  '@rbxts/services@1.6.0': {}
+
   '@rbxts/set-timeout@1.1.2':
     dependencies:
       '@rbxts/services': 1.5.5
@@ -1116,7 +1132,7 @@ snapshots:
 
   '@rbxts/testez@0.4.2-ts.0': {}
 
-  '@rbxts/types@1.0.813': {}
+  '@rbxts/types@1.0.909': {}
 
   '@rbxts/ui-labs@2.4.1': {}
 

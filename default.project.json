@@ -68,6 +68,11 @@
 			"Place": {
 				"$path": "./GamePlaceTemp.rbxmx"
 			},
+			"Terrain": {
+				"Clouds": {
+					"$path": "assets/clouds.rbxmx"
+				}
+			},
 			"$properties": {
 				"StreamingEnabled": true,
 				"StreamingMinRadius": 120,
