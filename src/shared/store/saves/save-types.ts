@@ -28,4 +28,4 @@ export const playerSaveSchema = t.interface({
 	crystals: t.number,
 	skins: t.array(t.string),
 	skin: t.string,
-) as unknown as t.check<PlayerSave>;
+}) as unknown as t.check<PlayerSave>;

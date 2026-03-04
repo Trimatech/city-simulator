@@ -67,7 +67,12 @@ export function Home({ visible }: HomeProps) {
 					spacing={rem(1)}
 				>
 					<PrimaryButton onClick={() => setIsShopOpen(true)} size={new UDim2(0, rem(10), 0, rem(4))}>
-						<Text font={fonts.inter.medium} text={"🛒 Shop"} textSize={rem(1.6)} size={new UDim2(1, 0, 1, 0)} />
+						<Text
+							font={fonts.inter.medium}
+							text={"🛒 Shop"}
+							textSize={rem(1.6)}
+							size={new UDim2(1, 0, 1, 0)}
+						/>
 					</PrimaryButton>
 					<PrimaryButton
 						onClick={openDailyReward}

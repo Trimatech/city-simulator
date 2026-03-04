@@ -1,7 +1,7 @@
 import { REWARD_CONFIGS, REWARD_TICK_INTERVAL, RewardType } from "shared/constants/rewards";
 import { createScheduler } from "shared/utils/scheduler";
 
-import { checkRewardPickups, populateRewards, spawnReward, getActiveRewardCount } from "./reward-utils";
+import { checkRewardPickups, getActiveRewardCount, populateRewards, spawnReward } from "./reward-utils";
 
 export async function initRewardService() {
 	// Pickup detection runs every REWARD_TICK_INTERVAL (1 second)
@@ -23,7 +23,7 @@ export async function initRewardService() {
 
 		// Periodic spawning: add spawnCount rewards every spawnInterval seconds
 		task.spawn(() => {
-			while (true) {
+			for (;;) {
 				task.wait(config.spawnInterval);
 				for (let i = 0; i < config.spawnCount; i++) {
 					spawnReward(rewardType as RewardType);

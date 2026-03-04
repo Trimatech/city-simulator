@@ -27,9 +27,5 @@ export function SlideIn({ visible, direction, children }: SlideInProps) {
 		positionMotion.spring(visible ? VISIBLE_POSITION : hidden, springs.gentle);
 	}, [visible]);
 
-	return (
-		<Group position={position}>
-			{children}
-		</Group>
-	);
+	return <Group position={position}>{children}</Group>;
 }

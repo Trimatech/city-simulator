@@ -12,12 +12,7 @@ import { REVIVE_CRYSTAL_COST, SOLDIER_SPEED, WORLD_TICK } from "shared/constants
 import { setIntersectionPoints, vectorsToPoints } from "shared/polybool/poly-utils";
 import { pointsToPolygon } from "shared/polybool/polybool";
 import { remotes } from "shared/remotes";
-import {
-	defaultPlayerSave,
-	RANDOM_SKIN,
-	selectPlayerCrystals,
-	selectPlayerSave,
-} from "shared/store/saves";
+import { defaultPlayerSave, RANDOM_SKIN, selectPlayerCrystals, selectPlayerSave } from "shared/store/saves";
 import {
 	identifySoldier,
 	selectAliveSoldiersById,
