@@ -1,4 +1,5 @@
-import { REWARD_CONFIGS, REWARD_TICK_INTERVAL, RewardType } from "shared/constants/rewards";
+import { WORLD_TICK } from "shared/constants/core";
+import { REWARD_CONFIGS, RewardType } from "shared/constants/rewards";
 import { createScheduler } from "shared/utils/scheduler";
 
 import { checkRewardPickups, getActiveRewardCount, populateRewards, spawnReward } from "./reward-utils";
@@ -7,7 +8,7 @@ export async function initRewardService() {
 	// Pickup detection runs every REWARD_TICK_INTERVAL (1 second)
 	createScheduler({
 		name: "reward-pickup",
-		tick: REWARD_TICK_INTERVAL,
+		tick: WORLD_TICK,
 		phase: 0,
 		onTick: checkRewardPickups,
 	});

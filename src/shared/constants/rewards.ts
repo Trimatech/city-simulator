@@ -22,9 +22,6 @@ export const REWARD_BEAM_HEIGHT = 60;
 export const REWARD_BEAM_WIDTH = 3;
 export const REWARD_BEAM_WIDTH_TOP = 0.5;
 
-// Reward pickup tick runs once per minute (in seconds)
-export const REWARD_TICK_INTERVAL = 1;
-
 export enum RewardType {
 	Revive = "revive",
 }
