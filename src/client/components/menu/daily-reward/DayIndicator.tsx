@@ -16,14 +16,25 @@ interface DayIndicatorProps {
 	readonly reward: number;
 }
 
+const DAY_COLORS = [
+	palette.red,
+	palette.peach,
+	palette.yellow,
+	palette.green,
+	palette.sky,
+	palette.blue,
+	palette.mauve,
+];
+
 export function DayIndicator({ day, isCurrentDay, isPastDay, reward }: DayIndicatorProps) {
 	const rem = useRem();
 	const isFutureDay = !isCurrentDay && !isPastDay;
+	const cardColor = DAY_COLORS[(day - 1) % DAY_COLORS.size()];
 
 	return (
 		<Frame size={new UDim2(0, rem(5), 0, rem(5))} cornerRadius={new UDim(0, rem(1))}>
 			<CanvasGroup
-				backgroundColor={palette.green}
+				backgroundColor={cardColor}
 				backgroundTransparency={0}
 				size={new UDim2(1, 0, 1, 0)}
 				cornerRadius={new UDim(0, rem(1))}

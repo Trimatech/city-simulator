@@ -9,6 +9,7 @@ import { palette } from "shared/constants/palette";
 interface BgWindowProps extends React.PropsWithChildren {
 	readonly image: string;
 	readonly accentColor?: Color3;
+	readonly secondaryColor?: Color3;
 	readonly position?: UDim2 | React.Binding<UDim2>;
 	readonly anchorPoint?: Vector2 | React.Binding<Vector2>;
 	readonly layoutOrder?: number | React.Binding<number>;
@@ -17,6 +18,7 @@ interface BgWindowProps extends React.PropsWithChildren {
 export function BgWindow({
 	image,
 	accentColor = palette.sky,
+	secondaryColor = palette.blue,
 	position,
 	anchorPoint = new Vector2(0.5, 0.5),
 	layoutOrder,
@@ -35,7 +37,7 @@ export function BgWindow({
 			{/* Background */}
 			<CanvasGroup
 				backgroundColor={palette.black}
-				backgroundTransparency={0.5}
+				backgroundTransparency={0.3}
 				size={new UDim2(1, 0, 1, 0)}
 				cornerRadius={new UDim(0, rem(2))}
 			>
@@ -43,14 +45,14 @@ export function BgWindow({
 					image={image}
 					scaleType="Tile"
 					tileSize={new UDim2(0, rem(8), 0, rem(8))}
-					imageTransparency={0.85}
+					imageTransparency={0.3}
 					size={new UDim2(1, 0, 1, 0)}
 				>
-					<uigradient Color={new ColorSequence(accentColor, palette.black)} Rotation={90} />
+					<uigradient Color={new ColorSequence(accentColor, secondaryColor)} Rotation={90} />
 				</Image>
 			</CanvasGroup>
 
-			<uistroke Color={palette.white} Transparency={0} Thickness={rem(0.5)} />
+			<uistroke Color={accentColor} Transparency={0} Thickness={rem(0.5)} />
 			<uicorner CornerRadius={new UDim(0, rem(2))} />
 
 			{/* Content */}

@@ -69,7 +69,13 @@ export function DeathScreen({ activeDeadline, onDismiss }: DeathScreenProps) {
 	};
 
 	return (
-		<BgWindow image={assets.ui.diagonal_stripes} accentColor={palette.red1} position={position} layoutOrder={100}>
+		<BgWindow
+			image={assets.ui.diagonal_stripes}
+			accentColor={palette.red}
+			secondaryColor={palette.red1}
+			position={position}
+			layoutOrder={100}
+		>
 			<Text
 				font={fonts.mplus.bold}
 				text="You Died"

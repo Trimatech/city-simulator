@@ -58,7 +58,7 @@ export function DailyRewardScreen({ streakDay, crystalAmount, onDismiss }: Daily
 	}
 
 	return (
-		<BgWindow image={assets.ui.diagonal_stripes} accentColor={palette.yellow} position={position}>
+		<BgWindow image={assets.ui.diagonal_stripes} accentColor={palette.mauve} position={position}>
 			<Text
 				font={fonts.mplus.bold}
 				text="Daily Reward"
@@ -66,7 +66,7 @@ export function DailyRewardScreen({ streakDay, crystalAmount, onDismiss }: Daily
 				textColor={palette.yellow}
 				textSize={rem(5)}
 			>
-				<uistroke Color={palette.white} Transparency={0} Thickness={rem(0.3)} />
+				<uistroke Color={palette.pink} Transparency={0} Thickness={rem(0.3)} />
 			</Text>
 
 			<HStack
@@ -94,7 +94,7 @@ export function DailyRewardScreen({ streakDay, crystalAmount, onDismiss }: Daily
 					<Text
 						font={fonts.inter.bold}
 						text={`+${crystalAmount}`}
-						textColor={palette.sapphire}
+						textColor={palette.yellow}
 						textSize={rem(3)}
 						automaticSize={Enum.AutomaticSize.XY}
 					/>
@@ -107,7 +107,7 @@ export function DailyRewardScreen({ streakDay, crystalAmount, onDismiss }: Daily
 
 				<PrimaryButton
 					onClick={handleClaim}
-					primaryColor={palette.green}
+					primaryColor={palette.pink}
 					enabled={!claimed}
 					size={new UDim2(0, rem(18), 0, rem(4))}
 				>
