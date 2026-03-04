@@ -23,10 +23,17 @@ export function DayIndicator({ day, isCurrentDay, isPastDay, reward }: DayIndica
 	return (
 		<Frame
 			size={new UDim2(0, rem(5), 0, rem(5))}
-			backgroundColor={isCurrentDay ? palette.green : isPastDay ? palette.green : palette.surface1}
-			backgroundTransparency={isCurrentDay ? 0 : isPastDay ? 0.3 : 0.5}
+			backgroundColor={palette.green}
+			backgroundTransparency={0}
 			cornerRadius={new UDim(0, rem(1))}
 		>
+			<Image
+				image={assets.ui.sunburst}
+				size={new UDim2(1, 0, 1, 0)}
+				imageColor={palette.white}
+				imageTransparency={0.55}
+				scaleType="Crop"
+			/>
 			<VStack
 				size={new UDim2(1, 0, 1, 0)}
 				horizontalAlignment={Enum.HorizontalAlignment.Center}
@@ -34,9 +41,9 @@ export function DayIndicator({ day, isCurrentDay, isPastDay, reward }: DayIndica
 				spacing={rem(0.2)}
 			>
 				<Text
-					font={isCurrentDay ? fonts.inter.bold : fonts.inter.medium}
+					font={fonts.inter.bold}
 					text={`Day ${day}`}
-					textColor={isCurrentDay ? palette.base : palette.text}
+					textColor={palette.base}
 					textSize={rem(1)}
 					automaticSize={Enum.AutomaticSize.XY}
 				>
@@ -46,19 +53,19 @@ export function DayIndicator({ day, isCurrentDay, isPastDay, reward }: DayIndica
 					<Text
 						font={fonts.inter.bold}
 						text={`${reward}`}
-						textColor={isCurrentDay ? palette.base : palette.sapphire}
+						textColor={palette.base}
 						textSize={rem(1.2)}
 						automaticSize={Enum.AutomaticSize.XY}
 					/>
 					<Image
 						image={assets.ui.shards_icon}
 						size={new UDim2(0, rem(1), 0, rem(1.2))}
-						imageColor={isCurrentDay ? palette.base : palette.sapphire}
+						imageColor={palette.base}
 						scaleType="Crop"
 					/>
 				</HStack>
 			</VStack>
-			{isCurrentDay && <uistroke Color={palette.white} Transparency={0} Thickness={rem(0.3)} />}
+			<uistroke Color={palette.white} Transparency={0} Thickness={rem(isCurrentDay ? 0.3 : 0.15)} />
 			{(isPastDay || isFutureDay) && (
 				<Text
 					text={isPastDay ? "✅" : "🔒"}

@@ -27,6 +27,7 @@ declare const assets: {
 		skin_card_gradient: string
 		skin_indicator: string
 		skin_indicator_locked: string
+		sunburst: string
 		tile_stripes: string
 		vignette: string
 	}
