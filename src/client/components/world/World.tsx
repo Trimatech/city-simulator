@@ -3,6 +3,7 @@ import { RemProvider } from "client/rem/rem-provider";
 import { Group } from "client/ui/layout/group";
 
 import { Bots } from "./bots/Bots";
+import { PlayerGlows } from "./glow/PlayerGlows";
 import { Towers } from "./towers/Towers";
 import { WorldSounds } from "./WorldSounds";
 import { WorldSubject } from "./WorldSubject";
@@ -16,6 +17,7 @@ export function World() {
 				{/* <Soldiers /> */}
 
 				<Bots />
+				<PlayerGlows />
 
 				<WorldSounds />
 

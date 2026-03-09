@@ -2,9 +2,12 @@ import React, { useState } from "@rbxts/react";
 import { CurrencyProducts } from "client/components/menu/currency/CurrencyProducts";
 import { Tabs } from "client/components/tabs/Tabs";
 import { useRem } from "client/hooks";
+import { CanvasGroup } from "client/ui/canvas-group";
 import { CloseButton } from "client/ui/buttons/CloseButton";
+import { Image } from "client/ui/image";
 import { Frame } from "client/ui/layout/frame";
 import { Outline } from "client/ui/outline";
+import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 
 import { SkinsList } from "../skins/SkinsList";
@@ -38,6 +41,27 @@ export function ShopWindow({ onClose }: ShopWindowProps) {
 			position={new UDim2(0.5, 0, 0.5, 0)}
 			anchorPoint={new Vector2(0.5, 0.5)}
 		>
+			{/* Background */}
+			<CanvasGroup
+				backgroundColor={palette.black}
+				backgroundTransparency={0.3}
+				size={new UDim2(1, 0, 1, 0)}
+				cornerRadius={new UDim(0, rem(2))}
+			>
+				<Image
+					image={assets.ui.diagonal_stripes}
+					scaleType="Tile"
+					tileSize={new UDim2(0, rem(8), 0, rem(8))}
+					imageTransparency={0.3}
+					size={new UDim2(1, 0, 1, 0)}
+				>
+					<uigradient Color={new ColorSequence(palette.sky, palette.blue)} Rotation={90} />
+				</Image>
+			</CanvasGroup>
+
+			<uistroke Color={palette.sky} Transparency={0} Thickness={rem(0.5)} />
+			<uicorner CornerRadius={new UDim(0, rem(2))} />
+
 			<CloseButton
 				onClick={onClose}
 				anchorPoint={new Vector2(1, 0)}

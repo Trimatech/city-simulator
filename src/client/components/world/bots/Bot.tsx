@@ -1,10 +1,11 @@
-import React, { useEffect, useRef } from "@rbxts/react";
+import React, { useEffect, useRef, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { RunService, TweenService } from "@rbxts/services";
 import { WORLD_TICK } from "shared/constants/core";
 import { selectSoldierPosition } from "shared/store/soldiers";
 import { RAGDOLL_DURATION_SEC } from "shared/utils/ragdoll";
 
+import { SoldierGlow } from "../glow/SoldierGlow";
 import { computeDesiredLookDirection, getCharacterHalfSize, initializeBotModel, sampleGroundYAt } from "./Bot.utils";
 
 interface BotProps {
@@ -14,6 +15,7 @@ interface BotProps {
 export function Bot({ id }: BotProps) {
 	const position = useSelector(selectSoldierPosition(id));
 	const modelRef = useRef<Model>();
+	const [model, setModel] = useState<Model>();
 	const lastPosRef = useRef<Vector2>(position);
 	const groundYOffset = useRef<number>(0);
 	const halfSize = useRef<number>(0);
@@ -22,13 +24,15 @@ export function Bot({ id }: BotProps) {
 
 	useEffect(() => {
 		(async () => {
-			const model = await initializeBotModel(id);
-			halfSize.current = getCharacterHalfSize(model);
-			modelRef.current = model;
+			const m = await initializeBotModel(id);
+			halfSize.current = getCharacterHalfSize(m);
+			modelRef.current = m;
+			setModel(m);
 		})();
 
 		return () => {
 			tweenRef.current?.Cancel();
+			setModel(undefined);
 			const model = modelRef.current;
 			if (model) {
 				const humanoid = model.FindFirstChildOfClass("Humanoid");
@@ -132,5 +136,5 @@ export function Bot({ id }: BotProps) {
 		lastPosRef.current = position;
 	}, [position]);
 
-	return <></>;
+	return <SoldierGlow id={id} model={model} />;
 }
