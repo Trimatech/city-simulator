@@ -17,6 +17,8 @@ export interface ShopItemTheme {
 	readonly innerBorderTo: Color3;
 	readonly gradientFrom: Color3;
 	readonly gradientTo: Color3;
+	readonly raysTransparency: number;
+	readonly rayTint: Color3;
 	readonly titleStrokeFrom: Color3;
 	readonly titleStrokeTo: Color3;
 	readonly subtitleStrokeFrom: Color3;
@@ -36,6 +38,8 @@ export const shopItemThemes = {
 		innerBorderTo: Color3.fromHex("#CC765F"),
 		gradientFrom: Color3.fromRGB(249, 197, 29),
 		gradientTo: Color3.fromRGB(230, 117, 83),
+		raysTransparency: 0,
+		rayTint: Color3.fromRGB(255, 225, 59),
 		titleStrokeFrom: SUBTITLE_STROKE_FROM,
 		titleStrokeTo: SUBTITLE_STROKE_TO,
 		subtitleStrokeFrom: SUBTITLE_STROKE_FROM,
@@ -50,6 +54,8 @@ export const shopItemThemes = {
 		innerBorderTo: Color3.fromHex("#4E72FF"),
 		gradientFrom: Color3.fromRGB(91, 198, 255),
 		gradientTo: Color3.fromRGB(65, 103, 255),
+		raysTransparency: 0.43,
+		rayTint: Color3.fromRGB(0, 249, 251),
 		titleStrokeFrom: SUBTITLE_STROKE_FROM,
 		titleStrokeTo: SUBTITLE_STROKE_TO,
 		subtitleStrokeFrom: SUBTITLE_STROKE_FROM,
@@ -93,7 +99,7 @@ export function ShopItem({
 }: ShopItemProps) {
 	const rem = useRem();
 
-	const cardSize = size ?? new UDim2(0, rem(20), 0, rem(24));
+	const cardSize = size ?? new UDim2(0, rem(20), 0, rem(20));
 	const outerRadius = new UDim(0, rem(1.8));
 	const whiteRadius = new UDim(0, rem(1.5));
 	const innerRadius = new UDim(0, rem(1.2));
@@ -103,8 +109,8 @@ export function ShopItem({
 	const subtitleStrokeGradient = new ColorSequence(theme.subtitleStrokeFrom, theme.subtitleStrokeTo);
 	const labelStrokeGradient = new ColorSequence(theme.labelStrokeFrom, theme.labelStrokeTo);
 	const strokeThickness = rem(0.15);
-	const borderPad = new UDim(0, rem(0.35));
-	const whitePad = new UDim(0, rem(0.65));
+	const borderPad = new UDim(0, rem(0.3));
+	const whitePad = new UDim(0, rem(0.6));
 
 	return (
 		<Frame
@@ -149,7 +155,6 @@ export function ShopItem({
 						cornerRadius={innerRadius}
 						size={new UDim2(1, 0, 1, 0)}
 						backgroundTransparency={0}
-						clipsDescendants={true}
 						name="ShopItemInner"
 					>
 						<uistroke Color={palette.white} Thickness={rem(0.15)}>
@@ -161,31 +166,33 @@ export function ShopItem({
 						<Image
 							image={assets.ui.shop_item_rays}
 							size={new UDim2(1, 0, 1, 0)}
-							imageTransparency={0.45}
+							imageTransparency={theme.raysTransparency}
 							zIndex={1}
 							scaleType="Crop"
+							cornerRadius={innerRadius}
+							imageColor={theme.rayTint}
 						/>
 
-						{/* Icon */}
+						{/* Icon — fills full inner area, absolute centered (Figma: 308x308 in 308x308) */}
 						{icon !== undefined && (
 							<Image
 								image={icon}
-								size={new UDim2(0.95, 0, 0.65, 0)}
-								position={new UDim2(0.5, 0, 0.42, 0)}
+								size={new UDim2(1.05, 0, 1.05, 0)}
+								position={new UDim2(0.5, 0, 0.5, 0)}
 								anchorPoint={new Vector2(0.5, 0.5)}
 								scaleType="Fit"
 								zIndex={2}
 							/>
 						)}
 
-						{/* Title */}
+						{/* Title — Figma: y=12 in 308h → ~3.9% */}
 						<Text
 							text={title}
 							font={fonts.fredokaOne.regular}
 							textColor={palette.white}
 							textSize={rem(sizes.fontSize.large)}
-							size={new UDim2(1, 0, 0, rem(2.5))}
-							position={new UDim2(0, 0, 0, rem(0.75))}
+							size={new UDim2(1, 0, 0, rem(2.2))}
+							position={new UDim2(0, 0, 0.039, 0)}
 							textXAlignment="Center"
 							textYAlignment="Center"
 							zIndex={3}
@@ -195,7 +202,7 @@ export function ShopItem({
 							</uistroke>
 						</Text>
 
-						{/* Subtitle */}
+						{/* Subtitle — Figma: y=44 in 308h → ~14.3% */}
 						{subtitle !== undefined && (
 							<Text
 								text={subtitle}
@@ -203,7 +210,7 @@ export function ShopItem({
 								textColor={SUBTITLE_COLOR}
 								textSize={rem(1.1)}
 								size={new UDim2(1, 0, 0, rem(1.5))}
-								position={new UDim2(0, 0, 0, rem(3))}
+								position={new UDim2(0, 0, 0.143, 0)}
 								textXAlignment="Center"
 								textYAlignment="Center"
 								zIndex={3}
@@ -214,16 +221,15 @@ export function ShopItem({
 							</Text>
 						)}
 
-						{/* Label */}
+						{/* Label — Figma: y=235 in 308h → ~76.3% */}
 						{label !== undefined && (
 							<Text
 								text={label}
 								font={fonts.fredokaOne.regular}
 								textColor={LABEL_COLOR}
 								textSize={rem(1.8)}
-								size={new UDim2(1, 0, 0, rem(2.5))}
-								anchorPoint={new Vector2(0, 1)}
-								position={new UDim2(0, 0, 1, -rem(3.2))}
+								size={new UDim2(1, 0, 0, rem(2.2))}
+								position={new UDim2(0, 0, 0.763, 0)}
 								textXAlignment="Center"
 								textYAlignment="Center"
 								zIndex={3}
@@ -234,14 +240,14 @@ export function ShopItem({
 							</Text>
 						)}
 
-						{/* Button */}
+						{/* Button — Figma: y=287 in 308h → ~93.2%, overflows bottom */}
 						<ShopItemButton
 							text={buttonText}
 							onClick={onButtonClick}
 							theme={buttonTheme}
-							size={new UDim2(0.7, 0, 0, rem(4))}
-							position={new UDim2(0.5, 0, 1, -rem(0.5))}
-							anchorPoint={new Vector2(0.5, 1)}
+							size={new UDim2(0.685, 0, 0.214, 0)}
+							position={new UDim2(0.5, 0, 0.932, 0)}
+							anchorPoint={new Vector2(0.5, 0)}
 						/>
 					</Frame>
 				</Frame>

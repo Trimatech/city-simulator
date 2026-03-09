@@ -64,6 +64,7 @@ export function ShopItemButton({
 			position={position}
 			anchorPoint={anchorPoint}
 			layoutOrder={layoutOrder}
+			zIndex={100}
 		>
 			{/* Outer background with dark border */}
 			<Frame
@@ -95,10 +96,12 @@ export function ShopItemButton({
 					<Image
 						image={assets.ui.shop_button_noise}
 						size={new UDim2(1, 0, 1, 0)}
-						imageTransparency={0.6}
+						imageTransparency={0}
 						scaleType="Tile"
-						tileSize={new UDim2(0, rem(16), 0, rem(16))}
-					/>
+						tileSize={new UDim2(0, rem(40), 0, rem(40))}
+					>
+						<uicorner CornerRadius={pillRadius} />
+					</Image>
 
 					<Text
 						text={text}

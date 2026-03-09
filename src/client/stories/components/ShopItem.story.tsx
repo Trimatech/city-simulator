@@ -16,10 +16,7 @@ const story = {
 	story: (_props: InferFusionProps<typeof controls>) => {
 		return (
 			<RootProvider>
-				<frame
-					Size={new UDim2(1, 0, 1, 0)}
-					BackgroundTransparency={1}
-				>
+				<frame Size={new UDim2(1, 0, 1, 0)} BackgroundTransparency={1}>
 					<uilistlayout
 						FillDirection={Enum.FillDirection.Horizontal}
 						HorizontalAlignment={Enum.HorizontalAlignment.Center}
@@ -29,21 +26,48 @@ const story = {
 
 					{/* Orange variant */}
 					<ShopItem
+						title="$100 Cash"
+						subtitle="+10 Bonus"
+						label="STARTER PACK"
+						buttonText="10"
+						icon={assets.ui.shop.Cash100Large}
+						theme={shopItemThemes.orange}
+					/>
+
+					<ShopItem
+						title="$500 Cash"
+						subtitle="+50 Bonus"
+						label="BONUS BOOST"
+						buttonText="50"
+						icon={assets.ui.shop.Cash500Large}
+						theme={shopItemThemes.orange}
+					/>
+
+					<ShopItem
+						title="$2500 Cash"
+						subtitle="+200 Bonus"
+						label="WEALTH CRATE"
+						buttonText="200"
+						icon={assets.ui.shop.Cash250Large}
+						theme={shopItemThemes.orange}
+					/>
+
+					<ShopItem
 						title="$10K Cash"
 						subtitle="+10K Bonus"
 						label="TREASURE CHEST"
-						buttonText="2000"
-						icon={assets.ui.shop_treasure_chest}
+						buttonText="500"
+						icon={assets.ui.shop.Cash10kLarge}
 						theme={shopItemThemes.orange}
 					/>
 
 					{/* Blue variant */}
 					<ShopItem
-						title="$10K Cash"
-						subtitle="+10K Bonus"
-						label="TREASURE CHEST"
+						title="$100K Cash"
+						subtitle="+100K Bonus"
+						label="BANK VAULT"
 						buttonText="2000"
-						icon={assets.ui.shop_treasure_chest}
+						icon={assets.ui.shop.Cash100kLarge}
 						theme={shopItemThemes.blue}
 					/>
 				</frame>
