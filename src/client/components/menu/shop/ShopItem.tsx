@@ -13,7 +13,8 @@ import { ShopItemButton, ShopItemButtonTheme } from "./ShopItemButton";
 export interface ShopItemTheme {
 	readonly outerBorderColor: Color3;
 	readonly whiteBorderColor: Color3;
-	readonly innerBorderColor: Color3;
+	readonly innerBorderFrom: Color3;
+	readonly innerBorderTo: Color3;
 	readonly gradientFrom: Color3;
 	readonly gradientTo: Color3;
 	readonly titleStrokeFrom: Color3;
@@ -31,7 +32,8 @@ export const shopItemThemes = {
 	orange: {
 		outerBorderColor: Color3.fromRGB(61, 39, 19),
 		whiteBorderColor: Color3.fromRGB(255, 251, 241),
-		innerBorderColor: Color3.fromRGB(227, 200, 85),
+		innerBorderFrom: Color3.fromHex("#e3c855"),
+		innerBorderTo: Color3.fromHex("#CC765F"),
 		gradientFrom: Color3.fromRGB(249, 197, 29),
 		gradientTo: Color3.fromRGB(230, 117, 83),
 		titleStrokeFrom: SUBTITLE_STROKE_FROM,
@@ -44,7 +46,8 @@ export const shopItemThemes = {
 	blue: {
 		outerBorderColor: Color3.fromRGB(61, 39, 19),
 		whiteBorderColor: Color3.fromRGB(255, 251, 241),
-		innerBorderColor: Color3.fromRGB(97, 199, 255),
+		innerBorderFrom: Color3.fromHex("#61c7ff"),
+		innerBorderTo: Color3.fromHex("#4E72FF"),
 		gradientFrom: Color3.fromRGB(91, 198, 255),
 		gradientTo: Color3.fromRGB(65, 103, 255),
 		titleStrokeFrom: SUBTITLE_STROKE_FROM,
@@ -95,6 +98,7 @@ export function ShopItem({
 	const whiteRadius = new UDim(0, rem(1.5));
 	const innerRadius = new UDim(0, rem(1.2));
 	const gradientSequence = new ColorSequence(theme.gradientFrom, theme.gradientTo);
+	const innerBorderGradient = new ColorSequence(theme.innerBorderFrom, theme.innerBorderTo);
 	const titleStrokeGradient = new ColorSequence(theme.titleStrokeFrom, theme.titleStrokeTo);
 	const subtitleStrokeGradient = new ColorSequence(theme.subtitleStrokeFrom, theme.subtitleStrokeTo);
 	const labelStrokeGradient = new ColorSequence(theme.labelStrokeFrom, theme.labelStrokeTo);
@@ -148,7 +152,9 @@ export function ShopItem({
 						clipsDescendants={true}
 						name="ShopItemInner"
 					>
-						<uistroke Color={theme.innerBorderColor} Thickness={rem(0.15)} />
+						<uistroke Color={palette.white} Thickness={rem(0.15)}>
+							<uigradient Color={innerBorderGradient} Rotation={90} />
+						</uistroke>
 						<uigradient Color={gradientSequence} Rotation={90} />
 
 						{/* Rays texture overlay */}
