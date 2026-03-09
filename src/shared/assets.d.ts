@@ -50,6 +50,9 @@ declare const assets: {
 		nav_skins_alt: string
 		shards_icon: string
 		shards_icon_color: string
+		shop_button_noise: string
+		shop_item_rays: string
+		shop_treasure_chest: string
 		skin_card_gradient: string
 		skin_indicator: string
 		skin_indicator_locked: string

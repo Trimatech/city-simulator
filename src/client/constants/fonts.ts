@@ -12,4 +12,7 @@ export const fonts = {
 	robotoMono: {
 		regular: Font.fromEnum(Enum.Font.RobotoMono),
 	},
+	fredokaOne: {
+		regular: Font.fromEnum(Enum.Font.FredokaOne),
+	},
 };
