@@ -11,10 +11,17 @@ import { ShopItemButton } from "./ShopItemButton";
 
 const WINDOW_BG = Color3.fromHex("#3a90dd");
 const WINDOW_OUTER_BORDER = Color3.fromHex("#000000");
-const WINDOW_INNER_BORDER = Color3.fromHex("#c1e3ff");
-const CONTENT_OUTER_BORDER = Color3.fromHex("#c1e3ff");
-const CONTENT_INNER_BORDER = Color3.fromHex("#01253b");
+
+const DARK_BORDER_THICKNESS = 0.2;
+const DARK_BORDER_COLOR = Color3.fromHex("#01253B");
 const DARK_BG = Color3.fromHex("#00334e");
+
+const BORDER_THICKNESS = 0.3;
+const BORDER_GRADIENT = new ColorSequence([
+	new ColorSequenceKeypoint(0, Color3.fromHex("#C1E3FF")),
+	new ColorSequenceKeypoint(0.5, Color3.fromHex("#43B9F7")),
+	new ColorSequenceKeypoint(1, Color3.fromHex("#326FB6")),
+]);
 
 enum ShopTabs {
 	Skins,
@@ -51,14 +58,16 @@ export function ShopWindow({ onClose }: ShopWindowProps) {
 			cornerRadius={windowRadius}
 		>
 			{/* Inner window (4px #c1e3ff border + cloud bg) */}
-			<frame
-				BackgroundColor3={WINDOW_BG}
-				BackgroundTransparency={0}
-				Size={new UDim2(1, 0, 1, 0)}
-				BorderSizePixel={0}
-			>
+			<frame BackgroundColor3={WINDOW_BG} BackgroundTransparency={0} Size={new UDim2(1, 0, 1, 0)}>
 				<uicorner CornerRadius={windowRadius} />
-				<uistroke Color={WINDOW_INNER_BORDER} Thickness={rem(0.4)} />
+				<uistroke
+					Color={DARK_BORDER_COLOR}
+					Thickness={rem(DARK_BORDER_THICKNESS + BORDER_THICKNESS)}
+					ZIndex={1}
+				/>
+				<uistroke Color={palette.white} Thickness={rem(BORDER_THICKNESS)} ZIndex={2}>
+					<uigradient Color={BORDER_GRADIENT} Rotation={90} />
+				</uistroke>
 
 				{/* Cloud background image */}
 				<imagelabel
@@ -107,41 +116,38 @@ export function ShopWindow({ onClose }: ShopWindowProps) {
 					/>
 				</frame>
 
-				{/* Content area: outer white frame (4px #c1e3ff) */}
+				{/* Content area */}
 				<frame
-					BackgroundColor3={palette.white}
+					BackgroundColor3={DARK_BG}
 					BackgroundTransparency={0}
 					Size={new UDim2(1, -(padSide * 2), 1, -(contentTop + padSide))}
 					Position={new UDim2(0, padSide, 0, contentTop)}
 					BorderSizePixel={0}
 				>
 					<uicorner CornerRadius={contentRadius} />
-					<uistroke Color={CONTENT_OUTER_BORDER} Thickness={rem(0.4)} />
 
-					{/* Inner dark frame (3px #01253b) */}
-					<frame
-						BackgroundColor3={DARK_BG}
-						BackgroundTransparency={0}
+					<uistroke Color={DARK_BORDER_COLOR} Thickness={rem(DARK_BORDER_THICKNESS)} ZIndex={2} />
+					<uistroke
+						Color={palette.white}
+						Thickness={rem(BORDER_THICKNESS + DARK_BORDER_THICKNESS)}
+						ZIndex={1}
+					>
+						<uigradient Color={BORDER_GRADIENT} Rotation={-90} />
+					</uistroke>
+
+					{/* Wavy stripes background texture */}
+					<imagelabel
+						Image={assets.ui.shop.shop_room_bg}
+						BackgroundTransparency={1}
 						Size={new UDim2(1, 0, 1, 0)}
-						BorderSizePixel={0}
-						ClipsDescendants={true}
+						ScaleType={Enum.ScaleType.Tile}
+						TileSize={new UDim2(0, 256, 0, 256)}
+						ImageTransparency={0}
 					>
 						<uicorner CornerRadius={contentRadius} />
-						<uistroke Color={CONTENT_INNER_BORDER} Thickness={rem(0.3)} />
-						{/* Wavy stripes background texture */}
-						<imagelabel
-							Image={assets.ui.shop.shop_room_bg}
-							BackgroundTransparency={1}
-							Size={new UDim2(1, 0, 1, 0)}
-							ScaleType={Enum.ScaleType.Tile}
-							TileSize={new UDim2(0, 256, 0, 256)}
-							ImageTransparency={0}
-						>
-							<uicorner CornerRadius={contentRadius} />
-						</imagelabel>
-						{activeTabId === ShopTabs.Skins && <SkinsList />}
-						{activeTabId === ShopTabs.Cash && <CashProducts />}
-					</frame>
+					</imagelabel>
+					{activeTabId === ShopTabs.Skins && <SkinsList />}
+					{activeTabId === ShopTabs.Cash && <CashProducts />}
 				</frame>
 
 				{/* Close button */}
