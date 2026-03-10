@@ -4,7 +4,7 @@ import assets from "shared/assets";
 import { fillArray } from "shared/utils/object-utils";
 
 import { BackdropBall } from "./backdrop-ball";
-
+// TODO: Remove this component
 export function Backdrop() {
 	return (
 		<Image image={assets.ui.backdrop} size={new UDim2(1, 0, 1, 0)}>

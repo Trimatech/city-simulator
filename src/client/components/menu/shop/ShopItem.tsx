@@ -31,6 +31,22 @@ const SUBTITLE_STROKE_FROM = Color3.fromHex("#005794");
 const SUBTITLE_STROKE_TO = Color3.fromHex("#000000");
 
 export const shopItemThemes = {
+	green: {
+		outerBorderColor: Color3.fromRGB(61, 39, 19),
+		whiteBorderColor: Color3.fromRGB(255, 251, 241),
+		innerBorderFrom: Color3.fromHex("#97c186"),
+		innerBorderTo: Color3.fromHex("#97c186"),
+		gradientFrom: Color3.fromHex("#86c86f"),
+		gradientTo: Color3.fromHex("#389c8f"),
+		raysTransparency: 1,
+		rayTint: Color3.fromRGB(134, 200, 111),
+		titleStrokeFrom: SUBTITLE_STROKE_FROM,
+		titleStrokeTo: SUBTITLE_STROKE_TO,
+		subtitleStrokeFrom: SUBTITLE_STROKE_FROM,
+		subtitleStrokeTo: SUBTITLE_STROKE_TO,
+		labelStrokeFrom: SUBTITLE_STROKE_FROM,
+		labelStrokeTo: SUBTITLE_STROKE_TO,
+	},
 	orange: {
 		outerBorderColor: Color3.fromRGB(61, 39, 19),
 		whiteBorderColor: Color3.fromRGB(255, 251, 241),

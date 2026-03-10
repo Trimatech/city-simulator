@@ -35,6 +35,7 @@ declare const assets: {
 		blur: string
 		button_glow_top: string
 		circle: string
+		clouds_bg: string
 		diagonal_stripes: string
 		heart: string
 		heart_glow: string
@@ -42,20 +43,17 @@ declare const assets: {
 		map_crosshair: string
 		map_cursor: string
 		menu_title: string
-		nav_heart: string
-		nav_heart_alt: string
-		nav_home: string
-		nav_home_alt: string
-		nav_skins: string
-		nav_skins_alt: string
 		shards_icon: string
 		shards_icon_color: string
 		shop: {
+			Cash: string
 			Cash100Large: string
 			Cash100kLarge: string
 			Cash10kLarge: string
 			Cash250Large: string
 			Cash500Large: string
+			Skins: string
+			shop_room_bg: string
 		}
 		shop_button_noise: string
 		shop_item_rays: string

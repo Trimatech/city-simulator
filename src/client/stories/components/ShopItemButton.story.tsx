@@ -16,10 +16,7 @@ const story = {
 	story: (_props: InferFusionProps<typeof controls>) => {
 		return (
 			<RootProvider>
-				<frame
-					Size={new UDim2(1, 0, 1, 0)}
-					BackgroundTransparency={1}
-				>
+				<frame Size={new UDim2(1, 0, 1, 0)} BackgroundTransparency={1}>
 					<uilistlayout
 						FillDirection={Enum.FillDirection.Vertical}
 						HorizontalAlignment={Enum.HorizontalAlignment.Center}

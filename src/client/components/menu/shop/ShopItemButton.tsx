@@ -79,6 +79,7 @@ export function ShopItemButton({
 		>
 			{/* Outer background with dark border */}
 			<Frame
+				name="ShopItemButton"
 				backgroundColor={theme.backgroundColor}
 				cornerRadius={pillRadius}
 				size={frameSize}

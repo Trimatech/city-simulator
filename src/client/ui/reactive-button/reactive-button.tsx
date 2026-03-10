@@ -64,8 +64,7 @@ export function ReactiveButton({
 	change,
 	children,
 }: ReactiveButtonProps) {
-	const autoWidth =
-		automaticSize === Enum.AutomaticSize.X || automaticSize === Enum.AutomaticSize.XY;
+	const autoWidth = automaticSize === Enum.AutomaticSize.X || automaticSize === Enum.AutomaticSize.XY;
 	const rem = useRem();
 	const [sizeAnimation, sizeMotion] = useMotion(0);
 	const [press, hover, buttonEvents] = useButtonState();
@@ -138,7 +137,7 @@ export function ReactiveButton({
 					},
 				)}
 				cornerRadius={cornerRadius}
-				anchorPoint={new Vector2(0.5, 0.5)}
+				anchorPoint={autoWidth ? new Vector2(0, 0.5) : new Vector2(0.5, 0.5)}
 				automaticSize={automaticSize}
 				size={lerpBinding(
 					animateSize ? sizeAnimation : 0,
@@ -149,9 +148,9 @@ export function ReactiveButton({
 				)}
 				position={lerpBinding(
 					animatePosition ? animation.position : 0,
-					new UDim2(0.5, 0, 0.5, 0),
+					autoWidth ? new UDim2(0, 0, 0.5, 0) : new UDim2(0.5, 0, 0.5, 0),
 					new UDim2(
-						0.5,
+						autoWidth ? 0 : 0.5,
 						(3 + rem(0.1)) * animatePositionStrength * animatePositionDirection.X,
 						0.5,
 						(3 + rem(0.1)) * animatePositionStrength * animatePositionDirection.Y,
