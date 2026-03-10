@@ -57,8 +57,8 @@ export function ShopWindow({ onClose }: ShopWindowProps) {
 			backgroundTransparency={0}
 			cornerRadius={windowRadius}
 		>
-			{/* Inner window (4px #c1e3ff border + cloud bg) */}
-			<frame BackgroundColor3={WINDOW_BG} BackgroundTransparency={0} Size={new UDim2(1, 0, 1, 0)}>
+			{/*  cloud bg) */}
+			<Frame backgroundColor={WINDOW_BG} backgroundTransparency={0} size={new UDim2(1, 0, 1, 0)}>
 				<uicorner CornerRadius={windowRadius} />
 				<uistroke
 					Color={DARK_BORDER_COLOR}
@@ -81,10 +81,10 @@ export function ShopWindow({ onClose }: ShopWindowProps) {
 				</imagelabel>
 
 				{/* Tabs row */}
-				<frame
-					BackgroundTransparency={1}
-					Size={new UDim2(1, 0, 0, tabH)}
-					Position={new UDim2(0, padSide, 0, padTop)}
+				<Frame
+					backgroundTransparency={1}
+					size={new UDim2(1, 0, 0, tabH)}
+					position={new UDim2(0, padSide, 0, padTop)}
 				>
 					<uilistlayout
 						FillDirection={Enum.FillDirection.Horizontal}
@@ -114,15 +114,14 @@ export function ShopWindow({ onClose }: ShopWindowProps) {
 						layoutOrder={3}
 						onClick={() => setActiveTabId(ShopTabs.Crystals)}
 					/>
-				</frame>
+				</Frame>
 
 				{/* Content area */}
-				<frame
-					BackgroundColor3={DARK_BG}
-					BackgroundTransparency={0}
-					Size={new UDim2(1, -(padSide * 2), 1, -(contentTop + padSide))}
-					Position={new UDim2(0, padSide, 0, contentTop)}
-					BorderSizePixel={0}
+				<Frame
+					backgroundColor={DARK_BG}
+					backgroundTransparency={0}
+					size={new UDim2(1, -(padSide * 2), 1, -(contentTop + padSide))}
+					position={new UDim2(0, padSide, 0, contentTop)}
 				>
 					<uicorner CornerRadius={contentRadius} />
 
@@ -148,7 +147,7 @@ export function ShopWindow({ onClose }: ShopWindowProps) {
 					</imagelabel>
 					{activeTabId === ShopTabs.Skins && <SkinsList />}
 					{activeTabId === ShopTabs.Cash && <CashProducts />}
-				</frame>
+				</Frame>
 
 				{/* Close button */}
 				<CloseButton
@@ -156,7 +155,7 @@ export function ShopWindow({ onClose }: ShopWindowProps) {
 					anchorPoint={new Vector2(1, 0)}
 					position={new UDim2(1, -rem(2), 0, rem(2))}
 				/>
-			</frame>
+			</Frame>
 		</Frame>
 	);
 }
