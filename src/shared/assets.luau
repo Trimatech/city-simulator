@@ -62,6 +62,7 @@ local assets = {
 		skin_card_gradient = "rbxassetid://95952869890735",
 		skin_indicator = "rbxassetid://71067875729832",
 		skin_indicator_locked = "rbxassetid://83103840743881",
+		spot_glow = "rbxassetid://137846456047736",
 		sunburst = "rbxassetid://135843462366109",
 		tile_stripes = "rbxassetid://104600821714577",
 		vignette = "rbxassetid://101589580529343",

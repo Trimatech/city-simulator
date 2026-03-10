@@ -70,6 +70,16 @@ const story = {
 						icon={assets.ui.shop.Cash100kLarge}
 						theme={shopItemThemes.blue}
 					/>
+
+					{/* Blue variant with button icon */}
+					<ShopItem
+						title="Crystals"
+						subtitle="Premium"
+						label="BEST VALUE"
+						buttonText="CRYSTALS"
+						buttonIcon={assets.ui.shards_icon_color}
+						theme={shopItemThemes.blue}
+					/>
 				</frame>
 			</RootProvider>
 		);

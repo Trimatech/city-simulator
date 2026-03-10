@@ -73,6 +73,7 @@ interface ShopItemProps {
 	readonly subtitle?: string;
 	readonly label?: string;
 	readonly buttonText: string;
+	readonly buttonIcon?: string;
 	readonly icon?: string;
 	readonly theme?: ShopItemTheme;
 	readonly buttonTheme?: ShopItemButtonTheme;
@@ -88,6 +89,7 @@ export function ShopItem({
 	subtitle,
 	label,
 	buttonText,
+	buttonIcon,
 	icon,
 	theme = shopItemThemes.orange,
 	buttonTheme,
@@ -172,6 +174,14 @@ export function ShopItem({
 							cornerRadius={innerRadius}
 							imageColor={theme.rayTint}
 						/>
+						<Image
+							image={assets.ui.spot_glow}
+							size={new UDim2(1, 0, 1, 0)}
+							imageTransparency={theme.raysTransparency}
+							zIndex={1}
+							scaleType="Fit"
+							imageColor={theme.rayTint}
+						/>
 
 						{/* Icon — fills full inner area, absolute centered (Figma: 308x308 in 308x308) */}
 						{icon !== undefined && (
@@ -243,6 +253,7 @@ export function ShopItem({
 						{/* Button — Figma: y=287 in 308h → ~93.2%, overflows bottom */}
 						<ShopItemButton
 							text={buttonText}
+							icon={buttonIcon}
 							onClick={onButtonClick}
 							theme={buttonTheme}
 							size={new UDim2(0.685, 0, 0.214, 0)}

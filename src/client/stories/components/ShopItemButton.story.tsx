@@ -5,6 +5,7 @@ import ReactRoblox from "@rbxts/react-roblox";
 import { InferFusionProps } from "@rbxts/ui-labs";
 import { ShopItemButton } from "client/components/menu/shop/ShopItemButton";
 import { RootProvider } from "client/providers/root-provider";
+import assets from "shared/assets";
 
 const controls = {};
 
@@ -26,9 +27,19 @@ const story = {
 						Padding={new UDim(0, 16)}
 					/>
 
+					{/* Fixed width (default) */}
 					<ShopItemButton text="2000" />
 
 					<ShopItemButton text="BUY NOW" />
+
+					<ShopItemButton text="CRYSTALS" icon={assets.ui.shards_icon_color} />
+
+					{/* Dynamic width — shrinks to content */}
+					<ShopItemButton text="2000" fitContent />
+
+					<ShopItemButton text="BUY NOW" fitContent />
+
+					<ShopItemButton text="CRYSTALS" icon={assets.ui.shards_icon_color} fitContent />
 				</frame>
 			</RootProvider>
 		);

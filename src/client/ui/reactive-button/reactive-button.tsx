@@ -18,6 +18,7 @@ interface ReactiveButtonProps extends React.PropsWithChildren {
 	onPress?: (pressed: boolean) => void;
 	enabled?: boolean;
 	size?: UDim2 | React.Binding<UDim2>;
+	automaticSize?: Enum.AutomaticSize;
 	position?: UDim2 | React.Binding<UDim2>;
 	anchorPoint?: Vector2 | React.Binding<Vector2>;
 	backgroundColor?: Color3 | React.Binding<Color3>;
@@ -45,6 +46,7 @@ export function ReactiveButton({
 	onPress,
 	enabled = true,
 	size,
+	automaticSize,
 	position,
 	anchorPoint,
 	backgroundColor = Color3.fromRGB(255, 255, 255),
@@ -62,6 +64,8 @@ export function ReactiveButton({
 	change,
 	children,
 }: ReactiveButtonProps) {
+	const autoWidth =
+		automaticSize === Enum.AutomaticSize.X || automaticSize === Enum.AutomaticSize.XY;
 	const rem = useRem();
 	const [sizeAnimation, sizeMotion] = useMotion(0);
 	const [press, hover, buttonEvents] = useButtonState();
@@ -109,6 +113,7 @@ export function ReactiveButton({
 			}}
 			backgroundTransparency={1}
 			size={size}
+			automaticSize={automaticSize}
 			position={position}
 			anchorPoint={anchorPoint}
 			layoutOrder={layoutOrder}
@@ -134,10 +139,13 @@ export function ReactiveButton({
 				)}
 				cornerRadius={cornerRadius}
 				anchorPoint={new Vector2(0.5, 0.5)}
+				automaticSize={automaticSize}
 				size={lerpBinding(
 					animateSize ? sizeAnimation : 0,
-					new UDim2(1, 0, 1, 0),
-					new UDim2(1, rem(2 * animateSizeStrength), 1, rem(2 * animateSizeStrength)),
+					autoWidth ? new UDim2(0, 0, 1, 0) : new UDim2(1, 0, 1, 0),
+					autoWidth
+						? new UDim2(0, rem(2 * animateSizeStrength), 1, rem(2 * animateSizeStrength))
+						: new UDim2(1, rem(2 * animateSizeStrength), 1, rem(2 * animateSizeStrength)),
 				)}
 				position={lerpBinding(
 					animatePosition ? animation.position : 0,
