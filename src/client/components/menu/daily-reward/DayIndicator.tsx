@@ -1,11 +1,11 @@
 import React from "@rbxts/react";
 import { fonts } from "client/constants/fonts";
 import { useRem } from "client/hooks";
-import { CanvasGroup } from "client/ui/canvas-group";
-import { Image } from "client/ui/image";
-import { Frame } from "client/ui/layout/frame";
-import { HStack } from "client/ui/layout/HStack";
-import { Text } from "client/ui/text";
+import { CanvasGroup } from "@rbxts-ui/primitives";
+import { Image } from "@rbxts-ui/primitives";
+import { Frame } from "@rbxts-ui/primitives";
+import { HStack } from "@rbxts-ui/layout";
+import { Text } from "@rbxts-ui/primitives";
 import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 
@@ -42,7 +42,7 @@ export function DayIndicator({ day, isCurrentDay, isPastDay, reward }: DayIndica
 				<Image
 					image={assets.ui.sunburst}
 					size={new UDim2(1, 0, 1, 0)}
-					imageColor={palette.white}
+					imageColor3={palette.white}
 					imageTransparency={0.55}
 					scaleType="Crop"
 				/>

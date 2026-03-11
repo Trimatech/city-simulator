@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "@rbxts/react";
+import { HStack, VStack } from "@rbxts-ui/layout";
+import { Image, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
 import { useMotion, useRem } from "client/hooks";
 import { BgWindow } from "client/ui/BgWindow";
-import { Image } from "client/ui/image";
-import { HStack } from "client/ui/layout/HStack";
-import { VStack } from "client/ui/layout/VStack";
-import { PrimaryButton } from "client/ui/PrimaryButton";
-import { Text } from "client/ui/text";
+import { MainButton } from "client/ui/MainButton";
 import assets from "shared/assets";
 import { DAILY_REWARD_CYCLE, getDailyRewardAmount } from "shared/constants/daily-rewards";
 import { palette } from "shared/constants/palette";
@@ -105,12 +103,7 @@ export function DailyRewardScreen({ streakDay, crystalAmount, onDismiss }: Daily
 					/>
 				</HStack>
 
-				<PrimaryButton
-					onClick={handleClaim}
-					primaryColor={palette.pink}
-					enabled={!claimed}
-					size={new UDim2(0, rem(18), 0, rem(4))}
-				>
+				<MainButton onClick={handleClaim} primaryColor={palette.pink} size={new UDim2(0, rem(18), 0, rem(4))}>
 					<Text
 						font={fonts.inter.medium}
 						text={claimed ? "Claimed!" : "Claim Reward"}
@@ -118,7 +111,7 @@ export function DailyRewardScreen({ streakDay, crystalAmount, onDismiss }: Daily
 						textSize={rem(2)}
 						size={new UDim2(1, 0, 1, 0)}
 					/>
-				</PrimaryButton>
+				</MainButton>
 			</VStack>
 		</BgWindow>
 	);

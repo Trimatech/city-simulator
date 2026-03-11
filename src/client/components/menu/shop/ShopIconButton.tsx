@@ -1,8 +1,8 @@
 import React from "@rbxts/react";
 import { useRem } from "client/hooks";
-import { Image } from "client/ui/image";
-import { Frame } from "client/ui/layout/frame";
-import { ReactiveButton } from "client/ui/reactive-button";
+import { Image } from "@rbxts-ui/primitives";
+import { Frame } from "@rbxts-ui/primitives";
+import { ReactiveButton } from "@rbxts-ui/components";
 import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 

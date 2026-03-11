@@ -3,7 +3,7 @@ import React, { useEffect } from "@rbxts/react";
 import { setTimeout } from "@rbxts/set-timeout";
 import { springs } from "client/constants/springs";
 import { useMotion, useRem } from "client/hooks";
-import { Image } from "client/ui/image";
+import { Image } from "@rbxts-ui/primitives";
 import assets from "shared/assets";
 
 export function SupportHeart() {

@@ -6,12 +6,12 @@ import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
 import { useMotion, useRem } from "client/hooks";
 import { Alert, selectAlertIndex } from "client/store/alert";
-import { Image } from "client/ui/image";
-import { Frame } from "client/ui/layout/frame";
-import { Outline } from "client/ui/outline";
-import { ReactiveButton } from "client/ui/reactive-button";
+import { Image } from "@rbxts-ui/primitives";
+import { Frame } from "@rbxts-ui/primitives";
+import { Outline } from "@rbxts-ui/components";
+import { ReactiveButton } from "@rbxts-ui/components";
 import { Shadow } from "client/ui/shadow";
-import { Text } from "client/ui/text";
+import { Text } from "@rbxts-ui/primitives";
 import assets from "shared/assets";
 import { playSound } from "shared/assetsFolder";
 import { palette } from "shared/constants/palette";
@@ -93,7 +93,6 @@ export function Alert({ alert, index }: AlertProps) {
 				playSound(assets.sounds.alert_dismiss);
 			}}
 			onHover={(hovered) => hoverMotion.spring(hovered ? 1 : 0, springs.responsive)}
-			soundVariant="none"
 			backgroundTransparency={1}
 			anchorPoint={new Vector2(0.5, 0)}
 			size={size}
@@ -163,7 +162,7 @@ export function Alert({ alert, index }: AlertProps) {
 
 			<Image
 				image={assets.ui.alert_dismiss}
-				imageColor={brightenIfDark(alert.colorSecondary || alert.colorMessage || alert.color)}
+				imageColor3={brightenIfDark(alert.colorSecondary || alert.colorMessage || alert.color)}
 				imageTransparency={lerpBinding(transition, 1, 0)}
 				anchorPoint={new Vector2(1, 0.5)}
 				size={new UDim2(0, rem(1), 0, rem(1))}

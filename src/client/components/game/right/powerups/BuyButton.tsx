@@ -1,11 +1,11 @@
 import { lerpBinding, useTimer } from "@rbxts/pretty-react-hooks";
 import React from "@rbxts/react";
+import { Outline } from "@rbxts-ui/components";
+import { Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { useMotion, useRem } from "client/hooks";
-import { Outline } from "client/ui/outline";
-import { PrimaryButton } from "client/ui/PrimaryButton";
+import { MainButton } from "client/ui/MainButton";
 import { Shadow } from "client/ui/shadow";
-import { Text } from "client/ui/text";
 import { palette } from "shared/constants/palette";
 import { PowerupId } from "shared/constants/powerups";
 import { remotes } from "shared/remotes";
@@ -38,8 +38,7 @@ export function BuyButton({
 	const size = new UDim2(0, rem(7), 0, rem(7));
 
 	return (
-		<PrimaryButton
-			enabled={enabled}
+		<MainButton
 			onClick={onClick}
 			onHover={(h) => hoverMotion.spring(h ? 1 : 0)}
 			overlayGradient={
@@ -84,6 +83,6 @@ export function BuyButton({
 				textTransparency={enabled ? 0 : 0.5}
 			/>
 			<Outline cornerRadius={new UDim(0, rem(1))} innerTransparency={0} />
-		</PrimaryButton>
+		</MainButton>
 	);
 }

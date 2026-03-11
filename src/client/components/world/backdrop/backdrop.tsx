@@ -1,5 +1,5 @@
 import React from "@rbxts/react";
-import { Image } from "client/ui/image";
+import { Image } from "@rbxts-ui/primitives";
 import assets from "shared/assets";
 import { fillArray } from "shared/utils/object-utils";
 

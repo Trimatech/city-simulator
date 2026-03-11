@@ -5,7 +5,7 @@ import assets from "shared/assets";
 import { images } from "shared/assetsFolder";
 
 import { useRem } from "../../hooks";
-import { Text } from "../../ui/text";
+import { Text } from "@rbxts-ui/primitives";
 
 interface Assets {
 	[key: string]: string | Assets;

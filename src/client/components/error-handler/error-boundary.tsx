@@ -2,6 +2,7 @@ import React, { Component, ErrorInfo, ReactComponent } from "@rbxts/react";
 
 interface ErrorBoundaryProps {
 	fallback: (error: unknown) => React.Element;
+	onError?: (message: unknown, info: ErrorInfo) => void;
 }
 
 interface ErrorBoundaryState {
@@ -16,7 +17,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 	};
 
 	public componentDidCatch(message: unknown, info: ErrorInfo) {
-		warn(message, info.componentStack);
+		this.props.onError?.(message, info);
 
 		this.setState({
 			hasError: true,

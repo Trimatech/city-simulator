@@ -8,7 +8,7 @@ import { BackgroundMusic } from "../components/music/BackgroundMusic";
 import { Preloader } from "../components/preloader";
 import { Screens } from "../components/Screens";
 import { World } from "../components/world/World";
-import { Layer } from "../ui/layout/layer";
+import { Layer } from "@rbxts-ui/layout";
 
 export function App() {
 	return (

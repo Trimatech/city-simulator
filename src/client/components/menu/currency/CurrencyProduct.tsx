@@ -1,14 +1,12 @@
 import { lerpBinding, useTimeout } from "@rbxts/pretty-react-hooks";
 import React, { useMemo } from "@rbxts/react";
 import { MarketplaceService, Players } from "@rbxts/services";
+import { ReactiveButton } from "@rbxts-ui/components";
+import { Transition } from "@rbxts-ui/layout";
+import { Frame, Group, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { useMotion, useProductPrice, useRem } from "client/hooks";
-import { Frame } from "client/ui/layout/frame";
-import { Group } from "client/ui/layout/group";
-import { PrimaryButton } from "client/ui/PrimaryButton";
-import { ReactiveButton } from "client/ui/reactive-button";
-import { Text } from "client/ui/text";
-import { Transition } from "client/ui/transition";
+import { MainButton } from "client/ui/MainButton";
 import { palette } from "shared/constants/palette";
 import { brighten } from "shared/utils/color-utils";
 
@@ -142,7 +140,7 @@ export function CurrencyProduct({
 					)}
 				</Group>
 
-				<PrimaryButton
+				<MainButton
 					onClick={promptPurchase}
 					overlayGradient={gradient}
 					anchorPoint={new Vector2(0.5, 1)}
@@ -156,7 +154,7 @@ export function CurrencyProduct({
 						textColor={palette.base}
 						position={new UDim2(0.5, 0, 0.5, 0)}
 					/>
-				</PrimaryButton>
+				</MainButton>
 
 				{children}
 			</ReactiveButton>

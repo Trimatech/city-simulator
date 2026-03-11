@@ -6,7 +6,7 @@ import { sendAlert } from "client/alerts";
 import { Alerts } from "client/components/alerts";
 import { Backdrop } from "client/components/world/backdrop";
 import { RootProvider } from "client/providers/root-provider";
-import { InputCapture } from "client/ui/input-capture";
+import { InputCapture } from "@rbxts-ui/components";
 import { palette } from "shared/constants/palette";
 
 function AlertsStoryContent() {

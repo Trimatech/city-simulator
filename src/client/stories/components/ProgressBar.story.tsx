@@ -6,8 +6,8 @@ import { InferFusionProps, Number } from "@rbxts/ui-labs";
 import { ProgressBar } from "client/components/ProgressBar";
 import { useRem } from "client/hooks";
 import { RootProvider } from "client/providers/root-provider";
-import { Frame } from "client/ui/layout/frame";
-import { VStack } from "client/ui/layout/VStack";
+import { Frame } from "@rbxts-ui/primitives";
+import { VStack } from "@rbxts-ui/layout";
 
 const controls = {
 	progress: Number(0.65, 0, 1, 0.01),

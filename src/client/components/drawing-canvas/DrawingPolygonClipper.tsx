@@ -1,10 +1,10 @@
 import React, { useState } from "@rbxts/react";
-import { useRem } from "client/rem/use-rem";
+import { useRem } from "@rbxts-ui/rem";
 import { calculatePolygonOperation, pointToVector2, setIntersectionPoints } from "shared/polybool/poly-utils";
 import { pointsToPolygon, Polygon } from "shared/polybool/polybool";
 
-import { Checkbox } from "../../ui/Checkbox";
-import { Frame } from "../../ui/layout/frame";
+import { Checkbox } from "@rbxts-ui/components";
+import { Frame } from "@rbxts-ui/primitives";
 import { findClosestPoint } from "../polygon-clipper/PolygonCanvas.utils";
 import { DrawingCanvas } from "./DrawingCanvas";
 

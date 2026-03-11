@@ -3,8 +3,8 @@ import React, { useEffect } from "@rbxts/react";
 import { SpringOptions } from "@rbxts/ripple";
 import { springs } from "client/constants/springs";
 import { useMotion } from "client/hooks";
-import { Frame } from "client/ui/layout/frame";
-import { Text } from "client/ui/text";
+import { Frame } from "@rbxts-ui/primitives";
+import { Text } from "@rbxts-ui/primitives";
 
 interface AnimatedCharProps {
 	readonly index: number;

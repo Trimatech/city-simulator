@@ -1,7 +1,7 @@
 import { useViewport } from "@rbxts/pretty-react-hooks";
 import React from "@rbxts/react";
 import { useOrientation, usePremium, useRem } from "client/hooks";
-import { Group } from "client/ui/layout/group";
+import { Group } from "@rbxts-ui/primitives";
 import { formatInteger } from "client/utils/format-integer";
 import { DevProduct } from "shared/assetsFolder";
 import { PREMIUM_BENEFIT } from "shared/constants/core";

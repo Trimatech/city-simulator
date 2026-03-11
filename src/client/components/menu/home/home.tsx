@@ -1,14 +1,13 @@
 import React, { useState } from "@rbxts/react";
 import { useSelectorCreator } from "@rbxts/react-reflex";
+import { ReactiveButton } from "@rbxts-ui/components";
+import { HStack } from "@rbxts-ui/layout";
+import { Frame, Text } from "@rbxts-ui/primitives";
 import { HomeStats } from "client/components/stats/HomeStats";
 import { fonts } from "client/constants/fonts";
 import { useRem } from "client/hooks";
-import { Frame } from "client/ui/layout/frame";
-import { HStack } from "client/ui/layout/HStack";
-import { PrimaryButton } from "client/ui/PrimaryButton";
-import { ReactiveButton } from "client/ui/reactive-button/reactive-button";
+import { MainButton } from "client/ui/MainButton";
 import { SlideIn } from "client/ui/slide-in";
-import { Text } from "client/ui/text";
 import { USER_NAME } from "shared/constants/core";
 import {
 	DAILY_REWARD_CYCLE,
@@ -66,15 +65,15 @@ export function Home({ visible }: HomeProps) {
 					verticalAlignment={Enum.VerticalAlignment.Top}
 					spacing={rem(1)}
 				>
-					<PrimaryButton onClick={() => setIsShopOpen(true)} size={new UDim2(0, rem(10), 0, rem(4))}>
+					<MainButton onClick={() => setIsShopOpen(true)} size={new UDim2(0, rem(10), 0, rem(4))}>
 						<Text
 							font={fonts.inter.medium}
 							text={"🛒 Shop"}
 							textSize={rem(1.6)}
 							size={new UDim2(1, 0, 1, 0)}
 						/>
-					</PrimaryButton>
-					<PrimaryButton
+					</MainButton>
+					<MainButton
 						onClick={openDailyReward}
 						primaryColor={palette.yellow}
 						size={new UDim2(0, rem(13), 0, rem(4))}
@@ -85,7 +84,7 @@ export function Home({ visible }: HomeProps) {
 							textSize={rem(1.6)}
 							size={new UDim2(1, 0, 1, 0)}
 						/>
-					</PrimaryButton>
+					</MainButton>
 				</HStack>
 			</SlideIn>
 

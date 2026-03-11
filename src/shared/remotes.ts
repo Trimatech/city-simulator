@@ -1,7 +1,7 @@
 import { BroadcastAction } from "@rbxts/reflex";
 import { Client, createRemotes, namespace, remote, Server } from "@rbxts/remo";
 import { t } from "@rbxts/t";
-import type { Alert } from "client/store/alert";
+import type { AlertI as Alert } from "@rbxts-ui/alerts";
 
 import { SharedStateSerialized } from "./serdes";
 

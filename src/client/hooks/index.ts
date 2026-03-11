@@ -1,8 +1,10 @@
-export * from "../rem/use-rem";
+export { useRem } from "@rbxts-ui/rem";
+export type { RemOptions, RemScaleMode } from "@rbxts-ui/rem";
+export { useInputDevice } from "@rbxts-ui/components";
+export type { InputDevice } from "@rbxts-ui/components";
 export * from "./use-character";
 export * from "./use-continuous-angle";
 export * from "./use-defined";
-export * from "./use-input-device";
 export * from "./use-motion";
 export * from "./use-observer-position";
 export * from "./use-orientation";

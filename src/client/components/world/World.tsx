@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
-import { RemProvider } from "client/rem/rem-provider";
-import { Group } from "client/ui/layout/group";
+import { RemProvider } from "@rbxts-ui/rem";
+import { Group } from "@rbxts-ui/primitives";
 
 import { Bots } from "./bots/Bots";
 import { PlayerGlows } from "./glow/PlayerGlows";

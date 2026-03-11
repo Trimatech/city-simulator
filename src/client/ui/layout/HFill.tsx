@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
 
-import { Frame } from "./frame";
+import { Frame } from "@rbxts-ui/primitives";
 
 export interface HFillProps {
 	readonly backgroundTransparency?: number;

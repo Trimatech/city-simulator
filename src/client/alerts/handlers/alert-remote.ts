@@ -1,6 +1,6 @@
 import { remotes } from "shared/remotes";
 
-import { sendAlert } from "../alert-factory";
+import { sendAlert } from "client/alerts";
 
 export function connectRemoteAlerts() {
 	remotes.client.alert.connect((alert) => {

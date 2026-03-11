@@ -1,16 +1,13 @@
 import React, { useEffect, useState } from "@rbxts/react";
 import { useSelectorCreator } from "@rbxts/react-reflex";
+import { HStack, VStack } from "@rbxts-ui/layout";
+import { Frame, Image, Text } from "@rbxts-ui/primitives";
 import { ProgressBarTimer } from "client/components/ProgressBarTimer";
 import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
 import { useMotion, useRem } from "client/hooks";
 import { BgWindow } from "client/ui/BgWindow";
-import { Image } from "client/ui/image";
-import { Frame } from "client/ui/layout/frame";
-import { HStack } from "client/ui/layout/HStack";
-import { VStack } from "client/ui/layout/VStack";
-import { PrimaryButton } from "client/ui/PrimaryButton";
-import { Text } from "client/ui/text";
+import { MainButton } from "client/ui/MainButton";
 import assets from "shared/assets";
 import { DEATH_CHOICE_TIMEOUT_SEC, USER_NAME } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
@@ -115,13 +112,12 @@ export function DeathScreen({ activeDeadline, onDismiss }: DeathScreenProps) {
 						)}
 					/>
 				</Frame>
-				<PrimaryButton
+				<MainButton
 					onClick={() => {
 						setIsReviving(true);
 						remotes.soldier.continue.fire();
 					}}
 					primaryColor={palette.sky}
-					enabled={canRevive}
 					size={new UDim2(0, rem(18), 0, rem(4))}
 				>
 					<HStack horizontalAlignment={Enum.HorizontalAlignment.Center} automaticSize={Enum.AutomaticSize.XY}>
@@ -139,7 +135,7 @@ export function DeathScreen({ activeDeadline, onDismiss }: DeathScreenProps) {
 							scaleType="Crop"
 						/>
 					</HStack>
-				</PrimaryButton>
+				</MainButton>
 				<HStack horizontalAlignment={Enum.HorizontalAlignment.Center} automaticSize={Enum.AutomaticSize.XY}>
 					<uiflexitem FlexMode={Enum.UIFlexMode.Shrink} />
 					<Text text={`You have `} {...smallTextProps} />
@@ -153,7 +149,7 @@ export function DeathScreen({ activeDeadline, onDismiss }: DeathScreenProps) {
 					<Image
 						image={assets.ui.shards_icon}
 						size={new UDim2(0, rem(1), 0, rem(1.5))}
-						imageColor={palette.sapphire}
+						imageColor3={palette.sapphire}
 						scaleType="Crop"
 					/>
 

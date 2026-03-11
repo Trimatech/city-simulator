@@ -1,11 +1,11 @@
 import { useThrottleCallback } from "@rbxts/pretty-react-hooks";
 import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
+import { Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { useRem, useStore } from "client/hooks";
 import { selectWorldSpectating } from "client/store/world";
-import { PrimaryButton } from "client/ui/PrimaryButton";
-import { Text } from "client/ui/text";
+import { MainButton } from "client/ui/MainButton";
 import { palette } from "shared/constants/palette";
 import { cycleNextSoldier } from "shared/store/soldiers";
 
@@ -22,12 +22,12 @@ export function SpectateButton() {
 	);
 
 	return (
-		<PrimaryButton
+		<MainButton
 			onClick={onClick.run}
 			overlayGradient={new ColorSequence(palette.text)}
 			size={new UDim2(0, rem(4), 0, rem(4))}
 		>
 			<Text font={fonts.inter.medium} text="🎥" textSize={rem(2)} size={new UDim2(1, 0, 1, 0)} />
-		</PrimaryButton>
+		</MainButton>
 	);
 }

@@ -3,9 +3,9 @@ import React, { useEffect, useMemo } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { useMotion, useRem } from "client/hooks";
 import { selectWorldSubjectPosition } from "client/store/world";
-import { Image } from "client/ui/image";
-import { Group } from "client/ui/layout/group";
-import { Text } from "client/ui/text";
+import { Image } from "@rbxts-ui/primitives";
+import { Group } from "@rbxts-ui/primitives";
+import { Text } from "@rbxts-ui/primitives";
 import assets from "shared/assets";
 
 import { useLeaderPosition } from "./utils";

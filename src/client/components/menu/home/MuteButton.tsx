@@ -1,10 +1,10 @@
 import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
+import { Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { useRem, useStore } from "client/hooks";
 import { selectMusicEnabled } from "client/store/settings/settingsSelectors";
-import { PrimaryButton } from "client/ui/PrimaryButton";
-import { Text } from "client/ui/text";
+import { MainButton } from "client/ui/MainButton";
 import { palette } from "shared/constants/palette";
 
 export function MuteButton() {
@@ -13,7 +13,7 @@ export function MuteButton() {
 	const musicEnabled = useSelector(selectMusicEnabled);
 
 	return (
-		<PrimaryButton
+		<MainButton
 			onClick={() => store.setMenuMusic(!musicEnabled)}
 			overlayGradient={new ColorSequence(musicEnabled ? palette.text : palette.maroon)}
 			size={new UDim2(0, rem(4), 0, rem(4))}
@@ -24,6 +24,6 @@ export function MuteButton() {
 				textSize={rem(2)}
 				size={new UDim2(1, 0, 1, 0)}
 			/>
-		</PrimaryButton>
+		</MainButton>
 	);
 }

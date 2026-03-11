@@ -2,7 +2,7 @@ import React, { useEffect } from "@rbxts/react";
 import { springs } from "client/constants/springs";
 import { useMotion } from "client/hooks";
 
-import { Group } from "./layout/group";
+import { Group } from "@rbxts-ui/primitives";
 
 type SlideDirection = "left" | "right" | "bottom";
 

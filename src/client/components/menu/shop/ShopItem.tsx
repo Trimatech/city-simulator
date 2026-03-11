@@ -1,9 +1,9 @@
 import React from "@rbxts/react";
 import { fonts } from "client/constants/fonts";
 import { useRem } from "client/hooks";
-import { Image } from "client/ui/image";
-import { Frame } from "client/ui/layout/frame";
-import { Text } from "client/ui/text";
+import { Image } from "@rbxts-ui/primitives";
+import { Frame } from "@rbxts-ui/primitives";
+import { Text } from "@rbxts-ui/primitives";
 import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 import { sizes } from "shared/constants/sizes";
@@ -188,7 +188,7 @@ export function ShopItem({
 							zIndex={1}
 							scaleType="Crop"
 							cornerRadius={innerRadius}
-							imageColor={theme.rayTint}
+							imageColor3={theme.rayTint}
 						/>
 						<Image
 							image={assets.ui.spot_glow}
@@ -196,7 +196,7 @@ export function ShopItem({
 							imageTransparency={theme.raysTransparency}
 							zIndex={1}
 							scaleType="Fit"
-							imageColor={theme.rayTint}
+							imageColor3={theme.rayTint}
 						/>
 
 						{/* Icon — fills full inner area, absolute centered (Figma: 308x308 in 308x308) */}

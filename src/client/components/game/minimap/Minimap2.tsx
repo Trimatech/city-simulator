@@ -1,10 +1,10 @@
 import React from "@rbxts/react";
 import { useInputDevice } from "client/hooks";
-import { RemProvider } from "client/rem/rem-provider";
-import { Image } from "client/ui/image";
-import { Frame } from "client/ui/layout/frame";
-import { Group } from "client/ui/layout/group";
-import { Outline } from "client/ui/outline";
+import { RemProvider } from "@rbxts-ui/rem";
+import { Image } from "@rbxts-ui/primitives";
+import { Frame } from "@rbxts-ui/primitives";
+import { Group } from "@rbxts-ui/primitives";
+import { Outline } from "@rbxts-ui/components";
 import { Shadow } from "client/ui/shadow";
 import assets from "shared/assets";
 import { palette } from "shared/constants/palette";

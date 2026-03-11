@@ -1,9 +1,9 @@
 import React from "@rbxts/react";
 import { useRem } from "client/hooks";
-import { Image } from "client/ui/image";
-import { Frame } from "client/ui/layout/frame";
-import { Outline } from "client/ui/outline";
-import { ReactiveButton } from "client/ui/reactive-button/reactive-button";
+import { Image } from "@rbxts-ui/primitives";
+import { Frame } from "@rbxts-ui/primitives";
+import { Outline } from "@rbxts-ui/components";
+import { ReactiveButton } from "@rbxts-ui/components";
 import { palette } from "shared/constants/palette";
 
 export function CloseButton({

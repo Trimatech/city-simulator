@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 import { useSelector, useSelectorCreator } from "@rbxts/react-reflex";
 import { useDefined, useRem } from "client/hooks";
-import { Group } from "client/ui/layout/group";
+import { Group } from "@rbxts-ui/primitives";
 import { formatInteger } from "client/utils/format-integer";
 import { USER_NAME } from "shared/constants/core";
 import { ROOT_PADDING } from "shared/constants/theme";

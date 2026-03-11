@@ -1,12 +1,11 @@
 import React, { useMemo } from "@rbxts/react";
 import { useSelectorCreator } from "@rbxts/react-reflex";
+import { ReactiveButton } from "@rbxts-ui/components";
+import { VStack } from "@rbxts-ui/layout";
+import { Frame, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { useMotion, useRem } from "client/hooks";
-import { Frame } from "client/ui/layout/frame";
-import { VStack } from "client/ui/layout/VStack";
-import { PrimaryButton } from "client/ui/PrimaryButton";
-import { ReactiveButton } from "client/ui/reactive-button";
-import { Text } from "client/ui/text";
+import { MainButton } from "client/ui/MainButton";
 import { formatInteger } from "client/utils/format-integer";
 import assets from "shared/assets";
 import { playSound } from "shared/assetsFolder";
@@ -76,7 +75,6 @@ export function SkinButton({ id, cellSize }: SkinButtonProps) {
 		<ReactiveButton
 			animateSizeStrength={2}
 			animatePositionStrength={1.5}
-			soundVariant="none"
 			backgroundTransparency={1}
 			anchorPoint={new Vector2(0.5, 1)}
 			size={size}
@@ -112,13 +110,7 @@ export function SkinButton({ id, cellSize }: SkinButtonProps) {
 				</Frame>
 
 				{/* Action */}
-				<PrimaryButton
-					onClick={onAction}
-					enabled={owns ? !isEquipped : canAfford}
-					primaryColor={actionColor}
-					cornerRadius={new UDim(1, 0)}
-					size={new UDim2(1, 0, 0, rem(3))}
-				>
+				<MainButton onClick={onAction} primaryColor={actionColor} size={new UDim2(1, 0, 0, rem(3))}>
 					<Text
 						text={actionLabel}
 						textSize={rem(1.4)}
@@ -127,7 +119,7 @@ export function SkinButton({ id, cellSize }: SkinButtonProps) {
 						anchorPoint={new Vector2(0.5, 0.5)}
 						font={fonts.inter.regular}
 					/>
-				</PrimaryButton>
+				</MainButton>
 			</VStack>
 		</ReactiveButton>
 	);

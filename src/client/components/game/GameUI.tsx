@@ -5,7 +5,7 @@ import { useMotion } from "client/hooks";
 import { selectWorldSubject } from "client/store/world";
 import { SlideIn } from "client/ui/slide-in";
 
-import { Transition } from "../../ui/transition";
+import { Transition } from "@rbxts-ui/layout";
 import { Stats } from "../stats/Stats";
 import { Compass } from "./compass";
 import { HealthView } from "./health/HealthView";

@@ -2,15 +2,15 @@ import React, { useEffect, useMemo } from "@rbxts/react";
 import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
 import { useMotion, useRem } from "client/hooks";
-import { Frame } from "client/ui/layout/frame";
-import { Group } from "client/ui/layout/group";
-import { Outline } from "client/ui/outline";
-import { ReactiveButton } from "client/ui/reactive-button";
+import { Frame } from "@rbxts-ui/primitives";
+import { Group } from "@rbxts-ui/primitives";
+import { Outline } from "@rbxts-ui/components";
+import { ReactiveButton } from "@rbxts-ui/components";
 import { Shadow } from "client/ui/shadow";
-import { Text } from "client/ui/text";
+import { Text } from "@rbxts-ui/primitives";
 import { palette } from "shared/constants/palette";
 
-import { Transition } from "../../ui/transition";
+import { Transition } from "@rbxts-ui/layout";
 
 interface StatsCardProps {
 	readonly onClick?: () => void;
@@ -52,7 +52,7 @@ export function StatsCard({ onClick, emoji, label, value, primary, secondary, en
 	const cornerRadius = new UDim(0, rem(1));
 
 	return (
-		<ReactiveButton onClick={onClick} soundVariant="alt" backgroundTransparency={1} size={size} layoutOrder={order}>
+		<ReactiveButton onClick={onClick} backgroundTransparency={1} size={size} layoutOrder={order}>
 			<Transition
 				groupTransparency={transparency}
 				size={new UDim2(1, rem(2 * CARD_CANVAS_MARGIN), 1, rem(2 * CARD_CANVAS_MARGIN))}

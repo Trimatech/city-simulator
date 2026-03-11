@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 import { useMotion } from "client/hooks";
 import { AnimatedText } from "client/ui/AnimatedText";
-import { PrimaryButton } from "client/ui/PrimaryButton";
+import { MainButton } from "client/ui/MainButton";
 import { remotes } from "shared/remotes";
 
 interface PlayButtonProps {
@@ -18,7 +18,7 @@ export function PlayButton({ anchorPoint, size, position }: PlayButtonProps) {
 	};
 
 	return (
-		<PrimaryButton
+		<MainButton
 			onClick={onClick}
 			onHover={(hovered) => hoverMotion.spring(hovered ? 1 : 0)}
 			anchorPoint={anchorPoint}
@@ -26,6 +26,6 @@ export function PlayButton({ anchorPoint, size, position }: PlayButtonProps) {
 			position={position}
 		>
 			<AnimatedText text="Start Playing →" size={new UDim2(1, 0, 1, 0)} />
-		</PrimaryButton>
+		</MainButton>
 	);
 }

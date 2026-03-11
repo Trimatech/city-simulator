@@ -1,6 +1,6 @@
 import React, { useEffect } from "@rbxts/react";
 import { useContinuousAngle, useMotion } from "client/hooks";
-import { Image } from "client/ui/image";
+import { Image } from "@rbxts-ui/primitives";
 import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 
@@ -23,7 +23,7 @@ export function MinimapCursor({ point, angle }: MinimapCursorProps) {
 	return (
 		<Image
 			image={assets.ui.map_cursor}
-			imageColor={palette.text}
+			imageColor3={palette.text}
 			anchorPoint={new Vector2(0.5, 0.5)}
 			size={new UDim2(0, rem(28, "pixel"), 0, rem(28, "pixel"))}
 			position={new UDim2(point.X, 0, point.Y, 0)}

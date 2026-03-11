@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 import { MarketplaceService, Players } from "@rbxts/services";
 import { useRem } from "client/hooks";
-import { Frame } from "client/ui/layout/frame";
+import { Frame } from "@rbxts-ui/primitives";
 import assets from "shared/assets";
 import { DevProduct } from "shared/assetsFolder";
 

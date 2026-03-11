@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 import { useRem } from "client/hooks";
-import { Frame } from "client/ui/layout/frame";
-import { HStack } from "client/ui/layout/HStack";
+import { Frame } from "@rbxts-ui/primitives";
+import { HStack } from "@rbxts-ui/layout";
 
 import { Tab } from "./Tab";
 

@@ -3,12 +3,12 @@ import React, { useEffect, useState } from "@rbxts/react";
 import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
 import { useRem } from "client/hooks";
-import { Frame } from "client/ui/layout/frame";
-import { HStack } from "client/ui/layout/HStack";
-import { Outline } from "client/ui/outline";
-import { ReactiveButton } from "client/ui/reactive-button";
-import { Text } from "client/ui/text";
-import { Transition } from "client/ui/transition";
+import { Frame } from "@rbxts-ui/primitives";
+import { HStack } from "@rbxts-ui/layout";
+import { Outline } from "@rbxts-ui/components";
+import { ReactiveButton } from "@rbxts-ui/components";
+import { Text } from "@rbxts-ui/primitives";
+import { Transition } from "@rbxts-ui/layout";
 import { palette } from "shared/constants/palette";
 import { remotes } from "shared/remotes";
 
@@ -99,7 +99,7 @@ export function BuyPowerup({
 
 				<HStack clipsDescendants={false} horizontalAlignment={Enum.HorizontalAlignment.Right}>
 					{showTooltip ? (
-						<HStack spacing={rem(INTERNAL_PADDING)} size={new UDim2(0, TOOLTIP_WIDTH, 0, HEIGHT)} wraps>
+						<HStack spacing={rem(INTERNAL_PADDING)} size={new UDim2(0, TOOLTIP_WIDTH, 0, HEIGHT)}>
 							<uipadding PaddingLeft={new UDim(0, rem(3))} />
 							<Text
 								text={label}

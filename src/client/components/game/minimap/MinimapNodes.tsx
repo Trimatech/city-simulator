@@ -1,8 +1,8 @@
 import { useInterval } from "@rbxts/pretty-react-hooks";
 import React, { Element, useState } from "@rbxts/react";
 import { useObserverPosition, useStore } from "client/hooks";
-import { CanvasGroup } from "client/ui/canvas-group";
-import { Image } from "client/ui/image";
+import { CanvasGroup } from "@rbxts-ui/primitives";
+import { Image } from "@rbxts-ui/primitives";
 import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 import { getWallSkin } from "shared/constants/skins";
@@ -35,7 +35,7 @@ export function MinimapNodes() {
 					<Image
 						key={`soldier-${soldier.id}`}
 						image={assets.ui.circle}
-						imageColor={color}
+						imageColor3={color}
 						anchorPoint={new Vector2(0.5, 0.5)}
 						size={new UDim2(0, sizePx, 0, sizePx)}
 						position={new UDim2(pos.X, 0, pos.Y, 0)}
@@ -69,7 +69,7 @@ export function MinimapNodes() {
 					<Image
 						key={`soldier-${localId}`}
 						image={assets.ui.circle}
-						imageColor={color}
+						imageColor3={color}
 						anchorPoint={new Vector2(0.5, 0.5)}
 						size={new UDim2(0, 5, 0, 5)}
 						position={new UDim2(pos.X, 0, pos.Y, 0)}

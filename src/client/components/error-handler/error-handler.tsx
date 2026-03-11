@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
-import { ErrorBoundary } from "client/ui/error-boundary";
 
+import { ErrorBoundary } from "./error-boundary";
 import { ErrorPage } from "./error-page";
 
 export function ErrorHandler({ children }: React.PropsWithChildren) {

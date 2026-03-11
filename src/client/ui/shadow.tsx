@@ -2,8 +2,8 @@ import { composeBindings } from "@rbxts/pretty-react-hooks";
 import React from "@rbxts/react";
 import assets from "shared/assets";
 
-import { useRem } from "../hooks";
-import { Image } from "./image";
+import { useRem } from "@rbxts-ui/rem";
+import { Image } from "@rbxts-ui/primitives";
 
 interface ShadowProps extends React.PropsWithChildren {
 	shadowBlur?: number;
@@ -34,7 +34,7 @@ export function Shadow({
 		<Image
 			image={assets.ui.blur}
 			imageTransparency={shadowTransparency}
-			imageColor={shadowColor}
+			imageColor3={shadowColor}
 			anchorPoint={new Vector2(0.5, 0.5)}
 			size={composeBindings(shadowSize, (size) => {
 				const sizeOffsetScaled = rem(BLUR_RADIUS * shadowBlur, "pixel");

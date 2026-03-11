@@ -1,12 +1,12 @@
 import React, { useRef, useState } from "@rbxts/react";
+import { Outline, ReactiveButton } from "@rbxts-ui/components";
+import { Frame } from "@rbxts-ui/primitives";
 import { mapMouseToUiGradient } from "client/utils/ui-gradient.utils";
+import { playButtonDown, playButtonUp } from "shared/assetsFolder/sounds/play-button-sound";
 import { palette } from "shared/constants/palette";
 import { brighten } from "shared/utils/color-utils";
 
 import { useMotion, useRem } from "../hooks";
-import { Frame } from "./layout/frame";
-import { Outline } from "./outline";
-import { ReactiveButton } from "./reactive-button";
 
 interface PrimaryButtonProps extends React.PropsWithChildren {
 	readonly onClick?: () => void;
@@ -23,7 +23,7 @@ interface PrimaryButtonProps extends React.PropsWithChildren {
 	readonly cornerRadius?: UDim | React.Binding<UDim>;
 }
 
-export function PrimaryButton({
+export function MainButton({
 	cornerRadius: cornerRadiusProp,
 	onClick,
 	onHover,
@@ -73,6 +73,12 @@ export function PrimaryButton({
 			onMouseLeave={() => {
 				setOffset(defaultOffset);
 				setHasMouseSample(false);
+			}}
+			onMouseDown={() => {
+				playButtonDown("default");
+			}}
+			onMouseUp={() => {
+				playButtonUp("default");
 			}}
 			event={undefined}
 			backgroundTransparency={1}

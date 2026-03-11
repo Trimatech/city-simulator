@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 
-import { omit } from "../../utils/object-utils";
-import { ScrollingFrame, ScrollingFrameProps } from "./ScrollingFrame";
+import { omit } from "@rbxts-ui/utils";
+import { ScrollingFrame, ScrollingFrameProps } from "@rbxts-ui/layout";
 
 export interface GridScrollingProps extends ScrollingFrameProps {
 	spacing?: number;

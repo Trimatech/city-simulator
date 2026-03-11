@@ -15,7 +15,7 @@
 		"moduleDetection": "force",
 		"strict": true,
 		"target": "ESNext",
-		"typeRoots": ["node_modules/@rbxts", "@types"],
+		"typeRoots": ["node_modules/@rbxts", "node_modules/@rbxts-ui", "@types"],
 
 		// configurable
 		"rootDir": "src",

@@ -1,8 +1,8 @@
 import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { useRem } from "client/hooks";
-import { HStack } from "client/ui/layout/HStack";
-import { VStack } from "client/ui/layout/VStack";
+import { HStack } from "@rbxts-ui/layout";
+import { VStack } from "@rbxts-ui/layout";
 import { POWERUP_COLORS, POWERUP_PRICES } from "shared/constants/powerups";
 import { selectLocalOrbs } from "shared/store/soldiers";
 

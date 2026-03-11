@@ -3,10 +3,10 @@ import { useSelector } from "@rbxts/react-reflex";
 import { springs } from "client/constants/springs";
 import { useMotion, useRem } from "client/hooks";
 import { selectWorldCamera } from "client/store/world";
-import { CanvasGroup } from "client/ui/canvas-group";
-import { Image } from "client/ui/image";
-import { Frame } from "client/ui/layout/frame";
-import { Group } from "client/ui/layout/group";
+import { CanvasGroup } from "@rbxts-ui/primitives";
+import { Image } from "@rbxts-ui/primitives";
+import { Frame } from "@rbxts-ui/primitives";
+import { Group } from "@rbxts-ui/primitives";
 import assets from "shared/assets";
 import { WORLD_BOUNDS } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
@@ -72,7 +72,7 @@ export function WorldBorder() {
 				<CanvasGroup size={new UDim2(1, 0, 1, 0)} backgroundTransparency={1}>
 					<Image
 						image={assets.ui.tile_stripes}
-						imageColor={palette.black}
+						imageColor3={palette.black}
 						imageTransparency={0.75}
 						scaleType="Tile"
 						tileSize={new UDim2(0, rem(4), 0, rem(4))}

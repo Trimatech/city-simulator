@@ -1,7 +1,7 @@
 import { composeBindings } from "@rbxts/pretty-react-hooks";
 import React from "@rbxts/react";
 import { useRem } from "client/hooks";
-import { Frame } from "client/ui/layout/frame";
+import { Frame } from "@rbxts-ui/primitives";
 import { palette } from "shared/constants/palette";
 
 const progressBarGradient = new ColorSequence(Color3.fromHex("#4FACFE"), Color3.fromHex("#00F2FE"));

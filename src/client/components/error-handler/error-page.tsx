@@ -1,13 +1,11 @@
 import React, { useEffect } from "@rbxts/react";
 import { TeleportService } from "@rbxts/services";
+import { TextField } from "@rbxts-ui/components";
+import { Layer } from "@rbxts-ui/layout";
+import { Frame, Group, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { useRem } from "client/hooks";
-import { Frame } from "client/ui/layout/frame";
-import { Group } from "client/ui/layout/group";
-import { Layer } from "client/ui/layout/layer";
-import { PrimaryButton } from "client/ui/PrimaryButton";
-import { Text } from "client/ui/text";
-import { TextField } from "client/ui/text-field";
+import { MainButton } from "client/ui/MainButton";
 import assets from "shared/assets";
 import { playSound } from "shared/assetsFolder";
 import { palette } from "shared/constants/palette";
@@ -97,7 +95,7 @@ export function ErrorPage({ message }: ErrorPageProps) {
 
 				<Group size={new UDim2(0, 0, 0, rem(2))} layoutOrder={index++} />
 
-				<PrimaryButton
+				<MainButton
 					onClick={async () => TeleportService.TeleportToPlaceInstance(game.PlaceId, game.JobId)}
 					overlayGradient={new ColorSequence(palette.blue, palette.mauve)}
 					size={new UDim2(0, rem(12), 0, rem(5))}
@@ -110,7 +108,7 @@ export function ErrorPage({ message }: ErrorPageProps) {
 						textSize={rem(1.5)}
 						size={new UDim2(1, 0, 1, 0)}
 					/>
-				</PrimaryButton>
+				</MainButton>
 			</Frame>
 		</Layer>
 	);

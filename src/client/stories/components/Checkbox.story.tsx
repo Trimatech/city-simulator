@@ -2,7 +2,7 @@ import "client/app/react-config";
 
 import React, { useState } from "@rbxts/react";
 import ReactRoblox from "@rbxts/react-roblox";
-import { Checkbox } from "client/ui/Checkbox";
+import { Checkbox } from "@rbxts-ui/components";
 
 function CheckboxStoryContent() {
 	const [checked1, setChecked1] = useState(false);

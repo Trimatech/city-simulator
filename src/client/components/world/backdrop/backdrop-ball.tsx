@@ -6,7 +6,7 @@ import { RunService } from "@rbxts/services";
 import { springs } from "client/constants/springs";
 import { useMotion, useSeed } from "client/hooks";
 import { selectWorldCamera } from "client/store/world";
-import { Image } from "client/ui/image";
+import { Image } from "@rbxts-ui/primitives";
 import assets from "shared/assets";
 import { accents } from "shared/constants/palette";
 
@@ -70,7 +70,7 @@ export function BackdropBall() {
 	return (
 		<Image
 			image={assets.ui.blur}
-			imageColor={color}
+			imageColor3={color}
 			imageTransparency={style.transparency}
 			scaleType="Fit"
 			anchorPoint={new Vector2(0.5, 0.5)}

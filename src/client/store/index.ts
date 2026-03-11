@@ -1,7 +1,7 @@
 import { combineProducers, InferState } from "@rbxts/reflex";
 import { slices } from "shared/store";
 
-import { alertSlice } from "./alert";
+import { alertSlice } from "@rbxts-ui/alerts";
 import { receiverMiddleware } from "./middleware/receiver";
 import { settingsSlice } from "./settings/settingsSlice";
 import { worldSlice } from "./world";

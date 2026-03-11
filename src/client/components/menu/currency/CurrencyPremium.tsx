@@ -1,9 +1,9 @@
 import React from "@rbxts/react";
 import { MarketplaceService, Players } from "@rbxts/services";
+import { Text } from "@rbxts-ui/primitives";
 import { sendAlert } from "client/alerts";
 import { useRem } from "client/hooks";
-import { PrimaryButton } from "client/ui/PrimaryButton";
-import { Text } from "client/ui/text";
+import { MainButton } from "client/ui/MainButton";
 import { palette } from "shared/constants/palette";
 
 export function CurrencyPremium() {
@@ -23,7 +23,7 @@ export function CurrencyPremium() {
 	};
 
 	return (
-		<PrimaryButton
+		<MainButton
 			onClick={promptPremiumPurchase}
 			anchorPoint={new Vector2(1, 1)}
 			position={new UDim2(1, rem(-3), 1, rem(-3))}
@@ -36,6 +36,6 @@ export function CurrencyPremium() {
 				textColor={palette.black}
 				text={`${RobloxEmoji.Premium} `}
 			/>
-		</PrimaryButton>
+		</MainButton>
 	);
 }
