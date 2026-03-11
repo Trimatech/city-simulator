@@ -52,6 +52,7 @@ declare const assets: {
 			Cash10kLarge: string
 			Cash250Large: string
 			Cash500Large: string
+			Close: string
 			Skins: string
 			shop_room_bg: string
 		}

@@ -31,7 +31,7 @@ export const shopItemButtonThemes = {
 } as const;
 
 interface ShopItemButtonProps {
-	readonly text: string;
+	readonly text?: string;
 	readonly icon?: string;
 	/** When true, the button width shrinks to fit its content with padding. */
 	readonly fitContent?: boolean;
@@ -47,7 +47,7 @@ const CONTENT_PADDING = new UDim(0, 20);
 const CONTENT_PADDING_LEFT_WITH_ICON = new UDim(0, 6);
 
 export function ShopItemButton({
-	text,
+	text = undefined,
 	icon,
 	fitContent = false,
 	onClick,
@@ -59,9 +59,12 @@ export function ShopItemButton({
 }: ShopItemButtonProps) {
 	const rem = useRem();
 
-	const buttonSize = fitContent ? new UDim2(0, 0, 0, rem(4)) : (size ?? new UDim2(0, rem(13), 0, rem(4)));
-	const autoSize = fitContent ? Enum.AutomaticSize.X : undefined;
-	const frameSize = fitContent ? new UDim2(0, 0, 1, 0) : new UDim2(1, 0, 1, 0);
+	const iconOnly = text === undefined;
+
+	const isFitContent = fitContent || iconOnly;
+	const buttonSize = isFitContent ? new UDim2(0, 0, 0, rem(4)) : (size ?? new UDim2(0, rem(13), 0, rem(4)));
+	const autoSize = isFitContent ? Enum.AutomaticSize.X : undefined;
+	const frameSize = isFitContent ? new UDim2(0, 0, 1, 0) : new UDim2(1, 0, 1, 0);
 	const pillRadius = new UDim(1, 0);
 	const gradientSequence = new ColorSequence(theme.gradientFrom, theme.gradientTo);
 	const textStrokeGradient = new ColorSequence(theme.textStrokeFrom, theme.textStrokeTo);
@@ -131,25 +134,30 @@ export function ShopItemButton({
 								PaddingRight={CONTENT_PADDING}
 							/>
 						)}
+						{iconOnly && (
+							<uipadding PaddingLeft={new UDim(0, rem(0.6))} PaddingRight={new UDim(0, rem(0.6))} />
+						)}
 
 						{icon !== undefined && (
 							<Image image={icon} size={new UDim2(0, rem(3), 0, rem(3))} scaleType="Fit" />
 						)}
 
-						<Text
-							text={text}
-							font={fonts.fredokaOne.regular}
-							textColor={palette.white}
-							textSize={rem(2.2)}
-							size={new UDim2(0, 0, 1, 0)}
-							textAutoResize="X"
-							textXAlignment="Center"
-							textYAlignment="Center"
-						>
-							<uistroke Thickness={rem(0.15)} Color={palette.white}>
-								<uigradient Color={textStrokeGradient} Rotation={90} />
-							</uistroke>
-						</Text>
+						{!iconOnly && (
+							<Text
+								text={text!}
+								font={fonts.fredokaOne.regular}
+								textColor={palette.white}
+								textSize={rem(2.2)}
+								size={new UDim2(0, 0, 1, 0)}
+								textAutoResize="X"
+								textXAlignment="Center"
+								textYAlignment="Center"
+							>
+								<uistroke Thickness={rem(0.15)} Color={palette.white}>
+									<uigradient Color={textStrokeGradient} Rotation={90} />
+								</uistroke>
+							</Text>
+						)}
 					</frame>
 				</Frame>
 			</Frame>

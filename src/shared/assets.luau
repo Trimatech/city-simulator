@@ -52,6 +52,7 @@ local assets = {
 			Cash10kLarge = "rbxassetid://135097160241995",
 			Cash250Large = "rbxassetid://118673062096605",
 			Cash500Large = "rbxassetid://71493964586309",
+			Close = "rbxassetid://122896623934459",
 			Skins = "rbxassetid://123486014841046",
 			shop_room_bg = "rbxassetid://134092118714845",
 		},

@@ -1,7 +1,9 @@
 import React, { useState } from "@rbxts/react";
 import { useRem } from "client/hooks";
-import { CloseButton } from "client/ui/buttons/CloseButton";
 import { Frame } from "client/ui/layout/frame";
+import { HFill } from "client/ui/layout/HFill";
+import { HStack } from "client/ui/layout/HStack";
+import { VStack } from "client/ui/layout/VStack";
 import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 
@@ -40,12 +42,6 @@ export function ShopWindow({ onClose }: ShopWindowProps) {
 	const windowRadius = new UDim(0, rem(2.8));
 	const contentRadius = new UDim(0, rem(1.5));
 
-	const padTop = rem(1.75);
-	const padSide = rem(1.9);
-	const tabH = rem(4);
-	const tabGap = rem(1);
-	const contentTop = padTop + tabH + tabGap;
-
 	return (
 		// Outer border wrapper (3px black)
 		<Frame
@@ -57,7 +53,7 @@ export function ShopWindow({ onClose }: ShopWindowProps) {
 			backgroundTransparency={0}
 			cornerRadius={windowRadius}
 		>
-			{/*  cloud bg) */}
+			{/* Cloud bg */}
 			<Frame backgroundColor={WINDOW_BG} backgroundTransparency={0} size={new UDim2(1, 0, 1, 0)}>
 				<uicorner CornerRadius={windowRadius} />
 				<uistroke
@@ -80,81 +76,60 @@ export function ShopWindow({ onClose }: ShopWindowProps) {
 					<uicorner CornerRadius={windowRadius} />
 				</imagelabel>
 
-				{/* Tabs row */}
-				<Frame
-					backgroundTransparency={1}
-					size={new UDim2(1, 0, 0, tabH)}
-					position={new UDim2(0, padSide, 0, padTop)}
-				>
-					<uilistlayout
-						FillDirection={Enum.FillDirection.Horizontal}
-						HorizontalAlignment={Enum.HorizontalAlignment.Left}
-						VerticalAlignment={Enum.VerticalAlignment.Center}
-						Padding={new UDim(0, rem(1))}
-						SortOrder={Enum.SortOrder.LayoutOrder}
-					/>
-					<ShopItemButton
-						text="SKINS"
-						icon={assets.ui.shop.Skins}
-						fitContent={true}
-						layoutOrder={1}
-						onClick={() => setActiveTabId(ShopTabs.Skins)}
-					/>
-					<ShopItemButton
-						text="CASH"
-						icon={assets.ui.shop.Cash}
-						fitContent={true}
-						layoutOrder={2}
-						onClick={() => setActiveTabId(ShopTabs.Cash)}
-					/>
-					<ShopItemButton
-						text="CRYSTALS"
-						icon={assets.ui.shards_icon_color}
-						fitContent={true}
-						layoutOrder={3}
-						onClick={() => setActiveTabId(ShopTabs.Crystals)}
-					/>
-				</Frame>
+				{/* Main layout: tabs + content */}
+				<VStack spacing={rem(1)} padding={rem(1.9)}>
+					{/* Tabs row */}
+					<HStack spacing={rem(1)} size={new UDim2(1, 0, 0, 0)} automaticSize={Enum.AutomaticSize.Y}>
+						<ShopItemButton
+							text="SKINS"
+							icon={assets.ui.shop.Skins}
+							fitContent={true}
+							onClick={() => setActiveTabId(ShopTabs.Skins)}
+						/>
+						<ShopItemButton
+							text="CASH"
+							icon={assets.ui.shop.Cash}
+							fitContent={true}
+							onClick={() => setActiveTabId(ShopTabs.Cash)}
+						/>
+						<ShopItemButton
+							text="CRYSTALS"
+							icon={assets.ui.shards_icon_color}
+							fitContent={true}
+							onClick={() => setActiveTabId(ShopTabs.Crystals)}
+						/>
+						<HFill verticalSize={0} />
+						<ShopItemButton icon={assets.ui.shop.Close} onClick={onClose} />
+					</HStack>
 
-				{/* Content area */}
-				<Frame
-					backgroundColor={DARK_BG}
-					backgroundTransparency={0}
-					size={new UDim2(1, -(padSide * 2), 1, -(contentTop + padSide))}
-					position={new UDim2(0, padSide, 0, contentTop)}
-				>
-					<uicorner CornerRadius={contentRadius} />
-
-					<uistroke Color={DARK_BORDER_COLOR} Thickness={rem(DARK_BORDER_THICKNESS)} ZIndex={2} />
-					<uistroke
-						Color={palette.white}
-						Thickness={rem(BORDER_THICKNESS + DARK_BORDER_THICKNESS)}
-						ZIndex={1}
-					>
-						<uigradient Color={BORDER_GRADIENT} Rotation={-90} />
-					</uistroke>
-
-					{/* Wavy stripes background texture */}
-					<imagelabel
-						Image={assets.ui.shop.shop_room_bg}
-						BackgroundTransparency={1}
-						Size={new UDim2(1, 0, 1, 0)}
-						ScaleType={Enum.ScaleType.Tile}
-						TileSize={new UDim2(0, 256, 0, 256)}
-						ImageTransparency={0}
-					>
+					{/* Content area — fills remaining height via flex */}
+					<Frame backgroundColor={DARK_BG} backgroundTransparency={0} size={new UDim2(1, 0, 0, 0)}>
+						<uiflexitem FlexMode={Enum.UIFlexMode.Fill} />
 						<uicorner CornerRadius={contentRadius} />
-					</imagelabel>
-					{activeTabId === ShopTabs.Skins && <SkinsList />}
-					{activeTabId === ShopTabs.Cash && <CashProducts />}
-				</Frame>
+						<uistroke Color={DARK_BORDER_COLOR} Thickness={rem(DARK_BORDER_THICKNESS)} ZIndex={2} />
+						<uistroke
+							Color={palette.white}
+							Thickness={rem(BORDER_THICKNESS + DARK_BORDER_THICKNESS)}
+							ZIndex={1}
+						>
+							<uigradient Color={BORDER_GRADIENT} Rotation={-90} />
+						</uistroke>
 
-				{/* Close button */}
-				<CloseButton
-					onClick={onClose}
-					anchorPoint={new Vector2(1, 0)}
-					position={new UDim2(1, -rem(2), 0, rem(2))}
-				/>
+						{/* Wavy stripes background texture */}
+						<imagelabel
+							Image={assets.ui.shop.shop_room_bg}
+							BackgroundTransparency={1}
+							Size={new UDim2(1, 0, 1, 0)}
+							ScaleType={Enum.ScaleType.Tile}
+							TileSize={new UDim2(0, 256, 0, 256)}
+							ImageTransparency={0}
+						>
+							<uicorner CornerRadius={contentRadius} />
+						</imagelabel>
+						{activeTabId === ShopTabs.Skins && <SkinsList />}
+						{activeTabId === ShopTabs.Cash && <CashProducts />}
+					</Frame>
+				</VStack>
 			</Frame>
 		</Frame>
 	);
