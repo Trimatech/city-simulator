@@ -3,6 +3,7 @@ import React from "@rbxts/react";
 import { Group } from "@rbxts-ui/primitives";
 import { useOrientation, usePremium } from "client/hooks";
 import { useRem } from "client/ui/rem/useRem";
+import { SCROLLBAR_COLOR, SCROLLBAR_THICKNESS, SCROLLBAR_TRANSPARENCY } from "client/ui/scrollbar.constants";
 import { formatInteger } from "client/utils/format-integer";
 import { DevProduct } from "shared/assetsFolder";
 import { PREMIUM_BENEFIT } from "shared/constants/core";
@@ -38,6 +39,9 @@ export function CurrencyProducts() {
 			CanvasSize={new UDim2(0, rem(70), 0, 0)}
 			BackgroundTransparency={1}
 			BorderSizePixel={0}
+			ScrollBarThickness={rem(SCROLLBAR_THICKNESS)}
+			ScrollBarImageColor3={SCROLLBAR_COLOR}
+			ScrollBarImageTransparency={SCROLLBAR_TRANSPARENCY}
 			ClipsDescendants={false}
 			AnchorPoint={new Vector2(0.5, 0.5)}
 			Size={new UDim2(0, rem(70), 0, rem(36))}

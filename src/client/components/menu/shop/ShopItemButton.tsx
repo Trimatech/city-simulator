@@ -26,6 +26,15 @@ export const shopItemButtonThemes = {
 		textStrokeFrom: Color3.fromRGB(10, 60, 130),
 		textStrokeTo: Color3.fromRGB(5, 40, 100),
 	},
+	cyan: {
+		backgroundColor: Color3.fromRGB(11, 184, 218),
+		outerBorderColor: Color3.fromRGB(14, 42, 78),
+		innerBorderColor: Color3.fromRGB(109, 233, 255),
+		gradientFrom: Color3.fromRGB(133, 243, 255),
+		gradientTo: Color3.fromRGB(46, 219, 238),
+		textStrokeFrom: Color3.fromRGB(10, 80, 120),
+		textStrokeTo: Color3.fromRGB(5, 60, 100),
+	},
 } as const;
 
 interface ShopItemButtonProps {
@@ -35,6 +44,7 @@ interface ShopItemButtonProps {
 	readonly fitContent?: boolean;
 	readonly onClick?: () => void;
 	readonly theme?: ShopItemButtonTheme;
+	readonly isActive?: boolean;
 	readonly size?: UDim2;
 	readonly position?: UDim2;
 	readonly anchorPoint?: Vector2;
@@ -50,6 +60,7 @@ export function ShopItemButton({
 	fitContent = false,
 	onClick,
 	theme = shopItemButtonThemes.blue,
+	isActive,
 	size,
 	position,
 	anchorPoint,
@@ -58,14 +69,15 @@ export function ShopItemButton({
 	const rem = useRem();
 
 	const iconOnly = text === undefined;
+	const activeTheme = isActive === true ? shopItemButtonThemes.cyan : theme;
 
 	const isFitContent = fitContent || iconOnly;
 	const buttonSize = isFitContent ? new UDim2(0, 0, 0, rem(4)) : (size ?? new UDim2(0, rem(13), 0, rem(4)));
 	const autoSize = isFitContent ? Enum.AutomaticSize.X : undefined;
 	const frameSize = isFitContent ? new UDim2(0, 0, 1, 0) : new UDim2(1, 0, 1, 0);
 	const pillRadius = new UDim(1, 0);
-	const gradientSequence = new ColorSequence(theme.gradientFrom, theme.gradientTo);
-	const textStrokeGradient = new ColorSequence(theme.textStrokeFrom, theme.textStrokeTo);
+	const gradientSequence = new ColorSequence(activeTheme.gradientFrom, activeTheme.gradientTo);
+	const textStrokeGradient = new ColorSequence(activeTheme.textStrokeFrom, activeTheme.textStrokeTo);
 
 	return (
 		<ReactiveButton2
@@ -81,13 +93,13 @@ export function ShopItemButton({
 			{/* Outer background with dark border */}
 			<Frame
 				name="ShopItemButton"
-				backgroundColor={theme.backgroundColor}
+				backgroundColor={activeTheme.backgroundColor}
 				cornerRadius={pillRadius}
 				size={frameSize}
 				automaticSize={autoSize}
 				backgroundTransparency={0}
 			>
-				<uistroke Color={theme.outerBorderColor} Thickness={rem(0.2)} />
+				<uistroke Color={activeTheme.outerBorderColor} Thickness={rem(0.2)} />
 				<uipadding
 					PaddingTop={new UDim(0, rem(0.2))}
 					PaddingBottom={new UDim(0, rem(0.35))}
@@ -104,7 +116,7 @@ export function ShopItemButton({
 					backgroundTransparency={0}
 					clipsDescendants={true}
 				>
-					<uistroke Color={theme.innerBorderColor} Thickness={rem(0.15)} />
+					<uistroke Color={activeTheme.innerBorderColor} Thickness={rem(0.15)} />
 					<uigradient Color={gradientSequence} Rotation={90} />
 
 					{/* Noise texture overlay */}

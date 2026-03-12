@@ -2,6 +2,7 @@ import React from "@rbxts/react";
 import { MarketplaceService, Players } from "@rbxts/services";
 import { Frame } from "@rbxts-ui/primitives";
 import { useRem } from "client/ui/rem/useRem";
+import { SCROLLBAR_COLOR, SCROLLBAR_THICKNESS, SCROLLBAR_TRANSPARENCY } from "client/ui/scrollbar.constants";
 import assets from "shared/assets";
 import { DevProduct } from "shared/assetsFolder";
 
@@ -34,7 +35,9 @@ export function CashProducts() {
 				AutomaticCanvasSize={Enum.AutomaticSize.None}
 				BackgroundTransparency={1}
 				BorderSizePixel={0}
-				ScrollBarThickness={0}
+				ScrollBarThickness={rem(SCROLLBAR_THICKNESS)}
+				ScrollBarImageColor3={SCROLLBAR_COLOR}
+				ScrollBarImageTransparency={SCROLLBAR_TRANSPARENCY}
 				ScrollingDirection={Enum.ScrollingDirection.Y}
 				ClipsDescendants={true}
 				AnchorPoint={new Vector2(0.5, 0)}

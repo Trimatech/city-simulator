@@ -30,18 +30,21 @@ export function ShopWindow({ onClose }: ShopWindowProps) {
 				text="SKINS"
 				icon={assets.ui.shop.Skins}
 				fitContent={true}
+				isActive={activeTabId === ShopTabs.Skins}
 				onClick={() => setActiveTabId(ShopTabs.Skins)}
 			/>
 			<ShopItemButton
 				text="CASH"
 				icon={assets.ui.shop.Cash}
 				fitContent={true}
+				isActive={activeTabId === ShopTabs.Cash}
 				onClick={() => setActiveTabId(ShopTabs.Cash)}
 			/>
 			<ShopItemButton
 				text="CRYSTALS"
 				icon={assets.ui.shards_icon_color}
 				fitContent={true}
+				isActive={activeTabId === ShopTabs.Crystals}
 				onClick={() => setActiveTabId(ShopTabs.Crystals)}
 			/>
 			<HFill verticalSize={0} />

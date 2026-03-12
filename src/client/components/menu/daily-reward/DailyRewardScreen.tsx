@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "@rbxts/react";
 import { HStack } from "@rbxts-ui/layout";
 import { Frame } from "@rbxts-ui/primitives";
 import { useRem } from "client/ui/rem/useRem";
+import { SCROLLBAR_COLOR, SCROLLBAR_THICKNESS, SCROLLBAR_TRANSPARENCY } from "client/ui/scrollbar.constants";
 import assets from "shared/assets";
 import { DAILY_REWARD_CYCLE, getDailyRewardAmount } from "shared/constants/daily-rewards";
-import { palette } from "shared/constants/palette";
 import { remotes } from "shared/remotes";
 
 import { GameWindow } from "../shop/GameWindow";
@@ -73,10 +73,10 @@ export function DailyRewardScreen({ streakDay: _streakDay, onDismiss }: DailyRew
 					Size={new UDim2(1, 0, 1, 0)}
 					CanvasSize={new UDim2(0, 0, 0, 0)}
 					AutomaticCanvasSize={Enum.AutomaticSize.X}
-					ScrollBarThickness={rem(1)}
+					ScrollBarThickness={rem(SCROLLBAR_THICKNESS)}
 					ScrollingDirection={Enum.ScrollingDirection.X}
-					ScrollBarImageColor3={palette.blue}
-					ScrollBarImageTransparency={0.9}
+					ScrollBarImageColor3={SCROLLBAR_COLOR}
+					ScrollBarImageTransparency={SCROLLBAR_TRANSPARENCY}
 					ClipsDescendants={true}
 					AutomaticSize={Enum.AutomaticSize.Y}
 				>
