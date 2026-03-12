@@ -79,6 +79,7 @@ export function SkinThumbnail({ skin, active: _active, transparency: _transparen
 			orbitYawDeg={65}
 			orbitPitchDeg={20}
 			orbitDistanceMultiplier={1.1}
+			shadowEnabled
 			isLoading={selectedParts === undefined}
 		/>
 	);

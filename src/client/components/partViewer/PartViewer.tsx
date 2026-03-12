@@ -22,6 +22,8 @@ interface PartViewerProps {
 	// Built-in interactive orbit controls
 	interactive?: boolean; // enables mouse drag + wheel controls
 	interactiveSpeed?: number;
+	// Fake shadow beneath parts
+	shadowEnabled?: boolean;
 	// Loading overlay
 	isLoading?: boolean;
 }
@@ -60,6 +62,7 @@ export function PartViewer({
 	orbitTargetOffset,
 	interactive = false,
 	interactiveSpeed = 1,
+	shadowEnabled = false,
 	isLoading = false,
 }: PartViewerProps) {
 	const rem = useRem();
@@ -151,6 +154,28 @@ export function PartViewer({
 			}
 		}
 
+		// Add fake shadow: clone model, rotate flat, darken (before adding highlight)
+		let shadowModel: Model | undefined;
+		if (shadowEnabled && model.GetChildren().size() > 0) {
+			shadowModel = model.Clone();
+			shadowModel.Name = "FakeShadow";
+			shadowModel.PivotTo(
+				new CFrame(0, -partHeightOffset - 0.05, -partHeightOffset + 0.05).mul(
+					CFrame.Angles(math.rad(90 + 180), 0, 0),
+				),
+			);
+			for (const desc of shadowModel.GetDescendants()) {
+				if (desc.IsA("BasePart")) {
+					desc.Color = Color3.fromRGB(0, 0, 0);
+					desc.Transparency = 0.7;
+					desc.Material = Enum.Material.SmoothPlastic;
+				} else if (desc.IsA("Decal") || desc.IsA("Texture")) {
+					desc.Transparency = 0.7;
+				}
+			}
+			shadowModel.Parent = viewportRef.current;
+		}
+
 		// store for interactive pan scale
 		partMaxDimensionRef.current = maxDimension;
 
@@ -185,6 +210,7 @@ export function PartViewer({
 		return () => {
 			model.Destroy();
 			camera.Destroy();
+			shadowModel?.Destroy();
 		};
 	}, [
 		selectedParts,
@@ -195,6 +221,7 @@ export function PartViewer({
 		effectivePitchDeg,
 		effectiveDistanceMul,
 		effectiveTargetOffset,
+		shadowEnabled,
 	]);
 
 	const viewportProps = useMemo(() => {
