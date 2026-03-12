@@ -1,7 +1,6 @@
 import React from "@rbxts/react";
-
-import { omit } from "@rbxts-ui/utils";
 import { ScrollingFrame, ScrollingFrameProps } from "@rbxts-ui/layout";
+import { omit } from "@rbxts-ui/utils";
 
 export interface GridScrollingProps extends ScrollingFrameProps {
 	spacing?: number;
@@ -54,7 +53,7 @@ export function GridScrolling(props: GridScrollingProps) {
 			BackgroundColor3={Color3.fromRGB(0, 0, 0)}
 			CanvasSize={new UDim2(0, 0, 0, 0)}
 			AutomaticCanvasSize={Enum.AutomaticSize.Y}
-			ClipsDescendants={false}
+			ClipsDescendants={true}
 			LayoutOrder={2}
 			{...rest}
 		>
