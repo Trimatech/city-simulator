@@ -36,6 +36,13 @@ declare const assets: {
 		button_glow_top: string
 		circle: string
 		clouds_bg: string
+		crystals: {
+			crystals_1: string
+			crystals_15: string
+			crystals_2: string
+			crystals_25: string
+			crystals_5: string
+		}
 		diagonal_stripes: string
 		heart: string
 		heart_glow: string

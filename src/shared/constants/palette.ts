@@ -110,6 +110,8 @@ const base = {
 const otherColors = {
 	blue1: Color3.fromRGB(19, 52, 92),
 	blue2: Color3.fromRGB(42, 101, 160),
+	subtitleStrokeFrom: Color3.fromHex("#005794"),
+	subtitleStrokeTo: Color3.fromHex("#000000"),
 	red1: Color3.fromRGB(244, 0, 27),
 } as const;
 

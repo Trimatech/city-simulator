@@ -20,8 +20,8 @@ export function CashProducts() {
 	const botPad = rem(4);
 
 	const itemWidth = rem(20);
-	const smallItemH = rem(20);
-	const largeItemH = rem(26);
+	const smallItemH = rem(15);
+	const largeItemH = rem(20);
 
 	const gridWidth = 3 * itemWidth + 2 * colSpacing;
 	const gridHeight = smallItemH + rowSpacing + largeItemH;

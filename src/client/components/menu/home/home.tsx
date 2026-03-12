@@ -12,7 +12,6 @@ import { USER_NAME } from "shared/constants/core";
 import {
 	DAILY_REWARD_CYCLE,
 	DAILY_STREAK_WINDOW,
-	getDailyRewardAmount,
 	SECONDS_PER_DAY,
 } from "shared/constants/daily-rewards";
 import { palette } from "shared/constants/palette";
@@ -27,7 +26,6 @@ import { PlayButton } from "./PlayButton";
 
 interface DailyRewardInfo {
 	readonly streakDay: number;
-	readonly crystalAmount: number;
 }
 
 interface HomeProps {
@@ -54,7 +52,7 @@ export function Home({ visible }: HomeProps) {
 			streakDay = currentStreak;
 		}
 
-		setDailyReward({ streakDay, crystalAmount: getDailyRewardAmount(streakDay) });
+		setDailyReward({ streakDay });
 	};
 
 	return (
@@ -137,11 +135,7 @@ export function Home({ visible }: HomeProps) {
 			)}
 
 			{dailyReward && (
-				<DailyRewardScreen
-					streakDay={dailyReward.streakDay}
-					crystalAmount={dailyReward.crystalAmount}
-					onDismiss={() => setDailyReward(undefined)}
-				/>
+				<DailyRewardScreen streakDay={dailyReward.streakDay} onDismiss={() => setDailyReward(undefined)} />
 			)}
 		</>
 	);

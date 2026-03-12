@@ -25,8 +25,8 @@ export interface ShopItemTheme {
 	readonly labelStrokeTo: Color3;
 }
 
-const SUBTITLE_STROKE_FROM = Color3.fromHex("#005794");
-const SUBTITLE_STROKE_TO = Color3.fromHex("#000000");
+const SUBTITLE_STROKE_FROM = palette.subtitleStrokeFrom;
+const SUBTITLE_STROKE_TO = palette.subtitleStrokeTo;
 
 export const shopItemThemes = {
 	green: {
@@ -89,6 +89,7 @@ interface ShopItemProps {
 	readonly buttonText: string;
 	readonly buttonIcon?: string;
 	readonly icon?: string;
+	readonly children?: React.ReactNode;
 	readonly theme?: ShopItemTheme;
 	readonly buttonTheme?: ShopItemButtonTheme;
 	readonly onButtonClick?: () => void;
@@ -105,6 +106,7 @@ export function ShopItem({
 	buttonText,
 	buttonIcon,
 	icon,
+	children,
 	theme = shopItemThemes.orange,
 	buttonTheme,
 	onButtonClick,
@@ -197,16 +199,26 @@ export function ShopItem({
 							imageColor3={theme.rayTint}
 						/>
 
-						{/* Icon — fills full inner area, absolute centered (Figma: 308x308 in 308x308) */}
-						{icon !== undefined && (
-							<Image
-								image={icon}
-								size={new UDim2(1.05, 0, 1.05, 0)}
-								position={new UDim2(0.5, 0, 0.5, 0)}
-								anchorPoint={new Vector2(0.5, 0.5)}
-								scaleType="Fit"
+						{/* Center content — either custom children or icon image */}
+						{children !== undefined ? (
+							<Frame
+								size={new UDim2(1, 0, 1, 0)}
+								backgroundTransparency={1}
 								zIndex={2}
-							/>
+							>
+								{children}
+							</Frame>
+						) : (
+							icon !== undefined && (
+								<Image
+									image={icon}
+									size={new UDim2(1.05, 0, 1.05, 0)}
+									position={new UDim2(0.5, 0, 0.5, 0)}
+									anchorPoint={new Vector2(0.5, 0.5)}
+									scaleType="Fit"
+									zIndex={2}
+								/>
+							)
 						)}
 
 						{/* Title — Figma: y=12 in 308h → ~3.9% */}

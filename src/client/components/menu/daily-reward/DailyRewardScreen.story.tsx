@@ -5,7 +5,6 @@ import ReactRoblox from "@rbxts/react-roblox";
 import { InferFusionProps, Number } from "@rbxts/ui-labs";
 import { DailyRewardScreen } from "client/components/menu/daily-reward/DailyRewardScreen";
 import { RootProvider } from "client/providers/root-provider";
-import { getDailyRewardAmount } from "shared/constants/daily-rewards";
 
 const controls = {
 	streakDay: Number(1, 1, 7, 1),
@@ -19,11 +18,7 @@ function DailyRewardScreenStoryContent({ streakDay }: StoryProps) {
 	return (
 		<RootProvider>
 			<frame BackgroundTransparency={1} Size={new UDim2(1, 0, 1, 0)}>
-				<DailyRewardScreen
-					streakDay={streakDay}
-					crystalAmount={getDailyRewardAmount(streakDay)}
-					onDismiss={() => {}}
-				/>
+				<DailyRewardScreen streakDay={streakDay} onDismiss={() => {}} />
 			</frame>
 		</RootProvider>
 	);

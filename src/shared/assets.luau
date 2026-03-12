@@ -36,6 +36,13 @@ local assets = {
 		button_glow_top = "rbxassetid://95372204523717",
 		circle = "rbxassetid://99378336767827",
 		clouds_bg = "rbxassetid://115538629850538",
+		crystals = {
+			crystals_1 = "rbxassetid://111697274501125",
+			crystals_15 = "rbxassetid://74957416291201",
+			crystals_2 = "rbxassetid://89934542330983",
+			crystals_25 = "rbxassetid://98880720652614",
+			crystals_5 = "rbxassetid://124206137488440",
+		},
 		diagonal_stripes = "rbxassetid://79238839735749",
 		heart = "rbxassetid://140385836727829",
 		heart_glow = "rbxassetid://98749324115035",
