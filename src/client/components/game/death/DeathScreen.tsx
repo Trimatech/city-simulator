@@ -102,6 +102,7 @@ export function DeathScreen({ activeDeadline, persistent, onDismiss }: DeathScre
 					Color={DARK_BORDER_COLOR}
 					Thickness={rem(DARK_BORDER_THICKNESS + BORDER_THICKNESS)}
 					ZIndex={1}
+					BorderStrokePosition={Enum.BorderStrokePosition.Outer}
 				/>
 				<uistroke Color={palette.white} Thickness={rem(BORDER_THICKNESS)} ZIndex={2}>
 					<uigradient Color={BORDER_GRADIENT} Rotation={90} />

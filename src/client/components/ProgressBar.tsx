@@ -9,10 +9,21 @@ const BG_COLOR = Color3.fromHex("#2a65a0");
 const FILL_COLOR = Color3.fromHex("#08f0fe");
 
 // Gradient stroke for the inner progress bar border (top → bottom)
-const INNER_STROKE_GRADIENT = new ColorSequence(Color3.fromHex("#2a65a0"), Color3.fromHex("#1a4e80"));
+const OUTER_STROKE_GRADIENT = new ColorSequence(Color3.fromHex("#0E2A4E"), Color3.fromHex("#0E2A4E"));
 
-// Gradient stroke for the fill bar border (top → bottom)
-const FILL_STROKE_GRADIENT = new ColorSequence(Color3.fromHex("#40ffff"), Color3.fromHex("#00a0d0"));
+// Gradient stroke for the fill bar border (top → bottom)00F0FF
+
+const FILL_STROKE_GRADIENT = new ColorSequence([
+	new ColorSequenceKeypoint(0, Color3.fromHex("#00F0FF")),
+	new ColorSequenceKeypoint(0.75, Color3.fromHex("#00F0FF")),
+	new ColorSequenceKeypoint(1, Color3.fromHex("#82F8FF")),
+]);
+
+const INNER_STROKE_GRADIENT = new ColorSequence([
+	new ColorSequenceKeypoint(0, Color3.fromHex("#1A4E80")),
+	new ColorSequenceKeypoint(0.48, Color3.fromHex("#2A65A0")),
+	new ColorSequenceKeypoint(1, Color3.fromHex("#2E73B8")),
+]);
 
 export interface ProgressBarProps {
 	/** Progress value from 0 to 1 */
@@ -25,8 +36,10 @@ export const ProgressBar = ({ progress, height = 28 }: ProgressBarProps) => {
 	const rem = useRem();
 
 	const fillPosition = composeBindings(progress, (p: number) => {
-		return new UDim2(math.clamp(p, 0, 1) - 1, 0, 0, 0);
+		return new UDim2(math.clamp(p, 0, 1) - 1, 0, 0.5, 0);
 	});
+
+	const thickness = rem(0.2);
 
 	return (
 		<Frame
@@ -36,36 +49,50 @@ export const ProgressBar = ({ progress, height = 28 }: ProgressBarProps) => {
 			size={new UDim2(1, 0, 0, height + rem(0.4))}
 			cornerRadius={cornerRadiusFull}
 		>
-			<uipadding
-				PaddingTop={new UDim(0, rem(0.2))}
-				PaddingBottom={new UDim(0, rem(0.2))}
-				PaddingLeft={new UDim(0, rem(0.2))}
-				PaddingRight={new UDim(0, rem(0.2))}
-			/>
-			<canvasgroup
-				key="ProgressBar"
-				Size={new UDim2(1, 0, 1, 0)}
-				BackgroundColor3={BG_COLOR}
-				BackgroundTransparency={0}
-				GroupTransparency={0}
-			>
+			<canvasgroup key="ProgressBar" Size={new UDim2(1, 0, 1, 0)} BackgroundColor3={BG_COLOR}>
 				<uicorner CornerRadius={cornerRadiusFull} />
-				<uistroke Color={Color3.fromHex("#ffffff")} Thickness={rem(0.2)}>
-					<uigradient Color={INNER_STROKE_GRADIENT} Rotation={90} />
+				<uistroke
+					Color={Color3.fromHex("#ffffff")}
+					Thickness={thickness}
+					BorderStrokePosition={Enum.BorderStrokePosition.Outer}
+				>
+					<uigradient Color={OUTER_STROKE_GRADIENT} Rotation={90} />
 				</uistroke>
 
 				{/* Filled portion — full size, slides via Position so roundness is preserved */}
 				<canvasgroup
 					key="ProgressFill"
 					Position={fillPosition}
-					Size={UDim2.fromScale(1, 1)}
+					Size={new UDim2(1, 0, 1, -thickness * 3)}
+					AnchorPoint={new Vector2(0, 0.5)}
 					BackgroundColor3={FILL_COLOR}
-					BackgroundTransparency={0}
-					GroupTransparency={0}
+					ZIndex={2}
 				>
-					<uicorner CornerRadius={new UDim(1, 0)} />
-					<uistroke Color={Color3.fromHex("#ffffff")} Thickness={rem(0.2)}>
-						<uigradient Color={FILL_STROKE_GRADIENT} Rotation={90} />
+					<uicorner CornerRadius={cornerRadiusFull} />
+					<uistroke
+						Color={Color3.fromHex("#ffffff")}
+						Thickness={rem(0.2)}
+						BorderStrokePosition={Enum.BorderStrokePosition.Outer}
+					>
+						<uigradient Color={FILL_STROKE_GRADIENT} Rotation={0} />
+					</uistroke>
+				</canvasgroup>
+
+				<canvasgroup
+					key="ProgressFillInner"
+					Position={new UDim2(0.5, 0, 0.5, 0)}
+					Size={new UDim2(1, -thickness * 2, 1, -thickness * 2)}
+					AnchorPoint={new Vector2(0.5, 0.5)}
+					Transparency={1}
+					ZIndex={1}
+				>
+					<uicorner CornerRadius={cornerRadiusFull} />
+					<uistroke
+						Color={Color3.fromHex("#ffffff")}
+						Thickness={rem(0.2)}
+						BorderStrokePosition={Enum.BorderStrokePosition.Outer}
+					>
+						<uigradient Color={INNER_STROKE_GRADIENT} Rotation={90} />
 					</uistroke>
 				</canvasgroup>
 			</canvasgroup>
