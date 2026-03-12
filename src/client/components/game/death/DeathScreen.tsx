@@ -128,14 +128,14 @@ export function DeathScreen({ activeDeadline, persistent, onDismiss }: DeathScre
 					automaticSize={Enum.AutomaticSize.Y}
 				>
 					{/* Heading: "You Died" */}
-					<Frame size={new UDim2(1, 0, 0, rem(5))} backgroundTransparency={1}>
+					<Frame size={new UDim2(1, 0, 0, rem(9))} backgroundTransparency={1}>
 						<Text
 							font={fonts.fredokaOne.regular}
 							text={`<font color="#ffffff">You </font><font color="#ff5050">Died</font>`}
 							richText={true}
 							size={new UDim2(1, 0, 1, 0)}
 							textColor={palette.white}
-							textSize={rem(4)}
+							textSize={rem(6)}
 							textXAlignment="Center"
 							textYAlignment="Center"
 							zIndex={2}
@@ -148,7 +148,7 @@ export function DeathScreen({ activeDeadline, persistent, onDismiss }: DeathScre
 							richText={true}
 							size={new UDim2(1, 0, 1, 0)}
 							textColor={palette.white}
-							textSize={rem(4)}
+							textSize={rem(6)}
 							textXAlignment="Center"
 							textYAlignment="Center"
 							zIndex={1}
@@ -176,11 +176,13 @@ export function DeathScreen({ activeDeadline, persistent, onDismiss }: DeathScre
 										text={secondsLeft}
 										automaticSize={Enum.AutomaticSize.XY}
 										textColor={palette.white}
-										textSize={rem(1.2)}
+										textSize={rem(1.6)}
 										zIndex={100}
 										position={new UDim2(0.5, 0, 0.5, 0)}
 										anchorPoint={new Vector2(0.5, 0.5)}
-									/>
+									>
+										<uistroke Color={palette.dark} Transparency={0} Thickness={rem(0.1)} />
+									</Text>
 								)}
 							/>
 						</Frame>
