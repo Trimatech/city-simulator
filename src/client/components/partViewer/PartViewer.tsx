@@ -1,9 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "@rbxts/react";
-import { useRem } from "client/hooks";
-import { InputCapture } from "@rbxts-ui/components";
-import { Frame } from "@rbxts-ui/primitives";
-import { Outline } from "@rbxts-ui/components";
-import { Text } from "@rbxts-ui/primitives";
+import { InputCapture, Outline } from "@rbxts-ui/components";
+import { Frame, Text } from "@rbxts-ui/primitives";
+import { useRem } from "client/ui/rem/useRem";
 import { palette } from "shared/constants/palette";
 
 import { filterValidParts, safeCloneInstance, safeCloneInstances } from "./PartViewer.utils";

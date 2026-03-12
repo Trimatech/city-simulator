@@ -1,14 +1,18 @@
 import { composeBindings } from "@rbxts/pretty-react-hooks";
 import React from "@rbxts/react";
 import { Frame } from "@rbxts-ui/primitives";
-import { useRem } from "client/hooks";
+import { useRem } from "client/ui/rem/useRem";
 import { cornerRadiusFull } from "shared/constants/sizes";
 
 const OUTER_BORDER_COLOR = Color3.fromHex("#0e2a4e");
 const BG_COLOR = Color3.fromHex("#2a65a0");
-const INNER_BORDER_COLOR = Color3.fromHex("#1a4e80");
 const FILL_COLOR = Color3.fromHex("#08f0fe");
-const FILL_BORDER_COLOR = Color3.fromHex("#00f0ff");
+
+// Gradient stroke for the inner progress bar border (top → bottom)
+const INNER_STROKE_GRADIENT = new ColorSequence(Color3.fromHex("#2a65a0"), Color3.fromHex("#1a4e80"));
+
+// Gradient stroke for the fill bar border (top → bottom)
+const FILL_STROKE_GRADIENT = new ColorSequence(Color3.fromHex("#40ffff"), Color3.fromHex("#00a0d0"));
 
 export interface ProgressBarProps {
 	/** Progress value from 0 to 1 */
@@ -46,7 +50,9 @@ export const ProgressBar = ({ progress, height = 28 }: ProgressBarProps) => {
 				GroupTransparency={0}
 			>
 				<uicorner CornerRadius={cornerRadiusFull} />
-				<uistroke Color={INNER_BORDER_COLOR} Thickness={rem(0.2)} />
+				<uistroke Color={Color3.fromHex("#ffffff")} Thickness={rem(0.2)}>
+					<uigradient Color={INNER_STROKE_GRADIENT} Rotation={90} />
+				</uistroke>
 
 				{/* Filled portion — full size, slides via Position so roundness is preserved */}
 				<canvasgroup
@@ -58,7 +64,9 @@ export const ProgressBar = ({ progress, height = 28 }: ProgressBarProps) => {
 					GroupTransparency={0}
 				>
 					<uicorner CornerRadius={new UDim(1, 0)} />
-					<uistroke Color={FILL_BORDER_COLOR} Thickness={rem(0.2)} />
+					<uistroke Color={Color3.fromHex("#ffffff")} Thickness={rem(0.2)}>
+						<uigradient Color={FILL_STROKE_GRADIENT} Rotation={90} />
+					</uistroke>
 				</canvasgroup>
 			</canvasgroup>
 		</Frame>

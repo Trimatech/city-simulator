@@ -3,11 +3,11 @@ import "client/app/react-config";
 import React from "@rbxts/react";
 import ReactRoblox from "@rbxts/react-roblox";
 import { InferFusionProps, Number } from "@rbxts/ui-labs";
-import { ProgressBar } from "client/components/ProgressBar";
-import { useRem } from "client/hooks";
-import { RootProvider } from "client/providers/root-provider";
-import { Frame } from "@rbxts-ui/primitives";
 import { VStack } from "@rbxts-ui/layout";
+import { Frame } from "@rbxts-ui/primitives";
+import { ProgressBar } from "client/components/ProgressBar";
+import { RootProvider } from "client/providers/root-provider";
+import { useRem } from "client/ui/rem/useRem";
 
 const controls = {
 	progress: Number(0.65, 0, 1, 0.01),

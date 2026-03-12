@@ -2,9 +2,10 @@ import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
-import { useRem, useStore } from "client/hooks";
+import { useStore } from "client/hooks";
 import { selectMusicEnabled } from "client/store/settings/settingsSelectors";
 import { MainButton } from "client/ui/MainButton";
+import { useRem } from "client/ui/rem/useRem";
 import { palette } from "shared/constants/palette";
 
 export function MuteButton() {

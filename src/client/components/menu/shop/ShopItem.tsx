@@ -1,9 +1,7 @@
 import React from "@rbxts/react";
+import { Frame, Image, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
-import { useRem } from "client/hooks";
-import { Image } from "@rbxts-ui/primitives";
-import { Frame } from "@rbxts-ui/primitives";
-import { Text } from "@rbxts-ui/primitives";
+import { useRem } from "client/ui/rem/useRem";
 import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 import { sizes } from "shared/constants/sizes";

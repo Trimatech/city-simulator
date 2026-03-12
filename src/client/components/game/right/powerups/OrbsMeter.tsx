@@ -1,19 +1,18 @@
 import Object from "@rbxts/object-utils";
 import React, { useEffect, useMemo } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { springs } from "client/constants/springs";
-import { useMotion, useRem } from "client/hooks";
-import { Frame } from "@rbxts-ui/primitives";
 import { Outline } from "@rbxts-ui/components";
+import { Frame } from "@rbxts-ui/primitives";
+import { springs } from "client/constants/springs";
+import { useMotion } from "client/hooks";
+import { useRem } from "client/ui/rem/useRem";
 import { Shadow } from "client/ui/shadow";
 import { SOLDIER_MAX_ORBS } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
 import { POWERUP_COLORS, POWERUP_PRICES, PowerupId } from "shared/constants/powerups";
 import { selectLocalOrbs } from "shared/store/soldiers";
 
-const SORTED_THRESHOLDS = (Object.entries(POWERUP_PRICES) as Array<[PowerupId, number]>).sort(
-	([, a], [, b]) => a < b,
-);
+const SORTED_THRESHOLDS = (Object.entries(POWERUP_PRICES) as Array<[PowerupId, number]>).sort(([, a], [, b]) => a < b);
 
 interface Props {
 	readonly anchorPoint?: Vector2;

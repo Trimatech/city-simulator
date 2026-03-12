@@ -1,11 +1,10 @@
 import { useAsyncEffect, useDeferState } from "@rbxts/pretty-react-hooks";
 import React, { useMemo } from "@rbxts/react";
 import { ContentProvider } from "@rbxts/services";
+import { Text } from "@rbxts-ui/primitives";
+import { useRem } from "client/ui/rem/useRem";
 import assets from "shared/assets";
 import { images } from "shared/assetsFolder";
-
-import { useRem } from "../../hooks";
-import { Text } from "@rbxts-ui/primitives";
 
 interface Assets {
 	[key: string]: string | Assets;

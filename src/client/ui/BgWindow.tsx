@@ -1,9 +1,7 @@
 import React, { useBinding } from "@rbxts/react";
-import { useRem } from "client/hooks";
-import { CanvasGroup } from "@rbxts-ui/primitives";
-import { Image } from "@rbxts-ui/primitives";
-import { Frame } from "@rbxts-ui/primitives";
 import { VStack } from "@rbxts-ui/layout";
+import { CanvasGroup, Frame, Image } from "@rbxts-ui/primitives";
+import { useRem } from "client/ui/rem/useRem";
 import { palette } from "shared/constants/palette";
 
 interface BgWindowProps extends React.PropsWithChildren {

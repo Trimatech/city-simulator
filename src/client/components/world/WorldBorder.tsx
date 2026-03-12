@@ -1,12 +1,10 @@
 import React, { useEffect, useMemo } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
+import { CanvasGroup, Frame, Group, Image } from "@rbxts-ui/primitives";
 import { springs } from "client/constants/springs";
-import { useMotion, useRem } from "client/hooks";
+import { useMotion } from "client/hooks";
 import { selectWorldCamera } from "client/store/world";
-import { CanvasGroup } from "@rbxts-ui/primitives";
-import { Image } from "@rbxts-ui/primitives";
-import { Frame } from "@rbxts-ui/primitives";
-import { Group } from "@rbxts-ui/primitives";
+import { useRem } from "client/ui/rem/useRem";
 import assets from "shared/assets";
 import { WORLD_BOUNDS } from "shared/constants/core";
 import { palette } from "shared/constants/palette";

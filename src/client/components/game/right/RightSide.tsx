@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
-import { useRem } from "client/hooks";
 import { Group } from "@rbxts-ui/primitives";
+import { useRem } from "client/ui/rem/useRem";
 
 import { PowerupsPanel } from "./powerups/PowerupsPanel";
 

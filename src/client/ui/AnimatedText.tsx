@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "@rbxts/react";
 import { SpringOptions } from "@rbxts/ripple";
-import { fonts } from "client/constants/fonts";
-import { useRem } from "client/hooks";
-import { FrameProps } from "@rbxts-ui/primitives";
 import { HStack } from "@rbxts-ui/layout";
+import { FrameProps } from "@rbxts-ui/primitives";
+import { fonts } from "client/constants/fonts";
+import { useRem } from "client/ui/rem/useRem";
 import { palette } from "shared/constants/palette";
 
 import { AnimatedChar } from "./AnimatedChar";

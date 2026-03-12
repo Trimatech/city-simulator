@@ -1,7 +1,8 @@
 import React from "@rbxts/react";
 import { useSelectorCreator } from "@rbxts/react-reflex";
-import { useDefined, useRem } from "client/hooks";
 import { Group } from "@rbxts-ui/primitives";
+import { useDefined } from "client/hooks";
+import { useRem } from "client/ui/rem/useRem";
 import { formatInteger } from "client/utils/format-integer";
 import { USER_NAME } from "shared/constants/core";
 import { ROOT_PADDING } from "shared/constants/theme";

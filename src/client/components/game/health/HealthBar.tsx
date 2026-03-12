@@ -1,9 +1,10 @@
 import React, { useEffect } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { springs } from "client/constants/springs";
-import { useMotion, useRem } from "client/hooks";
-import { Frame } from "@rbxts-ui/primitives";
 import { Outline } from "@rbxts-ui/components";
+import { Frame } from "@rbxts-ui/primitives";
+import { springs } from "client/constants/springs";
+import { useMotion } from "client/hooks";
+import { useRem } from "client/ui/rem/useRem";
 import { Shadow } from "client/ui/shadow";
 import { palette } from "shared/constants/palette";
 import { selectLocalHealth, selectLocalMaxHealth } from "shared/store/soldiers";

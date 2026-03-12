@@ -3,7 +3,8 @@ import { Outline, ReactiveButton2 } from "@rbxts-ui/components";
 import { Transition } from "@rbxts-ui/layout";
 import { Frame, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
-import { useMotion, useRem } from "client/hooks";
+import { useMotion } from "client/hooks";
+import { useRem } from "client/ui/rem/useRem";
 import { palette } from "shared/constants/palette";
 
 interface Props {

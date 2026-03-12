@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 import { Text } from "@rbxts-ui/primitives";
-import { useRem } from "client/hooks";
 import { MainButton } from "client/ui/MainButton";
+import { useRem } from "client/ui/rem/useRem";
 import { palette } from "shared/constants/palette";
 
 export function CanvasButton({ text, onClick }: { text: string; onClick: () => void }) {

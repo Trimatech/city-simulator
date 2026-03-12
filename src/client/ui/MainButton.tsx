@@ -6,7 +6,8 @@ import { playButtonDown, playButtonUp } from "shared/assetsFolder/sounds/play-bu
 import { palette } from "shared/constants/palette";
 import { brighten } from "shared/utils/color-utils";
 
-import { useMotion, useRem } from "../hooks";
+import { useMotion } from "../hooks";
+import { useRem } from "./rem/useRem";
 
 interface PrimaryButtonProps extends React.PropsWithChildren {
 	readonly onClick?: () => void;

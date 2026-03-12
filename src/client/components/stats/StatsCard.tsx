@@ -4,7 +4,8 @@ import { Transition } from "@rbxts-ui/layout";
 import { Frame, Group, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
-import { useMotion, useRem } from "client/hooks";
+import { useMotion } from "client/hooks";
+import { useRem } from "client/ui/rem/useRem";
 import { Shadow } from "client/ui/shadow";
 import { palette } from "shared/constants/palette";
 

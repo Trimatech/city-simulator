@@ -1,9 +1,10 @@
 import { lerpBinding, useInterval } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { setTimeout } from "@rbxts/set-timeout";
-import { springs } from "client/constants/springs";
-import { useMotion, useRem } from "client/hooks";
 import { Image } from "@rbxts-ui/primitives";
+import { springs } from "client/constants/springs";
+import { useMotion } from "client/hooks";
+import { useRem } from "client/ui/rem/useRem";
 import assets from "shared/assets";
 
 export function SupportHeart() {

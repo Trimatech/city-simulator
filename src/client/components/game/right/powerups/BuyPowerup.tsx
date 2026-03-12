@@ -5,7 +5,7 @@ import { HStack, Transition } from "@rbxts-ui/layout";
 import { Frame, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
-import { useRem } from "client/hooks";
+import { useRem } from "client/ui/rem/useRem";
 import { palette } from "shared/constants/palette";
 import { remotes } from "shared/remotes";
 

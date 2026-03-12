@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
-import { useRem } from "client/hooks";
 import { VStack } from "@rbxts-ui/layout";
 import { Text } from "@rbxts-ui/primitives";
+import { useRem } from "client/ui/rem/useRem";
 
 import { HealthBar } from "./HealthBar";
 

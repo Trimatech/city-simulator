@@ -5,8 +5,8 @@ import { HStack } from "@rbxts-ui/layout";
 import { Frame, Text } from "@rbxts-ui/primitives";
 import { HomeStats } from "client/components/stats/HomeStats";
 import { fonts } from "client/constants/fonts";
-import { useRem } from "client/hooks";
 import { MainButton } from "client/ui/MainButton";
+import { useRem } from "client/ui/rem/useRem";
 import { SlideIn } from "client/ui/slide-in";
 import { USER_NAME } from "shared/constants/core";
 import {

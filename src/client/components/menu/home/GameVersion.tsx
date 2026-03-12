@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
-import { fonts } from "client/constants/fonts";
-import { useRem } from "client/hooks";
 import { Text } from "@rbxts-ui/primitives";
+import { fonts } from "client/constants/fonts";
+import { useRem } from "client/ui/rem/useRem";
 import { $env } from "rbxts-transform-env";
 import { palette } from "shared/constants/palette";
 

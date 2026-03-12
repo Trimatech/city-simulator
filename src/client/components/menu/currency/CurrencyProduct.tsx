@@ -5,8 +5,9 @@ import { ReactiveButton2 } from "@rbxts-ui/components";
 import { Transition } from "@rbxts-ui/layout";
 import { Frame, Group, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
-import { useMotion, useProductPrice, useRem } from "client/hooks";
+import { useMotion, useProductPrice } from "client/hooks";
 import { MainButton } from "client/ui/MainButton";
+import { useRem } from "client/ui/rem/useRem";
 import { palette } from "shared/constants/palette";
 import { brighten } from "shared/utils/color-utils";
 

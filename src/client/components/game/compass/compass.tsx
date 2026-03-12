@@ -1,11 +1,10 @@
 import { composeBindings, lerpBinding, useViewport } from "@rbxts/pretty-react-hooks";
 import React, { useEffect, useMemo } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { useMotion, useRem } from "client/hooks";
+import { Group, Image, Text } from "@rbxts-ui/primitives";
+import { useMotion } from "client/hooks";
 import { selectWorldSubjectPosition } from "client/store/world";
-import { Image } from "@rbxts-ui/primitives";
-import { Group } from "@rbxts-ui/primitives";
-import { Text } from "@rbxts-ui/primitives";
+import { useRem } from "client/ui/rem/useRem";
 import assets from "shared/assets";
 
 import { useLeaderPosition } from "./utils";

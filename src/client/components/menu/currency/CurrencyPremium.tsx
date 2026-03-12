@@ -2,8 +2,8 @@ import React from "@rbxts/react";
 import { MarketplaceService, Players } from "@rbxts/services";
 import { Text } from "@rbxts-ui/primitives";
 import { sendAlert } from "client/alerts";
-import { useRem } from "client/hooks";
 import { MainButton } from "client/ui/MainButton";
+import { useRem } from "client/ui/rem/useRem";
 import { palette } from "shared/constants/palette";
 
 export function CurrencyPremium() {

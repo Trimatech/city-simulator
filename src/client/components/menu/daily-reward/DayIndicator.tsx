@@ -1,11 +1,8 @@
 import React from "@rbxts/react";
-import { fonts } from "client/constants/fonts";
-import { useRem } from "client/hooks";
-import { CanvasGroup } from "@rbxts-ui/primitives";
-import { Image } from "@rbxts-ui/primitives";
-import { Frame } from "@rbxts-ui/primitives";
 import { HStack } from "@rbxts-ui/layout";
-import { Text } from "@rbxts-ui/primitives";
+import { CanvasGroup, Frame, Image, Text } from "@rbxts-ui/primitives";
+import { fonts } from "client/constants/fonts";
+import { useRem } from "client/ui/rem/useRem";
 import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 

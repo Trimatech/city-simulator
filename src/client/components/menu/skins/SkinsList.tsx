@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
-import { useRem } from "client/hooks";
 import { GridScrolling } from "client/ui/layout/GridScrolling";
+import { useRem } from "client/ui/rem/useRem";
 import { allWallSkins } from "shared/constants/skins";
 import { RANDOM_SKIN } from "shared/store/saves";
 

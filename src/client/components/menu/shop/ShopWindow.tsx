@@ -1,7 +1,7 @@
 import React, { useState } from "@rbxts/react";
 import { HFill, HStack, VStack } from "@rbxts-ui/layout";
 import { Frame } from "@rbxts-ui/primitives";
-import { useRem } from "client/hooks";
+import { useRem } from "client/ui/rem/useRem";
 import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 
