@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "@rbxts/react";
-import { Outline, ReactiveButton } from "@rbxts-ui/components";
+import { Outline, ReactiveButton2 } from "@rbxts-ui/components";
 import { Frame } from "@rbxts-ui/primitives";
 import { mapMouseToUiGradient } from "client/utils/ui-gradient.utils";
 import { playButtonDown, playButtonUp } from "shared/assetsFolder/sounds/play-button-sound";
@@ -63,7 +63,7 @@ export function MainButton({
 	const color = hovered && hasMouseSample ? gradientColor : new ColorSequence(primaryColor);
 
 	return (
-		<ReactiveButton
+		<ReactiveButton2
 			onClick={onClick}
 			onHover={(hovered) => {
 				setHovered(hovered);
@@ -111,6 +111,6 @@ export function MainButton({
 			<Outline cornerRadius={cornerRadius} innerTransparency={0} outerTransparency={1} />
 
 			{children}
-		</ReactiveButton>
+		</ReactiveButton2>
 	);
 }

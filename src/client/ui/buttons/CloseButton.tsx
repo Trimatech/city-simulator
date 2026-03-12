@@ -1,9 +1,7 @@
 import React from "@rbxts/react";
+import { Outline, ReactiveButton2 } from "@rbxts-ui/components";
+import { Frame, Image } from "@rbxts-ui/primitives";
 import { useRem } from "client/hooks";
-import { Image } from "@rbxts-ui/primitives";
-import { Frame } from "@rbxts-ui/primitives";
-import { Outline } from "@rbxts-ui/components";
-import { ReactiveButton } from "@rbxts-ui/components";
 import { palette } from "shared/constants/palette";
 
 export function CloseButton({
@@ -20,7 +18,7 @@ export function CloseButton({
 	const fullRound = new UDim(1, 0);
 
 	return (
-		<ReactiveButton
+		<ReactiveButton2
 			onClick={onClick}
 			backgroundTransparency={1}
 			size={new UDim2(0, buttonSize, 0, buttonSize)}
@@ -50,7 +48,7 @@ export function CloseButton({
 					zIndex={(zIndex ?? 0) + 1}
 				/>
 			</Frame>
-		</ReactiveButton>
+		</ReactiveButton2>
 	);
 }
 

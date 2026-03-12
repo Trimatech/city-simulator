@@ -1,8 +1,7 @@
 import React from "@rbxts/react";
+import { ReactiveButton2 } from "@rbxts-ui/components";
+import { Frame, Image } from "@rbxts-ui/primitives";
 import { useRem } from "client/hooks";
-import { Image } from "@rbxts-ui/primitives";
-import { Frame } from "@rbxts-ui/primitives";
-import { ReactiveButton } from "@rbxts-ui/components";
 import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 
@@ -36,7 +35,7 @@ export function ShopIconButton({
 	const outerPadding = new UDim(0, rem(0.2));
 
 	return (
-		<ReactiveButton
+		<ReactiveButton2
 			onClick={onClick}
 			backgroundTransparency={1}
 			size={buttonSize}
@@ -93,6 +92,6 @@ export function ShopIconButton({
 					</frame>
 				</Frame>
 			</Frame>
-		</ReactiveButton>
+		</ReactiveButton2>
 	);
 }

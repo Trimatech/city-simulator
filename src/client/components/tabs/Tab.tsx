@@ -1,11 +1,9 @@
 import React, { useMemo } from "@rbxts/react";
+import { Outline, ReactiveButton2 } from "@rbxts-ui/components";
+import { Transition } from "@rbxts-ui/layout";
+import { Frame, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { useMotion, useRem } from "client/hooks";
-import { Frame } from "@rbxts-ui/primitives";
-import { Outline } from "@rbxts-ui/components";
-import { ReactiveButton } from "@rbxts-ui/components";
-import { Text } from "@rbxts-ui/primitives";
-import { Transition } from "@rbxts-ui/layout";
 import { palette } from "shared/constants/palette";
 
 interface Props {
@@ -45,7 +43,7 @@ export function Tab({ onClick, emoji, label, active, order }: Props) {
 	const cornerRadius = new UDim(0, roundness);
 
 	return (
-		<ReactiveButton onClick={onClick} backgroundTransparency={1} size={size} layoutOrder={order}>
+		<ReactiveButton2 onClick={onClick} backgroundTransparency={1} size={size} layoutOrder={order}>
 			<Transition
 				size={new UDim2(1, rem(2 * CARD_CANVAS_MARGIN), 1, rem(2 * CARD_CANVAS_MARGIN))}
 				position={new UDim2(0, rem(-CARD_CANVAS_MARGIN), 0, rem(-CARD_CANVAS_MARGIN))}
@@ -108,6 +106,6 @@ export function Tab({ onClick, emoji, label, active, order }: Props) {
 					}}
 				/>
 			</Transition>
-		</ReactiveButton>
+		</ReactiveButton2>
 	);
 }

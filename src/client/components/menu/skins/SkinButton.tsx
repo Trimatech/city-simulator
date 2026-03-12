@@ -1,6 +1,6 @@
 import React, { useMemo } from "@rbxts/react";
 import { useSelectorCreator } from "@rbxts/react-reflex";
-import { ReactiveButton } from "@rbxts-ui/components";
+import { ReactiveButton2 } from "@rbxts-ui/components";
 import { VStack } from "@rbxts-ui/layout";
 import { Frame, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
@@ -72,7 +72,7 @@ export function SkinButton({ id, cellSize }: SkinButtonProps) {
 	const corner = new UDim(0, rem(1.5));
 
 	return (
-		<ReactiveButton
+		<ReactiveButton2
 			animateSizeStrength={2}
 			animatePositionStrength={1.5}
 			backgroundTransparency={1}
@@ -121,6 +121,6 @@ export function SkinButton({ id, cellSize }: SkinButtonProps) {
 					/>
 				</MainButton>
 			</VStack>
-		</ReactiveButton>
+		</ReactiveButton2>
 	);
 }

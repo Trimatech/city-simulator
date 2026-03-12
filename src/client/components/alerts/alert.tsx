@@ -1,17 +1,14 @@
 import { composeBindings, lerpBinding, useMountEffect } from "@rbxts/pretty-react-hooks";
 import React, { useEffect, useMemo } from "@rbxts/react";
 import { useSelectorCreator } from "@rbxts/react-reflex";
+import { Outline, ReactiveButton2 } from "@rbxts-ui/components";
+import { Frame, Image, Text } from "@rbxts-ui/primitives";
 import { dismissAlert } from "client/alerts";
 import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
 import { useMotion, useRem } from "client/hooks";
 import { Alert, selectAlertIndex } from "client/store/alert";
-import { Image } from "@rbxts-ui/primitives";
-import { Frame } from "@rbxts-ui/primitives";
-import { Outline } from "@rbxts-ui/components";
-import { ReactiveButton } from "@rbxts-ui/components";
 import { Shadow } from "client/ui/shadow";
-import { Text } from "@rbxts-ui/primitives";
 import assets from "shared/assets";
 import { playSound } from "shared/assetsFolder";
 import { palette } from "shared/constants/palette";
@@ -87,7 +84,7 @@ export function Alert({ alert, index }: AlertProps) {
 	});
 
 	return (
-		<ReactiveButton
+		<ReactiveButton2
 			onClick={() => {
 				dismissAlert(alert.id);
 				playSound(assets.sounds.alert_dismiss);
@@ -175,6 +172,6 @@ export function Alert({ alert, index }: AlertProps) {
 				colorSecondary={alert.colorSecondary}
 				transparency={lerpBinding(transition, 1, 0)}
 			/>
-		</ReactiveButton>
+		</ReactiveButton2>
 	);
 }

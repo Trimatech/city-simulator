@@ -1,10 +1,8 @@
 import React from "@rbxts/react";
+import { ReactiveButton2 } from "@rbxts-ui/components";
+import { Frame, Image, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { useRem } from "client/hooks";
-import { Image } from "@rbxts-ui/primitives";
-import { Frame } from "@rbxts-ui/primitives";
-import { ReactiveButton } from "@rbxts-ui/components";
-import { Text } from "@rbxts-ui/primitives";
 import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 
@@ -70,7 +68,7 @@ export function ShopItemButton({
 	const textStrokeGradient = new ColorSequence(theme.textStrokeFrom, theme.textStrokeTo);
 
 	return (
-		<ReactiveButton
+		<ReactiveButton2
 			onClick={onClick}
 			backgroundTransparency={1}
 			size={buttonSize}
@@ -161,6 +159,6 @@ export function ShopItemButton({
 					</frame>
 				</Frame>
 			</Frame>
-		</ReactiveButton>
+		</ReactiveButton2>
 	);
 }

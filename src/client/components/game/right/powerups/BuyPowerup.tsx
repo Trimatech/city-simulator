@@ -1,14 +1,11 @@
 import { useMotion } from "@rbxts/pretty-react-hooks";
 import React, { useEffect, useState } from "@rbxts/react";
+import { Outline, ReactiveButton2 } from "@rbxts-ui/components";
+import { HStack, Transition } from "@rbxts-ui/layout";
+import { Frame, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
 import { useRem } from "client/hooks";
-import { Frame } from "@rbxts-ui/primitives";
-import { HStack } from "@rbxts-ui/layout";
-import { Outline } from "@rbxts-ui/components";
-import { ReactiveButton } from "@rbxts-ui/components";
-import { Text } from "@rbxts-ui/primitives";
-import { Transition } from "@rbxts-ui/layout";
 import { palette } from "shared/constants/palette";
 import { remotes } from "shared/remotes";
 
@@ -74,7 +71,7 @@ export function BuyPowerup({
 	}, [showTooltip, WIDTH, FULL_WIDTH, HEIGHT]);
 
 	return (
-		<ReactiveButton
+		<ReactiveButton2
 			onClick={() => remotes.powerups.use.fire(id)}
 			enabled={enabled}
 			backgroundTransparency={1}
@@ -128,6 +125,6 @@ export function BuyPowerup({
 					</Frame>
 				</HStack>
 			</Transition>
-		</ReactiveButton>
+		</ReactiveButton2>
 	);
 }

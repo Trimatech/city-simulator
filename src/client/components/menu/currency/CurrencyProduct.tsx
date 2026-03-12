@@ -1,7 +1,7 @@
 import { lerpBinding, useTimeout } from "@rbxts/pretty-react-hooks";
 import React, { useMemo } from "@rbxts/react";
 import { MarketplaceService, Players } from "@rbxts/services";
-import { ReactiveButton } from "@rbxts-ui/components";
+import { ReactiveButton2 } from "@rbxts-ui/components";
 import { Transition } from "@rbxts-ui/layout";
 import { Frame, Group, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
@@ -72,7 +72,7 @@ export function CurrencyProduct({
 			size={size}
 			position={lerpBinding(transition, position.add(new UDim2(0, 0, 0, rem(6))), position)}
 		>
-			<ReactiveButton
+			<ReactiveButton2
 				onClick={promptPurchase}
 				onHover={(hovered) => hoverMotion.spring(hovered ? 1 : 0)}
 				backgroundTransparency={1}
@@ -157,7 +157,7 @@ export function CurrencyProduct({
 				</MainButton>
 
 				{children}
-			</ReactiveButton>
+			</ReactiveButton2>
 		</Transition>
 	);
 }

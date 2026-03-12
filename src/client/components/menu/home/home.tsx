@@ -1,6 +1,6 @@
 import React, { useState } from "@rbxts/react";
 import { useSelectorCreator } from "@rbxts/react-reflex";
-import { ReactiveButton } from "@rbxts-ui/components";
+import { ReactiveButton2 } from "@rbxts-ui/components";
 import { HStack } from "@rbxts-ui/layout";
 import { Frame, Text } from "@rbxts-ui/primitives";
 import { HomeStats } from "client/components/stats/HomeStats";
@@ -124,7 +124,7 @@ export function Home({ visible }: HomeProps) {
 
 			{isShopOpen && (
 				<>
-					<ReactiveButton
+					<ReactiveButton2
 						onClick={() => setIsShopOpen(false)}
 						backgroundTransparency={0.2}
 						backgroundColor={palette.teal}
