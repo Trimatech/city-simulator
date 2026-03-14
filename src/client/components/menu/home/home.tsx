@@ -4,9 +4,10 @@ import { ReactiveButton2 } from "@rbxts-ui/components";
 import { HStack } from "@rbxts-ui/layout";
 import { Frame } from "@rbxts-ui/primitives";
 import { HomeStats } from "client/components/stats/HomeStats";
-import { MainButton, ShopButtonText } from "client/ui/MainButton";
+import { MainButton, ShopButtonTextWithIcon } from "client/ui/MainButton";
 import { useRem } from "client/ui/rem/useRem";
 import { SlideIn } from "client/ui/slide-in";
+import assets from "shared/assets";
 import { USER_NAME } from "shared/constants/core";
 import { DAILY_REWARD_CYCLE, DAILY_STREAK_WINDOW, SECONDS_PER_DAY } from "shared/constants/daily-rewards";
 import { palette } from "shared/constants/palette";
@@ -58,11 +59,11 @@ export function Home({ visible }: HomeProps) {
 					verticalAlignment={Enum.VerticalAlignment.Top}
 					spacing={rem(1)}
 				>
-					<MainButton onClick={() => setIsShopOpen(true)} size={new UDim2(0, rem(10), 0, rem(4))}>
-						<ShopButtonText text="🛒 Shop" />
+					<MainButton onClick={() => setIsShopOpen(true)} size={new UDim2(0, rem(10), 0, rem(4))} fitContent>
+						<ShopButtonTextWithIcon text="Shop" icon={assets.ui.icons.store} />
 					</MainButton>
-					<MainButton onClick={openDailyReward} size={new UDim2(0, rem(16), 0, rem(4))}>
-						<ShopButtonText text="🎁 Daily Reward" />
+					<MainButton onClick={openDailyReward} size={new UDim2(0, rem(16), 0, rem(4))} fitContent>
+						<ShopButtonTextWithIcon text="Daily Rewards" icon={assets.ui.icons.dailyRewards} />
 					</MainButton>
 				</HStack>
 			</SlideIn>
