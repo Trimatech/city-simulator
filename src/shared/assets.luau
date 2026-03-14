@@ -49,6 +49,9 @@ local assets = {
 		map_crosshair = "rbxassetid://102698198392446",
 		map_cursor = "rbxassetid://101291771113849",
 		menu_title = "rbxassetid://81914962844346",
+		patterns = {
+			dots_pattern = "rbxassetid://109011352852234",
+		},
 		shards_icon = "rbxassetid://128066684240466",
 		shards_icon_color = "rbxassetid://133438219301442",
 		shop = {

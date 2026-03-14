@@ -32,8 +32,7 @@ export function HomeStats() {
 				emoji="💵"
 				label="Cash"
 				value={`$${formatInteger(balance)}`}
-				primary={Color3.fromRGB(111, 158, 79)}
-				secondary={Color3.fromRGB(153, 181, 107)}
+				colorStyle="green"
 				enabled={currentBalance !== undefined}
 				order={2}
 			/>

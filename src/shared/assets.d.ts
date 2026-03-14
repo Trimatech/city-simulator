@@ -49,6 +49,9 @@ declare const assets: {
 		map_crosshair: string
 		map_cursor: string
 		menu_title: string
+		patterns: {
+			dots_pattern: string
+		}
 		shards_icon: string
 		shards_icon_color: string
 		shop: {

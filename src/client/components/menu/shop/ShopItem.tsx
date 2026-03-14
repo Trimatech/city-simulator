@@ -198,6 +198,16 @@ export function ShopItem({
 							scaleType="Fit"
 							imageColor3={theme.rayTint}
 						/>
+						<Image
+							image={assets.ui.patterns.dots_pattern}
+							imageColor3={palette.white}
+							imageTransparency={0.96}
+							scaleType="Tile"
+							tileSize={new UDim2(0, rem(4), 0, rem(4))}
+							size={new UDim2(1, 0, 1, 0)}
+						>
+							<uicorner CornerRadius={innerRadius} />
+						</Image>
 
 						{/* Center content — either custom children or icon image */}
 						{children !== undefined ? (

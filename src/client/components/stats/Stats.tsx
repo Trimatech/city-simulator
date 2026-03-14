@@ -47,8 +47,7 @@ export function Stats() {
 				emoji="☠️"
 				label="KOs"
 				value={`${formatInteger(eliminations)}`}
-				primary={Color3.fromRGB(194, 196, 222)}
-				secondary={Color3.fromRGB(97, 97, 138)}
+				colorStyle="gold"
 				enabled={currentEliminations !== undefined}
 				order={0}
 			/>
@@ -57,9 +56,17 @@ export function Stats() {
 				emoji="🏆"
 				label="Rank"
 				value={rank}
-				primary={Color3.fromRGB(255, 203, 80)}
-				secondary={Color3.fromRGB(255, 150, 79)}
+				colorStyle="gold"
 				enabled={currentRank !== undefined}
+				order={0}
+			/>
+
+			<StatsCard
+				emoji="🗺️"
+				label="Area"
+				value={`${formatInteger(area)} studs²`}
+				colorStyle="teal"
+				enabled={currentArea !== undefined}
 				order={0}
 			/>
 
@@ -67,8 +74,7 @@ export function Stats() {
 				emoji="🔮"
 				label="Orbs"
 				value={`${formatInteger(orbs)}`}
-				primary={Color3.fromRGB(252, 69, 69)}
-				secondary={Color3.fromRGB(150, 59, 84)}
+				colorStyle="red"
 				enabled={currentOrbs !== undefined}
 				order={1}
 			/>
@@ -77,19 +83,9 @@ export function Stats() {
 				emoji="💵"
 				label="Cash"
 				value={`$${formatInteger(balance)}`}
-				primary={Color3.fromRGB(111, 158, 79)}
-				secondary={Color3.fromRGB(153, 181, 107)}
+				colorStyle="green"
 				enabled={currentBalance !== undefined}
 				order={2}
-			/>
-			<StatsCard
-				emoji="🗺️"
-				label="Area"
-				value={`${formatInteger(area)} studs²`}
-				primary={Color3.fromRGB(186, 250, 255)}
-				secondary={Color3.fromRGB(8, 89, 255)}
-				enabled={currentArea !== undefined}
-				order={0}
 			/>
 		</Group>
 	);
