@@ -14,19 +14,26 @@ import { brighten } from "shared/utils/color-utils";
 
 interface Props {
 	readonly id: PowerupId;
-	readonly emoji: string;
 	readonly label: string;
 	readonly enabled: boolean;
 	readonly order: number;
 	readonly price: number;
 }
 
+const POWERUP_ICONS: Record<PowerupId, string> = {
+	nuclearExplosion: assets.ui.powerups.nuclear,
+	laserBeam: assets.ui.powerups.laser2,
+	shield: assets.ui.powerups.shield,
+	tower: assets.ui.powerups.tower,
+	turbo: assets.ui.powerups.speed,
+};
+
 const CIRCLE_SIZE = 5;
 const TOOLTIP_WIDTH = 7;
 const OUTER_STROKE_THICKNESS = 0.2;
 const INNER_STROKE_THICKNESS = 0.15;
 
-export function BuyPowerup({ id, emoji, label, enabled, order, price }: Props) {
+export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 	const rem = useRem();
 	const style = POWERUP_BUTTON_STYLES[id];
 
@@ -52,6 +59,8 @@ export function BuyPowerup({ id, emoji, label, enabled, order, price }: Props) {
 	}, [showTooltip, WIDTH, FULL_WIDTH, HEIGHT]);
 
 	const fullRound = new UDim(1, 0);
+
+	const iconSize = rem(4);
 
 	return (
 		<ReactiveButton2
@@ -115,14 +124,14 @@ export function BuyPowerup({ id, emoji, label, enabled, order, price }: Props) {
 							</HStack>
 						) : undefined}
 
-						{/* Circle with emoji */}
+						{/* Circle with icon */}
 						<Frame size={new UDim2(0, rem(CIRCLE_SIZE), 0, rem(CIRCLE_SIZE))}>
-							<Text
-								text={emoji}
-								textScaled
+							<Image
+								image={POWERUP_ICONS[id]}
 								anchorPoint={new Vector2(0.5, 0.5)}
-								size={new UDim2(0, rem(2.5), 0, rem(2.5))}
+								size={new UDim2(0, iconSize, 0, iconSize)}
 								position={new UDim2(0.5, 0, 0.5, 0)}
+								backgroundTransparency={1}
 							/>
 						</Frame>
 					</HStack>

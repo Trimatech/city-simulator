@@ -41,7 +41,6 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 				<BuyPowerup
 					id="nuclearExplosion"
 					label="Nuclear"
-					emoji="☢️"
 					enabled={orbs >= POWERUP_PRICES.nuclearExplosion}
 					order={1}
 					price={POWERUP_PRICES.nuclearExplosion}
@@ -50,7 +49,6 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 				<BuyPowerup
 					id="laserBeam"
 					label="Laser"
-					emoji="🔫"
 					enabled={orbs >= POWERUP_PRICES.laserBeam}
 					order={2}
 					price={POWERUP_PRICES.laserBeam}
@@ -59,7 +57,6 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 				<BuyPowerup
 					id="shield"
 					label="Shield"
-					emoji="🛡️"
 					enabled={orbs >= POWERUP_PRICES.shield}
 					order={3}
 					price={POWERUP_PRICES.shield}
@@ -68,7 +65,6 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 				<BuyPowerup
 					id="tower"
 					label="Tower"
-					emoji="🗼"
 					enabled={orbs >= POWERUP_PRICES.tower}
 					order={4}
 					price={POWERUP_PRICES.tower}
@@ -76,7 +72,6 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 
 				<BuyPowerup
 					id="turbo"
-					emoji="⚡"
 					label="Turbo"
 					enabled={orbs >= POWERUP_PRICES.turbo}
 					order={5}
