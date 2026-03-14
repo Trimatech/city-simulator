@@ -18,6 +18,12 @@ export function brightness(color: Color3) {
 	return (r * 299 + g * 587 + b * 114) / 1000;
 }
 
+export function opposite(color: Color3) {
+	const [h, s, v] = color.ToHSV();
+
+	return Color3.fromHSV((h + 0.5) % 1, s, v);
+}
+
 export function brightenIfDark(color: Color3) {
 	const darkness = 1 - brightness(color);
 

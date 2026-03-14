@@ -45,6 +45,10 @@ declare const assets: {
 		}
 		diagonal_stripes: string
 		heart: string
+		icons: {
+			dailyRewards: string
+			store: string
+		}
 		leader_pointer: string
 		map_crosshair: string
 		map_cursor: string

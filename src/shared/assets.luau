@@ -45,6 +45,10 @@ local assets = {
 		},
 		diagonal_stripes = "rbxassetid://79238839735749",
 		heart = "rbxassetid://136704988380660",
+		icons = {
+			dailyRewards = "rbxassetid://71704814079862",
+			store = "rbxassetid://81647999213259",
+		},
 		leader_pointer = "rbxassetid://119911225006035",
 		map_crosshair = "rbxassetid://102698198392446",
 		map_cursor = "rbxassetid://101291771113849",
