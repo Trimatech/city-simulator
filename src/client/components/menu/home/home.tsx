@@ -117,7 +117,7 @@ export function Home({ visible }: HomeProps) {
 			)}
 
 			{dailyReward && (
-				<DailyRewardScreen streakDay={dailyReward.streakDay} onDismiss={() => setDailyReward(undefined)} />
+				<DailyRewardScreen streakDay={dailyReward.streakDay} lastClaimTime={lastClaim} onDismiss={() => setDailyReward(undefined)} />
 			)}
 		</>
 	);

@@ -14,18 +14,22 @@ export interface ShopItemButtonTheme {
 	readonly gradientTo: Color3;
 	readonly textStrokeFrom: Color3;
 	readonly textStrokeTo: Color3;
+	readonly textColor: Color3;
 }
 
+const blueButtonTheme: ShopItemButtonTheme = {
+	backgroundColor: Color3.fromRGB(11, 150, 218),
+	outerBorderColor: Color3.fromRGB(14, 42, 78),
+	innerBorderColor: Color3.fromRGB(120, 211, 255),
+	gradientFrom: Color3.fromRGB(118, 210, 255),
+	gradientTo: Color3.fromRGB(48, 187, 255),
+	textStrokeFrom: Color3.fromRGB(10, 60, 130),
+	textStrokeTo: Color3.fromRGB(5, 40, 100),
+	textColor: palette.white,
+};
+
 export const shopItemButtonThemes = {
-	blue: {
-		backgroundColor: Color3.fromRGB(11, 150, 218),
-		outerBorderColor: Color3.fromRGB(14, 42, 78),
-		innerBorderColor: Color3.fromRGB(120, 211, 255),
-		gradientFrom: Color3.fromRGB(118, 210, 255),
-		gradientTo: Color3.fromRGB(48, 187, 255),
-		textStrokeFrom: Color3.fromRGB(10, 60, 130),
-		textStrokeTo: Color3.fromRGB(5, 40, 100),
-	},
+	blue: blueButtonTheme,
 	cyan: {
 		backgroundColor: Color3.fromRGB(11, 184, 218),
 		outerBorderColor: Color3.fromRGB(14, 42, 78),
@@ -34,6 +38,11 @@ export const shopItemButtonThemes = {
 		gradientTo: Color3.fromRGB(46, 219, 238),
 		textStrokeFrom: Color3.fromRGB(10, 80, 120),
 		textStrokeTo: Color3.fromRGB(5, 60, 100),
+		textColor: palette.white,
+	},
+	claimYellow: {
+		...blueButtonTheme,
+		textColor: palette.claimYellow,
 	},
 } as const;
 
@@ -160,7 +169,7 @@ export function ShopButtonText({ text, theme = shopItemButtonThemes.blue }: Shop
 			<Text
 				text={text}
 				font={fonts.fredokaOne.regular}
-				textColor={palette.white}
+				textColor={theme.textColor}
 				textSize={rem(2.2)}
 				size={new UDim2(0, 0, 1, 0)}
 				textAutoResize="X"

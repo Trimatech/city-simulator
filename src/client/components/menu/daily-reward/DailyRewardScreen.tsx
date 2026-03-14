@@ -1,19 +1,27 @@
-import React, { useEffect, useState } from "@rbxts/react";
+import { useEventListener } from "@rbxts/pretty-react-hooks";
+import React, { useBinding, useEffect, useState } from "@rbxts/react";
+import { RunService } from "@rbxts/services";
 import { HStack } from "@rbxts-ui/layout";
-import { Frame } from "@rbxts-ui/primitives";
+import { Frame, Text } from "@rbxts-ui/primitives";
+import { fonts } from "client/constants/fonts";
 import { useRem } from "client/ui/rem/useRem";
 import { SCROLLBAR_COLOR, SCROLLBAR_THICKNESS, SCROLLBAR_TRANSPARENCY } from "client/ui/scrollbar.constants";
 import assets from "shared/assets";
-import { DAILY_REWARD_CYCLE, getDailyRewardAmount } from "shared/constants/daily-rewards";
+import { DAILY_REWARD_CYCLE, getDailyRewardAmount, SECONDS_PER_DAY } from "shared/constants/daily-rewards";
 import { remotes } from "shared/remotes";
 
-import { MainButton, ShopButtonText } from "../../../ui/MainButton";
+import { MainButton, ShopButtonText, shopItemButtonThemes } from "../../../ui/MainButton";
 import { GameWindow } from "../shop/GameWindow";
 import { GameWindowTitleHeader } from "../shop/GameWindowTitleHeader";
 import { DailyRewardItem } from "./DailyRewardItem";
 
+const TIMER_TEXT_COLOR = Color3.fromRGB(255, 230, 80);
+const TIMER_STROKE_FROM = Color3.fromHex("#005794");
+const TIMER_STROKE_TO = Color3.fromHex("#000000");
+
 interface DailyRewardScreenProps {
 	readonly streakDay: number;
+	readonly lastClaimTime: number;
 	readonly onDismiss: () => void;
 }
 
@@ -28,9 +36,50 @@ function getCrystalIcon(reward: number): string {
 	return assets.ui.crystals.crystals_25;
 }
 
-export function DailyRewardScreen({ streakDay: _streakDay, onDismiss }: DailyRewardScreenProps) {
+function formatTimeRemaining(seconds: number): string {
+	const h = math.floor(seconds / 3600);
+	const m = math.floor((seconds % 3600) / 60);
+	const s = math.floor(seconds % 60);
+	return `${string.format("%02d", h)}h ${string.format("%02d", m)}m ${string.format("%02d", s)}s`;
+}
+
+function ClaimTimerText({ deadlineTime }: { deadlineTime: number }) {
+	const rem = useRem();
+	const [timerText, setTimerText] = useBinding(formatTimeRemaining(math.max(0, deadlineTime - os.time())));
+	const timerStrokeGradient = new ColorSequence(TIMER_STROKE_FROM, TIMER_STROKE_TO);
+
+	useEventListener(RunService.Heartbeat, () => {
+		const remaining = math.max(0, deadlineTime - os.time());
+		setTimerText(formatTimeRemaining(remaining));
+	});
+
+	return (
+		<frame AutomaticSize={Enum.AutomaticSize.X} Size={new UDim2(0, 0, 1, 0)} BackgroundTransparency={1}>
+			<uipadding PaddingLeft={new UDim(0, rem(1.5))} PaddingRight={new UDim(0, rem(1.5))} />
+			<Text
+				text={timerText}
+				font={fonts.fredokaOne.regular}
+				textColor={TIMER_TEXT_COLOR}
+				textSize={rem(2.2)}
+				size={new UDim2(0, 0, 1, 0)}
+				textAutoResize="X"
+				textXAlignment="Center"
+				textYAlignment="Center"
+			>
+				<uistroke Thickness={rem(0.15)} Color={TIMER_TEXT_COLOR}>
+					<uigradient Color={timerStrokeGradient} Rotation={90} />
+				</uistroke>
+			</Text>
+		</frame>
+	);
+}
+
+export function DailyRewardScreen({ streakDay, lastClaimTime, onDismiss }: DailyRewardScreenProps) {
 	const rem = useRem();
 	const [claimed, setClaimed] = useState(false);
+
+	const canClaim = lastClaimTime === 0 || os.time() - lastClaimTime >= SECONDS_PER_DAY;
+	const nextClaimDeadline = lastClaimTime + SECONDS_PER_DAY;
 
 	useEffect(() => {
 		if (claimed) {
@@ -40,7 +89,7 @@ export function DailyRewardScreen({ streakDay: _streakDay, onDismiss }: DailyRew
 	}, [claimed]);
 
 	const handleClaim = () => {
-		if (claimed) return;
+		if (claimed || !canClaim) return;
 		setClaimed(true);
 		remotes.dailyReward.claim.fire();
 	};
@@ -55,6 +104,8 @@ export function DailyRewardScreen({ streakDay: _streakDay, onDismiss }: DailyRew
 				label={reward === 1 ? `${reward} Crystal` : `${reward} Crystals`}
 				icon={getCrystalIcon(reward)}
 				layoutOrder={i}
+				isClaimed={i < streakDay}
+				isCurrent={i === streakDay}
 			/>,
 		);
 	}
@@ -98,9 +149,18 @@ export function DailyRewardScreen({ streakDay: _streakDay, onDismiss }: DailyRew
 					anchorPoint={new Vector2(0.5, 1)}
 					automaticSize={Enum.AutomaticSize.X}
 				>
-					<MainButton onClick={handleClaim} size={new UDim2(0, rem(22), 0, rem(4.5))} layoutOrder={2}>
-						<ShopButtonText text={claimed ? "CLAIMED!" : "CLAIM REWARD"} />
-					</MainButton>
+					{canClaim ? (
+						<MainButton onClick={handleClaim} size={new UDim2(0, rem(22), 0, rem(4.5))} layoutOrder={2}>
+							<ShopButtonText
+								text={claimed ? "CLAIMED!" : "CLAIM REWARD"}
+								theme={shopItemButtonThemes.claimYellow}
+							/>
+						</MainButton>
+					) : (
+						<MainButton size={new UDim2(0, rem(22), 0, rem(4.5))} layoutOrder={2} enabled={false}>
+							<ClaimTimerText deadlineTime={nextClaimDeadline} />
+						</MainButton>
+					)}
 				</Frame>
 			</Frame>
 		</GameWindow>

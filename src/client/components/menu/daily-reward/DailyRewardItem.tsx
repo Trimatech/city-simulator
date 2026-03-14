@@ -1,6 +1,9 @@
+import { lerpBinding } from "@rbxts/pretty-react-hooks";
 import React from "@rbxts/react";
+import { ReactiveButton2 } from "@rbxts-ui/components";
 import { Frame, Image, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
+import { useMotion } from "client/hooks";
 import { useRem } from "client/ui/rem/useRem";
 import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
@@ -8,6 +11,7 @@ import { palette } from "shared/constants/palette";
 import { ShopItemTheme, shopItemThemes } from "../shop/ShopItem";
 
 const LABEL_COLOR = Color3.fromRGB(250, 222, 77);
+const CURRENT_GLOW_COLOR = Color3.fromRGB(255, 230, 80);
 
 const SUBTITLE_STROKE_FROM = Color3.fromHex("#005794");
 const SUBTITLE_STROKE_TO = Color3.fromHex("#000000");
@@ -19,6 +23,8 @@ interface DailyRewardItemProps {
 	readonly theme?: ShopItemTheme;
 	readonly size?: UDim2;
 	readonly layoutOrder?: number;
+	readonly isClaimed?: boolean;
+	readonly isCurrent?: boolean;
 }
 
 export function DailyRewardItem({
@@ -28,10 +34,14 @@ export function DailyRewardItem({
 	theme = shopItemThemes.blue,
 	size,
 	layoutOrder,
+	isClaimed = false,
+	isCurrent = false,
 }: DailyRewardItemProps) {
 	const rem = useRem();
+	const [hover, hoverMotion] = useMotion(0);
 
-	const cardSize = size ?? new UDim2(0, rem(16), 0, rem(24));
+	const baseCardSize = size ?? new UDim2(0, rem(16), 0, rem(24));
+	const cardSize = isCurrent ? new UDim2(0, rem(18), 0, rem(26)) : baseCardSize;
 	const outerRadius = new UDim(0, rem(1.8));
 	const whiteRadius = new UDim(0, rem(1.5));
 	const innerRadius = new UDim(0, rem(1.2));
@@ -43,8 +53,16 @@ export function DailyRewardItem({
 	const borderPad = new UDim(0, rem(0.3));
 	const whitePad = new UDim(0, rem(0.3));
 
+	const iconSize = lerpBinding(hover, new UDim2(0.8, 0, 0.55, 0), new UDim2(0.95, 0, 0.65, 0));
+
 	return (
-		<Frame size={cardSize} layoutOrder={layoutOrder} backgroundTransparency={1} name="DailyRewardItem">
+		<ReactiveButton2
+			size={cardSize}
+			layoutOrder={layoutOrder}
+			backgroundTransparency={1}
+			onHover={(hovered) => hoverMotion.spring(hovered ? 1 : 0)}
+			name="DailyRewardItem"
+		>
 			{/* Layer 1: Outer border */}
 			<Frame
 				backgroundColor={theme.outerBorderColor}
@@ -110,7 +128,7 @@ export function DailyRewardItem({
 						{icon !== undefined && (
 							<Image
 								image={icon}
-								size={new UDim2(0.8, 0, 0.55, 0)}
+								size={iconSize}
 								position={new UDim2(0.5, 0, 0.45, 0)}
 								anchorPoint={new Vector2(0.5, 0.5)}
 								scaleType="Fit"
@@ -137,7 +155,8 @@ export function DailyRewardItem({
 
 						{/* Label — "N Crystal(s)" */}
 						<Text
-							text={label}
+							text={isClaimed ? `<s>${label}</s>` : label}
+							richText={isClaimed}
 							font={fonts.fredokaOne.regular}
 							textColor={LABEL_COLOR}
 							textSize={rem(2)}
@@ -147,13 +166,23 @@ export function DailyRewardItem({
 							textYAlignment="Center"
 							zIndex={3}
 						>
-							<uistroke Thickness={strokeThickness} Color={LABEL_COLOR}>
+							<uistroke Thickness={strokeThickness} Color={palette.white}>
 								<uigradient Color={labelStrokeGradient} Rotation={90} />
 							</uistroke>
 						</Text>
+						{/* Dim overlay for claimed items */}
+						{isClaimed && (
+							<Frame
+								backgroundColor={Color3.fromRGB(79, 0, 194)}
+								backgroundTransparency={0.7}
+								size={new UDim2(1, 0, 1, 0)}
+								cornerRadius={innerRadius}
+								zIndex={4}
+							/>
+						)}
 					</Frame>
 				</Frame>
 			</Frame>
-		</Frame>
+		</ReactiveButton2>
 	);
 }
