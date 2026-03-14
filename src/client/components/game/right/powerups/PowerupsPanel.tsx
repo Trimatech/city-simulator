@@ -2,7 +2,7 @@ import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { HStack, VStack } from "@rbxts-ui/layout";
 import { useRem } from "client/ui/rem/useRem";
-import { POWERUP_COLORS, POWERUP_PRICES } from "shared/constants/powerups";
+import { POWERUP_PRICES } from "shared/constants/powerups";
 import { selectLocalOrbs } from "shared/store/soldiers";
 
 import { BuyPowerup } from "./BuyPowerup";
@@ -16,7 +16,7 @@ interface Props {
 export function PowerupsPanel({ anchorPoint, position }: Props) {
 	const rem = useRem();
 	const height = rem(36);
-	const width = rem(20);
+	const width = rem(8);
 	const size = new UDim2(0, width, 0, height);
 	const orbs = useSelector(selectLocalOrbs) ?? 0;
 
@@ -31,24 +31,17 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 		>
 			<VStack
 				name="buy-powerups-stack"
-				size={new UDim2(0, rem(12), 1, 0)}
+				size={new UDim2(0, rem(5), 1, 0)}
 				spacing={rem(1)}
-				anchorPoint={new Vector2(1, 0.5)}
+				verticalAlignment={Enum.VerticalAlignment.Top}
 				horizontalAlignment={Enum.HorizontalAlignment.Right}
 			>
-				<uigridlayout
-					CellPadding={new UDim2(0, rem(1), 0, rem(1))}
-					CellSize={new UDim2(0, rem(6), 0, rem(6))}
-					FillDirectionMaxCells={2}
-					HorizontalAlignment="Right"
-					VerticalAlignment="Center"
-					SortOrder={Enum.SortOrder.LayoutOrder}
-				/>
+				<uipadding PaddingTop={new UDim(0, rem(0.5))} />
+
 				<BuyPowerup
 					id="nuclearExplosion"
 					label="Nuclear"
 					emoji="☢️"
-					primaryColor={POWERUP_COLORS.nuclearExplosion}
 					enabled={orbs >= POWERUP_PRICES.nuclearExplosion}
 					order={1}
 					price={POWERUP_PRICES.nuclearExplosion}
@@ -58,16 +51,15 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 					id="laserBeam"
 					label="Laser"
 					emoji="🔫"
-					primaryColor={POWERUP_COLORS.laserBeam}
 					enabled={orbs >= POWERUP_PRICES.laserBeam}
 					order={2}
 					price={POWERUP_PRICES.laserBeam}
 				/>
+
 				<BuyPowerup
 					id="shield"
 					label="Shield"
 					emoji="🛡️"
-					primaryColor={POWERUP_COLORS.shield}
 					enabled={orbs >= POWERUP_PRICES.shield}
 					order={3}
 					price={POWERUP_PRICES.shield}
@@ -77,7 +69,6 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 					id="tower"
 					label="Tower"
 					emoji="🗼"
-					primaryColor={POWERUP_COLORS.tower}
 					enabled={orbs >= POWERUP_PRICES.tower}
 					order={4}
 					price={POWERUP_PRICES.tower}
@@ -87,7 +78,6 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 					id="turbo"
 					emoji="⚡"
 					label="Turbo"
-					primaryColor={POWERUP_COLORS.turbo}
 					enabled={orbs >= POWERUP_PRICES.turbo}
 					order={5}
 					price={POWERUP_PRICES.turbo}

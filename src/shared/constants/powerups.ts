@@ -29,10 +29,56 @@ export const POWERUP_TURBO_SPEED = 40;
 import { palette } from "./palette";
 
 export const POWERUP_COLORS: Record<PowerupId, Color3> = {
-	// Choose complementary hues to make the emoji stand out
-	turbo: palette.blue, // deeper blue complements ⚡ (orange/yellow)
-	shield: palette.peach, // complements 🛡️ (blue)
-	tower: palette.sky, // complements 🗼 (red)
-	laserBeam: palette.pink, // complements 🔫 (green)
-	nuclearExplosion: palette.mauve, // complements ☢️ (yellow)
+	turbo: Color3.fromRGB(84, 255, 229), // #54FFE5
+	shield: Color3.fromRGB(252, 255, 100), // #FCFF64
+	tower: Color3.fromRGB(176, 236, 120), // #B0EC78
+	laserBeam: Color3.fromRGB(188, 91, 163), // #BC5BA3
+	nuclearExplosion: Color3.fromRGB(251, 85, 87), // #FB5557
 };
+
+export interface PowerupButtonStyle {
+	readonly backgroundColor: Color3;
+	readonly borderGradient: ColorSequence;
+}
+
+const OUTER_BORDER_COLOR = Color3.fromRGB(14, 42, 78); // #0E2A4E
+
+export const POWERUP_BUTTON_STYLES: Record<PowerupId, PowerupButtonStyle> = {
+	nuclearExplosion: {
+		backgroundColor: Color3.fromRGB(251, 85, 87),
+		borderGradient: new ColorSequence(
+			Color3.fromRGB(255, 160, 160),
+			Color3.fromRGB(180, 60, 60),
+		),
+	},
+	laserBeam: {
+		backgroundColor: Color3.fromRGB(188, 91, 163),
+		borderGradient: new ColorSequence(
+			Color3.fromRGB(230, 150, 210),
+			Color3.fromRGB(140, 65, 120),
+		),
+	},
+	shield: {
+		backgroundColor: Color3.fromRGB(252, 255, 100),
+		borderGradient: new ColorSequence(
+			Color3.fromRGB(255, 255, 180),
+			Color3.fromRGB(190, 190, 70),
+		),
+	},
+	tower: {
+		backgroundColor: Color3.fromRGB(176, 236, 120),
+		borderGradient: new ColorSequence(
+			Color3.fromRGB(210, 255, 170),
+			Color3.fromRGB(130, 175, 85),
+		),
+	},
+	turbo: {
+		backgroundColor: Color3.fromRGB(84, 255, 229),
+		borderGradient: new ColorSequence(
+			Color3.fromRGB(150, 255, 240),
+			Color3.fromRGB(60, 190, 170),
+		),
+	},
+};
+
+export { OUTER_BORDER_COLOR as POWERUP_OUTER_BORDER_COLOR };
