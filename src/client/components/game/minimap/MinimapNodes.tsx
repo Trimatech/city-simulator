@@ -1,8 +1,7 @@
 import { useInterval } from "@rbxts/pretty-react-hooks";
 import React, { Element, useState } from "@rbxts/react";
+import { CanvasGroup, Image } from "@rbxts-ui/primitives";
 import { useObserverPosition, useStore } from "client/hooks";
-import { CanvasGroup } from "@rbxts-ui/primitives";
-import { Image } from "@rbxts-ui/primitives";
 import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 import { getWallSkin } from "shared/constants/skins";

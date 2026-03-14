@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useState } from "@rbxts/react";
+import { Checkbox } from "@rbxts-ui/components";
+import { Frame, Text } from "@rbxts-ui/primitives";
 import { useRem } from "@rbxts-ui/rem";
 import { calculatePolygonOperation, shapeToPolygon } from "shared/polybool/poly-utils";
 import { Polygon } from "shared/polybool/polybool";
 
-import { Checkbox } from "@rbxts-ui/components";
-import { Frame } from "@rbxts-ui/primitives";
-import { Text } from "@rbxts-ui/primitives";
 import { CanvasButton } from "./CanvasButton";
 import { DemoPolygon, demoPolygons } from "./demo-cases";
 import { PolygonCanvas } from "./PolygonCanvas";

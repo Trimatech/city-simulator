@@ -1,5 +1,5 @@
-import React, { useState } from "@rbxts/react";
 import { useEventListener } from "@rbxts/pretty-react-hooks";
+import React, { useState } from "@rbxts/react";
 import { getPlayerByName } from "shared/utils/player-utils";
 
 import { SoldierGlow } from "./SoldierGlow";

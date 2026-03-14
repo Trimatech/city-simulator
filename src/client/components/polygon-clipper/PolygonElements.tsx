@@ -1,7 +1,6 @@
 import React from "@rbxts/react";
-import { Point } from "shared/polybool/polybool";
-
 import { Frame } from "@rbxts-ui/primitives";
+import { Point } from "shared/polybool/polybool";
 
 interface LineProps {
 	startPoint: Point;

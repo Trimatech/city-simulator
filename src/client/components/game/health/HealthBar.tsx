@@ -21,13 +21,6 @@ const FILL_STROKE_GRADIENT = new ColorSequence([
 	new ColorSequenceKeypoint(1, Color3.fromHex("#88FF20")),
 ]);
 
-// Vertical gradient for the fill bar background (top → bottom)
-const FILL_BG_GRADIENT = new ColorSequence([
-	new ColorSequenceKeypoint(0, Color3.fromHex("#6dff8a")),
-	new ColorSequenceKeypoint(0.5, Color3.fromHex("#08fe41")),
-	new ColorSequenceKeypoint(1, Color3.fromHex("#00c430")),
-]);
-
 const INNER_STROKE_GRADIENT = new ColorSequence([
 	new ColorSequenceKeypoint(0, Color3.fromHex("#1a6b1d")),
 	new ColorSequenceKeypoint(0.48, Color3.fromHex("#2aa044")),

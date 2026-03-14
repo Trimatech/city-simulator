@@ -2,11 +2,11 @@ import "client/app/react-config";
 
 import React from "@rbxts/react";
 import ReactRoblox from "@rbxts/react-roblox";
+import { InputCapture } from "@rbxts-ui/components";
 import { sendAlert } from "client/alerts";
 import { Alerts } from "client/components/alerts";
 import { Backdrop } from "client/components/world/backdrop";
 import { RootProvider } from "client/providers/root-provider";
-import { InputCapture } from "@rbxts-ui/components";
 import { palette } from "shared/constants/palette";
 
 function AlertsStoryContent() {

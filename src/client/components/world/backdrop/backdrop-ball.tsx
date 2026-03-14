@@ -3,10 +3,10 @@ import { map, useCamera, useEventListener } from "@rbxts/pretty-react-hooks";
 import React, { useBinding, useEffect, useMemo } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { RunService } from "@rbxts/services";
+import { Image } from "@rbxts-ui/primitives";
 import { springs } from "client/constants/springs";
 import { useMotion, useSeed } from "client/hooks";
 import { selectWorldCamera } from "client/store/world";
-import { Image } from "@rbxts-ui/primitives";
 import assets from "shared/assets";
 import { accents } from "shared/constants/palette";
 

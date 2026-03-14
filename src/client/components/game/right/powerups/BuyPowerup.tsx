@@ -42,8 +42,7 @@ export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 	const FULL_WIDTH = WIDTH + rem(TOOLTIP_WIDTH);
 
 	const [showTooltip, setShowTooltip] = useState(false);
-	const [transparency, transparencyMotion] = useMotion(0);
-	const [bgColor, bgColorMotion] = useMotion(style.backgroundColor);
+
 	const [size, sizeMotion] = useMotion(new UDim2(0, WIDTH, 0, HEIGHT));
 
 	// useEffect(() => {
@@ -73,10 +72,10 @@ export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 			onMouseLeave={() => setShowTooltip(false)}
 			anchorPoint={new Vector2(1, 0.5)}
 		>
-			<Transition groupTransparency={transparency} size={new UDim2(1, 0, 1, 0)}>
+			<Transition groupTransparency={1} size={new UDim2(1, 0, 1, 0)}>
 				{/* Outer frame — colored background with dual strokes */}
 				<Frame
-					backgroundColor={bgColor}
+					backgroundColor={style.backgroundColor}
 					backgroundTransparency={0}
 					cornerRadius={fullRound}
 					size={new UDim2(1, 0, 1, 0)}

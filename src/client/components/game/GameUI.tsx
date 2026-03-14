@@ -1,11 +1,11 @@
 import { lerpBinding } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
+import { Transition } from "@rbxts-ui/layout";
 import { useMotion } from "client/hooks";
 import { selectWorldSubject } from "client/store/world";
 import { SlideIn } from "client/ui/slide-in";
 
-import { Transition } from "@rbxts-ui/layout";
 import { Stats } from "../stats/Stats";
 import { Compass } from "./compass";
 import { HealthView } from "./health/HealthView";

@@ -1,5 +1,5 @@
-import { sendAlert as packageSendAlert, dismissAlert as packageDismissAlert } from "@rbxts-ui/alerts";
 import type { AlertI } from "@rbxts-ui/alerts";
+import { dismissAlert as packageDismissAlert, sendAlert as packageSendAlert } from "@rbxts-ui/alerts";
 import { store } from "client/store";
 
 export function sendAlert(patch: Partial<AlertI>) {

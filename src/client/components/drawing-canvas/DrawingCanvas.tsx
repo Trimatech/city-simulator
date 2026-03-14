@@ -1,8 +1,8 @@
 import React, { useCallback, useRef, useState } from "@rbxts/react";
+import { Frame } from "@rbxts-ui/primitives";
 import { palette } from "shared/constants/palette";
 import { Point, pointsToPolygon, Polygon } from "shared/polybool/polybool";
 
-import { Frame } from "@rbxts-ui/primitives";
 import { calculateSnappedPosition } from "../polygon-clipper/PolygonCanvas.utils";
 import { PolygonShape } from "../polygon-clipper/PolygonShape";
 

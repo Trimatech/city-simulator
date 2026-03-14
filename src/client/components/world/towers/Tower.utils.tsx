@@ -111,7 +111,12 @@ export function createAttackBeam(model: Model, targetId: string) {
 	if (specsEffect) specsEffect.Enabled = true;
 
 	// Play continuous laser sound
-	const sound = playSound(assets.sounds.laser_beam, { parent: orbPart, looped: true, volume: 0.35, pitchOctave: 0.5 });
+	const sound = playSound(assets.sounds.laser_beam, {
+		parent: orbPart,
+		looped: true,
+		volume: 0.35,
+		pitchOctave: 0.5,
+	});
 
 	// Auto-destroy beam attachments if the target goes away or leaves Workspace
 	const connections: RBXScriptConnection[] = [];

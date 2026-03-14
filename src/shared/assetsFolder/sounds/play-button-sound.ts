@@ -1,5 +1,4 @@
 import { throttle } from "@rbxts/set-timeout";
-
 import assets from "shared/assets";
 
 import { playSound } from "./play-sound";

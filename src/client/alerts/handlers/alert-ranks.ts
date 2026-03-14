@@ -1,8 +1,7 @@
+import { sendAlert } from "client/alerts";
 import { store } from "client/store";
 import { palette } from "shared/constants/palette";
 import { selectLocalSoldierRanking } from "shared/store/soldiers";
-
-import { sendAlert } from "client/alerts";
 
 const FIRST_PLACE = 'Congratulations! You are in <font color="#fff">first place</font>.';
 const SECOND_PLACE = 'Congratulations! You are in <font color="#fff">second place</font>.';

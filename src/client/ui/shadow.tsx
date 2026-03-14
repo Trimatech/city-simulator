@@ -1,9 +1,8 @@
 import { composeBindings } from "@rbxts/pretty-react-hooks";
 import React from "@rbxts/react";
-import assets from "shared/assets";
-
-import { useRem } from "@rbxts-ui/rem";
 import { Image } from "@rbxts-ui/primitives";
+import { useRem } from "@rbxts-ui/rem";
+import assets from "shared/assets";
 
 interface ShadowProps extends React.PropsWithChildren {
 	shadowBlur?: number;

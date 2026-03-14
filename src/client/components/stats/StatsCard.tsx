@@ -70,10 +70,7 @@ interface StatsCardProps {
 	readonly order: number;
 }
 
-const OUTER_BG = Color3.fromRGB(124, 88, 0);
-const OUTER_BG_TRANSPARENCY = 0.3;
 const OUTER_BORDER_COLOR = Color3.fromRGB(61, 39, 19); // #3d2713
-const OUTER_BORDER_THICKNESS = 3;
 const OUTER_CORNER_RADIUS = 1;
 const INNER_CORNER_RADIUS = 0.75;
 const INNER_PADDING = 0.2;
@@ -104,7 +101,6 @@ export function StatsCard({ onClick, emoji, label, value, colorStyle, enabled, o
 	}, [enabled]);
 
 	const outerCorner = new UDim(0, rem(OUTER_CORNER_RADIUS));
-	const innerCorner = new UDim(0, rem(INNER_CORNER_RADIUS));
 
 	return (
 		<ReactiveButton2 onClick={onClick} backgroundTransparency={1} size={size} layoutOrder={order}>

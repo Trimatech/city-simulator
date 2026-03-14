@@ -1,4 +1,5 @@
 import React from "@rbxts/react";
+import { Layer } from "@rbxts-ui/layout";
 
 import { Alerts } from "../components/alerts";
 import { BirdCamera } from "../components/camera/BirdCamera";
@@ -8,7 +9,6 @@ import { BackgroundMusic } from "../components/music/BackgroundMusic";
 import { Preloader } from "../components/preloader";
 import { Screens } from "../components/Screens";
 import { World } from "../components/world/World";
-import { Layer } from "@rbxts-ui/layout";
 
 export function App() {
 	return (

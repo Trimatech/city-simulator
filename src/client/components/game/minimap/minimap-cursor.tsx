@@ -1,6 +1,6 @@
 import React, { useEffect } from "@rbxts/react";
-import { useContinuousAngle, useMotion } from "client/hooks";
 import { Image } from "@rbxts-ui/primitives";
+import { useContinuousAngle, useMotion } from "client/hooks";
 import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 

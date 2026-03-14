@@ -44,12 +44,7 @@ export function DailyRewardItem({
 	const whitePad = new UDim(0, rem(0.3));
 
 	return (
-		<Frame
-			size={cardSize}
-			layoutOrder={layoutOrder}
-			backgroundTransparency={1}
-			name="DailyRewardItem"
-		>
+		<Frame size={cardSize} layoutOrder={layoutOrder} backgroundTransparency={1} name="DailyRewardItem">
 			{/* Layer 1: Outer border */}
 			<Frame
 				backgroundColor={theme.outerBorderColor}

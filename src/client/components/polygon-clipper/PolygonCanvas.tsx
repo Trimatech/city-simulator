@@ -1,8 +1,8 @@
 import React, { useCallback, useRef } from "@rbxts/react";
+import { Frame } from "@rbxts-ui/primitives";
 import { palette } from "shared/constants/palette";
 import { Polygon } from "shared/polybool/polybool";
 
-import { Frame } from "@rbxts-ui/primitives";
 import { findClosestPoint, getNormMousePos, updatePolygonPoint } from "./PolygonCanvas.utils";
 import { PolygonShape } from "./PolygonShape";
 
