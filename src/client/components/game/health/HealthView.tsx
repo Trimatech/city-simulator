@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 import { HStack } from "@rbxts-ui/layout";
-import { Text } from "@rbxts-ui/primitives";
 import { useRem } from "client/ui/rem/useRem";
+import assets from "shared/assets";
 
 import { HealthBar } from "./HealthBar";
 
@@ -19,11 +19,13 @@ export function HealthView() {
 			verticalAlignment={Enum.VerticalAlignment.Center}
 			spacing={rem(0.5)}
 		>
-			<Text text={`❤️`} textSize={rem(2)} size={new UDim2(0, iconSize, 0, iconSize)} />
-			<frame
+			<imagelabel
+				Image={assets.ui.heart}
 				BackgroundTransparency={1}
-				Size={new UDim2(1, -iconSize - rem(0.5), 0, rem(2))}
-			>
+				Size={new UDim2(0, iconSize, 0, iconSize)}
+				ScaleType={Enum.ScaleType.Fit}
+			/>
+			<frame BackgroundTransparency={1} Size={new UDim2(1, -iconSize - rem(0.5), 0, rem(2))}>
 				<HealthBar />
 			</frame>
 		</HStack>

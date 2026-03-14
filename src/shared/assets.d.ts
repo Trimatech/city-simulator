@@ -45,7 +45,6 @@ declare const assets: {
 		}
 		diagonal_stripes: string
 		heart: string
-		heart_glow: string
 		leader_pointer: string
 		map_crosshair: string
 		map_cursor: string

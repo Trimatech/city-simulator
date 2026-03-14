@@ -5,6 +5,7 @@ import { Frame } from "@rbxts-ui/primitives";
 import { springs } from "client/constants/springs";
 import { useMotion } from "client/hooks";
 import { useRem } from "client/ui/rem/useRem";
+import { palette } from "shared/constants/palette";
 import { cornerRadiusFull } from "shared/constants/sizes";
 import { selectLocalHealth, selectLocalMaxHealth } from "shared/store/soldiers";
 
@@ -12,7 +13,7 @@ const OUTER_BORDER_COLOR = Color3.fromHex("#000000");
 const BG_COLOR = Color3.fromHex("#2aa044");
 const FILL_COLOR = Color3.fromHex("#08FE41");
 
-const OUTER_STROKE_GRADIENT = new ColorSequence(Color3.fromHex("#1a801d"), Color3.fromHex("#1a801d"));
+const OUTER_STROKE_GRADIENT = new ColorSequence(Color3.fromHex("#00E135"), Color3.fromHex("#00D331"));
 
 const FILL_STROKE_GRADIENT = new ColorSequence([
 	new ColorSequenceKeypoint(0, FILL_COLOR),
@@ -65,9 +66,16 @@ export function HealthBar() {
 			<canvasgroup key="HealthBar" Size={new UDim2(1, 0, 1, 0)} BackgroundColor3={BG_COLOR}>
 				<uicorner CornerRadius={cornerRadiusFull} />
 				<uistroke
+					Color={palette.black}
+					Thickness={rem(0.3)}
+					BorderStrokePosition={Enum.BorderStrokePosition.Outer}
+					ZIndex={1}
+				/>
+				<uistroke
 					Color={Color3.fromHex("#ffffff")}
 					Thickness={thickness}
 					BorderStrokePosition={Enum.BorderStrokePosition.Outer}
+					ZIndex={2}
 				>
 					<uigradient Color={OUTER_STROKE_GRADIENT} Rotation={90} />
 				</uistroke>
