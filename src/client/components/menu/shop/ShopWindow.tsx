@@ -4,11 +4,11 @@ import { Frame } from "@rbxts-ui/primitives";
 import { useRem } from "client/ui/rem/useRem";
 import assets from "shared/assets";
 
+import { MainButton, ShopButtonTextWithIcon } from "../../../ui/MainButton";
 import { SkinsList } from "../skins/SkinsList";
 import { CashProducts } from "./CashProducts";
 import { GameWindow } from "./GameWindow";
 import { GameWindowTabsHeader } from "./GameWindowTabsHeader";
-import { ShopItemButton } from "./ShopItemButton";
 
 enum ShopTabs {
 	Skins,
@@ -26,27 +26,27 @@ export function ShopWindow({ onClose }: ShopWindowProps) {
 
 	const tabs = (
 		<>
-			<ShopItemButton
-				text="SKINS"
-				icon={assets.ui.shop.Skins}
-				fitContent={true}
+			<MainButton
+				fitContent
 				isActive={activeTabId === ShopTabs.Skins}
 				onClick={() => setActiveTabId(ShopTabs.Skins)}
-			/>
-			<ShopItemButton
-				text="CASH"
-				icon={assets.ui.shop.Cash}
-				fitContent={true}
+			>
+				<ShopButtonTextWithIcon text="SKINS" icon={assets.ui.shop.Skins} />
+			</MainButton>
+			<MainButton
+				fitContent
 				isActive={activeTabId === ShopTabs.Cash}
 				onClick={() => setActiveTabId(ShopTabs.Cash)}
-			/>
-			<ShopItemButton
-				text="CRYSTALS"
-				icon={assets.ui.shards_icon_color}
-				fitContent={true}
+			>
+				<ShopButtonTextWithIcon text="CASH" icon={assets.ui.shop.Cash} />
+			</MainButton>
+			<MainButton
+				fitContent
 				isActive={activeTabId === ShopTabs.Crystals}
 				onClick={() => setActiveTabId(ShopTabs.Crystals)}
-			/>
+			>
+				<ShopButtonTextWithIcon text="CRYSTALS" icon={assets.ui.shards_icon_color} />
+			</MainButton>
 			<HFill verticalSize={0} />
 		</>
 	);

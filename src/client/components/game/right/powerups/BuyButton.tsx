@@ -42,9 +42,6 @@ export function BuyButton({
 		<MainButton
 			onClick={onClick}
 			onHover={(h) => hoverMotion.spring(h ? 1 : 0)}
-			overlayGradient={
-				enabled ? new ColorSequence(palette.mauve, palette.blue) : new ColorSequence(palette.mauve, palette.red)
-			}
 			anchorPoint={anchorPoint}
 			size={size}
 			position={position}

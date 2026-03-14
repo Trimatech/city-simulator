@@ -2,18 +2,13 @@ import React, { useState } from "@rbxts/react";
 import { useSelectorCreator } from "@rbxts/react-reflex";
 import { ReactiveButton2 } from "@rbxts-ui/components";
 import { HStack } from "@rbxts-ui/layout";
-import { Frame, Text } from "@rbxts-ui/primitives";
+import { Frame } from "@rbxts-ui/primitives";
 import { HomeStats } from "client/components/stats/HomeStats";
-import { fonts } from "client/constants/fonts";
-import { MainButton } from "client/ui/MainButton";
+import { MainButton, ShopButtonText } from "client/ui/MainButton";
 import { useRem } from "client/ui/rem/useRem";
 import { SlideIn } from "client/ui/slide-in";
 import { USER_NAME } from "shared/constants/core";
-import {
-	DAILY_REWARD_CYCLE,
-	DAILY_STREAK_WINDOW,
-	SECONDS_PER_DAY,
-} from "shared/constants/daily-rewards";
+import { DAILY_REWARD_CYCLE, DAILY_STREAK_WINDOW, SECONDS_PER_DAY } from "shared/constants/daily-rewards";
 import { palette } from "shared/constants/palette";
 import { ROOT_PADDING } from "shared/constants/theme";
 import { selectPlayerDailyStreak, selectPlayerLastDailyRewardClaim } from "shared/store/saves";
@@ -64,24 +59,10 @@ export function Home({ visible }: HomeProps) {
 					spacing={rem(1)}
 				>
 					<MainButton onClick={() => setIsShopOpen(true)} size={new UDim2(0, rem(10), 0, rem(4))}>
-						<Text
-							font={fonts.inter.medium}
-							text={"🛒 Shop"}
-							textSize={rem(1.6)}
-							size={new UDim2(1, 0, 1, 0)}
-						/>
+						<ShopButtonText text="🛒 Shop" />
 					</MainButton>
-					<MainButton
-						onClick={openDailyReward}
-						primaryColor={palette.yellow}
-						size={new UDim2(0, rem(13), 0, rem(4))}
-					>
-						<Text
-							font={fonts.inter.medium}
-							text={"🎁 Daily Reward"}
-							textSize={rem(1.6)}
-							size={new UDim2(1, 0, 1, 0)}
-						/>
+					<MainButton onClick={openDailyReward} size={new UDim2(0, rem(16), 0, rem(4))}>
+						<ShopButtonText text="🎁 Daily Reward" />
 					</MainButton>
 				</HStack>
 			</SlideIn>

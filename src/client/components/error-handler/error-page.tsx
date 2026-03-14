@@ -4,7 +4,7 @@ import { TextField } from "@rbxts-ui/components";
 import { Layer } from "@rbxts-ui/layout";
 import { Frame, Group, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
-import { MainButton } from "client/ui/MainButton";
+import { MainButton, ShopButtonText } from "client/ui/MainButton";
 import { useRem } from "client/ui/rem/useRem";
 import assets from "shared/assets";
 import { playSound } from "shared/assetsFolder";
@@ -97,17 +97,10 @@ export function ErrorPage({ message }: ErrorPageProps) {
 
 				<MainButton
 					onClick={async () => TeleportService.TeleportToPlaceInstance(game.PlaceId, game.JobId)}
-					overlayGradient={new ColorSequence(palette.blue, palette.mauve)}
 					size={new UDim2(0, rem(12), 0, rem(5))}
 					layoutOrder={index++}
 				>
-					<Text
-						font={fonts.inter.medium}
-						text="Reconnect →"
-						textColor={palette.base}
-						textSize={rem(1.5)}
-						size={new UDim2(1, 0, 1, 0)}
-					/>
+					<ShopButtonText text="Reconnect →" />
 				</MainButton>
 			</Frame>
 		</Layer>

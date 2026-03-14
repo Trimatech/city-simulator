@@ -3,8 +3,8 @@ import "client/app/react-config";
 import React from "@rbxts/react";
 import ReactRoblox from "@rbxts/react-roblox";
 import { InferFusionProps } from "@rbxts/ui-labs";
-import { ShopItemButton } from "client/components/menu/shop/ShopItemButton";
 import { RootProvider } from "client/providers/root-provider";
+import { MainButton, ShopButtonText, ShopButtonTextWithIcon } from "client/ui/MainButton";
 import assets from "shared/assets";
 
 const controls = {};
@@ -25,18 +25,30 @@ const story = {
 					/>
 
 					{/* Fixed width (default) */}
-					<ShopItemButton text="2000" />
+					<MainButton>
+						<ShopButtonText text="2000" />
+					</MainButton>
 
-					<ShopItemButton text="BUY NOW" />
+					<MainButton>
+						<ShopButtonText text="BUY NOW" />
+					</MainButton>
 
-					<ShopItemButton text="CRYSTALS" icon={assets.ui.shards_icon_color} />
+					<MainButton>
+						<ShopButtonTextWithIcon text="CRYSTALS" icon={assets.ui.shards_icon_color} />
+					</MainButton>
 
 					{/* Dynamic width — shrinks to content */}
-					<ShopItemButton text="2000" fitContent />
+					<MainButton fitContent>
+						<ShopButtonText text="2000" />
+					</MainButton>
 
-					<ShopItemButton text="BUY NOW" fitContent />
+					<MainButton fitContent>
+						<ShopButtonText text="BUY NOW" />
+					</MainButton>
 
-					<ShopItemButton text="CRYSTALS" icon={assets.ui.shards_icon_color} fitContent />
+					<MainButton fitContent>
+						<ShopButtonTextWithIcon text="CRYSTALS" icon={assets.ui.shards_icon_color} />
+					</MainButton>
 				</frame>
 			</RootProvider>
 		);

@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "@rbxts/react";
 import { useSelectorCreator } from "@rbxts/react-reflex";
 import { HStack, VStack } from "@rbxts-ui/layout";
 import { Frame, Image, Text } from "@rbxts-ui/primitives";
-import { ShopItemButton } from "client/components/menu/shop/ShopItemButton";
 import { ProgressBarTimer } from "client/components/ProgressBarTimer";
 import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
 import { useMotion } from "client/hooks";
+import { MainButton, ShopButtonTextWithIcon } from "client/ui/MainButton";
 import { useRem } from "client/ui/rem/useRem";
 import assets from "shared/assets";
 import { DEATH_CHOICE_TIMEOUT_SEC, USER_NAME } from "shared/constants/core";
@@ -196,15 +196,15 @@ export function DeathScreen({ activeDeadline, persistent, onDismiss }: DeathScre
 						automaticSize={Enum.AutomaticSize.Y}
 						horizontalAlignment={Enum.HorizontalAlignment.Center}
 					>
-						<ShopItemButton
-							text="Revive"
-							icon={assets.ui.shards_icon_color}
+						<MainButton
+							fitContent
 							onClick={() => {
 								setIsReviving(true);
 								remotes.soldier.continue.fire();
 							}}
-							fitContent
-						/>
+						>
+							<ShopButtonTextWithIcon text="Revive" icon={assets.ui.shards_icon_color} />
+						</MainButton>
 
 						<HStack
 							horizontalAlignment={Enum.HorizontalAlignment.Center}

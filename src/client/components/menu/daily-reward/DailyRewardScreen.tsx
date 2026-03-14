@@ -7,9 +7,9 @@ import assets from "shared/assets";
 import { DAILY_REWARD_CYCLE, getDailyRewardAmount } from "shared/constants/daily-rewards";
 import { remotes } from "shared/remotes";
 
+import { MainButton, ShopButtonText } from "../../../ui/MainButton";
 import { GameWindow } from "../shop/GameWindow";
 import { GameWindowTitleHeader } from "../shop/GameWindowTitleHeader";
-import { ShopItemButton } from "../shop/ShopItemButton";
 import { DailyRewardItem } from "./DailyRewardItem";
 
 interface DailyRewardScreenProps {
@@ -98,12 +98,9 @@ export function DailyRewardScreen({ streakDay: _streakDay, onDismiss }: DailyRew
 					anchorPoint={new Vector2(0.5, 1)}
 					automaticSize={Enum.AutomaticSize.X}
 				>
-					<ShopItemButton
-						text={claimed ? "CLAIMED!" : "CLAIM REWARD"}
-						onClick={handleClaim}
-						size={new UDim2(0, rem(22), 0, rem(4.5))}
-						layoutOrder={2}
-					/>
+					<MainButton onClick={handleClaim} size={new UDim2(0, rem(22), 0, rem(4.5))} layoutOrder={2}>
+						<ShopButtonText text={claimed ? "CLAIMED!" : "CLAIM REWARD"} />
+					</MainButton>
 				</Frame>
 			</Frame>
 		</GameWindow>

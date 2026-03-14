@@ -6,7 +6,7 @@ import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 import { sizes } from "shared/constants/sizes";
 
-import { ShopItemButton, ShopItemButtonTheme } from "./ShopItemButton";
+import { MainButton, ShopButtonText, ShopButtonTextWithIcon, ShopItemButtonTheme } from "../../../ui/MainButton";
 
 export interface ShopItemTheme {
 	readonly outerBorderColor: Color3;
@@ -201,11 +201,7 @@ export function ShopItem({
 
 						{/* Center content — either custom children or icon image */}
 						{children !== undefined ? (
-							<Frame
-								size={new UDim2(1, 0, 1, 0)}
-								backgroundTransparency={1}
-								zIndex={2}
-							>
+							<Frame size={new UDim2(1, 0, 1, 0)} backgroundTransparency={1} zIndex={2}>
 								{children}
 							</Frame>
 						) : (
@@ -277,15 +273,19 @@ export function ShopItem({
 						)}
 
 						{/* Button — Figma: y=287 in 308h → ~93.2%, overflows bottom */}
-						<ShopItemButton
-							text={buttonText}
-							icon={buttonIcon}
+						<MainButton
 							onClick={onButtonClick}
 							theme={buttonTheme}
-							size={new UDim2(0.685, 0, 0.214, 0)}
-							position={new UDim2(0.5, 0, 0.932, 0)}
+							size={new UDim2(0.685, 0, 0, rem(4))}
+							position={new UDim2(0.5, 0, 1, -rem(1))}
 							anchorPoint={new Vector2(0.5, 0)}
-						/>
+						>
+							{buttonIcon !== undefined ? (
+								<ShopButtonTextWithIcon text={buttonText} icon={buttonIcon} theme={buttonTheme} />
+							) : (
+								<ShopButtonText text={buttonText} theme={buttonTheme} />
+							)}
+						</MainButton>
 					</Frame>
 				</Frame>
 			</Frame>

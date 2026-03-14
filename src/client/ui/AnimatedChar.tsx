@@ -1,10 +1,12 @@
 import { composeBindings } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { SpringOptions } from "@rbxts/ripple";
+import { Frame, Text } from "@rbxts-ui/primitives";
 import { springs } from "client/constants/springs";
 import { useMotion } from "client/hooks";
-import { Frame } from "@rbxts-ui/primitives";
-import { Text } from "@rbxts-ui/primitives";
+import { palette } from "shared/constants/palette";
+
+import { useRem } from "./rem/useRem";
 
 interface AnimatedCharProps {
 	readonly index: number;
@@ -20,6 +22,8 @@ interface AnimatedCharProps {
 	readonly pulseToken?: number;
 }
 
+const textStrokeGradient = new ColorSequence(palette.textStrokeFrom, palette.textStrokeTo);
+
 export function AnimatedChar({
 	index,
 	char,
@@ -34,7 +38,7 @@ export function AnimatedChar({
 	pulseToken,
 }: AnimatedCharProps) {
 	const [y, yMotion] = useMotion(0);
-
+	const rem = useRem();
 	const animationSpring = springOptions ?? springs.bubbly;
 
 	useEffect(() => {
@@ -68,8 +72,8 @@ export function AnimatedChar({
 	return (
 		<Frame automaticSize={Enum.AutomaticSize.X} size={new UDim2(0, 0, 1, 0)}>
 			<Text
-				font={font}
 				text={char}
+				font={font}
 				textColor={textColor}
 				textSize={textSize}
 				textYAlignment="Center"
@@ -77,7 +81,11 @@ export function AnimatedChar({
 				size={new UDim2(0, 0, 1, 0)}
 				position={positionBinding}
 				anchorPoint={new Vector2(0, 0.5)}
-			/>
+			>
+				<uistroke Thickness={rem(0.15)} Color={palette.white}>
+					<uigradient Color={textStrokeGradient} Rotation={90} />
+				</uistroke>
+			</Text>
 		</Frame>
 	);
 }

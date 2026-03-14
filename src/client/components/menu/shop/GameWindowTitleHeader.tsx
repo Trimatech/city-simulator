@@ -6,7 +6,7 @@ import { useRem } from "client/ui/rem/useRem";
 import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 
-import { ShopItemButton } from "./ShopItemButton";
+import { MainButton, ShopButtonIcon } from "../../../ui/MainButton";
 
 const TEXT_BG_GRADIENT = new ColorSequence([
 	new ColorSequenceKeypoint(0, Color3.fromHex("#FFEC7D")),
@@ -52,7 +52,9 @@ export function GameWindowTitleHeader({ title, onClose }: GameWindowTitleHeaderP
 				</Text>
 			</Frame>
 
-			<ShopItemButton icon={assets.ui.shop.Close} onClick={onClose} />
+			<MainButton fitContent onClick={onClose}>
+				<ShopButtonIcon icon={assets.ui.shop.Close} />
+			</MainButton>
 		</HStack>
 	);
 }

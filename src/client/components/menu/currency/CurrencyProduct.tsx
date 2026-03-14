@@ -6,7 +6,7 @@ import { Transition } from "@rbxts-ui/layout";
 import { Frame, Group, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { useMotion, useProductPrice } from "client/hooks";
-import { MainButton } from "client/ui/MainButton";
+import { MainButton, ShopButtonText } from "client/ui/MainButton";
 import { useRem } from "client/ui/rem/useRem";
 import { palette } from "shared/constants/palette";
 import { brighten } from "shared/utils/color-utils";
@@ -143,18 +143,11 @@ export function CurrencyProduct({
 
 				<MainButton
 					onClick={promptPurchase}
-					overlayGradient={gradient}
 					anchorPoint={new Vector2(0.5, 1)}
 					size={new UDim2(1, rem(-4), 0, rem(4.25))}
 					position={new UDim2(0.5, 0, 1, rem(-2.25))}
 				>
-					<Text
-						font={fonts.inter.medium}
-						text={`${RobloxEmoji.Robux}${price}`}
-						textSize={rem(1.5)}
-						textColor={palette.base}
-						position={new UDim2(0.5, 0, 0.5, 0)}
-					/>
+					<ShopButtonText text={`${RobloxEmoji.Robux}${price}`} />
 				</MainButton>
 
 				{children}

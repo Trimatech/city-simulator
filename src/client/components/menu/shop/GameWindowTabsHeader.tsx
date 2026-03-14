@@ -3,7 +3,7 @@ import { HStack } from "@rbxts-ui/layout";
 import { useRem } from "client/ui/rem/useRem";
 import assets from "shared/assets";
 
-import { ShopItemButton } from "./ShopItemButton";
+import { MainButton, ShopButtonIcon } from "../../../ui/MainButton";
 
 interface GameWindowTabsHeaderProps {
 	readonly tabs: React.Element;
@@ -16,7 +16,9 @@ export function GameWindowTabsHeader({ tabs, onClose }: GameWindowTabsHeaderProp
 	return (
 		<HStack spacing={rem(1)} size={new UDim2(1, 0, 0, 0)} automaticSize={Enum.AutomaticSize.Y}>
 			{tabs}
-			<ShopItemButton icon={assets.ui.shop.Close} onClick={onClose} />
+			<MainButton fitContent onClick={onClose}>
+				<ShopButtonIcon icon={assets.ui.shop.Close} />
+			</MainButton>
 		</HStack>
 	);
 }
