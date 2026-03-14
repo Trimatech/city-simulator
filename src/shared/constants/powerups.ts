@@ -38,6 +38,7 @@ export const POWERUP_COLORS: Record<PowerupId, Color3> = {
 
 export interface PowerupButtonStyle {
 	readonly backgroundColor: Color3;
+	readonly backgroundGradient: ColorSequence;
 	readonly borderGradient: ColorSequence;
 }
 
@@ -46,6 +47,10 @@ const OUTER_BORDER_COLOR = Color3.fromRGB(14, 42, 78); // #0E2A4E
 export const POWERUP_BUTTON_STYLES: Record<PowerupId, PowerupButtonStyle> = {
 	nuclearExplosion: {
 		backgroundColor: Color3.fromRGB(251, 85, 87),
+		backgroundGradient: new ColorSequence(
+			Color3.fromRGB(255, 139, 122),
+			Color3.fromRGB(201, 62, 69),
+		),
 		borderGradient: new ColorSequence(
 			Color3.fromRGB(255, 160, 160),
 			Color3.fromRGB(180, 60, 60),
@@ -53,6 +58,10 @@ export const POWERUP_BUTTON_STYLES: Record<PowerupId, PowerupButtonStyle> = {
 	},
 	laserBeam: {
 		backgroundColor: Color3.fromRGB(188, 91, 163),
+		backgroundGradient: new ColorSequence(
+			Color3.fromRGB(217, 133, 196),
+			Color3.fromRGB(143, 62, 124),
+		),
 		borderGradient: new ColorSequence(
 			Color3.fromRGB(230, 150, 210),
 			Color3.fromRGB(140, 65, 120),
@@ -60,6 +69,10 @@ export const POWERUP_BUTTON_STYLES: Record<PowerupId, PowerupButtonStyle> = {
 	},
 	shield: {
 		backgroundColor: Color3.fromRGB(252, 255, 100),
+		backgroundGradient: new ColorSequence(
+			Color3.fromRGB(255, 255, 158),
+			Color3.fromRGB(201, 204, 60),
+		),
 		borderGradient: new ColorSequence(
 			Color3.fromRGB(255, 255, 180),
 			Color3.fromRGB(190, 190, 70),
@@ -67,6 +80,10 @@ export const POWERUP_BUTTON_STYLES: Record<PowerupId, PowerupButtonStyle> = {
 	},
 	tower: {
 		backgroundColor: Color3.fromRGB(176, 236, 120),
+		backgroundGradient: new ColorSequence(
+			Color3.fromRGB(208, 255, 158),
+			Color3.fromRGB(127, 181, 78),
+		),
 		borderGradient: new ColorSequence(
 			Color3.fromRGB(210, 255, 170),
 			Color3.fromRGB(130, 175, 85),
@@ -74,6 +91,10 @@ export const POWERUP_BUTTON_STYLES: Record<PowerupId, PowerupButtonStyle> = {
 	},
 	turbo: {
 		backgroundColor: Color3.fromRGB(84, 255, 229),
+		backgroundGradient: new ColorSequence(
+			Color3.fromRGB(141, 255, 240),
+			Color3.fromRGB(43, 201, 179),
+		),
 		borderGradient: new ColorSequence(
 			Color3.fromRGB(150, 255, 240),
 			Color3.fromRGB(60, 190, 170),

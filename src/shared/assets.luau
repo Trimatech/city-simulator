@@ -51,6 +51,7 @@ local assets = {
 		menu_title = "rbxassetid://81914962844346",
 		patterns = {
 			dots_pattern = "rbxassetid://109011352852234",
+			water_noise_pattern = "rbxassetid://116904224511881",
 		},
 		shards_icon = "rbxassetid://128066684240466",
 		shards_icon_color = "rbxassetid://133438219301442",

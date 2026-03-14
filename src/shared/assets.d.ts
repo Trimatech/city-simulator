@@ -51,6 +51,7 @@ declare const assets: {
 		menu_title: string
 		patterns: {
 			dots_pattern: string
+			water_noise_pattern: string
 		}
 		shards_icon: string
 		shards_icon_color: string

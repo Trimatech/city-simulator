@@ -10,16 +10,16 @@ importers:
     dependencies:
       '@rbxts-ui/alerts':
         specifier: 6.0.0
-        version: 6.0.0(fuqkrtfeokwrzcxdphekoyhb6a)
+        version: 6.0.0(ifnxbgzfw6bhjgm3mzrsvgujrq)
       '@rbxts-ui/components':
         specifier: 7.0.1
-        version: 7.0.1(xzfjobwfxa4yuhz3eptcxpd2f4)
+        version: 7.0.1(ufighicbvgxmhnwwm7r2dg5ski)
       '@rbxts-ui/layout':
-        specifier: 6.0.1
-        version: 6.0.1(@rbxts-ui/primitives@2.4.0(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1))(@rbxts-ui/rem@2.3.1(@rbxts/pretty-react-hooks@0.6.0)(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)(@rbxts/ripple@0.9.1)(@rbxts/set-timeout@1.1.2))(@rbxts-ui/theme@1.3.1(@rbxts/ripple@0.9.1)(@rbxts/types@1.0.909))(@rbxts-ui/utils@2.3.1(@rbxts/object-utils@1.0.4)(@rbxts/types@1.0.909))(@rbxts/pretty-react-hooks@0.6.0)(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)(@rbxts/ripple@0.9.1)(@rbxts/services@1.5.5)(@rbxts/set-timeout@1.1.2)
+        specifier: 6.0.2
+        version: 6.0.2(@rbxts-ui/primitives@2.4.1(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1))(@rbxts-ui/rem@2.3.1(@rbxts/pretty-react-hooks@0.6.0)(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)(@rbxts/ripple@0.9.1)(@rbxts/set-timeout@1.1.2))(@rbxts-ui/theme@1.3.1(@rbxts/ripple@0.9.1)(@rbxts/types@1.0.909))(@rbxts-ui/utils@2.3.1(@rbxts/object-utils@1.0.4)(@rbxts/types@1.0.909))(@rbxts/pretty-react-hooks@0.6.0)(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)(@rbxts/ripple@0.9.1)(@rbxts/services@1.5.5)(@rbxts/set-timeout@1.1.2)
       '@rbxts-ui/primitives':
-        specifier: 2.4.0
-        version: 2.4.0(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)
+        specifier: 2.4.1
+        version: 2.4.1(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)
       '@rbxts-ui/rem':
         specifier: 2.3.1
         version: 2.3.1(@rbxts/pretty-react-hooks@0.6.0)(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)(@rbxts/ripple@0.9.1)(@rbxts/set-timeout@1.1.2)
@@ -226,8 +226,8 @@ packages:
       '@rbxts/types': '*'
       '@rbxts/ui-labs': '*'
 
-  '@rbxts-ui/layout@6.0.1':
-    resolution: {integrity: sha512-wdui8uJqqhldDzLFv/L+hsezOr9zyJ7OAze3hWEKmN7EVzf6TCZG379gI9i73k5NDzRUfeAu5LSP/rLKuK7I7Q==}
+  '@rbxts-ui/layout@6.0.2':
+    resolution: {integrity: sha512-2SSjPWYLcOoSZTf/0MA1mu2J4KY2oKtm/EQSZk5e0xSovrFD+HPikB5KqSpvVXRGWwrw7uKx7xNGit21vpXGUQ==}
     peerDependencies:
       '@rbxts-ui/primitives': 2.4.1
       '@rbxts-ui/rem': 2.3.1
@@ -241,8 +241,8 @@ packages:
       '@rbxts/services': '*'
       '@rbxts/set-timeout': '*'
 
-  '@rbxts-ui/primitives@2.4.0':
-    resolution: {integrity: sha512-iXfa4lUksgvw3S+f+s9s/pC6FnkBlcsM3p5e5GN5XXylkkIJ74HbsCKvvvfXFNpol4CkPOh9qaXp3NxocpDhbQ==}
+  '@rbxts-ui/primitives@2.4.1':
+    resolution: {integrity: sha512-4Oy1L8JKYbn5KwyQOF+jV9Iapj5qeFLFJVicA2OiV0IiluK5xq8JOot2JznlMT1cBth2I1m6GREl2nI1jGN6jA==}
     peerDependencies:
       '@rbxts/react': '*'
       '@rbxts/react-roblox': '*'
@@ -1174,11 +1174,11 @@ snapshots:
 
   '@pkgr/core@0.1.1': {}
 
-  '@rbxts-ui/alerts@6.0.0(fuqkrtfeokwrzcxdphekoyhb6a)':
+  '@rbxts-ui/alerts@6.0.0(ifnxbgzfw6bhjgm3mzrsvgujrq)':
     dependencies:
-      '@rbxts-ui/components': 7.0.1(xzfjobwfxa4yuhz3eptcxpd2f4)
-      '@rbxts-ui/layout': 6.0.1(@rbxts-ui/primitives@2.4.0(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1))(@rbxts-ui/rem@2.3.1(@rbxts/pretty-react-hooks@0.6.0)(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)(@rbxts/ripple@0.9.1)(@rbxts/set-timeout@1.1.2))(@rbxts-ui/theme@1.3.1(@rbxts/ripple@0.9.1)(@rbxts/types@1.0.909))(@rbxts-ui/utils@2.3.1(@rbxts/object-utils@1.0.4)(@rbxts/types@1.0.909))(@rbxts/pretty-react-hooks@0.6.0)(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)(@rbxts/ripple@0.9.1)(@rbxts/services@1.5.5)(@rbxts/set-timeout@1.1.2)
-      '@rbxts-ui/primitives': 2.4.0(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)
+      '@rbxts-ui/components': 7.0.1(ufighicbvgxmhnwwm7r2dg5ski)
+      '@rbxts-ui/layout': 6.0.2(@rbxts-ui/primitives@2.4.1(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1))(@rbxts-ui/rem@2.3.1(@rbxts/pretty-react-hooks@0.6.0)(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)(@rbxts/ripple@0.9.1)(@rbxts/set-timeout@1.1.2))(@rbxts-ui/theme@1.3.1(@rbxts/ripple@0.9.1)(@rbxts/types@1.0.909))(@rbxts-ui/utils@2.3.1(@rbxts/object-utils@1.0.4)(@rbxts/types@1.0.909))(@rbxts/pretty-react-hooks@0.6.0)(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)(@rbxts/ripple@0.9.1)(@rbxts/services@1.5.5)(@rbxts/set-timeout@1.1.2)
+      '@rbxts-ui/primitives': 2.4.1(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)
       '@rbxts-ui/rem': 2.3.1(@rbxts/pretty-react-hooks@0.6.0)(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)(@rbxts/ripple@0.9.1)(@rbxts/set-timeout@1.1.2)
       '@rbxts-ui/theme': 1.3.1(@rbxts/ripple@0.9.1)(@rbxts/types@1.0.909)
       '@rbxts/pretty-react-hooks': 0.6.0
@@ -1191,10 +1191,10 @@ snapshots:
       '@rbxts/services': 1.5.5
       '@rbxts/set-timeout': 1.1.2
 
-  '@rbxts-ui/components@7.0.1(xzfjobwfxa4yuhz3eptcxpd2f4)':
+  '@rbxts-ui/components@7.0.1(ufighicbvgxmhnwwm7r2dg5ski)':
     dependencies:
-      '@rbxts-ui/layout': 6.0.1(@rbxts-ui/primitives@2.4.0(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1))(@rbxts-ui/rem@2.3.1(@rbxts/pretty-react-hooks@0.6.0)(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)(@rbxts/ripple@0.9.1)(@rbxts/set-timeout@1.1.2))(@rbxts-ui/theme@1.3.1(@rbxts/ripple@0.9.1)(@rbxts/types@1.0.909))(@rbxts-ui/utils@2.3.1(@rbxts/object-utils@1.0.4)(@rbxts/types@1.0.909))(@rbxts/pretty-react-hooks@0.6.0)(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)(@rbxts/ripple@0.9.1)(@rbxts/services@1.5.5)(@rbxts/set-timeout@1.1.2)
-      '@rbxts-ui/primitives': 2.4.0(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)
+      '@rbxts-ui/layout': 6.0.2(@rbxts-ui/primitives@2.4.1(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1))(@rbxts-ui/rem@2.3.1(@rbxts/pretty-react-hooks@0.6.0)(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)(@rbxts/ripple@0.9.1)(@rbxts/set-timeout@1.1.2))(@rbxts-ui/theme@1.3.1(@rbxts/ripple@0.9.1)(@rbxts/types@1.0.909))(@rbxts-ui/utils@2.3.1(@rbxts/object-utils@1.0.4)(@rbxts/types@1.0.909))(@rbxts/pretty-react-hooks@0.6.0)(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)(@rbxts/ripple@0.9.1)(@rbxts/services@1.5.5)(@rbxts/set-timeout@1.1.2)
+      '@rbxts-ui/primitives': 2.4.1(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)
       '@rbxts-ui/rem': 2.3.1(@rbxts/pretty-react-hooks@0.6.0)(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)(@rbxts/ripple@0.9.1)(@rbxts/set-timeout@1.1.2)
       '@rbxts-ui/theme': 1.3.1(@rbxts/ripple@0.9.1)(@rbxts/types@1.0.909)
       '@rbxts-ui/utils': 2.3.1(@rbxts/object-utils@1.0.4)(@rbxts/types@1.0.909)
@@ -1210,9 +1210,9 @@ snapshots:
       '@rbxts/types': 1.0.909
       '@rbxts/ui-labs': 2.4.1
 
-  '@rbxts-ui/layout@6.0.1(@rbxts-ui/primitives@2.4.0(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1))(@rbxts-ui/rem@2.3.1(@rbxts/pretty-react-hooks@0.6.0)(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)(@rbxts/ripple@0.9.1)(@rbxts/set-timeout@1.1.2))(@rbxts-ui/theme@1.3.1(@rbxts/ripple@0.9.1)(@rbxts/types@1.0.909))(@rbxts-ui/utils@2.3.1(@rbxts/object-utils@1.0.4)(@rbxts/types@1.0.909))(@rbxts/pretty-react-hooks@0.6.0)(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)(@rbxts/ripple@0.9.1)(@rbxts/services@1.5.5)(@rbxts/set-timeout@1.1.2)':
+  '@rbxts-ui/layout@6.0.2(@rbxts-ui/primitives@2.4.1(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1))(@rbxts-ui/rem@2.3.1(@rbxts/pretty-react-hooks@0.6.0)(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)(@rbxts/ripple@0.9.1)(@rbxts/set-timeout@1.1.2))(@rbxts-ui/theme@1.3.1(@rbxts/ripple@0.9.1)(@rbxts/types@1.0.909))(@rbxts-ui/utils@2.3.1(@rbxts/object-utils@1.0.4)(@rbxts/types@1.0.909))(@rbxts/pretty-react-hooks@0.6.0)(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)(@rbxts/ripple@0.9.1)(@rbxts/services@1.5.5)(@rbxts/set-timeout@1.1.2)':
     dependencies:
-      '@rbxts-ui/primitives': 2.4.0(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)
+      '@rbxts-ui/primitives': 2.4.1(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)
       '@rbxts-ui/rem': 2.3.1(@rbxts/pretty-react-hooks@0.6.0)(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)(@rbxts/ripple@0.9.1)(@rbxts/set-timeout@1.1.2)
       '@rbxts-ui/theme': 1.3.1(@rbxts/ripple@0.9.1)(@rbxts/types@1.0.909)
       '@rbxts-ui/utils': 2.3.1(@rbxts/object-utils@1.0.4)(@rbxts/types@1.0.909)
@@ -1224,7 +1224,7 @@ snapshots:
       '@rbxts/services': 1.5.5
       '@rbxts/set-timeout': 1.1.2
 
-  '@rbxts-ui/primitives@2.4.0(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)':
+  '@rbxts-ui/primitives@2.4.1(@rbxts/react-roblox@17.2.1)(@rbxts/react-vendor@17.2.1)(@rbxts/react@17.2.1)':
     dependencies:
       '@rbxts/react': 17.2.1
       '@rbxts/react-roblox': 17.2.1

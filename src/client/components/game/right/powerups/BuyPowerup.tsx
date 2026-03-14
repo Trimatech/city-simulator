@@ -10,6 +10,7 @@ import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 import { POWERUP_BUTTON_STYLES, POWERUP_OUTER_BORDER_COLOR, PowerupId } from "shared/constants/powerups";
 import { remotes } from "shared/remotes";
+import { brighten } from "shared/utils/color-utils";
 
 interface Props {
 	readonly id: PowerupId;
@@ -34,17 +35,17 @@ export function BuyPowerup({ id, emoji, label, enabled, order, price }: Props) {
 	const FULL_WIDTH = WIDTH + rem(TOOLTIP_WIDTH);
 
 	const [showTooltip, setShowTooltip] = useState(false);
-	const [transparency, transparencyMotion] = useMotion(1);
+	const [transparency, transparencyMotion] = useMotion(0);
 	const [bgColor, bgColorMotion] = useMotion(style.backgroundColor);
 	const [size, sizeMotion] = useMotion(new UDim2(0, WIDTH, 0, HEIGHT));
 
-	useEffect(() => {
-		transparencyMotion.spring(enabled ? 0 : 0.4, springs.slow);
-	}, [enabled]);
+	// useEffect(() => {
+	// 	transparencyMotion.spring(enabled ? 0 : 0.4, springs.slow);
+	// }, [enabled]);
 
-	useEffect(() => {
-		bgColorMotion.spring(enabled ? style.backgroundColor : palette.overlay2, springs.slow);
-	}, [enabled, style.backgroundColor]);
+	// useEffect(() => {
+	// 	bgColorMotion.spring(enabled ? style.backgroundColor : palette.overlay2, springs.slow);
+	// }, [enabled, style.backgroundColor]);
 
 	useEffect(() => {
 		sizeMotion.spring(new UDim2(0, showTooltip ? FULL_WIDTH : WIDTH, 0, HEIGHT), springs.gentle);
@@ -72,6 +73,9 @@ export function BuyPowerup({ id, emoji, label, enabled, order, price }: Props) {
 					size={new UDim2(1, 0, 1, 0)}
 					clipsDescendants
 				>
+					{/* Background gradient */}
+					<uigradient Color={style.backgroundGradient} Rotation={60} />
+
 					{/* Dark blue outer stroke */}
 					<uistroke Color={POWERUP_OUTER_BORDER_COLOR} Thickness={rem(OUTER_STROKE_THICKNESS)} ZIndex={0} />
 
@@ -80,50 +84,48 @@ export function BuyPowerup({ id, emoji, label, enabled, order, price }: Props) {
 						<uigradient Color={style.borderGradient} Rotation={90} />
 					</uistroke>
 
-					{/* Dots pattern overlay */}
 					<Image
-						image={assets.ui.patterns.dots_pattern}
-						imageColor3={palette.white}
-						imageTransparency={0.96}
-						scaleType="Tile"
-						tileSize={new UDim2(0, rem(4), 0, rem(4))}
+						image={assets.ui.patterns.water_noise_pattern}
 						size={new UDim2(1, 0, 1, 0)}
+						imageTransparency={0.5}
+						scaleType="Tile"
+						imageColor3={brighten(style.backgroundColor, 1)}
+						tileSize={new UDim2(0, rem(40), 0, rem(40))}
 					>
 						<uicorner CornerRadius={fullRound} />
 					</Image>
 
 					{/* Content */}
-					<frame Size={new UDim2(1, 0, 1, 0)} BackgroundTransparency={1} ZIndex={2}>
-						<HStack clipsDescendants={false} horizontalAlignment={Enum.HorizontalAlignment.Right}>
-							{showTooltip ? (
-								<HStack spacing={rem(1)} size={new UDim2(0, rem(TOOLTIP_WIDTH), 0, HEIGHT)}>
-									<uipadding PaddingLeft={new UDim(0, rem(3))} />
-									<Text
-										text={label}
-										size={new UDim2(1, 0, 0, rem(1))}
-										font={fonts.inter.bold}
-										textColor={palette.crust}
-										textSize={rem(1.5)}
-										textXAlignment="Center"
-										textYAlignment="Center"
-										richText
-									/>
-									<Text size={new UDim2(1, 0, 0, rem(1))} text={`🔮 ${price}`} textSize={rem(1)} />
-								</HStack>
-							) : undefined}
 
-							{/* Circle with emoji */}
-							<Frame size={new UDim2(0, rem(CIRCLE_SIZE), 0, rem(CIRCLE_SIZE))}>
+					<HStack clipsDescendants={false} horizontalAlignment={Enum.HorizontalAlignment.Right}>
+						{showTooltip ? (
+							<HStack spacing={rem(1)} size={new UDim2(0, rem(TOOLTIP_WIDTH), 0, HEIGHT)} wraps>
+								<uipadding PaddingLeft={new UDim(0, rem(3))} />
 								<Text
-									text={emoji}
-									textScaled
-									anchorPoint={new Vector2(0.5, 0.5)}
-									size={new UDim2(0, rem(2.5), 0, rem(2.5))}
-									position={new UDim2(0.5, 0, 0.5, 0)}
+									text={label}
+									size={new UDim2(1, 0, 0, rem(1))}
+									font={fonts.inter.bold}
+									textColor={palette.crust}
+									textSize={rem(1.5)}
+									textXAlignment="Center"
+									textYAlignment="Center"
+									richText
 								/>
-							</Frame>
-						</HStack>
-					</frame>
+								<Text size={new UDim2(1, 0, 0, rem(1))} text={`🔮 ${price}`} textSize={rem(1)} />
+							</HStack>
+						) : undefined}
+
+						{/* Circle with emoji */}
+						<Frame size={new UDim2(0, rem(CIRCLE_SIZE), 0, rem(CIRCLE_SIZE))}>
+							<Text
+								text={emoji}
+								textScaled
+								anchorPoint={new Vector2(0.5, 0.5)}
+								size={new UDim2(0, rem(2.5), 0, rem(2.5))}
+								position={new UDim2(0.5, 0, 0.5, 0)}
+							/>
+						</Frame>
+					</HStack>
 				</Frame>
 			</Transition>
 		</ReactiveButton2>
