@@ -1,7 +1,8 @@
 import { lerpBinding } from "@rbxts/pretty-react-hooks";
-import React from "@rbxts/react";
+import React, { useBinding, useEffect } from "@rbxts/react";
+import { RunService } from "@rbxts/services";
 import { ReactiveButton2 } from "@rbxts-ui/components";
-import { Frame, Image, Text } from "@rbxts-ui/primitives";
+import { CanvasGroup, Frame, Image, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { useMotion } from "client/hooks";
 import { useRem } from "client/ui/rem/useRem";
@@ -11,10 +12,50 @@ import { palette } from "shared/constants/palette";
 import { ShopItemTheme, shopItemThemes } from "../shop/ShopItem";
 
 const LABEL_COLOR = Color3.fromRGB(250, 222, 77);
-const CURRENT_GLOW_COLOR = Color3.fromRGB(255, 230, 80);
 
 const SUBTITLE_STROKE_FROM = Color3.fromHex("#005794");
 const SUBTITLE_STROKE_TO = Color3.fromHex("#000000");
+
+interface RotatingRaysProps {
+	readonly image: string;
+	readonly transparency: number;
+	readonly tint: Color3;
+	readonly cornerRadius: UDim;
+	readonly isActive: boolean;
+}
+
+const speed = 5;
+
+function RotatingRays({ image, transparency, tint, cornerRadius, isActive }: RotatingRaysProps) {
+	const [rotation, setRotation] = useBinding(0);
+
+	useEffect(() => {
+		if (!isActive) return;
+		let angle = 0;
+		const connection = RunService.Heartbeat.Connect((dt) => {
+			angle = (angle + dt * speed) % 360;
+			setRotation(angle);
+		});
+		return () => connection.Disconnect();
+	}, []);
+
+	return (
+		<CanvasGroup size={new UDim2(1, 0, 1, 0)} backgroundTransparency={1} cornerRadius={cornerRadius} zIndex={1}>
+			<Image
+				image={image}
+				size={new UDim2(1.8, 0, 1.8, 0)}
+				position={new UDim2(0.5, 0, 0.5, 0)}
+				anchorPoint={new Vector2(0.5, 0.5)}
+				imageTransparency={transparency}
+				scaleType="Fit"
+				imageColor3={tint}
+				rotation={rotation}
+			>
+				<uiaspectratioconstraint AspectRatio={1} />
+			</Image>
+		</CanvasGroup>
+	);
+}
 
 interface DailyRewardItemProps {
 	readonly title: string;
@@ -106,14 +147,12 @@ export function DailyRewardItem({
 						<uigradient Color={gradientSequence} Rotation={90} />
 
 						{/* Rays texture overlay */}
-						<Image
+						<RotatingRays
 							image={assets.ui.shop_item_rays}
-							size={new UDim2(1, 0, 1, 0)}
-							imageTransparency={theme.raysTransparency}
-							zIndex={1}
-							scaleType="Crop"
+							transparency={theme.raysTransparency}
+							tint={theme.rayTint}
 							cornerRadius={innerRadius}
-							imageColor3={theme.rayTint}
+							isActive={isCurrent}
 						/>
 						<Image
 							image={assets.ui.spot_glow}
