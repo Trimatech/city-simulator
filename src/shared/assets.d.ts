@@ -53,6 +53,13 @@ declare const assets: {
 			dots_pattern: string
 			water_noise_pattern: string
 		}
+		powerups: {
+			laser2: string
+			nuclear: string
+			shield: string
+			speed: string
+			tower: string
+		}
 		shards_icon: string
 		shards_icon_color: string
 		shop: {

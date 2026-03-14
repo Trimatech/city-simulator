@@ -53,6 +53,13 @@ local assets = {
 			dots_pattern = "rbxassetid://109011352852234",
 			water_noise_pattern = "rbxassetid://116904224511881",
 		},
+		powerups = {
+			laser2 = "rbxassetid://130492003013477",
+			nuclear = "rbxassetid://122681708460942",
+			shield = "rbxassetid://101048923737006",
+			speed = "rbxassetid://74257669280897",
+			tower = "rbxassetid://80794465117778",
+		},
 		shards_icon = "rbxassetid://128066684240466",
 		shards_icon_color = "rbxassetid://133438219301442",
 		shop = {
