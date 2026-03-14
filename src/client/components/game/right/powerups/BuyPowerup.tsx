@@ -7,7 +7,7 @@ import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
 import { useRem } from "client/ui/rem/useRem";
 import assets from "shared/assets";
-import { palette } from "shared/constants/palette";
+import { palette, textStrokeGradient } from "shared/constants/palette";
 import { POWERUP_BUTTON_STYLES, POWERUP_OUTER_BORDER_COLOR, PowerupId } from "shared/constants/powerups";
 import { remotes } from "shared/remotes";
 import { brighten } from "shared/utils/color-utils";
@@ -109,18 +109,32 @@ export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 					<HStack clipsDescendants={false} horizontalAlignment={Enum.HorizontalAlignment.Right}>
 						{showTooltip ? (
 							<HStack spacing={rem(1)} size={new UDim2(0, rem(TOOLTIP_WIDTH), 0, HEIGHT)} wraps>
-								<uipadding PaddingLeft={new UDim(0, rem(3))} />
+								<uipadding PaddingLeft={new UDim(0, rem(1))} />
 								<Text
 									text={label}
 									size={new UDim2(1, 0, 0, rem(1))}
-									font={fonts.inter.bold}
-									textColor={palette.crust}
+									font={fonts.fredokaOne.regular}
+									textColor={palette.white}
 									textSize={rem(1.5)}
 									textXAlignment="Center"
 									textYAlignment="Center"
 									richText
-								/>
-								<Text size={new UDim2(1, 0, 0, rem(1))} text={`🔮 ${price}`} textSize={rem(1)} />
+								>
+									<uistroke Thickness={rem(0.15)} Color={palette.white}>
+										<uigradient Color={textStrokeGradient} Rotation={90} />
+									</uistroke>
+								</Text>
+								<Text
+									size={new UDim2(1, 0, 0, rem(1))}
+									font={fonts.fredokaOne.regular}
+									textColor={enabled ? palette.green : palette.red1}
+									text={`🔮 ${price}`}
+									textSize={rem(1)}
+								>
+									<uistroke Thickness={rem(0.15)} Color={palette.white}>
+										<uigradient Color={textStrokeGradient} Rotation={90} />
+									</uistroke>
+								</Text>
 							</HStack>
 						) : undefined}
 

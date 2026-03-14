@@ -142,3 +142,5 @@ export function getRandomAccent(): Color3 {
 	const values = Object.values(accents);
 	return values[math.random(0, values.size() - 1)];
 }
+
+export const textStrokeGradient = new ColorSequence(palette.textStrokeFrom, palette.textStrokeTo);
