@@ -38,7 +38,7 @@ function HealthBarStoryContent({ health, maxHealth }: StoryProps) {
 			<frame BackgroundTransparency={1} Size={new UDim2(1, 0, 1, 0)}>
 				<frame
 					BackgroundTransparency={1}
-					Size={new UDim2(0, 28, 0, 180)}
+					Size={new UDim2(0, 180, 0, 28)}
 					AnchorPoint={new Vector2(0.5, 0.5)}
 					Position={new UDim2(0.5, 0, 0.5, 0)}
 				>

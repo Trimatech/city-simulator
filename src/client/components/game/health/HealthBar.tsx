@@ -1,65 +1,115 @@
+import { composeBindings } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { Outline } from "@rbxts-ui/components";
 import { Frame } from "@rbxts-ui/primitives";
 import { springs } from "client/constants/springs";
 import { useMotion } from "client/hooks";
 import { useRem } from "client/ui/rem/useRem";
-import { Shadow } from "client/ui/shadow";
-import { palette } from "shared/constants/palette";
+import { cornerRadiusFull } from "shared/constants/sizes";
 import { selectLocalHealth, selectLocalMaxHealth } from "shared/store/soldiers";
+
+const OUTER_BORDER_COLOR = Color3.fromHex("#000000");
+const BG_COLOR = Color3.fromHex("#2aa044");
+const FILL_COLOR = Color3.fromHex("#08FE41");
+
+const OUTER_STROKE_GRADIENT = new ColorSequence(Color3.fromHex("#1a801d"), Color3.fromHex("#1a801d"));
+
+const FILL_STROKE_GRADIENT = new ColorSequence([
+	new ColorSequenceKeypoint(0, FILL_COLOR),
+	new ColorSequenceKeypoint(0.64, FILL_COLOR),
+	new ColorSequenceKeypoint(1, Color3.fromHex("#88FF20")),
+]);
+
+// Vertical gradient for the fill bar background (top → bottom)
+const FILL_BG_GRADIENT = new ColorSequence([
+	new ColorSequenceKeypoint(0, Color3.fromHex("#6dff8a")),
+	new ColorSequenceKeypoint(0.5, Color3.fromHex("#08fe41")),
+	new ColorSequenceKeypoint(1, Color3.fromHex("#00c430")),
+]);
+
+const INNER_STROKE_GRADIENT = new ColorSequence([
+	new ColorSequenceKeypoint(0, Color3.fromHex("#1a6b1d")),
+	new ColorSequenceKeypoint(0.48, Color3.fromHex("#2aa044")),
+	new ColorSequenceKeypoint(1, Color3.fromHex("#34b852")),
+]);
 
 export function HealthBar() {
 	const rem = useRem();
 	const health = useSelector(selectLocalHealth) ?? 0;
 	const maxHealth = useSelector(selectLocalMaxHealth) ?? 0;
 
-	const progress = math.clamp(math.max(health, 15) / maxHealth, 0, 1);
+	const progress = math.clamp(math.max(health, 0) / math.max(maxHealth, 1), 0, 1);
 
-	const [progressSize, progressMotion] = useMotion(progress, (value) => new UDim2(1, 0, value, 0));
+	const [progressValue, progressMotion] = useMotion(progress);
 
 	useEffect(() => {
 		progressMotion.spring(progress, springs.gentle);
 	}, [progress]);
 
-	const width = rem(1.5);
+	// Fill slides along X: positionX = p - 1 moves fill left to right
+	const fillPosition = composeBindings(progressValue, (p: number) => {
+		return new UDim2(math.clamp(p, 0, 1) - 1, 0, 0.5, 0);
+	});
 
-	const meterSize = new UDim2(0, width, 1, 0);
-
-	const cornerRadius = new UDim(0, rem(0.75));
-
-	const badColor = new ColorSequence(palette.red, palette.mauve);
-	const goodColor = new ColorSequence(palette.green, palette.blue);
-
-	const gradientColor = progress < 0.3 ? badColor : goodColor;
+	const height = rem(1.5);
+	const thickness = rem(0.2);
 
 	return (
-		<Frame backgroundTransparency={1} size={meterSize}>
-			<Shadow shadowSize={rem(2)} shadowBlur={0.2} shadowTransparency={0.75} shadowPosition={rem(0.25)} />
+		<Frame
+			name="HealthBarOuter"
+			backgroundColor={OUTER_BORDER_COLOR}
+			backgroundTransparency={0}
+			size={new UDim2(1, 0, 0, height + rem(0.4))}
+			cornerRadius={cornerRadiusFull}
+		>
+			<canvasgroup key="HealthBar" Size={new UDim2(1, 0, 1, 0)} BackgroundColor3={BG_COLOR}>
+				<uicorner CornerRadius={cornerRadiusFull} />
+				<uistroke
+					Color={Color3.fromHex("#ffffff")}
+					Thickness={thickness}
+					BorderStrokePosition={Enum.BorderStrokePosition.Outer}
+				>
+					<uigradient Color={OUTER_STROKE_GRADIENT} Rotation={90} />
+				</uistroke>
 
-			<Frame
-				backgroundColor={palette.white}
-				backgroundTransparency={0.2}
-				cornerRadius={cornerRadius}
-				size={new UDim2(1, 0, 1, 0)}
-			>
-				<uigradient Color={gradientColor} Rotation={90} Transparency={new NumberSequence(0.8)} />
-			</Frame>
+				{/* Filled portion — full width, slides via Position X so roundness is preserved */}
+				<canvasgroup
+					key="HealthFill"
+					Position={fillPosition}
+					Size={new UDim2(1, 0, 1, -thickness * 2)}
+					AnchorPoint={new Vector2(0, 0.5)}
+					BackgroundColor3={FILL_COLOR}
+					ZIndex={2}
+				>
+					<uicorner CornerRadius={cornerRadiusFull} />
+					{/* <uigradient Color={FILL_BG_GRADIENT} Rotation={90} /> */}
+					<uistroke
+						Color={Color3.fromHex("#ffffff")}
+						Thickness={rem(0.2)}
+						BorderStrokePosition={Enum.BorderStrokePosition.Outer}
+					>
+						<uigradient Color={FILL_STROKE_GRADIENT} Rotation={0} />
+					</uistroke>
+				</canvasgroup>
 
-			<Frame
-				name="orbs-meter-progress"
-				backgroundColor={palette.white}
-				backgroundTransparency={0}
-				anchorPoint={new Vector2(0, 1)}
-				cornerRadius={cornerRadius}
-				size={progressSize}
-				position={new UDim2(0, 0, 1, 0)}
-				clipsDescendants={true}
-			>
-				<uigradient Color={gradientColor} Rotation={90} />
-			</Frame>
-
-			<Outline cornerRadius={cornerRadius} innerTransparency={0} outerTransparency={1} />
+				<canvasgroup
+					key="HealthFillInner"
+					Position={new UDim2(0.5, 0, 0.5, 0)}
+					Size={new UDim2(1, -thickness * 2, 1, -thickness * 2)}
+					AnchorPoint={new Vector2(0.5, 0.5)}
+					Transparency={1}
+					ZIndex={1}
+				>
+					<uicorner CornerRadius={cornerRadiusFull} />
+					<uistroke
+						Color={Color3.fromHex("#ffffff")}
+						Thickness={rem(0.2)}
+						BorderStrokePosition={Enum.BorderStrokePosition.Outer}
+					>
+						<uigradient Color={INNER_STROKE_GRADIENT} Rotation={90} />
+					</uistroke>
+				</canvasgroup>
+			</canvasgroup>
 		</Frame>
 	);
 }
