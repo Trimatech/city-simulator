@@ -23,7 +23,6 @@ import { calculatePolygonArea } from "shared/polygon-extra.utils";
 import { remotes } from "shared/remotes";
 import { selectSoldierById, selectSoldierOrbs, selectSoldiersById } from "shared/store/soldiers";
 import { selectTowersById } from "shared/store/towers/tower-selectors";
-import { findCharacterPrimaryPart } from "shared/utils/player-utils";
 
 /** Tracks the turbo generation per soldier so stacked activations extend duration correctly. */
 const turboGeneration = new Map<string, number>();

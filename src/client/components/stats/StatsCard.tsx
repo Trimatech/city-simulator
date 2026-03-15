@@ -91,7 +91,6 @@ interface StatsCardProps {
 
 const OUTER_BORDER_COLOR = Color3.fromRGB(61, 39, 19); // #3d2713
 const OUTER_CORNER_RADIUS = 1;
-const INNER_CORNER_RADIUS = 0.75;
 const INNER_PADDING = 0.2;
 
 const CARD_HEIGHT = 4;

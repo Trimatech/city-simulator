@@ -26,7 +26,18 @@ const getCenterPosition = (imageLabel: Frame | ImageLabel) => {
 	return new Vector2(centerX, centerY);
 };
 
-export function FlyTo({ delay, image, from, flyToRef, toRef, duration, curveHeight, sound, imageTransparency, startScale = 15 }: FlyToProps) {
+export function FlyTo({
+	delay,
+	image,
+	from,
+	flyToRef,
+	toRef,
+	duration,
+	curveHeight,
+	sound,
+	imageTransparency,
+	startScale = 15,
+}: FlyToProps) {
 	const rem = useRem();
 	const [position, setPosition] = useBinding(from);
 	const width = rem(startScale);

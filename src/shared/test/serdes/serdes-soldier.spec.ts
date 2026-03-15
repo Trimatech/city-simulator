@@ -41,7 +41,12 @@ export = () => {
 				assert(shallowEqual(value, deserialized[key]), "tracers are not equal");
 			} else if (key === "polygon") {
 				assert(shallowEqual(value, deserialized[key]), "polygon are not equal");
-			} else if (key === "angle" || key === "desiredAngle" || key === "turboActiveUntil" || key === "shieldActiveUntil") {
+			} else if (
+				key === "angle" ||
+				key === "desiredAngle" ||
+				key === "turboActiveUntil" ||
+				key === "shieldActiveUntil"
+			) {
 				expect(value).to.be.near(deserialized[key], 0.0001);
 			} else if (key === "polygonBounds") {
 				// polygonBounds is derived from polygon and may not round-trip bitwise equal

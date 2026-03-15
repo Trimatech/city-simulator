@@ -5,17 +5,16 @@ import { getRandomPointInWorld, getSoldier } from "server/world/world-query.util
 import { SOLDIER_MAX_ORBS } from "shared/constants/core";
 import { getRandomAccent } from "shared/constants/palette";
 import { remotes } from "shared/remotes";
-import { selectSoldierOrbs } from "shared/store/soldiers";
-import { getPlayerByName } from "shared/utils/player-utils";
 import {
 	selectCandyGridCells,
 	selectCandyGridCount,
 	selectCandyGridResolution,
 } from "shared/store/candy-grid/candy-grid-selectors";
 import { CandyEntity, CandyType } from "shared/store/candy-grid/candy-types";
-import { SOLDIER_RADIUS_BASE } from "shared/store/soldiers";
+import { selectSoldierOrbs, SOLDIER_RADIUS_BASE } from "shared/store/soldiers";
 import { Grid, GridPoint } from "shared/utils/grid";
 import { fillArray } from "shared/utils/object-utils";
+import { getPlayerByName } from "shared/utils/player-utils";
 
 import { createCandyPart, markCandyEaten, removeCandyPart } from "./candy-part-manager";
 import {

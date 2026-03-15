@@ -9,7 +9,12 @@ import { useRem } from "client/ui/rem/useRem";
 import { SCROLLBAR_COLOR, SCROLLBAR_THICKNESS, SCROLLBAR_TRANSPARENCY } from "client/ui/scrollbar.constants";
 import assets from "shared/assets";
 import { USER_NAME } from "shared/constants/core";
-import { DAILY_REWARD_CYCLE, DAILY_STREAK_WINDOW, getDailyRewardAmount, SECONDS_PER_DAY } from "shared/constants/daily-rewards";
+import {
+	DAILY_REWARD_CYCLE,
+	DAILY_STREAK_WINDOW,
+	getDailyRewardAmount,
+	SECONDS_PER_DAY,
+} from "shared/constants/daily-rewards";
 import { remotes } from "shared/remotes";
 import { selectPlayerDailyStreak, selectPlayerLastDailyRewardClaim } from "shared/store/saves";
 
