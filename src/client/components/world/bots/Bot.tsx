@@ -97,7 +97,7 @@ export function Bot({ id }: BotProps) {
 		const playTween = (targetCf: CFrame, duration: number) => {
 			const part = model.PrimaryPart;
 			if (!part) {
-				warn("No primary part found");
+				warn("No primary part found for bot, probably out of range");
 				return;
 			}
 

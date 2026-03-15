@@ -15,7 +15,7 @@ import {
 } from "shared/constants/core";
 import { selectGridResolution } from "shared/store/grid/grid-selectors";
 import type { GridCellsByEdgeId, GridLine } from "shared/store/grid/grid-types";
-import { selectSoldiersById } from "shared/store/soldiers";
+import { selectSoldiersById, selectSoldierZIndex } from "shared/store/soldiers";
 import { quantizeVector2 } from "shared/utils/edge-id";
 import { getQuantizationStep } from "shared/utils/grid-lines.utils";
 
@@ -160,6 +160,7 @@ function calculateWallTransform(
 	underground: boolean,
 	extA: number,
 	extB: number,
+	yOffsetExtra = 0,
 ): { width: number; center: Vector3; rotation: CFrame } {
 	const startPoint = new Vector3(a.X, 0, a.Y);
 	const endPoint = new Vector3(b.X, 0, b.Y);
@@ -168,7 +169,7 @@ function calculateWallTransform(
 	const baseWidth = direction.Magnitude;
 	const width = baseWidth + extA + extB;
 
-	const targetY = height / 2 - 1;
+	const targetY = height / 2 - 1 + yOffsetExtra;
 	const actualY = underground ? WALL_UNDERGROUND_OFFSET : targetY;
 
 	const groundCenter = startPoint.add(direction.mul(0.5));
@@ -195,7 +196,8 @@ function updateWallPartGeometry(compositeKey: string): void {
 	const height = getHeightForKind(line.kind);
 	const extA = computeMiterExtensionAtEndpoint(compositeKey, line, "a");
 	const extB = computeMiterExtensionAtEndpoint(compositeKey, line, "b");
-	const { width, center, rotation } = calculateWallTransform(line.a, line.b, height, false, extA, extB);
+	const yOffset = getSoldierYOffset(line.ownerId);
+	const { width, center, rotation } = calculateWallTransform(line.a, line.b, height, false, extA, extB, yOffset);
 
 	part.Size = new Vector3(width, height, WALL_THICKNESS);
 	part.CFrame = new CFrame(center).mul(rotation);
@@ -227,6 +229,10 @@ function getSoldierSkin(ownerId: string): string {
 	return soldiers[ownerId]?.skin ?? "";
 }
 
+function getSoldierYOffset(ownerId: string): number {
+	return store.getState(selectSoldierZIndex(ownerId)) * 0.0001;
+}
+
 function createWallPart(cellKey: string, edgeId: string, line: GridLine): BasePart {
 	const compositeKey = getCompositeKey(cellKey, edgeId);
 
@@ -236,8 +242,9 @@ function createWallPart(cellKey: string, edgeId: string, line: GridLine): BasePa
 	const height = getHeightForKind(line.kind);
 	const extA = computeMiterExtensionAtEndpoint(compositeKey, line, "a");
 	const extB = computeMiterExtensionAtEndpoint(compositeKey, line, "b");
-	const { width, center, rotation } = calculateWallTransform(line.a, line.b, height, true, extA, extB);
-	const targetY = height / 2 - 1;
+	const yOffset = getSoldierYOffset(line.ownerId);
+	const { width, center, rotation } = calculateWallTransform(line.a, line.b, height, true, extA, extB, yOffset);
+	const targetY = height / 2 - 1 + yOffset;
 
 	const part = new Instance("Part");
 	part.Name = `wall_${cellKey}_${edgeId}`;
