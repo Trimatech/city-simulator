@@ -1,22 +1,15 @@
 import { memo, useEffect, useRef } from "@rbxts/react";
-import { useSelector } from "@rbxts/react-reflex";
 import { Workspace } from "@rbxts/services";
 import { palette } from "shared/constants/palette";
 import { getWallSkin } from "shared/constants/skins";
-import { selectGridResolution } from "shared/store/grid/grid-selectors";
 
 import {
 	calculateWallTransform,
-	computeWallJoinForCell,
-	createCylinder,
 	createWallHighlight,
 	createWallPartOld,
-	getEndpointWorldPosition,
 	positionWallAtGround,
 	tweenWallToTarget,
 	uncollideAndDestroy,
-	WALL_JOIN_DEFAULTS,
-	WallJoinConfig,
 } from "./Walls.utils";
 
 const WALL_MATERIAL = Enum.Material.SmoothPlastic;
@@ -66,11 +59,6 @@ interface Props {
 	cellKey?: string;
 	startPoint: Vector2;
 	endPoint: Vector2;
-	startMiterFactor?: number;
-	endMiterFactor?: number;
-	startNeighborDir?: Vector2;
-	endNeighborDir?: Vector2;
-	joinConfig?: WallJoinConfig;
 	color?: Color3;
 	transparency?: number;
 	height: number;
@@ -85,14 +73,8 @@ interface Props {
 
 function WallComponent({
 	folderName,
-	cellKey,
 	startPoint,
 	endPoint,
-	startMiterFactor,
-	endMiterFactor,
-	startNeighborDir,
-	endNeighborDir,
-	joinConfig,
 	color = palette.white,
 	transparency = 0,
 	height,
@@ -104,30 +86,9 @@ function WallComponent({
 	zIndex,
 }: Props) {
 	const mainPartRef = useRef<BasePart>();
-	const cylinderRef = useRef<Part>();
-	const filletStartRef = useRef<Part>();
-	const filletEndRef = useRef<Part>();
 	const outlineRef = useRef<Highlight>();
 	const hasAnimatedRef = useRef(false);
 	const tweenCleanupRef = useRef<() => void>();
-	const gridResolution = useSelector(selectGridResolution);
-
-	function ensureFilletCylinder(ref: React.MutableRefObject<Part | undefined>, folder: Folder) {
-		if (!ref.current) {
-			const cyl = new Instance("Part");
-			cyl.Name = "wall_fillet";
-			cyl.Shape = Enum.PartType.Cylinder;
-			cyl.Anchored = true;
-			cyl.CanCollide = false;
-			cyl.TopSurface = Enum.SurfaceType.Smooth;
-			cyl.BottomSurface = Enum.SurfaceType.Smooth;
-			cyl.Parent = folder;
-			ref.current = cyl;
-		}
-		return ref.current!;
-	}
-
-	//print(`rendering wall ${folderName} ${startPoint.X},${startPoint.Y} -> ${endPoint.X},${endPoint.Y}`);
 
 	// Create wall parts once
 	useEffect(() => {
@@ -180,22 +141,8 @@ function WallComponent({
 			}
 			part.Parent = folder;
 
-			if (resolved.type === "tint") {
-				const cylinder = createCylinder({
-					folderName,
-					height,
-					thickness,
-					startPosition,
-					color,
-					transparency: 1,
-					material: WALL_MATERIAL,
-				});
-				cylinder.Parent = folder;
-				cylinderRef.current = cylinder;
-			}
-
 			// Start at ground level for animation (all wall types including tracers)
-			positionWallAtGround({ part, cylinder: cylinderRef.current, center, rotation, startPosition });
+			positionWallAtGround({ part, center, rotation, startPosition });
 
 			if (outline) {
 				outlineRef.current = createWallHighlight(part);
@@ -209,9 +156,6 @@ function WallComponent({
 			if (tweenCleanupRef.current) tweenCleanupRef.current();
 			if (outlineRef.current) outlineRef.current.Destroy();
 			if (mainPartRef.current) uncollideAndDestroy(mainPartRef.current, math.random(0.5, 2));
-			if (cylinderRef.current) uncollideAndDestroy(cylinderRef.current, math.random(0.5, 2));
-			if (filletStartRef.current) uncollideAndDestroy(filletStartRef.current, math.random(0.5, 2));
-			if (filletEndRef.current) uncollideAndDestroy(filletEndRef.current, math.random(0.5, 2));
 		};
 		// create once; subsequent updates handled by effects below
 	}, []);
@@ -219,10 +163,7 @@ function WallComponent({
 	// Update transform (position/size/orientation) on geometry changes
 	useEffect(() => {
 		const part = mainPartRef.current;
-		const cylinder = cylinderRef.current;
 		if (!part) return;
-
-		// miter/fillet math lives in Walls.utils
 
 		const yOffsetExtra = (zIndex ?? 0) * 0.0001;
 		const { width, center, rotation, startPosition } = calculateWallTransform(
@@ -231,56 +172,7 @@ function WallComponent({
 			yOffsetExtra,
 		);
 
-		// Compute join deltas using util (configurable)
-		const { extA, extB, acuteA, acuteB } = computeWallJoinForCell({
-			cellKey,
-			gridResolution,
-			thickness,
-			segmentWidth: width,
-			a: startPoint,
-			b: endPoint,
-			startNeighborDir,
-			endNeighborDir,
-			startMiterFactor,
-			endMiterFactor,
-			config: joinConfig ?? WALL_JOIN_DEFAULTS,
-		});
-		const newWidth = width + extA + extB;
-		part.Size = new Vector3(newWidth, height, thickness);
-		if (cylinder) {
-			cylinder.Size = new Vector3(height, thickness, thickness);
-		}
-		// Manage fillet cylinders for acute corners
-		const folder = ensureFolder(folderName);
-		const appearanceColor = part.Color;
-		const appearanceMaterial = part.Material;
-		const appearanceTransparency = part.Transparency;
-		if (acuteA) {
-			const c = ensureFilletCylinder(filletStartRef, folder);
-			c.Size = new Vector3(height, thickness, thickness);
-			c.Color = appearanceColor;
-			c.Material = appearanceMaterial;
-			c.Transparency = appearanceTransparency;
-			const pos = getEndpointWorldPosition(startPoint, height, yOffsetExtra);
-			const cf = new CFrame(pos).mul(CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90)));
-			c.CFrame = cf;
-		} else if (filletStartRef.current) {
-			filletStartRef.current.Destroy();
-			filletStartRef.current = undefined;
-		}
-		if (acuteB) {
-			const c = ensureFilletCylinder(filletEndRef, folder);
-			c.Size = new Vector3(height, thickness, thickness);
-			c.Color = appearanceColor;
-			c.Material = appearanceMaterial;
-			c.Transparency = appearanceTransparency;
-			const pos = getEndpointWorldPosition(endPoint, height, yOffsetExtra);
-			const cf = new CFrame(pos).mul(CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90)));
-			c.CFrame = cf;
-		} else if (filletEndRef.current) {
-			filletEndRef.current.Destroy();
-			filletEndRef.current = undefined;
-		}
+		part.Size = new Vector3(width, height, thickness);
 
 		const targetPartCFrame = new CFrame(center).mul(rotation);
 		const targetCylinderCFrame = new CFrame(startPosition).mul(CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90)));
@@ -288,10 +180,9 @@ function WallComponent({
 		const shouldAnimate = !hasAnimatedRef.current;
 		if (shouldAnimate) {
 			// Position from ground then tween to targets
-			positionWallAtGround({ part, cylinder, center, rotation, startPosition });
+			positionWallAtGround({ part, center, rotation, startPosition });
 			tweenCleanupRef.current = tweenWallToTarget({
 				part,
-				cylinder,
 				targetPartCFrame,
 				targetCylinderCFrame,
 				duration: 0.8,
@@ -301,37 +192,13 @@ function WallComponent({
 		}
 
 		// Apply transforms directly (for tracer or subsequent updates)
-		// Shift center along length to account for unequal extensions
-		{
-			// use same deltas for shift
-			const extA2 = extA;
-			const extB2 = extB;
-			const shift = (extB2 - extA2) / 2;
-			part.CFrame = targetPartCFrame.add(targetPartCFrame.RightVector.mul(shift));
-		}
-		if (cylinder) {
-			cylinder.CFrame = targetCylinderCFrame;
-		}
+		part.CFrame = targetPartCFrame;
 		hasAnimatedRef.current = true;
-	}, [
-		startPoint.X,
-		startPoint.Y,
-		endPoint.X,
-		endPoint.Y,
-		height,
-		thickness,
-		startMiterFactor,
-		endMiterFactor,
-		startNeighborDir && startNeighborDir.X,
-		startNeighborDir && startNeighborDir.Y,
-		endNeighborDir && endNeighborDir.X,
-		endNeighborDir && endNeighborDir.Y,
-	]);
+	}, [startPoint.X, startPoint.Y, endPoint.X, endPoint.Y, height, thickness]);
 
 	// Update visuals (color/material/transparency) when appearance props change
 	useEffect(() => {
 		const part = mainPartRef.current;
-		const cylinder = cylinderRef.current;
 		if (!part) return;
 
 		const resolved = resolveWallSkin({
@@ -344,17 +211,8 @@ function WallComponent({
 			part.Color = resolved.appearance.color;
 			part.Transparency = resolved.appearance.transparency;
 			part.Material = resolved.appearance.material;
-
-			if (cylinder) {
-				cylinder.Color = resolved.appearance.color;
-				cylinder.Transparency = resolved.appearance.transparency;
-				cylinder.Material = resolved.appearance.material;
-			}
 			return;
 		}
-
-		// For model-based skins, preserve the part's native look and hide the cylinder
-		if (cylinder) cylinder.Transparency = 1;
 	}, [color, transparency, skinId, kind]);
 
 	// Toggle outline without recreating
@@ -387,18 +245,6 @@ function WallComponent({
 		if (mainPartRef.current) {
 			uncollideAndDestroy(mainPartRef.current, math.random(0.5, 2));
 			mainPartRef.current = undefined;
-		}
-		if (cylinderRef.current) {
-			uncollideAndDestroy(cylinderRef.current, math.random(0.5, 2));
-			cylinderRef.current = undefined;
-		}
-		if (filletStartRef.current) {
-			uncollideAndDestroy(filletStartRef.current, math.random(0.5, 2));
-			filletStartRef.current = undefined;
-		}
-		if (filletEndRef.current) {
-			uncollideAndDestroy(filletEndRef.current, math.random(0.5, 2));
-			filletEndRef.current = undefined;
 		}
 	}, [isCrumbling]);
 
