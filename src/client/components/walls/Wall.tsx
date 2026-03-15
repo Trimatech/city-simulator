@@ -10,7 +10,7 @@ import {
 	computeWallJoinForCell,
 	createCylinder,
 	createWallHighlight,
-	createWallPart,
+	createWallPartOld,
 	getEndpointWorldPosition,
 	positionWallAtGround,
 	tweenWallToTarget,
@@ -152,7 +152,7 @@ function WallComponent({
 
 			let part: BasePart;
 			if (resolved.type === "part") {
-				part = await createWallPart({
+				part = await createWallPartOld({
 					folderName,
 					width,
 					height,
@@ -162,7 +162,7 @@ function WallComponent({
 					modelPath: resolved.modelPath,
 				});
 			} else {
-				part = await createWallPart({
+				part = await createWallPartOld({
 					folderName,
 					width,
 					height,

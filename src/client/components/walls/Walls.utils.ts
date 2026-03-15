@@ -350,7 +350,7 @@ interface WallPartOptions {
 	modelPath?: string;
 }
 
-export async function createWallPart(options: WallPartOptions) {
+export async function createWallPartOld(options: WallPartOptions) {
 	const { folderName, width, height, thickness, center, rotation, color, transparency, material, modelPath } =
 		options;
 
