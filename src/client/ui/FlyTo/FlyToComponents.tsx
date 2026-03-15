@@ -99,11 +99,12 @@ const FlyToComponentsTemp = ({
 	const flatElements: React.Element[] = [];
 	for (const batch of batches) {
 		const batchDelay = math.min(0.1, delayDuration / batch.instances.size());
-		for (const [index, { id, from, curveHeight }] of ipairs(batch.instances)) {
+		for (let index = 0; index < batch.instances.size(); index++) {
+			const { id, from, curveHeight } = batch.instances[index];
 			flatElements.push(
 				<FlyTo
 					key={`flyto-${batch.batchKey}-${id}`}
-					delay={(index - 1) * batchDelay}
+					delay={index * batchDelay}
 					image={image}
 					from={from}
 					flyToRef={flyToRef}
