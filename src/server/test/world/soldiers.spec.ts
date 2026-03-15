@@ -18,17 +18,17 @@ export = () => {
 		expect(soldier.tracers.size()).to.never.equal(0);
 	});
 
-	it("should toggle shieldActive state", () => {
+	it("should set shieldActiveUntil state", () => {
 		const id = "__shield__";
 		store.addSoldier(id);
 		let s = getSoldier(id)!;
-		expect(s.shieldActive).to.equal(false);
-		store.setSoldierShieldActive(id, true);
+		expect(s.shieldActiveUntil).to.equal(0);
+		store.setSoldierShieldActiveUntil(id, 1000);
 		s = getSoldier(id)!;
-		expect(s.shieldActive).to.equal(true);
-		store.setSoldierShieldActive(id, false);
+		expect(s.shieldActiveUntil).to.equal(1000);
+		store.setSoldierShieldActiveUntil(id, 0);
 		s = getSoldier(id)!;
-		expect(s.shieldActive).to.equal(false);
+		expect(s.shieldActiveUntil).to.equal(0);
 	});
 
 	it("should not move dead soldiers", () => {

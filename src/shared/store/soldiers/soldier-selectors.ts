@@ -200,8 +200,8 @@ export const selectSoldierZIndex = (id: string) => {
 	return (state: SharedState) => state.soldiers[id]?.zIndex ?? 0;
 };
 
-export const selectSoldierShieldActive = (id: string) => {
-	return (state: SharedState) => state.soldiers[id]?.shieldActive ?? false;
+export const selectSoldierShieldActiveUntil = (id: string) => {
+	return (state: SharedState) => state.soldiers[id]?.shieldActiveUntil ?? 0;
 };
 
 export const selectSoldierTurboActiveUntil = (id: string) => {
@@ -210,6 +210,10 @@ export const selectSoldierTurboActiveUntil = (id: string) => {
 
 export const selectLocalTurboActiveUntil = (state: SharedState) => {
 	return state.soldiers[USER_NAME]?.turboActiveUntil ?? 0;
+};
+
+export const selectLocalShieldActiveUntil = (state: SharedState) => {
+	return state.soldiers[USER_NAME]?.shieldActiveUntil ?? 0;
 };
 
 export const selectSoldierOrbs = (id: string) => {

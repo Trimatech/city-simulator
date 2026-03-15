@@ -70,7 +70,7 @@ export function onCollisionTick() {
 
 		if (enemyId !== undefined) {
 			const owner = store.getState(selectSoldiersById)[enemyId];
-			if (owner && owner.shieldActive) {
+			if (owner && owner.shieldActiveUntil > tick()) {
 				print(`Collided with enemy tracer while owner shielded, kill collider ${soldier.id}`);
 				onPlayerDeath(soldier.id);
 				store.playerKilledSoldier(enemyId, soldier.id);

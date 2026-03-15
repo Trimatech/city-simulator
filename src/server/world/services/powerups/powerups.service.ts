@@ -29,6 +29,8 @@ import { findCharacterPrimaryPart } from "shared/utils/player-utils";
 const turboGeneration = new Map<string, number>();
 /** Stores the cancel function for the active turbo timeout per soldier. */
 const turboCancelMap = new Map<string, () => void>();
+/** Stores the cancel function for the active shield timeout per soldier. */
+const shieldCancelMap = new Map<string, () => void>();
 
 interface Edge {
 	start: Vector3;
@@ -401,12 +403,20 @@ export function executePowerupForSoldier(
 			break;
 		}
 		case "shield": {
-			store.setSoldierShieldActive(soldierId, true);
+			const now = tick();
+			const activeUntil =
+				math.max(store.getState(selectSoldierById(soldierId))?.shieldActiveUntil ?? 0, now) +
+				POWERUP_DURATIONS.shield;
+			store.setSoldierShieldActiveUntil(soldierId, activeUntil);
 			ensureForceFieldOnPlayerName(soldierId, true);
-			setTimeout(() => {
-				store.setSoldierShieldActive(soldierId, false);
+			const prevCancel = shieldCancelMap.get(soldierId);
+			if (prevCancel) prevCancel();
+			const cancel = setTimeout(() => {
+				shieldCancelMap.delete(soldierId);
+				store.setSoldierShieldActiveUntil(soldierId, 0);
 				removeForceFieldFromPlayerName(soldierId);
-			}, POWERUP_DURATIONS.shield);
+			}, activeUntil - now);
+			shieldCancelMap.set(soldierId, cancel);
 			break;
 		}
 		case "tower": {

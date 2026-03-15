@@ -13,9 +13,18 @@ import { getRandomBotSkin } from "shared/constants/skins";
 const controls = {
 	orbs: Number(120, 0, 1000, 1),
 	turboActive: Boolean(false),
+	shieldActive: Boolean(false),
 };
 
-function CustomComponent({ orbs, turboActive }: { orbs: number; turboActive: boolean }) {
+function CustomComponent({
+	orbs,
+	turboActive,
+	shieldActive,
+}: {
+	orbs: number;
+	turboActive: boolean;
+	shieldActive: boolean;
+}) {
 	useEffect(() => {
 		store.addSoldier(USER_NAME, {
 			name: USER_NAME,
@@ -28,6 +37,10 @@ function CustomComponent({ orbs, turboActive }: { orbs: number; turboActive: boo
 	useEffect(() => {
 		store.setSoldierTurboActiveUntil(USER_NAME, turboActive ? tick() + POWERUP_DURATIONS.turbo : 0);
 	}, [turboActive]);
+
+	useEffect(() => {
+		store.setSoldierShieldActiveUntil(USER_NAME, shieldActive ? tick() + POWERUP_DURATIONS.shield : 0);
+	}, [shieldActive]);
 
 	return (
 		<RootProvider>
@@ -43,8 +56,8 @@ const story = {
 	reactRoblox: ReactRoblox,
 	controls: controls,
 	story: (props: InferFusionProps<typeof controls>) => {
-		const { orbs, turboActive } = props.controls;
-		return <CustomComponent orbs={orbs} turboActive={turboActive} />;
+		const { orbs, turboActive, shieldActive } = props.controls;
+		return <CustomComponent orbs={orbs} turboActive={turboActive} shieldActive={shieldActive} />;
 	},
 };
 

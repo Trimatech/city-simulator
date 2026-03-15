@@ -20,7 +20,7 @@ import {
 	PowerupId,
 } from "shared/constants/powerups";
 import { remotes } from "shared/remotes";
-import { selectLocalTurboActiveUntil } from "shared/store/soldiers";
+import { selectLocalShieldActiveUntil, selectLocalTurboActiveUntil } from "shared/store/soldiers";
 import { brighten } from "shared/utils/color-utils";
 
 interface Props {
@@ -88,6 +88,13 @@ export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 	const isTurboActive = id === "turbo" && turboActiveUntil > 0;
 	const { secondsLeft: turboSecondsLeft } = useDeadlineTimer(turboActiveUntil, POWERUP_DURATIONS.turbo);
 
+	const shieldActiveUntil = useSelector(selectLocalShieldActiveUntil);
+	const isShieldActive = id === "shield" && shieldActiveUntil > 0;
+	const { secondsLeft: shieldSecondsLeft } = useDeadlineTimer(shieldActiveUntil, POWERUP_DURATIONS.shield);
+
+	const isTimerActive = isTurboActive || isShieldActive;
+	const timerSecondsLeft = isTurboActive ? turboSecondsLeft : shieldSecondsLeft;
+
 	const HEIGHT = rem(CIRCLE_SIZE);
 	const WIDTH = HEIGHT;
 	const FULL_WIDTH = WIDTH + rem(TOOLTIP_WIDTH);
@@ -149,8 +156,6 @@ export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 			}
 		}
 	}, [pressed, id]);
-
-	print("isTurboActive.......", isTurboActive);
 
 	return (
 		<Frame
@@ -295,11 +300,11 @@ export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 									backgroundTransparency={1}
 								/>
 
-								{isTurboActive && (
+								{isTimerActive && (
 									<Text
 										position={new UDim2(0, 0, 0, 0)}
 										size={new UDim2(1, 0, 1, 0)}
-										text={turboSecondsLeft}
+										text={timerSecondsLeft}
 										font={fonts.fredokaOne.regular}
 										textColor={palette.white}
 										textSize={rem(3)}

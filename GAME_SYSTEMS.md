@@ -107,7 +107,7 @@ interface SoldierEntity {
   tracers: Vector2[];           // Trail for expansion
   orbs: number;                 // Powerup resource
   health: number;
-  shieldActive: boolean;
+  shieldActiveUntil: number;
   eliminations: number;
 }
 ```

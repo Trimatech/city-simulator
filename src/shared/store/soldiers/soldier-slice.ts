@@ -38,7 +38,7 @@ export interface SoldierEntity {
 	readonly polygonAreaSize: number;
 	readonly polygonBounds: BoundingBox;
 	readonly isInside: boolean;
-	readonly shieldActive: boolean;
+	readonly shieldActiveUntil: number;
 	readonly turboActiveUntil: number;
 	readonly health: number;
 	readonly maxHealth: number;
@@ -63,7 +63,7 @@ const defaultEntity: SoldierEntity = {
 	polygonAreaSize: 0,
 	polygonBounds: { min: new Vector2(), max: new Vector2(), size: new Vector2() },
 	isInside: true,
-	shieldActive: false,
+	shieldActiveUntil: 0,
 	turboActiveUntil: 0,
 	health: 100,
 	maxHealth: 100,
@@ -240,10 +240,10 @@ export const soldiersSlice = createProducer(initialState, {
 		}));
 	},
 
-	setSoldierShieldActive: (state, id: string, active: boolean) => {
+	setSoldierShieldActiveUntil: (state, id: string, activeUntil: number) => {
 		return mapProperty(state, id, (soldier) => ({
 			...soldier,
-			shieldActive: active,
+			shieldActiveUntil: activeUntil,
 		}));
 	},
 
