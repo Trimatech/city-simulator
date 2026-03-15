@@ -113,24 +113,28 @@ export function Stats() {
 				statsImageRef={eliminationsRef}
 				image={assets.ui.icons.kills}
 				sound={assets.sounds.thump_sound}
+				startFromCharacter={true}
 			/>
 			<FlyToComponents
 				amount={currentOrbs ?? 0}
 				statsImageRef={orbsRef}
 				image={assets.ui.icons.orb}
 				sound={assets.sounds.bong_001}
+				startFromCharacter={true}
 			/>
 			<FlyToComponents
 				amount={currentBalance ?? 0}
 				statsImageRef={balanceRef}
 				image={assets.ui.shop.Cash}
 				sound={assets.sounds.alert_money}
+				startFromCharacter={true}
 			/>
 			<FlyToComponents
 				amount={currentCrystals ?? 0}
 				statsImageRef={crystalsRef}
 				image={assets.ui.shards_icon_color}
 				sound={assets.sounds.alert_neutral}
+				startFromCharacter={true}
 			/>
 		</>
 	);

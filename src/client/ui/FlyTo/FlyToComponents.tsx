@@ -1,6 +1,6 @@
 import { usePrevious } from "@rbxts/pretty-react-hooks";
 import React, { memo, MutableRefObject, useRef } from "@rbxts/react";
-import { Workspace } from "@rbxts/services";
+import { Players, Workspace } from "@rbxts/services";
 import { Frame } from "@rbxts-ui/primitives";
 import { fillArray } from "shared/utils/object-utils";
 
@@ -17,18 +17,38 @@ const getRandomStartPosition = (flyToRef: MutableRefObject<Frame | ImageLabel | 
 	);
 };
 
+const getCharacterStartPosition = (flyToRef: MutableRefObject<Frame | ImageLabel | undefined>) => {
+	const camera = Workspace.CurrentCamera;
+	const rootPart = Players.LocalPlayer.Character?.FindFirstChild("HumanoidRootPart") as BasePart | undefined;
+	if (camera && rootPart) {
+		const [screenPos, onScreen] = camera.WorldToViewportPoint(rootPart.Position);
+		if (onScreen) {
+			const framePos = flyToRef.current?.AbsolutePosition ?? new Vector2();
+			return new UDim2(0, screenPos.X - framePos.X, 0, screenPos.Y - framePos.Y);
+		}
+	}
+	return getRandomStartPosition(flyToRef);
+};
+
 interface FlyToComponentsProps {
 	readonly amount: number;
 	readonly statsImageRef: MutableRefObject<Frame | ImageLabel | undefined>;
 	readonly image: string;
 	readonly sound?: string;
+	readonly startFromCharacter?: boolean;
 }
 
 const ROUND_AMOUNT = 10;
 
 const MAX_ITEMS = 50;
 
-const FlyToComponentsTemp = ({ amount, statsImageRef: goldCardRef, image, sound }: FlyToComponentsProps) => {
+const FlyToComponentsTemp = ({
+	amount,
+	statsImageRef: goldCardRef,
+	image,
+	sound,
+	startFromCharacter,
+}: FlyToComponentsProps) => {
 	const lastAmount = usePrevious(amount);
 
 	const flyToRef = useRef<Frame>();
@@ -42,9 +62,11 @@ const FlyToComponentsTemp = ({ amount, statsImageRef: goldCardRef, image, sound 
 
 	const newAmountChange = math.min(MAX_ITEMS, math.ceil(diff / ROUND_AMOUNT));
 
+	const getStartPosition = startFromCharacter ? getCharacterStartPosition : getRandomStartPosition;
+
 	const flyToInstances = fillArray(newAmountChange, (index) => ({
 		id: `${index}`,
-		from: getRandomStartPosition(flyToRef),
+		from: getStartPosition(flyToRef),
 	}));
 
 	const duration = 0.5;
