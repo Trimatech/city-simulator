@@ -14,6 +14,8 @@ interface FlyToProps {
 	duration: number;
 	curveHeight: number;
 	sound?: string;
+	imageTransparency?: number;
+	startScale?: number;
 }
 
 const getCenterPosition = (imageLabel: Frame | ImageLabel) => {
@@ -24,10 +26,10 @@ const getCenterPosition = (imageLabel: Frame | ImageLabel) => {
 	return new Vector2(centerX, centerY);
 };
 
-export function FlyTo({ delay, image, from, flyToRef, toRef, duration, curveHeight, sound }: FlyToProps) {
+export function FlyTo({ delay, image, from, flyToRef, toRef, duration, curveHeight, sound, imageTransparency, startScale = 15 }: FlyToProps) {
 	const rem = useRem();
 	const [position, setPosition] = useBinding(from);
-	const width = rem(15);
+	const width = rem(startScale);
 	const [size, setSize] = useBinding(new UDim2(0, width, 0, width));
 	const startSize = new Vector2(width, width);
 	const [isFinished, setIsFinished] = useState(false);
@@ -100,6 +102,7 @@ export function FlyTo({ delay, image, from, flyToRef, toRef, duration, curveHeig
 			position={position}
 			size={size}
 			backgroundTransparency={1}
+			imageTransparency={imageTransparency}
 			anchorPoint={new Vector2(0.5, 0.5)}
 		/>
 	);

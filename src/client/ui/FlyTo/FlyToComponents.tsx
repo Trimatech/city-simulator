@@ -19,7 +19,7 @@ const getRandomStartPosition = (flyToRef: MutableRefObject<Frame | ImageLabel | 
 
 const getCharacterStartPosition = (flyToRef: MutableRefObject<Frame | ImageLabel | undefined>) => {
 	const camera = Workspace.CurrentCamera;
-	const rootPart = Players.LocalPlayer.Character?.FindFirstChild("HumanoidRootPart") as BasePart | undefined;
+	const rootPart = Players.LocalPlayer?.Character?.FindFirstChild("HumanoidRootPart") as BasePart | undefined;
 	if (camera && rootPart) {
 		const [screenPos, onScreen] = camera.WorldToViewportPoint(rootPart.Position);
 		if (onScreen) {
@@ -36,6 +36,7 @@ interface FlyToComponentsProps {
 	readonly image: string;
 	readonly sound?: string;
 	readonly startFromCharacter?: boolean;
+	readonly imageTransparency?: number;
 }
 
 const ROUND_AMOUNT = 10;
@@ -48,6 +49,7 @@ const FlyToComponentsTemp = ({
 	image,
 	sound,
 	startFromCharacter,
+	imageTransparency,
 }: FlyToComponentsProps) => {
 	const lastAmount = usePrevious(amount);
 
@@ -67,6 +69,7 @@ const FlyToComponentsTemp = ({
 	const flyToInstances = fillArray(newAmountChange, (index) => ({
 		id: `${index}`,
 		from: getStartPosition(flyToRef),
+		curveHeight: math.random(2, 200),
 	}));
 
 	const duration = 0.5;
@@ -76,7 +79,7 @@ const FlyToComponentsTemp = ({
 
 	return (
 		<Frame size={new UDim2(1, 0, 1, 0)} ref={flyToRef} backgroundTransparency={1}>
-			{flyToInstances.map(({ id, from }, index) => (
+			{flyToInstances.map(({ id, from, curveHeight }, index) => (
 				<FlyTo
 					key={`flyto-${id}-${math.random()}`}
 					delay={index * delay}
@@ -85,8 +88,9 @@ const FlyToComponentsTemp = ({
 					flyToRef={flyToRef}
 					toRef={goldCardRef}
 					duration={duration}
-					curveHeight={100}
+					curveHeight={curveHeight}
 					sound={sound}
+					imageTransparency={imageTransparency}
 				/>
 			))}
 		</Frame>

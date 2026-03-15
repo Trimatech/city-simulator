@@ -114,6 +114,7 @@ export function Stats() {
 				image={assets.ui.icons.kills}
 				sound={assets.sounds.thump_sound}
 				startFromCharacter={true}
+				imageTransparency={0.3}
 			/>
 			<FlyToComponents
 				amount={currentOrbs ?? 0}
@@ -121,6 +122,7 @@ export function Stats() {
 				image={assets.ui.icons.orb}
 				sound={assets.sounds.bong_001}
 				startFromCharacter={true}
+				imageTransparency={0.3}
 			/>
 			<FlyToComponents
 				amount={currentBalance ?? 0}
@@ -128,6 +130,7 @@ export function Stats() {
 				image={assets.ui.shop.Cash}
 				sound={assets.sounds.alert_money}
 				startFromCharacter={true}
+				imageTransparency={0.3}
 			/>
 			<FlyToComponents
 				amount={currentCrystals ?? 0}
@@ -135,6 +138,7 @@ export function Stats() {
 				image={assets.ui.shards_icon_color}
 				sound={assets.sounds.alert_neutral}
 				startFromCharacter={true}
+				imageTransparency={0.3}
 			/>
 		</>
 	);
