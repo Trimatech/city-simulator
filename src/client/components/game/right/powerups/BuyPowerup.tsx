@@ -72,7 +72,7 @@ export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 			onMouseLeave={() => setShowTooltip(false)}
 			anchorPoint={new Vector2(1, 0.5)}
 		>
-			<Transition groupTransparency={1} size={new UDim2(1, 0, 1, 0)}>
+			<Transition groupTransparency={0} size={new UDim2(1, 0, 1, 0)}>
 				{/* Outer frame — colored background with dual strokes */}
 				<Frame
 					backgroundColor={style.backgroundColor}

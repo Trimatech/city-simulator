@@ -11,7 +11,6 @@ const excludedActions = [
 	"setSoldierTracers",
 	"clearSoldierTracers",
 	"soldierTick",
-	"incrementSoldierOrbs",
 	// Grid data is now server-side only; walls are rendered via server-created Parts
 	"setCellLines",
 	"clearGrid",
