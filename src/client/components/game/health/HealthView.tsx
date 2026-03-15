@@ -5,6 +5,9 @@ import assets from "shared/assets";
 
 import { HealthBar } from "./HealthBar";
 
+const ROBLOX_TOOLBAR_HEIGHT = 68;
+const ROBLOX_TOOLBAR_WIDTH = 150;
+
 export function HealthView() {
 	const rem = useRem();
 
@@ -13,11 +16,11 @@ export function HealthView() {
 	return (
 		<HStack
 			name="HealthView"
-			size={new UDim2(0.3, 0, 0, iconSize)}
-			position={new UDim2(0, rem(3), 0, rem(6))}
-			anchorPoint={new Vector2(0, 0)}
-			verticalAlignment={Enum.VerticalAlignment.Center}
+			size={new UDim2(0, rem(25), 0, ROBLOX_TOOLBAR_HEIGHT)}
+			position={new UDim2(0, ROBLOX_TOOLBAR_WIDTH, 0, 0)}
 			spacing={rem(0.5)}
+			padding={30}
+			verticalAlignment={Enum.VerticalAlignment.Center}
 		>
 			<imagelabel
 				Image={assets.ui.heart}
