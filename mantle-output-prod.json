@@ -1,0 +1,236 @@
+{
+  "badgeIcon_1-area-25000": {
+    "badgeIcon": {
+      "assetId": 110417390164413
+    }
+  },
+  "badgeIcon_2-area-50000": {
+    "badgeIcon": {
+      "assetId": 137514168764361
+    }
+  },
+  "badgeIcon_3-area-100000": {
+    "badgeIcon": {
+      "assetId": 93103492247906
+    }
+  },
+  "badgeIcon_4-3rd-place": {
+    "badgeIcon": {
+      "assetId": 120013384097458
+    }
+  },
+  "badgeIcon_5-2nd-place": {
+    "badgeIcon": {
+      "assetId": 127918514784270
+    }
+  },
+  "badgeIcon_6-1st-place": {
+    "badgeIcon": {
+      "assetId": 104783444868503
+    }
+  },
+  "badge_1-area-25000": {
+    "badge": {
+      "assetId": 1984841532985296,
+      "initialIconAssetId": 110417390164413
+    }
+  },
+  "badge_2-area-50000": {
+    "badge": {
+      "assetId": 1888647527215748,
+      "initialIconAssetId": 137514168764361
+    }
+  },
+  "badge_3-area-100000": {
+    "badge": {
+      "assetId": 695632610799933,
+      "initialIconAssetId": 93103492247906
+    }
+  },
+  "badge_4-3rd-place": {
+    "badge": {
+      "assetId": 1208010097287248,
+      "initialIconAssetId": 120013384097458
+    }
+  },
+  "badge_5-2nd-place": {
+    "badge": {
+      "assetId": 184734364699862,
+      "initialIconAssetId": 127918514784270
+    }
+  },
+  "badge_6-1st-place": {
+    "badge": {
+      "assetId": 2982394162428564,
+      "initialIconAssetId": 104783444868503
+    }
+  },
+  "experienceActivation_singleton": "experienceActivation",
+  "experienceConfiguration_singleton": "experienceConfiguration",
+  "experienceIcon_singleton": {
+    "experienceIcon": {
+      "assetId": 3118640682242623
+    }
+  },
+  "experienceThumbnailOrder_singleton": "experienceThumbnailOrder",
+  "experienceThumbnail_assets/marketing/game_thumbnail.png": {
+    "experienceThumbnail": {
+      "assetId": 2911032881340522
+    }
+  },
+  "experience_singleton": {
+    "experience": {
+      "assetId": 8776849277,
+      "startPlaceId": 137091142050829
+    }
+  },
+  "placeConfiguration_start": "placeConfiguration",
+  "placeFile_start": {
+    "placeFile": {
+      "version": 17
+    }
+  },
+  "place_start": {
+    "place": {
+      "assetId": 137091142050829
+    }
+  },
+  "productIcon_crystals-1": {
+    "productIcon": {
+      "assetId": 92340978427515
+    }
+  },
+  "productIcon_crystals-15": {
+    "productIcon": {
+      "assetId": 109302705167596
+    }
+  },
+  "productIcon_crystals-25": {
+    "productIcon": {
+      "assetId": 108506359039194
+    }
+  },
+  "productIcon_crystals-5": {
+    "productIcon": {
+      "assetId": 89427729898805
+    }
+  },
+  "productIcon_money-100": {
+    "productIcon": {
+      "assetId": 138345855682600
+    }
+  },
+  "productIcon_money-1000": {
+    "productIcon": {
+      "assetId": 127817300331280
+    }
+  },
+  "productIcon_money-10000": {
+    "productIcon": {
+      "assetId": 140041265706910
+    }
+  },
+  "productIcon_money-100000": {
+    "productIcon": {
+      "assetId": 134772051163381
+    }
+  },
+  "productIcon_money-250": {
+    "productIcon": {
+      "assetId": 117064059685288
+    }
+  },
+  "productIcon_money-2500": {
+    "productIcon": {
+      "assetId": 131743450948415
+    }
+  },
+  "productIcon_money-500": {
+    "productIcon": {
+      "assetId": 133601885503840
+    }
+  },
+  "productIcon_money-5000": {
+    "productIcon": {
+      "assetId": 114888890153665
+    }
+  },
+  "product_crystals-1": {
+    "product": {
+      "assetId": 3557201530,
+      "productId": 73852853
+    }
+  },
+  "product_crystals-15": {
+    "product": {
+      "assetId": 3557201501,
+      "productId": 73852850
+    }
+  },
+  "product_crystals-25": {
+    "product": {
+      "assetId": 3557201464,
+      "productId": 73852848
+    }
+  },
+  "product_crystals-5": {
+    "product": {
+      "assetId": 3557201432,
+      "productId": 73852845
+    }
+  },
+  "product_money-100": {
+    "product": {
+      "assetId": 3411267206,
+      "productId": 70576095
+    }
+  },
+  "product_money-1000": {
+    "product": {
+      "assetId": 3411267182,
+      "productId": 70576094
+    }
+  },
+  "product_money-10000": {
+    "product": {
+      "assetId": 3557201399,
+      "productId": 73852844
+    }
+  },
+  "product_money-100000": {
+    "product": {
+      "assetId": 3557201361,
+      "productId": 73852843
+    }
+  },
+  "product_money-250": {
+    "product": {
+      "assetId": 3411267156,
+      "productId": 70576091
+    }
+  },
+  "product_money-2500": {
+    "product": {
+      "assetId": 3557201332,
+      "productId": 73852841
+    }
+  },
+  "product_money-500": {
+    "product": {
+      "assetId": 3411267134,
+      "productId": 70576090
+    }
+  },
+  "product_money-5000": {
+    "product": {
+      "assetId": 3411267111,
+      "productId": 70576089
+    }
+  },
+  "socialLink_www.roblox.com": {
+    "socialLink": {
+      "assetId": 29121720
+    }
+  },
+  "spatialVoice_singleton": "spatialVoice"
+}

@@ -15,7 +15,8 @@
 		"output:prod": "mantle outputs --environment prod > mantle-output-prod.json",
 		"github": "./actions-runner/run.sh",
 		"models": "lune run get-models",
-		"sync-assets": "asphalt sync cloud"
+		"sync-assets": "asphalt sync cloud",
+		"rbx_cookie": "rbx_cookie"
 	},
 	"devDependencies": {
 		"@rbxts/compiler-types": "3.0.0-types.0",
