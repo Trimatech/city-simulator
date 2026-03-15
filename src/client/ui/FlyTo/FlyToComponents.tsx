@@ -19,9 +19,9 @@ const getRandomStartPosition = (flyToRef: MutableRefObject<Frame | ImageLabel | 
 
 const getCharacterStartPosition = (flyToRef: MutableRefObject<Frame | ImageLabel | undefined>) => {
 	const camera = Workspace.CurrentCamera;
-	const rootPart = Players.LocalPlayer?.Character?.FindFirstChild("HumanoidRootPart") as BasePart | undefined;
-	if (camera && rootPart) {
-		const [screenPos, onScreen] = camera.WorldToViewportPoint(rootPart.Position);
+	const head = Players.LocalPlayer?.Character?.FindFirstChild("Head") as BasePart | undefined;
+	if (camera && head) {
+		const [screenPos, onScreen] = camera.WorldToScreenPoint(head.Position);
 		if (onScreen) {
 			const framePos = flyToRef.current?.AbsolutePosition ?? new Vector2();
 			return new UDim2(0, screenPos.X - framePos.X, 0, screenPos.Y - framePos.Y);
@@ -37,6 +37,7 @@ interface FlyToComponentsProps {
 	readonly sound?: string;
 	readonly startFromCharacter?: boolean;
 	readonly imageTransparency?: number;
+	readonly startScale?: number;
 }
 
 const ROUND_AMOUNT = 10;
@@ -50,6 +51,7 @@ const FlyToComponentsTemp = ({
 	sound,
 	startFromCharacter,
 	imageTransparency,
+	startScale,
 }: FlyToComponentsProps) => {
 	const lastAmount = usePrevious(amount);
 
@@ -91,6 +93,7 @@ const FlyToComponentsTemp = ({
 					curveHeight={curveHeight}
 					sound={sound}
 					imageTransparency={imageTransparency}
+					startScale={startScale}
 				/>
 			))}
 		</Frame>
