@@ -26,7 +26,11 @@ const CustomComponent = () => {
 	return (
 		<RootProvider>
 			<Image ref={imageRef} image={image} position={new UDim2(0.5, 0, 0.5, 0)} size={new UDim2(0, 100, 0, 100)} />
-			<FlyToComponents amount={amount} statsImageRef={imageRef} image={image} />
+			<FlyToComponents
+				amount={amount}
+				statsImageRef={imageRef as unknown as React.MutableRefObject<Frame | undefined>}
+				image={image}
+			/>
 		</RootProvider>
 	);
 };

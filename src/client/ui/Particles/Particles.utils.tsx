@@ -1,4 +1,4 @@
-import { Workspace } from '@rbxts/services';
+import { Workspace } from "@rbxts/services";
 
 export const getRandomStartPosition = () => {
 	const screenSize = Workspace.CurrentCamera?.ViewportSize ?? new Vector2(800, 600);
@@ -42,7 +42,7 @@ export function evaluateColorSequence(sequence: ColorSequence, alpha: number): C
 			return new Color3(
 				current.Value.R + t * (nextKeypoint.Value.R - current.Value.R),
 				current.Value.G + t * (nextKeypoint.Value.G - current.Value.G),
-				current.Value.B + t * (nextKeypoint.Value.B - current.Value.B)
+				current.Value.B + t * (nextKeypoint.Value.B - current.Value.B),
 			);
 		}
 	}

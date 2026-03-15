@@ -9,4 +9,9 @@ export enum DevProduct {
 	MONEY_5000 = IS_PROD ? 70576089 : 70575129,
 	MONEY_10000 = IS_PROD ? 0 : 0, // TODO: configure product IDs in Roblox developer dashboard
 	MONEY_100000 = IS_PROD ? 0 : 0, // TODO: configure product IDs in Roblox developer dashboard
+
+	CRYSTALS_1 = IS_PROD ? 0 : 0, // TODO: configure product IDs in Roblox developer dashboard
+	CRYSTALS_5 = IS_PROD ? 0 : 0, // TODO: configure product IDs in Roblox developer dashboard
+	CRYSTALS_15 = IS_PROD ? 0 : 0, // TODO: configure product IDs in Roblox developer dashboard
+	CRYSTALS_25 = IS_PROD ? 0 : 0, // TODO: configure product IDs in Roblox developer dashboard
 }

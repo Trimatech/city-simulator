@@ -7,6 +7,7 @@ import assets from "shared/assets";
 import { MainButton, ShopButtonTextWithIcon } from "../../../ui/MainButton";
 import { SkinsList } from "../skins/SkinsList";
 import { CashProducts } from "./CashProducts";
+import { CrystalProducts } from "./CrystalProducts";
 import { GameWindow } from "./GameWindow";
 import { GameWindowTabsHeader } from "./GameWindowTabsHeader";
 
@@ -56,6 +57,7 @@ export function ShopWindow({ onClose }: ShopWindowProps) {
 			<Frame size={new UDim2(1, 0, 0, rem(45))}>
 				{activeTabId === ShopTabs.Skins && <SkinsList />}
 				{activeTabId === ShopTabs.Cash && <CashProducts />}
+				{activeTabId === ShopTabs.Crystals && <CrystalProducts />}
 			</Frame>
 		</GameWindow>
 	);

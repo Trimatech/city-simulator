@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "@rbxts/react";
+import React, { MutableRefObject, useEffect, useMemo } from "@rbxts/react";
 import { ReactiveButton2 } from "@rbxts-ui/components";
 import { Transition } from "@rbxts-ui/layout";
 import { Frame, Image, Text } from "@rbxts-ui/primitives";
@@ -77,6 +77,7 @@ interface StatsCardProps {
 	readonly colorStyle: StatsCardStyleName;
 	readonly enabled: boolean;
 	readonly order: number;
+	readonly iconRef?: MutableRefObject<Frame | undefined>;
 }
 
 const OUTER_BORDER_COLOR = Color3.fromRGB(61, 39, 19); // #3d2713
@@ -90,7 +91,7 @@ const CARD_PADDING = 0.75;
 const CARD_MARGIN = 0.75;
 const CARD_CANVAS_MARGIN = 3;
 
-export function StatsCard({ onClick, emoji, label, value, colorStyle, enabled, order }: StatsCardProps) {
+export function StatsCard({ onClick, emoji, label, value, colorStyle, enabled, order, iconRef }: StatsCardProps) {
 	const style = STATS_CARD_STYLES[colorStyle];
 
 	const rem = useRem();
@@ -127,6 +128,7 @@ export function StatsCard({ onClick, emoji, label, value, colorStyle, enabled, o
 
 				{/* Outer frame with border */}
 				<Frame
+					ref={iconRef}
 					backgroundColor={style.innerBackground}
 					backgroundTransparency={style.innerBackgroundTransparency}
 					cornerRadius={outerCorner}

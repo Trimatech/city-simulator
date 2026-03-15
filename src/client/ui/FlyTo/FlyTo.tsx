@@ -1,5 +1,5 @@
 import React, { MutableRefObject, useBinding, useEffect, useState } from "@rbxts/react";
-import { RunService } from "@rbxts/services";
+import { RunService, Workspace } from "@rbxts/services";
 import { setTimeout } from "@rbxts/set-timeout";
 import { Image } from "@rbxts-ui/primitives";
 import { useRem } from "client/ui/rem/useRem";
@@ -10,13 +10,13 @@ interface FlyToProps {
 	image: string;
 	from: UDim2;
 	flyToRef: MutableRefObject<Frame | undefined>;
-	toRef: MutableRefObject<ImageLabel | undefined>;
+	toRef: MutableRefObject<Frame | undefined>;
 	duration: number;
 	curveHeight: number;
 	sound?: string;
 }
 
-const getCenterPosition = (imageLabel: ImageLabel) => {
+const getCenterPosition = (imageLabel: Frame) => {
 	const absPos = imageLabel.AbsolutePosition;
 	const absSize = imageLabel.AbsoluteSize;
 	const centerX = absPos.X + absSize.X / 2;
@@ -50,16 +50,17 @@ export function FlyTo({ delay, image, from, flyToRef, toRef, duration, curveHeig
 
 		const startTime = tick();
 		const connection = RunService.RenderStepped.Connect(() => {
-			if (!toRef.current) {
-				return;
-			}
-
 			const elapsed = tick() - startTime;
 			const alpha = math.min(elapsed / duration, 1);
 
 			const flyToFramePosition = flyToRef.current?.AbsolutePosition ?? new Vector2();
 
-			const centerTo = getCenterPosition(toRef.current);
+			const centerTo = toRef.current
+				? getCenterPosition(toRef.current)
+				: (() => {
+						const vp = Workspace.CurrentCamera?.ViewportSize ?? new Vector2(800, 600);
+						return new Vector2(vp.X / 2, vp.Y / 2);
+					})();
 
 			const asbPosTo = new UDim2(0, centerTo.X - flyToFramePosition.X, 0, centerTo.Y - flyToFramePosition.Y);
 
@@ -71,7 +72,7 @@ export function FlyTo({ delay, image, from, flyToRef, toRef, duration, curveHeig
 			setPosition(newPosition);
 
 			// Take the absolute size of the toRef image
-			const targetSize = toRef.current.AbsoluteSize;
+			const targetSize = toRef.current?.AbsoluteSize ?? new Vector2(width, width);
 
 			const lerpedSize = startSize.Lerp(targetSize, alpha);
 

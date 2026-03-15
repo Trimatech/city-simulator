@@ -6,14 +6,20 @@ import { fillArray } from "shared/utils/object-utils";
 
 import { FlyTo } from "./FlyTo";
 
-const getRandomStartPosition = () => {
+const getRandomStartPosition = (flyToRef: MutableRefObject<Frame | undefined>) => {
 	const screenSize = Workspace.CurrentCamera?.ViewportSize ?? new Vector2(800, 600);
-	return new UDim2(0, math.round(math.random() * screenSize.X), 0, math.round(math.random() * screenSize.Y));
+	const framePos = flyToRef.current?.AbsolutePosition ?? new Vector2();
+	return new UDim2(
+		0,
+		math.round(math.random() * screenSize.X) - framePos.X,
+		0,
+		math.round(math.random() * screenSize.Y) - framePos.Y,
+	);
 };
 
 interface FlyToComponentsProps {
 	readonly amount: number;
-	readonly statsImageRef: MutableRefObject<ImageLabel | undefined>;
+	readonly statsImageRef: MutableRefObject<Frame | undefined>;
 	readonly image: string;
 	readonly sound?: string;
 }
@@ -27,17 +33,18 @@ const FlyToComponentsTemp = ({ amount, statsImageRef: goldCardRef, image, sound 
 
 	const flyToRef = useRef<Frame>();
 
-	const diff = amount - (lastAmount ?? 0);
-
-	if (diff <= 0) {
-		return undefined;
+	// Skip first render to avoid spawning for already-existing values
+	if (lastAmount === undefined || amount - lastAmount <= 0) {
+		return <Frame size={new UDim2(1, 0, 1, 0)} ref={flyToRef} backgroundTransparency={1} />;
 	}
+
+	const diff = amount - lastAmount;
 
 	const newAmountChange = math.min(MAX_ITEMS, math.ceil(diff / ROUND_AMOUNT));
 
 	const flyToInstances = fillArray(newAmountChange, (index) => ({
 		id: `${index}`,
-		from: getRandomStartPosition(),
+		from: getRandomStartPosition(flyToRef),
 	}));
 
 	const duration = 0.5;
@@ -46,7 +53,7 @@ const FlyToComponentsTemp = ({ amount, statsImageRef: goldCardRef, image, sound 
 	const delay = math.min(0.1, delayDuration / size);
 
 	return (
-		<Frame size={new UDim2(1, 0, 1, 0)} ref={flyToRef}>
+		<Frame size={new UDim2(1, 0, 1, 0)} ref={flyToRef} backgroundTransparency={1}>
 			{flyToInstances.map(({ id, from }, index) => (
 				<FlyTo
 					key={`flyto-${id}-${math.random()}`}
