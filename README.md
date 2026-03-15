@@ -1,7 +1,7 @@
 <h3 align="center">
-    <img src="assets/marketing/github_logo.png" alt="Qonquer Icon" width="192" />
+    <img src="assets/marketing/github_logo.png" alt="Zone Wars Icon" width="192" />
     <br />
-    Qonquer
+    Zone Wars
 </h3>
 
 <p align="center">

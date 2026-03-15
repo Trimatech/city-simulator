@@ -1,6 +1,6 @@
-# ✅ Divide and Qonquer – Development To-Do List
+# ✅ Zone Wars – Development To-Do List
 
-A structured roadmap to build and polish _Divide and Qonquer_, a viral, competitive Roblox land-control game.
+A structured roadmap to build and polish _Zone Wars_, a viral, competitive Roblox land-control game.
 
 ---
 

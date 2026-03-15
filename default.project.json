@@ -1,5 +1,5 @@
 {
-	"name": "qonquer",
+	"name": "zone-wars",
 	"globIgnorePaths": ["**/package.json", "**/tsconfig.json"],
 	"tree": {
 		"$className": "DataModel",
