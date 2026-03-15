@@ -29,6 +29,7 @@ export const remotes = createRemotes({
 		alert: remote<Client, [params: Partial<Alert>]>(),
 		powerupCarpet: remote<Client, [cframe: CFrame, size: Vector3]>(t.CFrame, t.Vector3),
 		powerupNuclear: remote<Client, [cframe: CFrame, size: Vector3]>(t.CFrame, t.Vector3),
+		orbsWasted: remote<Client, [amount: number]>(),
 	}),
 
 	powerups: namespace({

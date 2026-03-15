@@ -2,7 +2,11 @@ import { setTimeout } from "@rbxts/set-timeout";
 import { store } from "server/store";
 import { CANDY_LIMITS } from "server/world/constants";
 import { getRandomPointInWorld, getSoldier } from "server/world/world-query.utils";
+import { SOLDIER_MAX_ORBS } from "shared/constants/core";
 import { getRandomAccent } from "shared/constants/palette";
+import { remotes } from "shared/remotes";
+import { selectSoldierOrbs } from "shared/store/soldiers";
+import { getPlayerByName } from "shared/utils/player-utils";
 import {
 	selectCandyGridCells,
 	selectCandyGridCount,
@@ -128,6 +132,17 @@ export function removeCandy(id: string, eatenAt?: Vector2) {
 	}, TIMEOUT_DELAY);
 }
 
+function fireOrbsWastedIfNeeded(soldierId: string, orbsToAdd: number) {
+	const currentOrbs = store.getState(selectSoldierOrbs(soldierId)) ?? 0;
+	const wasted = currentOrbs + orbsToAdd - SOLDIER_MAX_ORBS;
+	if (wasted > 0) {
+		const player = getPlayerByName(soldierId);
+		if (player) {
+			remotes.client.orbsWasted.fire(player, wasted);
+		}
+	}
+}
+
 export function eatCandy(candyId: string, soldierId: string) {
 	const candy = getCandyLocal(candyId);
 	const soldier = getSoldier(soldierId);
@@ -135,6 +150,7 @@ export function eatCandy(candyId: string, soldierId: string) {
 	if (soldier && candy && !candy.eatenAt) {
 		print(`Candy eaten with id ${candy.id}`);
 		removeCandy(candy.id, soldier.position);
+		fireOrbsWastedIfNeeded(soldier.id, candy.size);
 		store.incrementSoldierOrbs(soldier.id, candy.size);
 	}
 }
@@ -170,6 +186,7 @@ export function eatCandies(candyPoints: GridPoint<{ id: string }>[], soldierId: 
 		id: c.id,
 		position: c.position,
 	}));
+	fireOrbsWastedIfNeeded(soldierId, totalOrbs);
 	store.incrementSoldierOrbs(soldierId, totalOrbs);
 
 	// Immediately mark as eaten in replicated grid so clients animate

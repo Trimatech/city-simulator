@@ -1,18 +1,52 @@
 import Object from "@rbxts/object-utils";
-import React, { useEffect, useMemo } from "@rbxts/react";
+import React, { useEffect, useMemo, useRef, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { Frame } from "@rbxts-ui/primitives";
 import { springs } from "client/constants/springs";
 import { useMotion } from "client/hooks";
+import { Particles } from "client/ui/Particles/Particles";
+import { ParticleEmitter2DConfig } from "client/ui/Particles/Particles.interfaces";
 import { useRem } from "client/ui/rem/useRem";
+import assets from "shared/assets";
 import { SOLDIER_MAX_ORBS } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
 import { POWERUP_COLORS, POWERUP_PRICES, PowerupId } from "shared/constants/powerups";
 import { cornerRadiusFull } from "shared/constants/sizes";
+import { remotes } from "shared/remotes";
 import { selectLocalOrbs } from "shared/store/soldiers";
 import { brighten } from "shared/utils/color-utils";
 
 const SORTED_THRESHOLDS = (Object.entries(POWERUP_PRICES) as Array<[PowerupId, number]>).sort(([, a], [, b]) => a < b);
+
+const WASTED_ORBS_BURST_LIFETIME = 3.5;
+
+const WASTED_ORBS_CONFIG: ParticleEmitter2DConfig = {
+	rate: 20,
+	lifetime: new NumberRange(2, WASTED_ORBS_BURST_LIFETIME),
+	speed: new NumberRange(15, 40),
+	size: new NumberSequence([
+		new NumberSequenceKeypoint(0, 8),
+		new NumberSequenceKeypoint(0.3, 10),
+		new NumberSequenceKeypoint(1, 4),
+	]),
+	texture: assets.ui.icons.orb,
+	acceleration: new NumberRange(0),
+	spreadAngle: new NumberRange(-30, 30),
+	rotation: new NumberRange(0, 360),
+	rotSpeed: new NumberRange(-30, 30),
+	transparency: new NumberSequence([
+		new NumberSequenceKeypoint(0, 0),
+		new NumberSequenceKeypoint(0.6, 0.3),
+		new NumberSequenceKeypoint(1, 1),
+	]),
+	color: new ColorSequence([
+		new ColorSequenceKeypoint(0, Color3.fromRGB(255, 60, 60)),
+		new ColorSequenceKeypoint(0.5, Color3.fromRGB(200, 30, 30)),
+		new ColorSequenceKeypoint(1, Color3.fromRGB(120, 10, 10)),
+	]),
+	zOffset: 5,
+	gravityStrength: 80,
+};
 
 const OUTER_BORDER_COLOR = Color3.fromHex("#0e2a4e");
 const BG_COLOR = Color3.fromHex("#2a65a0");
@@ -34,6 +68,25 @@ interface Props {
 export function OrbsMeter({ position = new UDim2(0, 0, 0, 0) }: Props) {
 	const rem = useRem();
 	const orbs = useSelector(selectLocalOrbs) ?? 0;
+
+	const [wasteBursts, setWasteBursts] = useState<Array<{ key: number; emitDuration: number }>>([]);
+	const burstCounter = useRef(0);
+
+	useEffect(() => {
+		const disconnect = remotes.client.orbsWasted.connect((amount) => {
+			burstCounter.current += 1;
+			const key = burstCounter.current;
+			const emitDuration = math.clamp(amount * 0.1, 0.15, 0.5);
+
+			setWasteBursts((prev) => [...prev, { key, emitDuration }]);
+
+			task.delay(emitDuration + WASTED_ORBS_BURST_LIFETIME + 0.5, () => {
+				setWasteBursts((prev) => prev.filter((b) => b.key !== key));
+			});
+		});
+
+		return () => disconnect();
+	}, []);
 
 	const progressColor = useMemo(() => {
 		let color = palette.blue;
@@ -154,6 +207,24 @@ export function OrbsMeter({ position = new UDim2(0, 0, 0, 0) }: Props) {
 					</Frame>
 				);
 			})}
+
+			{/* Wasted orbs burst effect when picking up orbs while full */}
+			{wasteBursts.map((burst) => (
+				<Frame
+					key={`waste-burst-${burst.key}`}
+					position={new UDim2(0.5, 0, 0, 0)}
+					size={new UDim2(0, width, 0, 1)}
+					anchorPoint={new Vector2(0.5, 1)}
+					backgroundTransparency={1}
+					zIndex={5}
+				>
+					<Particles
+						config={WASTED_ORBS_CONFIG}
+						size={new UDim2(1, 0, 0, 1)}
+						emitDuration={burst.emitDuration}
+					/>
+				</Frame>
+			))}
 		</Frame>
 	);
 }
