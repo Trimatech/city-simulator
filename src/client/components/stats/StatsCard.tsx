@@ -1,4 +1,4 @@
-import React, { MutableRefObject, useEffect, useMemo } from "@rbxts/react";
+import React, { useEffect, useMemo } from "@rbxts/react";
 import { ReactiveButton2 } from "@rbxts-ui/components";
 import { Transition } from "@rbxts-ui/layout";
 import { Frame, Image, Text } from "@rbxts-ui/primitives";
@@ -86,7 +86,7 @@ interface StatsCardProps {
 	readonly colorStyle: StatsCardStyleName;
 	readonly enabled: boolean;
 	readonly order: number;
-	readonly iconRef?: MutableRefObject<Frame | undefined>;
+	readonly iconRef?: React.Ref<ImageLabel>;
 }
 
 const OUTER_BORDER_COLOR = Color3.fromRGB(61, 39, 19); // #3d2713
@@ -137,7 +137,6 @@ export function StatsCard({ onClick, image, label, value, colorStyle, enabled, o
 
 				{/* Outer frame with border */}
 				<Frame
-					ref={iconRef}
 					backgroundColor={style.innerBackground}
 					backgroundTransparency={style.innerBackgroundTransparency}
 					cornerRadius={outerCorner}
@@ -163,10 +162,12 @@ export function StatsCard({ onClick, image, label, value, colorStyle, enabled, o
 					</Image>
 
 					{/* Icon image */}
-					<Image
-						image={image}
-						size={new UDim2(0, rem(CARD_EMOJI_WIDTH), 0, rem(CARD_EMOJI_WIDTH))}
-						position={new UDim2(0, rem(CARD_MARGIN), 0.5, rem(-CARD_EMOJI_WIDTH / 2))}
+					<imagelabel
+						ref={iconRef}
+						Image={image}
+						BackgroundTransparency={1}
+						Size={new UDim2(0, rem(CARD_EMOJI_WIDTH), 0, rem(CARD_EMOJI_WIDTH))}
+						Position={new UDim2(0, rem(CARD_MARGIN), 0.5, rem(-CARD_EMOJI_WIDTH / 2))}
 					/>
 
 					{/* Label text */}

@@ -6,7 +6,7 @@ import { fillArray } from "shared/utils/object-utils";
 
 import { FlyTo } from "./FlyTo";
 
-const getRandomStartPosition = (flyToRef: MutableRefObject<Frame | undefined>) => {
+const getRandomStartPosition = (flyToRef: MutableRefObject<Frame | ImageLabel | undefined>) => {
 	const screenSize = Workspace.CurrentCamera?.ViewportSize ?? new Vector2(800, 600);
 	const framePos = flyToRef.current?.AbsolutePosition ?? new Vector2();
 	return new UDim2(
@@ -19,7 +19,7 @@ const getRandomStartPosition = (flyToRef: MutableRefObject<Frame | undefined>) =
 
 interface FlyToComponentsProps {
 	readonly amount: number;
-	readonly statsImageRef: MutableRefObject<Frame | undefined>;
+	readonly statsImageRef: MutableRefObject<Frame | ImageLabel | undefined>;
 	readonly image: string;
 	readonly sound?: string;
 }

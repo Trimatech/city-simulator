@@ -21,10 +21,10 @@ import { StatsCard } from "./StatsCard";
 export function Stats() {
 	const rem = useRem();
 
-	const eliminationsRef = useRef<Frame>();
-	const orbsRef = useRef<Frame>();
-	const balanceRef = useRef<Frame>();
-	const crystalsRef = useRef<Frame>();
+	const eliminationsRef = useRef<ImageLabel>();
+	const orbsRef = useRef<ImageLabel>();
+	const balanceRef = useRef<ImageLabel>();
+	const crystalsRef = useRef<ImageLabel>();
 
 	const currentEliminations = useSelector(selectLocalEliminations);
 	const currentOrbs = useSelector(selectLocalOrbs);
