@@ -1,5 +1,5 @@
-import { useMotion } from "@rbxts/pretty-react-hooks";
-import React, { useEffect, useMemo, useRef, useState } from "@rbxts/react";
+import { useKeyPress, useMotion } from "@rbxts/pretty-react-hooks";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "@rbxts/react";
 import { GuiService, UserInputService } from "@rbxts/services";
 import { ReactiveButton2 } from "@rbxts-ui/components";
 import { HStack, Transition } from "@rbxts-ui/layout";
@@ -37,6 +37,8 @@ const OUTER_STROKE_THICKNESS = 0.2;
 const INNER_STROKE_THICKNESS = 0.15;
 
 const BURST_LIFETIME_MAX = 2.5;
+
+const ORDER_TO_KEY = ["One", "Two", "Three", "Four", "Five"] as const;
 
 function getBurstEmitDuration(price: number): number {
 	return math.clamp(price * 0.01, 0.15, 0.75);
@@ -105,6 +107,37 @@ export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 	const orbFountainConfig = useMemo(() => getOrbFountainConfig(price), [price]);
 	const burstEmitDuration = useMemo(() => getBurstEmitDuration(price), [price]);
 
+	const emitBurst = useCallback(
+		(pos: Vector2) => {
+			burstCounter.current += 1;
+			const key = burstCounter.current;
+			setBursts((prev) => [...prev, { key, pos }]);
+			task.delay(burstEmitDuration + BURST_LIFETIME_MAX + 0.5, () =>
+				setBursts((prev) => prev.filter((b) => b.key !== key)),
+			);
+		},
+		[burstEmitDuration],
+	);
+
+	const getButtonCenter = useCallback((): Vector2 => {
+		const wrapper = wrapperRef.current;
+		if (!wrapper) return new Vector2(0, 0);
+		const absSize = wrapper.AbsoluteSize;
+		return new Vector2(absSize.X / 2, absSize.Y / 2);
+	}, []);
+
+	const shortcutKey = ORDER_TO_KEY[5 - order];
+	const pressed = useKeyPress(shortcutKey ? [shortcutKey] : []);
+
+	useEffect(() => {
+		if (pressed) {
+			remotes.powerups.use.fire(id);
+			if (enabled) {
+				emitBurst(getButtonCenter());
+			}
+		}
+	}, [pressed, id]);
+
 	return (
 		<Frame
 			ref={wrapperRef}
@@ -139,12 +172,7 @@ export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 							mousePos.X - guiInset.X - wrapperPos.X,
 							mousePos.Y - guiInset.Y - wrapperPos.Y,
 						);
-						burstCounter.current += 1;
-						const key = burstCounter.current;
-						setBursts((prev) => [...prev, { key, pos }]);
-						task.delay(burstEmitDuration + BURST_LIFETIME_MAX + 0.5, () =>
-							setBursts((prev) => prev.filter((b) => b.key !== key)),
-						);
+						emitBurst(pos);
 					}
 				}}
 				enabled={enabled}
