@@ -50,7 +50,7 @@ const ORB_FOUNTAIN_CONFIG: ParticleEmitter2DConfig = {
 	]),
 	texture: assets.ui.icons.orb,
 	acceleration: new NumberRange(0),
-	spreadAngle: new NumberRange(-55, 55),
+	spreadAngle: new NumberRange(-30, 30),
 	rotation: new NumberRange(0, 0),
 	rotSpeed: new NumberRange(0, 0),
 	transparency: new NumberSequence([
@@ -75,6 +75,7 @@ export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 	const [burstPos, setBurstPos] = useState<Vector2 | undefined>();
 	const [burstKey, setBurstKey] = useState(0);
 	const frameRef = useRef<Frame>();
+	const wrapperRef = useRef<Frame>();
 	const cleanupRef = useRef<thread>();
 
 	const [size, sizeMotion] = useMotion(new UDim2(0, WIDTH, 0, HEIGHT));
@@ -96,27 +97,12 @@ export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 	const iconSize = rem(4);
 
 	return (
-		<ReactiveButton2
-			onClick={() => {
-				remotes.powerups.use.fire(id);
-				if (enabled) {
-					const mousePos = UserInputService.GetMouseLocation();
-					const framePos = frameRef.current?.AbsolutePosition ?? new Vector2(0, 0);
-					setBurstPos(new Vector2(mousePos.X - framePos.X, mousePos.Y - framePos.Y));
-					setBurstKey((prev) => prev + 1);
-					if (cleanupRef.current) task.cancel(cleanupRef.current);
-					cleanupRef.current = task.delay(BURST_EMIT_DURATION + BURST_LIFETIME_MAX + 0.5, () =>
-						setBurstPos(undefined),
-					);
-				}
-			}}
-			enabled={enabled}
+		<Frame
+			ref={wrapperRef}
 			backgroundTransparency={1}
-			size={size}
+			size={new UDim2(0, 0, 0, HEIGHT)}
 			layoutOrder={order}
-			onMouseEnter={() => setShowTooltip(true)}
-			onMouseLeave={() => setShowTooltip(false)}
-			anchorPoint={new Vector2(1, 0.5)}
+			clipsDescendants={false}
 		>
 			{burstPos !== undefined && (
 				<Frame
@@ -133,104 +119,130 @@ export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 					/>
 				</Frame>
 			)}
-			<Transition groupTransparency={0} size={new UDim2(1, 0, 1, 0)}>
-				{/* Outer frame — colored background with dual strokes */}
-				<Frame
-					ref={frameRef}
-					backgroundColor={style.backgroundColor}
-					backgroundTransparency={0}
-					cornerRadius={fullRound}
-					size={new UDim2(1, 0, 1, 0)}
-					clipsDescendants
-				>
-					{/* Background gradient */}
-					<uigradient Color={style.backgroundGradient} Rotation={60} />
-
-					{/* Dark blue outer stroke */}
-					<uistroke Color={POWERUP_OUTER_BORDER_COLOR} Thickness={rem(OUTER_STROKE_THICKNESS)} ZIndex={0} />
-
-					{/* Inner gradient stroke */}
-					<uistroke Color={palette.white} Thickness={rem(INNER_STROKE_THICKNESS)} ZIndex={1}>
-						<uigradient Color={style.borderGradient} Rotation={90} />
-					</uistroke>
-
-					<Image
-						image={assets.ui.patterns.water_noise_pattern}
+			<ReactiveButton2
+				onClick={() => {
+					remotes.powerups.use.fire(id);
+					if (enabled) {
+						const mousePos = UserInputService.GetMouseLocation();
+						const wrapperPos = wrapperRef.current?.AbsolutePosition ?? new Vector2(0, 0);
+						setBurstPos(new Vector2(mousePos.X - wrapperPos.X, mousePos.Y - wrapperPos.Y));
+						setBurstKey((prev) => prev + 1);
+						if (cleanupRef.current) task.cancel(cleanupRef.current);
+						cleanupRef.current = task.delay(BURST_EMIT_DURATION + BURST_LIFETIME_MAX + 0.5, () =>
+							setBurstPos(undefined),
+						);
+					}
+				}}
+				enabled={enabled}
+				backgroundTransparency={1}
+				size={size}
+				anchorPoint={new Vector2(1, 0)}
+				onMouseEnter={() => setShowTooltip(true)}
+				onMouseLeave={() => setShowTooltip(false)}
+			>
+				<Transition groupTransparency={0} size={new UDim2(1, 0, 1, 0)}>
+					{/* Outer frame — colored background with dual strokes */}
+					<Frame
+						ref={frameRef}
+						backgroundColor={style.backgroundColor}
+						backgroundTransparency={0}
+						cornerRadius={fullRound}
 						size={new UDim2(1, 0, 1, 0)}
-						imageTransparency={0.5}
-						scaleType="Tile"
-						imageColor3={brighten(style.backgroundColor, 1)}
-						tileSize={new UDim2(0, rem(40), 0, rem(40))}
+						clipsDescendants
 					>
-						<uicorner CornerRadius={fullRound} />
-					</Image>
+						{/* Background gradient */}
+						<uigradient Color={style.backgroundGradient} Rotation={60} />
 
-					{/* Content */}
+						{/* Dark blue outer stroke */}
+						<uistroke
+							Color={POWERUP_OUTER_BORDER_COLOR}
+							Thickness={rem(OUTER_STROKE_THICKNESS)}
+							ZIndex={0}
+						/>
 
-					<HStack clipsDescendants={false} horizontalAlignment={Enum.HorizontalAlignment.Right}>
-						{showTooltip ? (
-							<HStack spacing={rem(1)} size={new UDim2(0, rem(TOOLTIP_WIDTH), 0, HEIGHT)} wraps>
-								<uipadding PaddingLeft={new UDim(0, rem(1))} />
-								<Text
-									text={label}
-									size={new UDim2(1, 0, 0, rem(1))}
-									font={fonts.fredokaOne.regular}
-									textColor={palette.white}
-									textSize={rem(1.5)}
-									textXAlignment="Center"
-									textYAlignment="Center"
-									richText
-								>
-									<uistroke Thickness={rem(0.15)} Color={palette.white}>
-										<uigradient Color={textStrokeGradient} Rotation={90} />
-									</uistroke>
-								</Text>
-								<HStack
-									size={new UDim2(1, 0, 0, rem(1))}
-									backgroundTransparency={1}
-									spacing={rem(0.25)}
-									verticalAlignment={Enum.VerticalAlignment.Center}
-									horizontalAlignment={Enum.HorizontalAlignment.Center}
-								>
-									<Image
-										image={assets.ui.icons.orb}
-										size={new UDim2(0, rem(1), 0, rem(1))}
-										position={new UDim2(0, 0, 0.5, 0)}
-										anchorPoint={new Vector2(0, 0.5)}
-										scaleType="Fit"
-										zIndex={1}
-									/>
+						{/* Inner gradient stroke */}
+						<uistroke Color={palette.white} Thickness={rem(INNER_STROKE_THICKNESS)} ZIndex={1}>
+							<uigradient Color={style.borderGradient} Rotation={90} />
+						</uistroke>
+
+						<Image
+							image={assets.ui.patterns.water_noise_pattern}
+							size={new UDim2(1, 0, 1, 0)}
+							imageTransparency={0.5}
+							scaleType="Tile"
+							imageColor3={brighten(style.backgroundColor, 1)}
+							tileSize={new UDim2(0, rem(40), 0, rem(40))}
+						>
+							<uicorner CornerRadius={fullRound} />
+						</Image>
+
+						{/* Content */}
+
+						<HStack clipsDescendants={false} horizontalAlignment={Enum.HorizontalAlignment.Right}>
+							{showTooltip ? (
+								<HStack spacing={rem(1)} size={new UDim2(0, rem(TOOLTIP_WIDTH), 0, HEIGHT)} wraps>
+									<uipadding PaddingLeft={new UDim(0, rem(1))} />
 									<Text
-										size={new UDim2(0, 0, 1, 0)}
-										automaticSize={Enum.AutomaticSize.X}
+										text={label}
+										size={new UDim2(1, 0, 0, rem(1))}
 										font={fonts.fredokaOne.regular}
-										textColor={enabled ? palette.green : palette.red1}
-										text={tostring(price)}
-										textSize={rem(1)}
+										textColor={palette.white}
+										textSize={rem(1.5)}
 										textXAlignment="Center"
 										textYAlignment="Center"
+										richText
 									>
 										<uistroke Thickness={rem(0.15)} Color={palette.white}>
 											<uigradient Color={textStrokeGradient} Rotation={90} />
 										</uistroke>
 									</Text>
+									<HStack
+										size={new UDim2(1, 0, 0, rem(1))}
+										backgroundTransparency={1}
+										spacing={rem(0.25)}
+										verticalAlignment={Enum.VerticalAlignment.Center}
+										horizontalAlignment={Enum.HorizontalAlignment.Center}
+									>
+										<Image
+											image={assets.ui.icons.orb}
+											size={new UDim2(0, rem(1), 0, rem(1))}
+											position={new UDim2(0, 0, 0.5, 0)}
+											anchorPoint={new Vector2(0, 0.5)}
+											scaleType="Fit"
+											zIndex={1}
+										/>
+										<Text
+											size={new UDim2(0, 0, 1, 0)}
+											automaticSize={Enum.AutomaticSize.X}
+											font={fonts.fredokaOne.regular}
+											textColor={enabled ? palette.green : palette.red1}
+											text={tostring(price)}
+											textSize={rem(1)}
+											textXAlignment="Center"
+											textYAlignment="Center"
+										>
+											<uistroke Thickness={rem(0.15)} Color={palette.white}>
+												<uigradient Color={textStrokeGradient} Rotation={90} />
+											</uistroke>
+										</Text>
+									</HStack>
 								</HStack>
-							</HStack>
-						) : undefined}
+							) : undefined}
 
-						{/* Circle with icon */}
-						<Frame size={new UDim2(0, rem(CIRCLE_SIZE), 0, rem(CIRCLE_SIZE))}>
-							<Image
-								image={POWERUP_ICONS[id]}
-								anchorPoint={new Vector2(0.5, 0.5)}
-								size={new UDim2(0, iconSize, 0, iconSize)}
-								position={new UDim2(0.5, 0, 0.5, 0)}
-								backgroundTransparency={1}
-							/>
-						</Frame>
-					</HStack>
-				</Frame>
-			</Transition>
-		</ReactiveButton2>
+							{/* Circle with icon */}
+							<Frame size={new UDim2(0, rem(CIRCLE_SIZE), 0, rem(CIRCLE_SIZE))}>
+								<Image
+									image={POWERUP_ICONS[id]}
+									anchorPoint={new Vector2(0.5, 0.5)}
+									size={new UDim2(0, iconSize, 0, iconSize)}
+									position={new UDim2(0.5, 0, 0.5, 0)}
+									backgroundTransparency={1}
+								/>
+							</Frame>
+						</HStack>
+					</Frame>
+				</Transition>
+			</ReactiveButton2>
+		</Frame>
 	);
 }

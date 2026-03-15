@@ -26,14 +26,14 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 			anchorPoint={anchorPoint}
 			position={position}
 			size={size}
-			verticalAlignment={Enum.VerticalAlignment.Top}
+			verticalAlignment={Enum.VerticalAlignment.Bottom}
 			spacing={rem(1)}
 		>
 			<VStack
 				name="buy-powerups-stack"
 				size={new UDim2(0, rem(5), 1, 0)}
 				spacing={rem(1)}
-				verticalAlignment={Enum.VerticalAlignment.Top}
+				verticalAlignment={Enum.VerticalAlignment.Center}
 				horizontalAlignment={Enum.HorizontalAlignment.Right}
 			>
 				<uipadding PaddingTop={new UDim(0, rem(0.5))} />
