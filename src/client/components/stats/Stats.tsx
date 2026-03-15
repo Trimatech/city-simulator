@@ -114,8 +114,8 @@ export function Stats() {
 				image={assets.ui.icons.kills}
 				sound={assets.sounds.thump_sound}
 				startFromCharacter={true}
-				imageTransparency={0.3}
-				startScale={1}
+				imageTransparency={0.1}
+				startScale={5}
 			/>
 			<FlyToComponents
 				amount={currentOrbs ?? 0}
