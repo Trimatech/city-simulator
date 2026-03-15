@@ -1,6 +1,6 @@
 import { useMotion } from "@rbxts/pretty-react-hooks";
-import React, { useEffect, useRef, useState } from "@rbxts/react";
-import { UserInputService } from "@rbxts/services";
+import React, { useEffect, useMemo, useRef, useState } from "@rbxts/react";
+import { GuiService, UserInputService } from "@rbxts/services";
 import { ReactiveButton2 } from "@rbxts-ui/components";
 import { HStack, Transition } from "@rbxts-ui/layout";
 import { Frame, Image, Text } from "@rbxts-ui/primitives";
@@ -36,32 +36,39 @@ const TOOLTIP_WIDTH = 7;
 const OUTER_STROKE_THICKNESS = 0.2;
 const INNER_STROKE_THICKNESS = 0.15;
 
-const BURST_EMIT_DURATION = 0.25;
 const BURST_LIFETIME_MAX = 2.5;
 
-const ORB_FOUNTAIN_CONFIG: ParticleEmitter2DConfig = {
-	rate: 50,
-	lifetime: new NumberRange(1.5, BURST_LIFETIME_MAX),
-	speed: new NumberRange(300, 650),
-	size: new NumberSequence([
-		new NumberSequenceKeypoint(0, 14),
-		new NumberSequenceKeypoint(0.35, 18),
-		new NumberSequenceKeypoint(1, 5),
-	]),
-	texture: assets.ui.icons.orb,
-	acceleration: new NumberRange(0),
-	spreadAngle: new NumberRange(-30, 30),
-	rotation: new NumberRange(0, 0),
-	rotSpeed: new NumberRange(0, 0),
-	transparency: new NumberSequence([
-		new NumberSequenceKeypoint(0, 0.05),
-		new NumberSequenceKeypoint(0.5, 0.15),
-		new NumberSequenceKeypoint(1, 1),
-	]),
-	color: new ColorSequence(new Color3(1, 1, 1)),
-	zOffset: 10,
-	gravityStrength: 900,
-};
+function getBurstEmitDuration(price: number): number {
+	return math.clamp(price * 0.01, 0.15, 0.75);
+}
+
+function getOrbFountainConfig(price: number): ParticleEmitter2DConfig {
+	const rate = math.clamp(price * 4, 20, 400);
+
+	return {
+		rate,
+		lifetime: new NumberRange(1.5, BURST_LIFETIME_MAX),
+		speed: new NumberRange(80, 200),
+		size: new NumberSequence([
+			new NumberSequenceKeypoint(0, 14),
+			new NumberSequenceKeypoint(0.35, 18),
+			new NumberSequenceKeypoint(1, 5),
+		]),
+		texture: assets.ui.icons.orb,
+		acceleration: new NumberRange(2),
+		spreadAngle: new NumberRange(-60, 60),
+		rotation: new NumberRange(0, 0),
+		rotSpeed: new NumberRange(0, 0),
+		transparency: new NumberSequence([
+			new NumberSequenceKeypoint(0, 0.05),
+			new NumberSequenceKeypoint(0.5, 0.15),
+			new NumberSequenceKeypoint(1, 1),
+		]),
+		color: new ColorSequence(new Color3(1, 1, 1)),
+		zOffset: 10,
+		gravityStrength: 900,
+	};
+}
 
 export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 	const rem = useRem();
@@ -72,11 +79,10 @@ export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 	const FULL_WIDTH = WIDTH + rem(TOOLTIP_WIDTH);
 
 	const [showTooltip, setShowTooltip] = useState(false);
-	const [burstPos, setBurstPos] = useState<Vector2 | undefined>();
-	const [burstKey, setBurstKey] = useState(0);
+	const [bursts, setBursts] = useState<Array<{ key: number; pos: Vector2 }>>([]);
+	const burstCounter = useRef(0);
 	const frameRef = useRef<Frame>();
 	const wrapperRef = useRef<Frame>();
-	const cleanupRef = useRef<thread>();
 
 	const [size, sizeMotion] = useMotion(new UDim2(0, WIDTH, 0, HEIGHT));
 
@@ -96,6 +102,9 @@ export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 
 	const iconSize = rem(4);
 
+	const orbFountainConfig = useMemo(() => getOrbFountainConfig(price), [price]);
+	const burstEmitDuration = useMemo(() => getBurstEmitDuration(price), [price]);
+
 	return (
 		<Frame
 			ref={wrapperRef}
@@ -104,32 +113,37 @@ export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 			layoutOrder={order}
 			clipsDescendants={false}
 		>
-			{burstPos !== undefined && (
+			{bursts.map((burst) => (
 				<Frame
-					key={`burst-${burstKey}`}
-					position={new UDim2(0, burstPos.X, 0, burstPos.Y)}
+					key={`burst-${burst.key}`}
+					position={new UDim2(0, burst.pos.X, 0, burst.pos.Y)}
 					size={new UDim2(0, 1, 0, 1)}
 					backgroundTransparency={1}
 					zIndex={10}
 				>
 					<Particles
-						config={ORB_FOUNTAIN_CONFIG}
+						config={orbFountainConfig}
 						size={new UDim2(0, 1, 0, 1)}
-						emitDuration={BURST_EMIT_DURATION}
+						emitDuration={burstEmitDuration}
 					/>
 				</Frame>
-			)}
+			))}
 			<ReactiveButton2
 				onClick={() => {
 					remotes.powerups.use.fire(id);
 					if (enabled) {
 						const mousePos = UserInputService.GetMouseLocation();
+						const [guiInset] = GuiService.GetGuiInset();
 						const wrapperPos = wrapperRef.current?.AbsolutePosition ?? new Vector2(0, 0);
-						setBurstPos(new Vector2(mousePos.X - wrapperPos.X, mousePos.Y - wrapperPos.Y));
-						setBurstKey((prev) => prev + 1);
-						if (cleanupRef.current) task.cancel(cleanupRef.current);
-						cleanupRef.current = task.delay(BURST_EMIT_DURATION + BURST_LIFETIME_MAX + 0.5, () =>
-							setBurstPos(undefined),
+						const pos = new Vector2(
+							mousePos.X - guiInset.X - wrapperPos.X,
+							mousePos.Y - guiInset.Y - wrapperPos.Y,
+						);
+						burstCounter.current += 1;
+						const key = burstCounter.current;
+						setBursts((prev) => [...prev, { key, pos }]);
+						task.delay(burstEmitDuration + BURST_LIFETIME_MAX + 0.5, () =>
+							setBursts((prev) => prev.filter((b) => b.key !== key)),
 						);
 					}
 				}}

@@ -1,4 +1,4 @@
-import React, { MutableRefObject, useBinding, useEffect, useState } from "@rbxts/react";
+import React, { MutableRefObject, useBinding, useEffect, useRef, useState } from "@rbxts/react";
 import { RunService, Workspace } from "@rbxts/services";
 import { setTimeout } from "@rbxts/set-timeout";
 import { Image } from "@rbxts-ui/primitives";
@@ -35,6 +35,12 @@ export function FlyTo({ delay, image, from, flyToRef, toRef, duration, curveHeig
 	const [isFinished, setIsFinished] = useState(false);
 	const [shouldRender, setShouldRender] = useState(false);
 
+	// Stash props in refs so the animation effect never restarts due to
+	// Roblox userdata (UDim2) failing reference-equality checks on re-render.
+	const fromRef = useRef(from);
+	const curveHeightRef = useRef(curveHeight);
+	const durationRef = useRef(duration);
+
 	useEffect(() => {
 		const clearTimeout = setTimeout(() => {
 			setShouldRender(true);
@@ -50,10 +56,14 @@ export function FlyTo({ delay, image, from, flyToRef, toRef, duration, curveHeig
 	useEffect(() => {
 		if (!shouldRender) return;
 
+		const animFrom = fromRef.current;
+		const animDuration = durationRef.current;
+		const animCurveHeight = curveHeightRef.current;
+
 		const startTime = tick();
 		const connection = RunService.RenderStepped.Connect(() => {
 			const elapsed = tick() - startTime;
-			const alpha = math.min(elapsed / duration, 1);
+			const alpha = math.min(elapsed / animDuration, 1);
 
 			const flyToFramePosition = flyToRef.current?.AbsolutePosition ?? new Vector2();
 
@@ -67,8 +77,8 @@ export function FlyTo({ delay, image, from, flyToRef, toRef, duration, curveHeig
 			const asbPosTo = new UDim2(0, centerTo.X - flyToFramePosition.X, 0, centerTo.Y - flyToFramePosition.Y);
 
 			// Calculate the curved position
-			const lerpPosition = from.Lerp(asbPosTo, alpha);
-			const curveOffset = new UDim2(0, 0, 0, curveHeight * math.sin(math.pi * alpha));
+			const lerpPosition = animFrom.Lerp(asbPosTo, alpha);
+			const curveOffset = new UDim2(0, 0, 0, animCurveHeight * math.sin(math.pi * alpha));
 			const newPosition = lerpPosition.add(curveOffset);
 
 			setPosition(newPosition);
@@ -90,7 +100,7 @@ export function FlyTo({ delay, image, from, flyToRef, toRef, duration, curveHeig
 		});
 
 		return () => connection.Disconnect();
-	}, [from, toRef, duration, curveHeight, shouldRender]);
+	}, [shouldRender]);
 
 	if (!shouldRender || isFinished) {
 		return undefined;

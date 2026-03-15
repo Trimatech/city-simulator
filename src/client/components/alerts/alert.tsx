@@ -24,10 +24,10 @@ interface AlertProps {
 }
 
 const MAX_VISIBLE_ALERTS = 5;
-const ALERT_WIDTH = 35;
-const ALERT_HEIGHT = 5;
-const ALERT_PADDING = 2;
-const LIST_PADDING = 1;
+const ALERT_WIDTH = 30;
+const ALERT_HEIGHT = 4;
+const ALERT_PADDING = 1.5;
+const LIST_PADDING = 0.75;
 
 export function Alert({ alert, index }: AlertProps) {
 	const rem = useRem();
@@ -106,7 +106,7 @@ export function Alert({ alert, index }: AlertProps) {
 
 			<Frame
 				backgroundColor={hasGradient ? palette.white : style.background}
-				backgroundTransparency={lerpBinding(transition, 1, 0.1)}
+				backgroundTransparency={lerpBinding(transition, 1, 0.3)}
 				cornerRadius={new UDim(0, rem(1))}
 				size={new UDim2(1, 0, 1, 0)}
 			>
@@ -134,7 +134,7 @@ export function Alert({ alert, index }: AlertProps) {
 				text={alert.emoji}
 				textColor={style.message}
 				textTransparency={lerpBinding(transition, 1, 0)}
-				textSize={rem(2)}
+				textSize={rem(1.75)}
 				textXAlignment="Left"
 				textYAlignment="Center"
 				position={new UDim2(0, rem(ALERT_PADDING), 0.5, 0)}
@@ -146,7 +146,7 @@ export function Alert({ alert, index }: AlertProps) {
 				text={alert.message}
 				textColor={style.message}
 				textTransparency={lerpBinding(transition, 1, 0)}
-				textSize={rem(1.5)}
+				textSize={rem(1.25)}
 				textXAlignment="Left"
 				textYAlignment="Center"
 				anchorPoint={new Vector2(0, 0.5)}

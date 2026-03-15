@@ -1,5 +1,5 @@
 import { usePrevious } from "@rbxts/pretty-react-hooks";
-import React, { memo, MutableRefObject, useRef } from "@rbxts/react";
+import React, { memo, MutableRefObject, useEffect, useRef, useState } from "@rbxts/react";
 import { Players, Workspace } from "@rbxts/services";
 import { Frame } from "@rbxts-ui/primitives";
 import { fillArray } from "shared/utils/object-utils";
@@ -44,6 +44,11 @@ const ROUND_AMOUNT = 10;
 
 const MAX_ITEMS = 50;
 
+interface FlyToBatch {
+	readonly batchKey: number;
+	readonly instances: Array<{ id: string; from: UDim2; curveHeight: number }>;
+}
+
 const FlyToComponentsTemp = ({
 	amount,
 	statsImageRef: goldCardRef,
@@ -54,37 +59,51 @@ const FlyToComponentsTemp = ({
 	startScale,
 }: FlyToComponentsProps) => {
 	const lastAmount = usePrevious(amount);
-
 	const flyToRef = useRef<Frame>();
-
-	// Skip first render to avoid spawning for already-existing values
-	if (lastAmount === undefined || amount - lastAmount <= 0) {
-		return <Frame size={new UDim2(1, 0, 1, 0)} ref={flyToRef} backgroundTransparency={1} />;
-	}
-
-	const diff = amount - lastAmount;
-
-	const newAmountChange = math.min(MAX_ITEMS, math.ceil(diff / ROUND_AMOUNT));
+	const batchCounter = useRef(0);
+	const [batches, setBatches] = useState<Array<FlyToBatch>>([]);
 
 	const getStartPosition = startFromCharacter ? getCharacterStartPosition : getRandomStartPosition;
 
-	const flyToInstances = fillArray(newAmountChange, (index) => ({
-		id: `${index}`,
-		from: getStartPosition(flyToRef),
-		curveHeight: math.random(2, 200),
-	}));
+	useEffect(() => {
+		// Skip first render to avoid spawning for already-existing values
+		if (lastAmount === undefined || amount - lastAmount <= 0) return;
+
+		const diff = amount - lastAmount;
+		const newAmountChange = math.min(MAX_ITEMS, math.ceil(diff / ROUND_AMOUNT));
+
+		const instances = fillArray(newAmountChange, (index) => ({
+			id: `${index}`,
+			from: getStartPosition(flyToRef),
+			curveHeight: math.random(2, 200),
+		}));
+
+		batchCounter.current += 1;
+		const batchKey = batchCounter.current;
+
+		setBatches((prev) => [...prev, { batchKey, instances }]);
+
+		const delayDuration = 2;
+		const delay = math.min(0.1, delayDuration / instances.size());
+		const duration = 0.5;
+		const totalLifetime = instances.size() * delay + duration + 0.5;
+
+		task.delay(totalLifetime, () => {
+			setBatches((prev) => prev.filter((b) => b.batchKey !== batchKey));
+		});
+	}, [amount]);
 
 	const duration = 0.5;
 	const delayDuration = 2;
-	const size = flyToInstances.size();
-	const delay = math.min(0.1, delayDuration / size);
 
-	return (
-		<Frame size={new UDim2(1, 0, 1, 0)} ref={flyToRef} backgroundTransparency={1}>
-			{flyToInstances.map(({ id, from, curveHeight }, index) => (
+	const flatElements: React.Element[] = [];
+	for (const batch of batches) {
+		const batchDelay = math.min(0.1, delayDuration / batch.instances.size());
+		for (const [index, { id, from, curveHeight }] of ipairs(batch.instances)) {
+			flatElements.push(
 				<FlyTo
-					key={`flyto-${id}-${math.random()}`}
-					delay={index * delay}
+					key={`flyto-${batch.batchKey}-${id}`}
+					delay={(index - 1) * batchDelay}
 					image={image}
 					from={from}
 					flyToRef={flyToRef}
@@ -94,8 +113,14 @@ const FlyToComponentsTemp = ({
 					sound={sound}
 					imageTransparency={imageTransparency}
 					startScale={startScale}
-				/>
-			))}
+				/>,
+			);
+		}
+	}
+
+	return (
+		<Frame size={new UDim2(1, 0, 1, 0)} ref={flyToRef} backgroundTransparency={1}>
+			{flatElements}
 		</Frame>
 	);
 };
