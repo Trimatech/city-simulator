@@ -4,13 +4,15 @@ import { Frame } from "@rbxts-ui/primitives";
 import { useRem } from "client/ui/rem/useRem";
 import { SCROLLBAR_COLOR, SCROLLBAR_THICKNESS, SCROLLBAR_TRANSPARENCY } from "client/ui/scrollbar.constants";
 import assets from "shared/assets";
-import { DevProduct } from "shared/assetsFolder";
+import { MONEY_OFFERS } from "shared/constants/shopPrices";
 
 import { ShopItem, shopItemThemes } from "./ShopItem";
 
 function promptPurchase(productId: number) {
 	MarketplaceService.PromptProductPurchase(Players.LocalPlayer, productId);
 }
+
+const [m100, m500, m2500, m10000, m100000] = MONEY_OFFERS;
 
 export function CashProducts() {
 	const rem = useRem();
@@ -70,31 +72,31 @@ export function CashProducts() {
 							title="$100 Cash"
 							subtitle="+10 Bonus"
 							label="STARTER PACK"
-							buttonText="10"
+							buttonText={`${RobloxEmoji.Robux} ${m100.robuxPrice}`}
 							icon={assets.ui.shop.Cash100Large}
 							theme={shopItemThemes.green}
 							size={new UDim2(0, itemWidth, 0, smallItemH)}
-							onButtonClick={() => promptPurchase(DevProduct.MONEY_100)}
+							onButtonClick={() => promptPurchase(m100.productId)}
 						/>
 						<ShopItem
 							title="$500 Cash"
 							subtitle="+100 Bonus"
 							label="BONUS BOOST"
-							buttonText="50"
+							buttonText={`${RobloxEmoji.Robux} ${m500.robuxPrice}`}
 							icon={assets.ui.shop.Cash500Large}
 							theme={shopItemThemes.green}
 							size={new UDim2(0, itemWidth, 0, smallItemH)}
-							onButtonClick={() => promptPurchase(DevProduct.MONEY_500)}
+							onButtonClick={() => promptPurchase(m500.productId)}
 						/>
 						<ShopItem
 							title="$2500 Cash"
 							subtitle="+200 Bonus"
 							label="WEALTH CRATE"
-							buttonText="200"
+							buttonText={`${RobloxEmoji.Robux} ${m2500.robuxPrice}`}
 							icon={assets.ui.shop.Cash250Large}
 							theme={shopItemThemes.orange}
 							size={new UDim2(0, itemWidth, 0, smallItemH)}
-							onButtonClick={() => promptPurchase(DevProduct.MONEY_2500)}
+							onButtonClick={() => promptPurchase(m2500.productId)}
 						/>
 					</frame>
 
@@ -110,21 +112,21 @@ export function CashProducts() {
 							title="$10K Cash"
 							subtitle="+10K Bonus"
 							label="TREASURE CHEST"
-							buttonText="500"
+							buttonText={`${RobloxEmoji.Robux} ${m10000.robuxPrice}`}
 							icon={assets.ui.shop.Cash10kLarge}
 							theme={shopItemThemes.orange}
 							size={new UDim2(0, itemWidth, 0, largeItemH)}
-							onButtonClick={() => promptPurchase(DevProduct.MONEY_10000)}
+							onButtonClick={() => promptPurchase(m10000.productId)}
 						/>
 						<ShopItem
 							title="$100K Cash"
 							subtitle="+10K Bonus"
 							label="BANK VAULT"
-							buttonText="2000"
+							buttonText={`${RobloxEmoji.Robux} ${m100000.robuxPrice}`}
 							icon={assets.ui.shop.Cash100kLarge}
 							theme={shopItemThemes.blue}
 							size={new UDim2(0, itemWidth, 0, largeItemH)}
-							onButtonClick={() => promptPurchase(DevProduct.MONEY_100000)}
+							onButtonClick={() => promptPurchase(m100000.productId)}
 						/>
 					</frame>
 				</frame>

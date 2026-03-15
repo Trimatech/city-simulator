@@ -275,6 +275,7 @@ export function ShopItem({
 								textXAlignment="Center"
 								textYAlignment="Center"
 								zIndex={3}
+								richText={true}
 							>
 								<uistroke Thickness={strokeThickness} Color={LABEL_COLOR}>
 									<uigradient Color={labelStrokeGradient} Rotation={90} />

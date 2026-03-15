@@ -4,13 +4,15 @@ import { Frame } from "@rbxts-ui/primitives";
 import { useRem } from "client/ui/rem/useRem";
 import { SCROLLBAR_COLOR, SCROLLBAR_THICKNESS, SCROLLBAR_TRANSPARENCY } from "client/ui/scrollbar.constants";
 import assets from "shared/assets";
-import { DevProduct } from "shared/assetsFolder";
+import { CRYSTAL_OFFERS } from "shared/constants/shopPrices";
 
 import { ShopItem, shopItemThemes } from "./ShopItem";
 
 function promptPurchase(productId: number) {
 	MarketplaceService.PromptProductPurchase(Players.LocalPlayer, productId);
 }
+
+const [c1, c5, c15, c25] = CRYSTAL_OFFERS;
 
 export function CrystalProducts() {
 	const rem = useRem();
@@ -69,31 +71,31 @@ export function CrystalProducts() {
 						<ShopItem
 							title="1 Crystal"
 							label="STARTER"
-							buttonText="10"
+							buttonText={`${RobloxEmoji.Robux} ${c1.robuxPrice}`}
 							icon={assets.ui.crystals.crystals_1}
 							theme={shopItemThemes.green}
 							size={new UDim2(0, itemWidth, 0, smallItemH)}
-							onButtonClick={() => promptPurchase(DevProduct.CRYSTALS_1)}
+							onButtonClick={() => promptPurchase(c1.productId)}
 						/>
 						<ShopItem
 							title="5 Crystals"
 							subtitle="+1 Bonus"
 							label="CRYSTAL PACK"
-							buttonText="40"
+							buttonText={`${RobloxEmoji.Robux} ${c5.robuxPrice}`}
 							icon={assets.ui.crystals.crystals_5}
 							theme={shopItemThemes.green}
 							size={new UDim2(0, itemWidth, 0, smallItemH)}
-							onButtonClick={() => promptPurchase(DevProduct.CRYSTALS_5)}
+							onButtonClick={() => promptPurchase(c5.productId)}
 						/>
 						<ShopItem
 							title="15 Crystals"
 							subtitle="+3 Bonus"
 							label="SHARD CRATE"
-							buttonText="100"
+							buttonText={`${RobloxEmoji.Robux} ${c15.robuxPrice}`}
 							icon={assets.ui.crystals.crystals_15}
 							theme={shopItemThemes.orange}
 							size={new UDim2(0, itemWidth, 0, smallItemH)}
-							onButtonClick={() => promptPurchase(DevProduct.CRYSTALS_15)}
+							onButtonClick={() => promptPurchase(c15.productId)}
 						/>
 					</frame>
 
@@ -109,11 +111,11 @@ export function CrystalProducts() {
 							title="25 Crystals"
 							subtitle="+5 Bonus"
 							label="CRYSTAL VAULT"
-							buttonText="200"
+							buttonText={`${RobloxEmoji.Robux} ${c25.robuxPrice}`}
 							icon={assets.ui.crystals.crystals_25}
 							theme={shopItemThemes.blue}
 							size={new UDim2(0, itemWidth, 0, largeItemH)}
-							onButtonClick={() => promptPurchase(DevProduct.CRYSTALS_25)}
+							onButtonClick={() => promptPurchase(c25.productId)}
 						/>
 					</frame>
 				</frame>

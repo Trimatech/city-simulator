@@ -175,6 +175,7 @@ export function ShopButtonText({ text, theme = shopItemButtonThemes.blue }: Shop
 				textAutoResize="X"
 				textXAlignment="Center"
 				textYAlignment="Center"
+				richText={true}
 			>
 				<uistroke Thickness={rem(0.15)} Color={palette.white}>
 					<uigradient Color={textStrokeGradient} Rotation={90} />
@@ -224,6 +225,7 @@ export function ShopButtonTextWithIcon({ text, icon, theme = shopItemButtonTheme
 				textAutoResize="X"
 				textXAlignment="Center"
 				textYAlignment="Center"
+				richText={true}
 			>
 				<uistroke Thickness={rem(0.15)} Color={palette.white}>
 					<uigradient Color={textStrokeGradient} Rotation={90} />
