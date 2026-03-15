@@ -41,23 +41,71 @@ function getHeightForKind(kind: "tracer" | "area" | "area2"): number {
 	return WALL_HEIGHT;
 }
 
+/**
+ * Compute how much to extend one end of a wall segment so its outer corner
+ * touches the outer corner of the adjacent wall (resizeToTouch / miter join).
+ * Only extends for outside corners (miterFactor > 0).
+ *
+ * segDir:      unit direction of this segment FROM the endpoint being extended
+ * neighborDir: unit direction FROM that endpoint TOWARD its neighbor point
+ */
+function computeOutsideCornerExtension(
+	segDir: Vector2,
+	neighborDir: Vector2,
+	miterFactor: number | undefined,
+): number {
+	if (!miterFactor || miterFactor <= 0) return 0;
+	const dot = math.clamp(segDir.Dot(neighborDir), -1, 1);
+	const theta = math.acos(dot);
+	// Straight line or U-turn — no extension needed
+	if (theta <= 1e-3 || math.abs(theta - math.pi) <= 1e-3) return 0;
+	const t = math.tan(theta / 2);
+	if (math.abs(t) < 1e-6) return 0;
+	return (WALL_THICKNESS / 2) / t;
+}
+
 function calculateWallTransform(
 	a: Vector2,
 	b: Vector2,
 	height: number,
 	underground: boolean,
+	line?: { startNeighborDir?: Vector2; endNeighborDir?: Vector2; startMiterFactor?: number; endMiterFactor?: number },
 ): { width: number; center: Vector3; rotation: CFrame } {
 	const startPoint = new Vector3(a.X, 0, a.Y);
 	const endPoint = new Vector3(b.X, 0, b.Y);
 
 	const direction = endPoint.sub(startPoint);
-	const width = direction.Magnitude;
+	const baseWidth = direction.Magnitude;
+
+	// Extend each outside corner so parts touch at the outer edge (resizeToTouch)
+	let extA = 0;
+	let extB = 0;
+	if (line && baseWidth > 1e-6) {
+		const dir2D = new Vector2(direction.X, direction.Z).div(baseWidth);
+		if (line.startNeighborDir) {
+			// segDir at A points from A toward B; neighborDir points from A toward prev
+			extA = computeOutsideCornerExtension(dir2D, line.startNeighborDir, line.startMiterFactor);
+		}
+		if (line.endNeighborDir) {
+			// segDir at B points from B back toward A; neighborDir points from B toward next
+			extB = computeOutsideCornerExtension(dir2D.mul(-1), line.endNeighborDir, line.endMiterFactor);
+		}
+	}
+
+	const width = baseWidth + extA + extB;
 
 	const targetY = height / 2 - 1; // Y_OFFSET from Walls.utils.ts is -1
 	const actualY = underground ? WALL_UNDERGROUND_OFFSET : targetY;
 
 	const groundCenter = startPoint.add(direction.mul(0.5));
-	const center = new Vector3(groundCenter.X, actualY, groundCenter.Z);
+	// Shift center along the wall direction to account for asymmetric extensions
+	const shift = baseWidth > 1e-6 ? (extB - extA) / 2 : 0;
+	const dirUnit = baseWidth > 1e-6 ? direction.div(baseWidth) : new Vector3(1, 0, 0);
+	const center = new Vector3(
+		groundCenter.X + dirUnit.X * shift,
+		actualY,
+		groundCenter.Z + dirUnit.Z * shift,
+	);
 
 	const rotation = CFrame.lookAt(new Vector3(), new Vector3(direction.X, 0, direction.Z)).mul(
 		CFrame.fromEulerAnglesXYZ(0, math.rad(90), 0),
@@ -73,7 +121,7 @@ function getSoldierSkin(ownerId: string): string {
 
 function createWallPart(cellKey: string, edgeId: string, line: GridLine): BasePart {
 	const height = getHeightForKind(line.kind);
-	const { width, center, rotation } = calculateWallTransform(line.a, line.b, height, true);
+	const { width, center, rotation } = calculateWallTransform(line.a, line.b, height, true, line);
 	const targetY = height / 2 - 1;
 
 	const part = new Instance("Part");
