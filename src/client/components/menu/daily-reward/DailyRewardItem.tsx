@@ -1,15 +1,20 @@
 import { lerpBinding } from "@rbxts/pretty-react-hooks";
-import React, { useBinding, useEffect } from "@rbxts/react";
+import React, { useBinding, useEffect, useMemo, useRef } from "@rbxts/react";
 import { RunService } from "@rbxts/services";
 import { ReactiveButton2 } from "@rbxts-ui/components";
 import { CanvasGroup, Frame, Image, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { useMotion } from "client/hooks";
+import { Particles } from "client/ui/Particles/Particles";
+import { ParticleEmitter2DConfig } from "client/ui/Particles/Particles.interfaces";
 import { useRem } from "client/ui/rem/useRem";
 import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 
 import { ShopItemTheme, shopItemThemes } from "../shop/ShopItem";
+
+const RAYS_BASE_SPEED = 5;
+const RAYS_BURST_SPEED = 90;
 
 const LABEL_COLOR = Color3.fromRGB(250, 222, 77);
 
@@ -22,18 +27,18 @@ interface RotatingRaysProps {
 	readonly tint: Color3;
 	readonly cornerRadius: UDim;
 	readonly isActive: boolean;
+	readonly speedRef?: { current: number };
 }
 
-const speed = 5;
-
-function RotatingRays({ image, transparency, tint, cornerRadius, isActive }: RotatingRaysProps) {
+function RotatingRays({ image, transparency, tint, cornerRadius, isActive, speedRef }: RotatingRaysProps) {
 	const [rotation, setRotation] = useBinding(0);
 
 	useEffect(() => {
 		if (!isActive) return;
 		let angle = 0;
 		const connection = RunService.Heartbeat.Connect((dt) => {
-			angle = (angle + dt * speed) % 360;
+			const currentSpeed = speedRef?.current ?? RAYS_BASE_SPEED;
+			angle = (angle + dt * currentSpeed) % 360;
 			setRotation(angle);
 		});
 		return () => connection.Disconnect();
@@ -66,6 +71,7 @@ interface DailyRewardItemProps {
 	readonly layoutOrder?: number;
 	readonly isClaimed?: boolean;
 	readonly isCurrent?: boolean;
+	readonly justClaimed?: boolean;
 }
 
 export function DailyRewardItem({
@@ -77,9 +83,48 @@ export function DailyRewardItem({
 	layoutOrder,
 	isClaimed = false,
 	isCurrent = false,
+	justClaimed = false,
 }: DailyRewardItemProps) {
 	const rem = useRem();
 	const [hover, hoverMotion] = useMotion(0);
+	const raysSpeedRef = useRef(RAYS_BASE_SPEED);
+
+	useEffect(() => {
+		if (!justClaimed) return;
+		raysSpeedRef.current = RAYS_BURST_SPEED;
+		const thread = task.delay(1.2, () => {
+			raysSpeedRef.current = RAYS_BASE_SPEED;
+		});
+		return () => task.cancel(thread);
+	}, [justClaimed]);
+
+	const crystalBurstConfig = useMemo(
+		(): ParticleEmitter2DConfig => ({
+			rate: 40,
+			lifetime: new NumberRange(0.7, 1.4),
+			speed: new NumberRange(80, 260),
+			size: new NumberSequence([
+				new NumberSequenceKeypoint(0, 28),
+				new NumberSequenceKeypoint(0.4, 38),
+				new NumberSequenceKeypoint(1, 0),
+			]),
+			texture: icon ?? assets.ui.crystals.crystals_1,
+			acceleration: new NumberRange(0),
+			spreadAngle: new NumberRange(-180, 180),
+			rotation: new NumberRange(0, 360),
+			rotSpeed: new NumberRange(-200, 200),
+			transparency: new NumberSequence([
+				new NumberSequenceKeypoint(0, 0),
+				new NumberSequenceKeypoint(0.65, 0),
+				new NumberSequenceKeypoint(1, 1),
+			]),
+			color: new ColorSequence(new Color3(1, 1, 1)),
+			zOffset: 10,
+			gravityStrength: 350,
+			dragForce: 0.6,
+		}),
+		[icon],
+	);
 
 	const baseCardSize = size ?? new UDim2(0, rem(16), 0, rem(24));
 	const cardSize = isCurrent ? new UDim2(0, rem(18), 0, rem(26)) : baseCardSize;
@@ -153,6 +198,7 @@ export function DailyRewardItem({
 							tint={theme.rayTint}
 							cornerRadius={innerRadius}
 							isActive={isCurrent}
+							speedRef={raysSpeedRef}
 						/>
 						<Image
 							image={assets.ui.spot_glow}
@@ -222,6 +268,20 @@ export function DailyRewardItem({
 					</Frame>
 				</Frame>
 			</Frame>
+
+			{/* Crystal particles burst on claim — positioned at icon center, overflows card */}
+			{justClaimed && (
+				<frame
+					Size={new UDim2(0, rem(6), 0, rem(6))}
+					Position={new UDim2(0.5, 0, 0.42, 0)}
+					AnchorPoint={new Vector2(0.5, 0.5)}
+					BackgroundTransparency={1}
+					ZIndex={10}
+					ClipsDescendants={false}
+				>
+					<Particles config={crystalBurstConfig} size={new UDim2(1, 0, 1, 0)} emitDuration={0.35} />
+				</frame>
+			)}
 		</ReactiveButton2>
 	);
 }

@@ -1,7 +1,7 @@
 import { useEventListener } from "@rbxts/pretty-react-hooks";
 import React, { useBinding, useEffect, useRef, useState } from "@rbxts/react";
 import { useSelectorCreator } from "@rbxts/react-reflex";
-import { RunService } from "@rbxts/services";
+import { RunService, TweenService } from "@rbxts/services";
 import { HStack } from "@rbxts-ui/layout";
 import { Frame, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
@@ -94,10 +94,27 @@ export function DailyRewardScreen({ onDismiss }: DailyRewardScreenProps) {
 	const nextClaimDeadline = lastClaimTime + SECONDS_PER_DAY;
 
 	useEffect(() => {
-		if (claimed) {
-			const thread = task.delay(1, () => onDismiss());
-			return () => task.cancel(thread);
+		if (!claimed) return;
+
+		const scrollFrame = scrollRef.current;
+		if (scrollFrame) {
+			const padding = rem(1.3);
+			const nonCurrentWidth = rem(16);
+			const currentWidth = rem(18);
+			const spacing = rem(1.5);
+			const xStart = padding + (streakDay - 1) * (nonCurrentWidth + spacing);
+			const xCenter = xStart + currentWidth / 2;
+			const targetX = math.max(0, xCenter - scrollFrame.AbsoluteSize.X / 2);
+			const tween = TweenService.Create(
+				scrollFrame,
+				new TweenInfo(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+				{ CanvasPosition: new Vector2(targetX, 0) },
+			);
+			tween.Play();
 		}
+
+		const thread = task.delay(1, () => onDismiss());
+		return () => task.cancel(thread);
 	}, [claimed]);
 
 	const scrollRef = useRef<ScrollingFrame>();
@@ -140,6 +157,7 @@ export function DailyRewardScreen({ onDismiss }: DailyRewardScreenProps) {
 				layoutOrder={i}
 				isClaimed={i < streakDay}
 				isCurrent={i === streakDay}
+				justClaimed={claimed && i === streakDay}
 			/>,
 		);
 	}
