@@ -344,8 +344,8 @@ export function getSpawnPointNearPlayer(soldierId: string, maxTries = 25): Vecto
 		const edgeOffset = new Vector2(direction.X * bboxHalfWidth, direction.Y * bboxHalfHeight);
 		const candidate = bboxCenter.add(edgeOffset).add(direction.mul(distance));
 
-		// Check if within world bounds (circular world)
-		if (candidate.Magnitude > WORLD_BOUNDS) continue;
+		// Check if within world bounds (circular world), with same margin as getSafePointInWorld
+		if (candidate.Magnitude > WORLD_BOUNDS * RANDOM_POINT_MARGIN) continue;
 
 		// Check if not inside any soldier polygon and doesn't intersect
 		if (!isInsideAnySoldierPolygon(candidate) && !intersectsAnySoldierPolygon(candidate)) {
@@ -368,7 +368,7 @@ function getSpawnPointNearPosition(center: Vector2, maxTries = 25): Vector2 | un
 		const direction = new Vector2(math.cos(angle), math.sin(angle));
 		const candidate = center.add(direction.mul(distance));
 
-		if (candidate.Magnitude > WORLD_BOUNDS) continue;
+		if (candidate.Magnitude > WORLD_BOUNDS * RANDOM_POINT_MARGIN) continue;
 
 		if (!isInsideAnySoldierPolygon(candidate) && !intersectsAnySoldierPolygon(candidate)) {
 			return candidate;
