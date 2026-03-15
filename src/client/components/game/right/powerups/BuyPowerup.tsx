@@ -1,10 +1,13 @@
 import { useMotion } from "@rbxts/pretty-react-hooks";
-import React, { useEffect, useState } from "@rbxts/react";
+import React, { useEffect, useRef, useState } from "@rbxts/react";
+import { UserInputService } from "@rbxts/services";
 import { ReactiveButton2 } from "@rbxts-ui/components";
 import { HStack, Transition } from "@rbxts-ui/layout";
 import { Frame, Image, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
+import { Particles } from "client/ui/Particles/Particles";
+import { ParticleEmitter2DConfig } from "client/ui/Particles/Particles.interfaces";
 import { useRem } from "client/ui/rem/useRem";
 import assets from "shared/assets";
 import { palette, textStrokeGradient } from "shared/constants/palette";
@@ -33,6 +36,33 @@ const TOOLTIP_WIDTH = 7;
 const OUTER_STROKE_THICKNESS = 0.2;
 const INNER_STROKE_THICKNESS = 0.15;
 
+const BURST_EMIT_DURATION = 0.25;
+const BURST_LIFETIME_MAX = 2.5;
+
+const ORB_FOUNTAIN_CONFIG: ParticleEmitter2DConfig = {
+	rate: 50,
+	lifetime: new NumberRange(1.5, BURST_LIFETIME_MAX),
+	speed: new NumberRange(300, 650),
+	size: new NumberSequence([
+		new NumberSequenceKeypoint(0, 14),
+		new NumberSequenceKeypoint(0.35, 18),
+		new NumberSequenceKeypoint(1, 5),
+	]),
+	texture: assets.ui.icons.orb,
+	acceleration: new NumberRange(0),
+	spreadAngle: new NumberRange(-55, 55),
+	rotation: new NumberRange(0, 0),
+	rotSpeed: new NumberRange(0, 0),
+	transparency: new NumberSequence([
+		new NumberSequenceKeypoint(0, 0.05),
+		new NumberSequenceKeypoint(0.5, 0.15),
+		new NumberSequenceKeypoint(1, 1),
+	]),
+	color: new ColorSequence(new Color3(1, 1, 1)),
+	zOffset: 10,
+	gravityStrength: 900,
+};
+
 export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 	const rem = useRem();
 	const style = POWERUP_BUTTON_STYLES[id];
@@ -42,6 +72,10 @@ export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 	const FULL_WIDTH = WIDTH + rem(TOOLTIP_WIDTH);
 
 	const [showTooltip, setShowTooltip] = useState(false);
+	const [burstPos, setBurstPos] = useState<Vector2 | undefined>();
+	const [burstKey, setBurstKey] = useState(0);
+	const frameRef = useRef<Frame>();
+	const cleanupRef = useRef<thread>();
 
 	const [size, sizeMotion] = useMotion(new UDim2(0, WIDTH, 0, HEIGHT));
 
@@ -63,7 +97,19 @@ export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 
 	return (
 		<ReactiveButton2
-			onClick={() => remotes.powerups.use.fire(id)}
+			onClick={() => {
+				remotes.powerups.use.fire(id);
+				if (enabled) {
+					const mousePos = UserInputService.GetMouseLocation();
+					const framePos = frameRef.current?.AbsolutePosition ?? new Vector2(0, 0);
+					setBurstPos(new Vector2(mousePos.X - framePos.X, mousePos.Y - framePos.Y));
+					setBurstKey((prev) => prev + 1);
+					if (cleanupRef.current) task.cancel(cleanupRef.current);
+					cleanupRef.current = task.delay(BURST_EMIT_DURATION + BURST_LIFETIME_MAX + 0.5, () =>
+						setBurstPos(undefined),
+					);
+				}
+			}}
 			enabled={enabled}
 			backgroundTransparency={1}
 			size={size}
@@ -72,9 +118,25 @@ export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 			onMouseLeave={() => setShowTooltip(false)}
 			anchorPoint={new Vector2(1, 0.5)}
 		>
+			{burstPos !== undefined && (
+				<Frame
+					key={`burst-${burstKey}`}
+					position={new UDim2(0, burstPos.X, 0, burstPos.Y)}
+					size={new UDim2(0, 1, 0, 1)}
+					backgroundTransparency={1}
+					zIndex={10}
+				>
+					<Particles
+						config={ORB_FOUNTAIN_CONFIG}
+						size={new UDim2(0, 1, 0, 1)}
+						emitDuration={BURST_EMIT_DURATION}
+					/>
+				</Frame>
+			)}
 			<Transition groupTransparency={0} size={new UDim2(1, 0, 1, 0)}>
 				{/* Outer frame — colored background with dual strokes */}
 				<Frame
+					ref={frameRef}
 					backgroundColor={style.backgroundColor}
 					backgroundTransparency={0}
 					cornerRadius={fullRound}
@@ -123,17 +185,36 @@ export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 										<uigradient Color={textStrokeGradient} Rotation={90} />
 									</uistroke>
 								</Text>
-								<Text
+								<HStack
 									size={new UDim2(1, 0, 0, rem(1))}
-									font={fonts.fredokaOne.regular}
-									textColor={enabled ? palette.green : palette.red1}
-									text={`🔮 ${price}`}
-									textSize={rem(1)}
+									backgroundTransparency={1}
+									spacing={rem(0.25)}
+									verticalAlignment={Enum.VerticalAlignment.Center}
+									horizontalAlignment={Enum.HorizontalAlignment.Center}
 								>
-									<uistroke Thickness={rem(0.15)} Color={palette.white}>
-										<uigradient Color={textStrokeGradient} Rotation={90} />
-									</uistroke>
-								</Text>
+									<Image
+										image={assets.ui.icons.orb}
+										size={new UDim2(0, rem(1), 0, rem(1))}
+										position={new UDim2(0, 0, 0.5, 0)}
+										anchorPoint={new Vector2(0, 0.5)}
+										scaleType="Fit"
+										zIndex={1}
+									/>
+									<Text
+										size={new UDim2(0, 0, 1, 0)}
+										automaticSize={Enum.AutomaticSize.X}
+										font={fonts.fredokaOne.regular}
+										textColor={enabled ? palette.green : palette.red1}
+										text={tostring(price)}
+										textSize={rem(1)}
+										textXAlignment="Center"
+										textYAlignment="Center"
+									>
+										<uistroke Thickness={rem(0.15)} Color={palette.white}>
+											<uigradient Color={textStrokeGradient} Rotation={90} />
+										</uistroke>
+									</Text>
+								</HStack>
 							</HStack>
 						) : undefined}
 

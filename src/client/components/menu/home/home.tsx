@@ -1,13 +1,12 @@
 import React, { useState } from "@rbxts/react";
-import { ReactiveButton2 } from "@rbxts-ui/components";
 import { HStack } from "@rbxts-ui/layout";
 import { Frame } from "@rbxts-ui/primitives";
 import { HomeStats } from "client/components/stats/HomeStats";
 import { MainButton, ShopButtonTextWithIcon } from "client/ui/MainButton";
+import { Overlay } from "client/ui/Overlay";
 import { useRem } from "client/ui/rem/useRem";
 import { SlideIn } from "client/ui/slide-in";
 import assets from "shared/assets";
-import { palette } from "shared/constants/palette";
 import { ROOT_PADDING } from "shared/constants/theme";
 
 import { DailyRewardScreen } from "../daily-reward/DailyRewardScreen";
@@ -90,19 +89,17 @@ export function Home({ visible }: HomeProps) {
 
 			{openWindow === Window.Shop && (
 				<>
-					<ReactiveButton2
-						onClick={() => setOpenWindow(undefined)}
-						backgroundTransparency={0.2}
-						backgroundColor={palette.teal}
-						size={new UDim2(1, 0, 1, 0)}
-						position={new UDim2(0, 0, 0, 0)}
-					/>
-
+					<Overlay onClick={() => setOpenWindow(undefined)} />
 					<ShopWindow onClose={() => setOpenWindow(undefined)} />
 				</>
 			)}
 
-			{openWindow === Window.DailyReward && <DailyRewardScreen onDismiss={() => setOpenWindow(undefined)} />}
+			{openWindow === Window.DailyReward && (
+				<>
+					<Overlay onClick={() => setOpenWindow(undefined)} />
+					<DailyRewardScreen onDismiss={() => setOpenWindow(undefined)} />
+				</>
+			)}
 		</>
 	);
 }

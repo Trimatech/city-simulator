@@ -1,6 +1,8 @@
 import { StarterGui } from "@rbxts/services";
 import { remotes } from "shared/remotes";
 
+StarterGui.SetCoreGuiEnabled(Enum.CoreGuiType.Health, false);
+
 async function setCore() {
 	const resetBindable = new Instance("BindableEvent");
 
