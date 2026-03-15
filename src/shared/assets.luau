@@ -46,7 +46,11 @@ local assets = {
 		diagonal_stripes = "rbxassetid://79238839735749",
 		heart = "rbxassetid://136704988380660",
 		icons = {
+			area = "rbxassetid://94471370924106",
 			dailyRewards = "rbxassetid://71704814079862",
+			kills = "rbxassetid://81562864123967",
+			orb = "rbxassetid://97326546971050",
+			rank = "rbxassetid://137070328508548",
 			store = "rbxassetid://81647999213259",
 		},
 		leader_pointer = "rbxassetid://119911225006035",

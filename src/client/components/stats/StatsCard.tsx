@@ -71,7 +71,7 @@ export type StatsCardStyleName = keyof typeof STATS_CARD_STYLES;
 
 interface StatsCardProps {
 	readonly onClick?: () => void;
-	readonly emoji: string;
+	readonly image: string;
 	readonly label: string;
 	readonly value: string;
 	readonly colorStyle: StatsCardStyleName;
@@ -91,7 +91,7 @@ const CARD_PADDING = 0.75;
 const CARD_MARGIN = 0.75;
 const CARD_CANVAS_MARGIN = 3;
 
-export function StatsCard({ onClick, emoji, label, value, colorStyle, enabled, order, iconRef }: StatsCardProps) {
+export function StatsCard({ onClick, image, label, value, colorStyle, enabled, order, iconRef }: StatsCardProps) {
 	const style = STATS_CARD_STYLES[colorStyle];
 
 	const rem = useRem();
@@ -153,12 +153,11 @@ export function StatsCard({ onClick, emoji, label, value, colorStyle, enabled, o
 						<uicorner CornerRadius={outerCorner} />
 					</Image>
 
-					{/* Emoji icon */}
-					<Text
-						text={emoji}
-						textSize={rem(2)}
-						size={new UDim2(0, rem(CARD_EMOJI_WIDTH), 1, 0)}
-						position={new UDim2(0, rem(CARD_MARGIN), 0, 0)}
+					{/* Icon image */}
+					<Image
+						image={image}
+						size={new UDim2(0, rem(CARD_EMOJI_WIDTH), 0, rem(CARD_EMOJI_WIDTH))}
+						position={new UDim2(0, rem(CARD_MARGIN), 0.5, rem(-CARD_EMOJI_WIDTH / 2))}
 					/>
 
 					{/* Label text */}

@@ -4,6 +4,7 @@ import { Group } from "@rbxts-ui/primitives";
 import { useDefined } from "client/hooks";
 import { useRem } from "client/ui/rem/useRem";
 import { formatInteger } from "client/utils/format-integer";
+import assets from "shared/assets";
 import { USER_NAME } from "shared/constants/core";
 import { ROOT_PADDING } from "shared/constants/theme";
 import { selectPlayerBalance } from "shared/store/saves";
@@ -29,7 +30,7 @@ export function HomeStats() {
 			/>
 
 			<StatsCard
-				emoji="💵"
+				image={assets.ui.shop.Cash}
 				label="Cash"
 				value={`$${formatInteger(balance)}`}
 				colorStyle="green"

@@ -40,7 +40,10 @@ export function Stats() {
 	return (
 		<>
 			<Group name="Stats">
-				<uipadding PaddingBottom={new UDim(0, rem(ROOT_PADDING))} PaddingLeft={new UDim(0, rem(ROOT_PADDING))} />
+				<uipadding
+					PaddingBottom={new UDim(0, rem(ROOT_PADDING))}
+					PaddingLeft={new UDim(0, rem(ROOT_PADDING))}
+				/>
 				<uilistlayout
 					FillDirection="Vertical"
 					HorizontalAlignment="Left"
@@ -49,7 +52,7 @@ export function Stats() {
 					SortOrder="LayoutOrder"
 				/>
 				<StatsCard
-					emoji="☠️"
+					image={assets.ui.icons.kills}
 					label="KOs"
 					value={`${formatInteger(eliminations)}`}
 					colorStyle="red"
@@ -58,7 +61,7 @@ export function Stats() {
 					iconRef={eliminationsRef}
 				/>
 				<StatsCard
-					emoji="🏆"
+					image={assets.ui.icons.rank}
 					label="Rank"
 					value={rank}
 					colorStyle="gold"
@@ -66,7 +69,7 @@ export function Stats() {
 					order={1}
 				/>
 				<StatsCard
-					emoji="🔮"
+					image={assets.ui.icons.orb}
 					label="Orbs"
 					value={`${formatInteger(orbs)}`}
 					colorStyle="purple"
@@ -75,7 +78,7 @@ export function Stats() {
 					iconRef={orbsRef}
 				/>
 				<StatsCard
-					emoji="💵"
+					image={assets.ui.shop.Cash}
 					label="Cash"
 					value={`$${formatInteger(balance)}`}
 					colorStyle="green"
@@ -84,8 +87,8 @@ export function Stats() {
 					iconRef={balanceRef}
 				/>
 				<StatsCard
-					emoji="🗺️"
-					label="Area2"
+					image={assets.ui.icons.area}
+					label="Area"
 					value={`${formatInteger(area)} studs²`}
 					colorStyle="teal"
 					enabled={currentArea !== undefined}
@@ -96,13 +99,13 @@ export function Stats() {
 			<FlyToComponents
 				amount={currentEliminations ?? 0}
 				statsImageRef={eliminationsRef}
-				image={assets.ui.shards_icon}
+				image={assets.ui.icons.kills}
 				sound={assets.sounds.thump_sound}
 			/>
 			<FlyToComponents
 				amount={currentOrbs ?? 0}
 				statsImageRef={orbsRef}
-				image={assets.ui.crystals.crystals_1}
+				image={assets.ui.icons.orb}
 				sound={assets.sounds.bong_001}
 			/>
 			<FlyToComponents
