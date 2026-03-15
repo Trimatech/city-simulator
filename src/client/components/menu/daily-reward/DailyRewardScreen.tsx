@@ -1,5 +1,5 @@
 import { useEventListener } from "@rbxts/pretty-react-hooks";
-import React, { useBinding, useEffect, useState } from "@rbxts/react";
+import React, { useBinding, useEffect, useRef, useState } from "@rbxts/react";
 import { useSelectorCreator } from "@rbxts/react-reflex";
 import { RunService } from "@rbxts/services";
 import { HStack } from "@rbxts-ui/layout";
@@ -100,6 +100,28 @@ export function DailyRewardScreen({ onDismiss }: DailyRewardScreenProps) {
 		}
 	}, [claimed]);
 
+	const scrollRef = useRef<ScrollingFrame>();
+
+	useEffect(() => {
+		const thread = task.defer(() => {
+			const scrollFrame = scrollRef.current;
+			if (!scrollFrame) return;
+
+			const padding = rem(1.3);
+			const nonCurrentWidth = rem(16);
+			const currentWidth = rem(18);
+			const spacing = rem(1.5);
+
+			const xStart = padding + (streakDay - 1) * (nonCurrentWidth + spacing);
+			const xCenter = xStart + currentWidth / 2;
+			const viewportWidth = scrollFrame.AbsoluteSize.X;
+			const targetX = math.max(0, xCenter - viewportWidth / 2);
+
+			scrollFrame.CanvasPosition = new Vector2(targetX, 0);
+		});
+		return () => task.cancel(thread);
+	}, [streakDay]);
+
 	const handleClaim = () => {
 		if (claimed || !canClaim) return;
 		setClaimed(true);
@@ -131,6 +153,7 @@ export function DailyRewardScreen({ onDismiss }: DailyRewardScreenProps) {
 				name="DailyRewardScreenContent"
 			>
 				<scrollingframe
+					ref={scrollRef}
 					BackgroundTransparency={1}
 					BorderSizePixel={0}
 					Size={new UDim2(1, 0, 1, 0)}
