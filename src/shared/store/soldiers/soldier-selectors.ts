@@ -204,6 +204,14 @@ export const selectSoldierShieldActive = (id: string) => {
 	return (state: SharedState) => state.soldiers[id]?.shieldActive ?? false;
 };
 
+export const selectSoldierTurboActiveUntil = (id: string) => {
+	return (state: SharedState) => state.soldiers[id]?.turboActiveUntil ?? 0;
+};
+
+export const selectLocalTurboActiveUntil = (state: SharedState) => {
+	return state.soldiers[USER_NAME]?.turboActiveUntil ?? 0;
+};
+
 export const selectSoldierOrbs = (id: string) => {
 	return (state: SharedState) => state.soldiers[id]?.orbs;
 };

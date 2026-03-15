@@ -25,7 +25,10 @@ import { selectSoldierById, selectSoldierOrbs, selectSoldiersById } from "shared
 import { selectTowersById } from "shared/store/towers/tower-selectors";
 import { findCharacterPrimaryPart } from "shared/utils/player-utils";
 
-import { placeTower } from "./placeTower";
+/** Tracks the turbo generation per soldier so stacked activations extend duration correctly. */
+const turboGeneration = new Map<string, number>();
+/** Stores the cancel function for the active turbo timeout per soldier. */
+const turboCancelMap = new Map<string, () => void>();
 
 interface Edge {
 	start: Vector3;
@@ -147,47 +150,6 @@ function alertMessage(player: Player, message: string, color = palette.blue) {
 		message,
 		color,
 	});
-}
-
-function triggerTurbo(player: Player) {
-	const playerName = player.Name;
-	const speed = POWERUP_TURBO_SPEED;
-	const duration = POWERUP_DURATIONS.turbo;
-	if (!trySpendOrbs(playerName, POWERUP_PRICES.turbo)) {
-		alertMessage(player, "Not enough orbs!", palette.red);
-		return;
-	}
-	const humanoid = getPlayerHumanoidByName(playerName);
-	if (humanoid) {
-		humanoid.WalkSpeed = speed;
-		setTimeout(() => {
-			const again = getPlayerHumanoidByName(playerName);
-			if (again) again.WalkSpeed = SOLDIER_SPEED;
-		}, duration);
-	}
-
-	alertMessage(player, "Turbo activated!", palette.green);
-}
-
-function triggerShield(player: Player) {
-	const playerName = player.Name;
-	if (!trySpendOrbs(playerName, POWERUP_PRICES.shield)) {
-		alertMessage(player, "Not enough orbs!", palette.red);
-		return;
-	}
-	// enable shield in state
-	store.setSoldierShieldActive(playerName, true);
-
-	// create a ForceField on the character for the duration
-	ensureForceFieldOnPlayerName(playerName, true);
-
-	setTimeout(() => {
-		// disable shield in state and remove forcefield if present
-		store.setSoldierShieldActive(playerName, false);
-		removeForceFieldFromPlayerName(playerName);
-	}, POWERUP_DURATIONS.shield);
-
-	alertMessage(player, "Shield activated!", palette.green);
 }
 
 function magnitude2D(a: Vector2, b: Vector2) {
@@ -378,166 +340,63 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[]) {
 	}
 }
 
-function triggerLaserBeam(player: Player) {
-	const playerName = player.Name;
-	const cfg = POWERUP_EXPLOSIONS.laserBeam;
-	const cost = POWERUP_PRICES.laserBeam;
-	if (!trySpendOrbs(playerName, cost)) {
-		alertMessage(player, "Not enough orbs!", palette.red);
-		return;
-	}
+const POWERUP_ALERT_MESSAGES: Record<PowerupId, string> = {
+	turbo: "Turbo activated!",
+	shield: "Shield activated!",
+	tower: "Tower placed!",
+	laserBeam: "Laser Beam deployed!",
+	nuclearExplosion: "Nuclear Explosion detonated!",
+};
 
-	const centerSoldier = store.getState(selectSoldierById(playerName));
-	if (!centerSoldier) {
-		warn(`triggerLaserBeam: centerSoldier not found for player ${playerName}`);
-		return;
-	}
-
-	// Get player's character to determine facing direction
-	const character = player.Character as Model;
-	const primaryPart = findCharacterPrimaryPart(character);
-
-	if (!primaryPart) {
-		warn(`triggerLaserBeam: primaryPart not found for player ${playerName}`);
-		return;
-	}
-
-	// Calculate the center of the carpet bomb area (in front of player)
-	const lookVector = primaryPart.CFrame.LookVector;
-	const forwardOffset = lookVector.mul(cfg.length / 2);
-	const bombCenter = primaryPart.Position.add(forwardOffset);
-	const bombCenter2D = new Vector2(bombCenter.X, bombCenter.Z);
-
-	// Calculate angle for the rectangle (player's facing direction)
-	// The rectangle's length should align with player's forward direction
-
-	print(`[DEBUG] Player lookVector: ${lookVector},`);
-
-	// Build an absolute CFrame at the bomb center, oriented along player's forward
-	const forwardFlat = new Vector3(lookVector.X, 0, lookVector.Z);
-	const forwardUnit = forwardFlat.Magnitude > 0 ? forwardFlat.Unit : new Vector3(0, 0, 1);
-	const cframe = CFrame.lookAt(
-		new Vector3(bombCenter2D.X, 0.5, bombCenter2D.Y),
-		new Vector3(bombCenter2D.X, 0.5, bombCenter2D.Y).add(forwardUnit),
-	);
-	// For hit detection, X corresponds to width (RightVector), Z corresponds to length (LookVector)
-	const size = new Vector3(cfg.width, 5, cfg.length);
-
-	// Affect enemy soldiers in the rectangular area
-	const soldiers = store.getState(selectSoldiersById);
-	for (const [, s] of Object.entries(soldiers)) {
-		if (!s || s.dead || s.id === playerName) continue;
-		if (isPointInRectangleWithCFrame(s.position, cframe, size)) {
-			// Push and damage
-			const h = getPlayerHumanoidByName(s.id);
-			if (h) {
-				pushHumanoidAway(h, new Vector3(bombCenter2D.X, 0, bombCenter2D.Y), 80);
-			}
-
-			const h2 = getPlayerHumanoidByName(s.id);
-			if (h2) {
-				h2.TakeDamage(cfg.damage);
-			}
-		}
-	}
-
-	// Affect enemy towers in the rectangular area
-	const towers = store.getState(selectTowersById);
-	for (const [id, t] of Object.entries(towers)) {
-		if (!t || t.ownerId === playerName) continue;
-		if (isPointInRectangleWithCFrame(t.position, cframe, size)) {
-			const towerId = `${id}`;
-			store.removeTower(towerId);
-		}
-	}
-
-	// Cut damage area from all soldier polygons (including the player who fired it)
-	// Try the new geometry-based approach first
-	const damagePolygon = createExplosionPolygonFromPart(bombCenter2D, cfg.length, cfg.width, cframe);
-	print(
-		`[DEBUG] LaserBeam damage polygon (geometry-based): center=${bombCenter2D}, length=${cfg.length}, width=${cfg.width}`,
-	);
-	print(`[DEBUG] LaserBeam damage polygon points: ${damagePolygon.map((p) => `(${p.X}, ${p.Y})`).join(", ")}`);
-	cutDamageAreaFromSoldiers(damagePolygon);
-
-	// Send visual effect to all clients
-	print(`[DEBUG] Created CFrame: ${cframe}, LookVector: ${cframe.LookVector}, RightVector: ${cframe.RightVector}`);
-
-	remotes.client.powerupCarpet.fireAll(cframe, size);
-
-	alertMessage(player, "Laser Beam deployed!", palette.green);
-}
-
-function triggerNuclearExplosion(player: Player) {
-	const playerName = player.Name;
-	const cfg = POWERUP_EXPLOSIONS.nuclearExplosion;
-	const cost = POWERUP_PRICES.nuclearExplosion;
-	if (!trySpendOrbs(playerName, cost)) {
-		alertMessage(player, "Not enough orbs!", palette.red);
-		return;
-	}
-	const centerSoldier = store.getState(selectSoldierById(playerName));
-	if (!centerSoldier) return;
-	const center = centerSoldier.position;
-
-	// Affect enemy soldiers - mega explosion kills everything
-	const soldiers = store.getState(selectSoldiersById);
-	for (const [, s] of Object.entries(soldiers)) {
-		if (!s || s.dead || s.id === playerName) continue;
-		if (magnitude2D(s.position, center) <= cfg.radius) {
-			killSoldier(s.id);
-		}
-	}
-
-	// Affect enemy towers (remove within radius)
-	const towers = store.getState(selectTowersById);
-	for (const [id, t] of Object.entries(towers)) {
-		if (!t || t.ownerId === playerName) continue;
-		if (magnitude2D(t.position, center) <= cfg.radius) {
-			const towerId = `${id}`;
-			store.removeTower(towerId);
-		}
-	}
-
-	const damagePolygon = createCircularExplosionPolygonFromPart(center, cfg.radius);
-	print(`[DEBUG] Nuclear damage polygon (geometry-based): center=${center}, radius=${cfg.radius}`);
-
-	cutDamageAreaFromSoldiers(damagePolygon);
-
-	const nuclearCFrame = new CFrame(center.X, 0.5, center.Y);
-	const size = new Vector3(5, cfg.radius * 2, cfg.radius * 2);
-	remotes.client.powerupNuclear.fireAll(nuclearCFrame, size);
-
-	alertMessage(player, "Nuclear Explosion detonated!", palette.green);
-}
+let towerId = 0;
 
 export function executePowerupForSoldier(
 	soldierId: string,
 	powerupId: PowerupId,
-	options?: { skipCost?: boolean; directionToward?: Vector2 },
+	options?: { skipCost?: boolean; directionToward?: Vector2; player?: Player },
 ) {
 	const soldier = store.getState(selectSoldierById(soldierId));
 	if (!soldier || soldier.dead) return;
 
 	const skipCost = options?.skipCost ?? false;
 	const directionToward = options?.directionToward ?? new Vector2(1, 0);
+	const player = options?.player;
 
 	if (!skipCost) {
 		const cost = POWERUP_PRICES[powerupId];
-		if (!trySpendOrbs(soldierId, cost)) return;
+		if (!trySpendOrbs(soldierId, cost)) {
+			if (player) alertMessage(player, "Not enough orbs!", palette.red);
+			return;
+		}
 	}
 
 	const center = soldier.position;
 
 	switch (powerupId) {
 		case "turbo": {
+			const gen = (turboGeneration.get(soldierId) ?? 0) + 1;
+			turboGeneration.set(soldierId, gen);
+
+			const now = tick();
+			const activeUntil =
+				math.max(store.getState(selectSoldierById(soldierId))?.turboActiveUntil ?? 0, now) +
+				POWERUP_DURATIONS.turbo;
+			store.setSoldierTurboActiveUntil(soldierId, activeUntil);
+
 			const humanoid = getPlayerHumanoidByName(soldierId);
 			if (humanoid) {
 				humanoid.WalkSpeed = POWERUP_TURBO_SPEED;
-				setTimeout(() => {
+				const prevCancel = turboCancelMap.get(soldierId);
+				if (prevCancel) prevCancel();
+				const cancel = setTimeout(() => {
+					if (turboGeneration.get(soldierId) !== gen) return;
+					turboGeneration.delete(soldierId);
+					turboCancelMap.delete(soldierId);
+					store.setSoldierTurboActiveUntil(soldierId, 0);
 					const again = getPlayerHumanoidByName(soldierId);
 					if (again) again.WalkSpeed = SOLDIER_SPEED;
-				}, POWERUP_DURATIONS.turbo);
+				}, activeUntil - now);
+				turboCancelMap.set(soldierId, cancel);
 			}
 			break;
 		}
@@ -553,9 +412,8 @@ export function executePowerupForSoldier(
 		case "tower": {
 			const dir = directionToward.Magnitude > 0.001 ? directionToward.Unit : new Vector2(0, 1);
 			const towerPos = center.add(dir.mul(10));
-			const towerId = `tower_${tick()}`;
 			store.placeTower({
-				id: towerId,
+				id: `${towerId++}`,
 				position: towerPos,
 				ownerId: soldierId,
 				damage: 15,
@@ -630,31 +488,27 @@ export function executePowerupForSoldier(
 		default:
 			warn(`Unknown powerup id ${powerupId}`);
 	}
+
+	if (player) alertMessage(player, POWERUP_ALERT_MESSAGES[powerupId], palette.green);
+}
+
+function getPlayerLookDirection(player: Player): Vector2 | undefined {
+	const character = player.Character as Model | undefined;
+	if (!character) return undefined;
+	const primaryPart =
+		(character.PrimaryPart as BasePart | undefined) ??
+		(character.FindFirstChild("HumanoidRootPart") as BasePart | undefined);
+	if (!primaryPart) return undefined;
+	const look = primaryPart.CFrame.LookVector;
+	return new Vector2(look.X, look.Z);
 }
 
 export async function initPowerupService() {
 	remotes.powerups.use.connect((player, id) => {
-		const soldier = store.getState(selectSoldierById(player.Name));
-		if (!soldier || soldier.dead) return;
-		switch (id) {
-			case "turbo":
-				triggerTurbo(player);
-				break;
-
-			case "shield":
-				triggerShield(player);
-				break;
-			case "tower":
-				placeTower(player);
-				break;
-			case "laserBeam":
-				triggerLaserBeam(player);
-				break;
-			case "nuclearExplosion":
-				triggerNuclearExplosion(player);
-				break;
-			default:
-				warn(`Unknown powerup id ${id}`);
-		}
+		const directionToward = getPlayerLookDirection(player);
+		executePowerupForSoldier(player.Name, id as PowerupId, {
+			player,
+			directionToward,
+		});
 	});
 }

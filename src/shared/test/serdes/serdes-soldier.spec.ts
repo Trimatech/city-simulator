@@ -28,6 +28,7 @@ export = () => {
 			polygonBounds: calculateVector2ArrayBoundingBox(polygon),
 			isInside: true,
 			shieldActive: math.random() > 0.5,
+			turboActiveUntil: math.random() * 1000,
 			health: 100,
 			maxHealth: 100,
 			zIndex: 0,
@@ -40,7 +41,7 @@ export = () => {
 				assert(shallowEqual(value, deserialized[key]), "tracers are not equal");
 			} else if (key === "polygon") {
 				assert(shallowEqual(value, deserialized[key]), "polygon are not equal");
-			} else if (key === "angle" || key === "desiredAngle") {
+			} else if (key === "angle" || key === "desiredAngle" || key === "turboActiveUntil") {
 				expect(value).to.be.near(deserialized[key], 0.0001);
 			} else if (key === "polygonBounds") {
 				// polygonBounds is derived from polygon and may not round-trip bitwise equal

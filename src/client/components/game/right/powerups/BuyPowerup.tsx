@@ -1,18 +1,26 @@
 import { useKeyPress, useMotion } from "@rbxts/pretty-react-hooks";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "@rbxts/react";
+import { useSelector } from "@rbxts/react-reflex";
 import { GuiService, UserInputService } from "@rbxts/services";
 import { ReactiveButton2 } from "@rbxts-ui/components";
 import { HStack, Transition } from "@rbxts-ui/layout";
 import { Frame, Image, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
+import { useDeadlineTimer } from "client/hooks/use-deadline-timer";
 import { Particles } from "client/ui/Particles/Particles";
 import { ParticleEmitter2DConfig } from "client/ui/Particles/Particles.interfaces";
 import { useRem } from "client/ui/rem/useRem";
 import assets from "shared/assets";
 import { palette, textStrokeGradient } from "shared/constants/palette";
-import { POWERUP_BUTTON_STYLES, POWERUP_OUTER_BORDER_COLOR, PowerupId } from "shared/constants/powerups";
+import {
+	POWERUP_BUTTON_STYLES,
+	POWERUP_DURATIONS,
+	POWERUP_OUTER_BORDER_COLOR,
+	PowerupId,
+} from "shared/constants/powerups";
 import { remotes } from "shared/remotes";
+import { selectLocalTurboActiveUntil } from "shared/store/soldiers";
 import { brighten } from "shared/utils/color-utils";
 
 interface Props {
@@ -76,6 +84,10 @@ export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 	const rem = useRem();
 	const style = POWERUP_BUTTON_STYLES[id];
 
+	const turboActiveUntil = useSelector(selectLocalTurboActiveUntil);
+	const isTurboActive = id === "turbo" && turboActiveUntil > 0;
+	const { secondsLeft: turboSecondsLeft } = useDeadlineTimer(turboActiveUntil, POWERUP_DURATIONS.turbo);
+
 	const HEIGHT = rem(CIRCLE_SIZE);
 	const WIDTH = HEIGHT;
 	const FULL_WIDTH = WIDTH + rem(TOOLTIP_WIDTH);
@@ -137,6 +149,8 @@ export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 			}
 		}
 	}, [pressed, id]);
+
+	print("isTurboActive.......", isTurboActive);
 
 	return (
 		<Frame
@@ -280,6 +294,24 @@ export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 									position={new UDim2(0.5, 0, 0.5, 0)}
 									backgroundTransparency={1}
 								/>
+
+								{isTurboActive && (
+									<Text
+										position={new UDim2(0, 0, 0, 0)}
+										size={new UDim2(1, 0, 1, 0)}
+										text={turboSecondsLeft}
+										font={fonts.fredokaOne.regular}
+										textColor={palette.white}
+										textSize={rem(3)}
+										textXAlignment="Center"
+										textYAlignment="Center"
+										zIndex={5}
+									>
+										<uistroke Thickness={rem(0.1)} Color={palette.white}>
+											<uigradient Color={textStrokeGradient} Rotation={90} />
+										</uistroke>
+									</Text>
+								)}
 							</Frame>
 						</HStack>
 					</Frame>
