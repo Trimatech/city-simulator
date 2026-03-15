@@ -90,7 +90,7 @@ export function Stats() {
 					iconRef={balanceRef}
 				/>
 				<StatsCard
-					image={assets.ui.crystals.crystals_1}
+					image={assets.ui.shards_icon_color}
 					label="Crystals"
 					value={`${formatInteger(crystals)}`}
 					colorStyle="cyan"
@@ -129,7 +129,7 @@ export function Stats() {
 			<FlyToComponents
 				amount={currentCrystals ?? 0}
 				statsImageRef={crystalsRef}
-				image={assets.ui.crystals.crystals_1}
+				image={assets.ui.shards_icon_color}
 				sound={assets.sounds.alert_neutral}
 			/>
 		</>
