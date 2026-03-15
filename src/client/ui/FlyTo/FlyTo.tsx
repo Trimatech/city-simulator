@@ -9,14 +9,14 @@ interface FlyToProps {
 	delay: number;
 	image: string;
 	from: UDim2;
-	flyToRef: MutableRefObject<Frame | undefined>;
-	toRef: MutableRefObject<Frame | undefined>;
+	flyToRef: MutableRefObject<Frame | ImageLabel | undefined>;
+	toRef: MutableRefObject<Frame | ImageLabel | undefined>;
 	duration: number;
 	curveHeight: number;
 	sound?: string;
 }
 
-const getCenterPosition = (imageLabel: Frame) => {
+const getCenterPosition = (imageLabel: Frame | ImageLabel) => {
 	const absPos = imageLabel.AbsolutePosition;
 	const absSize = imageLabel.AbsoluteSize;
 	const centerX = absPos.X + absSize.X / 2;
@@ -71,8 +71,10 @@ export function FlyTo({ delay, image, from, flyToRef, toRef, duration, curveHeig
 
 			setPosition(newPosition);
 
-			// Take the absolute size of the toRef image
-			const targetSize = toRef.current?.AbsoluteSize ?? new Vector2(width, width);
+			// Take the absolute size of the toRef image — use the minimum dimension to keep square
+			const targetAbsSize = toRef.current?.AbsoluteSize ?? new Vector2(width, width);
+			const targetDim = math.min(targetAbsSize.X, targetAbsSize.Y);
+			const targetSize = new Vector2(targetDim, targetDim);
 
 			const lerpedSize = startSize.Lerp(targetSize, alpha);
 

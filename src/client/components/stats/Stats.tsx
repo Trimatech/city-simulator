@@ -8,7 +8,7 @@ import { formatInteger } from "client/utils/format-integer";
 import assets from "shared/assets";
 import { USER_NAME } from "shared/constants/core";
 import { ROOT_PADDING } from "shared/constants/theme";
-import { selectPlayerBalance } from "shared/store/saves";
+import { selectPlayerBalance, selectPlayerCrystals } from "shared/store/saves";
 import {
 	selectLocalEliminations,
 	selectLocalOrbs,
@@ -24,18 +24,21 @@ export function Stats() {
 	const eliminationsRef = useRef<Frame>();
 	const orbsRef = useRef<Frame>();
 	const balanceRef = useRef<Frame>();
+	const crystalsRef = useRef<Frame>();
 
 	const currentEliminations = useSelector(selectLocalEliminations);
 	const currentOrbs = useSelector(selectLocalOrbs);
 	const currentRank = useSelector(selectRankForDisplay);
 	const currentBalance = useSelectorCreator(selectPlayerBalance, USER_NAME);
 	const currentArea = useSelector(selectLocalPolygonAreaSize);
+	const currentCrystals = useSelectorCreator(selectPlayerCrystals, USER_NAME);
 	// displays the previous value if any are set to undefined
 	const eliminations = useDefined<string | number>(currentEliminations, "N/A");
 	const area = useDefined<string | number>(currentArea, "N/A");
 	const orbs = useDefined<string | number>(currentOrbs, "N/A");
 	const rank = useDefined(currentRank, "N/A");
 	const balance = useDefined(currentBalance, 0);
+	const crystals = useDefined(currentCrystals, 0);
 
 	return (
 		<>
@@ -87,12 +90,21 @@ export function Stats() {
 					iconRef={balanceRef}
 				/>
 				<StatsCard
+					image={assets.ui.crystals.crystals_1}
+					label="Crystals"
+					value={`${formatInteger(crystals)}`}
+					colorStyle="cyan"
+					enabled={currentCrystals !== undefined}
+					order={4}
+					iconRef={crystalsRef}
+				/>
+				<StatsCard
 					image={assets.ui.icons.area}
 					label="Area"
 					value={`${formatInteger(area)} studs²`}
 					colorStyle="teal"
 					enabled={currentArea !== undefined}
-					order={4}
+					order={5}
 				/>
 			</Group>
 
@@ -113,6 +125,12 @@ export function Stats() {
 				statsImageRef={balanceRef}
 				image={assets.ui.shop.Cash}
 				sound={assets.sounds.alert_money}
+			/>
+			<FlyToComponents
+				amount={currentCrystals ?? 0}
+				statsImageRef={crystalsRef}
+				image={assets.ui.crystals.crystals_1}
+				sound={assets.sounds.alert_neutral}
 			/>
 		</>
 	);

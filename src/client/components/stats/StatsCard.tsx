@@ -65,6 +65,15 @@ export const STATS_CARD_STYLES = {
 		),
 		labelColor: Color3.fromRGB(246, 197, 78),
 	},
+	cyan: {
+		innerBackground: Color3.fromRGB(0, 60, 90),
+		innerBackgroundTransparency: 0.3,
+		innerBorderGradient: new ColorSequence(
+			Color3.fromRGB(81, 220, 255), // #51DCFF
+			Color3.fromRGB(48, 148, 200), // #3094C8
+		),
+		labelColor: Color3.fromRGB(150, 230, 255), // #96E6FF
+	},
 } as const satisfies Record<string, StatsCardColorStyle>;
 
 export type StatsCardStyleName = keyof typeof STATS_CARD_STYLES;
