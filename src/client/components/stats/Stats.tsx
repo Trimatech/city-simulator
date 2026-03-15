@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
 import { useSelector, useSelectorCreator } from "@rbxts/react-reflex";
-import { Group } from "@rbxts-ui/primitives";
+import { VStack } from "@rbxts-ui/layout";
 import { useDefined } from "client/hooks";
 import { useRem } from "client/ui/rem/useRem";
 import { formatInteger } from "client/utils/format-integer";
@@ -32,22 +32,12 @@ export function Stats() {
 	const balance = useDefined(currentBalance, 0);
 
 	return (
-		<Group name="Stats">
-			<uipadding PaddingBottom={new UDim(0, rem(ROOT_PADDING))} PaddingLeft={new UDim(0, rem(ROOT_PADDING))} />
-
-			<uilistlayout
-				FillDirection="Vertical"
-				HorizontalAlignment="Left"
-				VerticalAlignment="Bottom"
-				Padding={new UDim(0, rem(1))}
-				SortOrder="LayoutOrder"
-			/>
-
+		<VStack name="Stats" spacing={rem(1)} padding={rem(ROOT_PADDING)}>
 			<StatsCard
 				emoji="☠️"
 				label="KOs"
 				value={`${formatInteger(eliminations)}`}
-				colorStyle="gold"
+				colorStyle="red"
 				enabled={currentEliminations !== undefined}
 				order={0}
 			/>
@@ -58,25 +48,16 @@ export function Stats() {
 				value={rank}
 				colorStyle="gold"
 				enabled={currentRank !== undefined}
-				order={0}
-			/>
-
-			<StatsCard
-				emoji="🗺️"
-				label="Area"
-				value={`${formatInteger(area)} studs²`}
-				colorStyle="teal"
-				enabled={currentArea !== undefined}
-				order={0}
+				order={1}
 			/>
 
 			<StatsCard
 				emoji="🔮"
 				label="Orbs"
 				value={`${formatInteger(orbs)}`}
-				colorStyle="red"
+				colorStyle="purple"
 				enabled={currentOrbs !== undefined}
-				order={1}
+				order={2}
 			/>
 
 			<StatsCard
@@ -85,8 +66,16 @@ export function Stats() {
 				value={`$${formatInteger(balance)}`}
 				colorStyle="green"
 				enabled={currentBalance !== undefined}
-				order={2}
+				order={3}
 			/>
-		</Group>
+			<StatsCard
+				emoji="🗺️"
+				label="Area2"
+				value={`${formatInteger(area)} studs²`}
+				colorStyle="teal"
+				enabled={currentArea !== undefined}
+				order={4}
+			/>
+		</VStack>
 	);
 }
