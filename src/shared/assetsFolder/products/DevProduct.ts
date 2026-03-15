@@ -5,13 +5,13 @@ export enum DevProduct {
 	MONEY_250 = IS_PROD ? 70576091 : 70575131,
 	MONEY_500 = IS_PROD ? 70576090 : 70575130,
 	MONEY_1000 = IS_PROD ? 70576094 : 70575136,
-	MONEY_2500 = IS_PROD ? 0 : 0, // TODO: configure product IDs in Roblox developer dashboard
+	MONEY_2500 = IS_PROD ? 73852841 : 73852811,
 	MONEY_5000 = IS_PROD ? 70576089 : 70575129,
-	MONEY_10000 = IS_PROD ? 0 : 0, // TODO: configure product IDs in Roblox developer dashboard
-	MONEY_100000 = IS_PROD ? 0 : 0, // TODO: configure product IDs in Roblox developer dashboard
+	MONEY_10000 = IS_PROD ? 73852844 : 73852815,
+	MONEY_100000 = IS_PROD ? 73852843 : 73852812,
 
-	CRYSTALS_1 = IS_PROD ? 0 : 0, // TODO: configure product IDs in Roblox developer dashboard
-	CRYSTALS_5 = IS_PROD ? 0 : 0, // TODO: configure product IDs in Roblox developer dashboard
-	CRYSTALS_15 = IS_PROD ? 0 : 0, // TODO: configure product IDs in Roblox developer dashboard
-	CRYSTALS_25 = IS_PROD ? 0 : 0, // TODO: configure product IDs in Roblox developer dashboard
+	CRYSTALS_1 = IS_PROD ? 73852853 : 73852826,
+	CRYSTALS_5 = IS_PROD ? 73852845 : 73852817,
+	CRYSTALS_15 = IS_PROD ? 73852850 : 73852822,
+	CRYSTALS_25 = IS_PROD ? 73852848 : 73852819,
 }
