@@ -1,5 +1,4 @@
 import React, { useState } from "@rbxts/react";
-import { useSelectorCreator } from "@rbxts/react-reflex";
 import { ReactiveButton2 } from "@rbxts-ui/components";
 import { HStack } from "@rbxts-ui/layout";
 import { Frame } from "@rbxts-ui/primitives";
@@ -8,11 +7,8 @@ import { MainButton, ShopButtonTextWithIcon } from "client/ui/MainButton";
 import { useRem } from "client/ui/rem/useRem";
 import { SlideIn } from "client/ui/slide-in";
 import assets from "shared/assets";
-import { USER_NAME } from "shared/constants/core";
-import { DAILY_REWARD_CYCLE, DAILY_STREAK_WINDOW, SECONDS_PER_DAY } from "shared/constants/daily-rewards";
 import { palette } from "shared/constants/palette";
 import { ROOT_PADDING } from "shared/constants/theme";
-import { selectPlayerDailyStreak, selectPlayerLastDailyRewardClaim } from "shared/store/saves";
 
 import { DailyRewardScreen } from "../daily-reward/DailyRewardScreen";
 import { ShopWindow } from "../shop/ShopWindow";
@@ -20,8 +16,9 @@ import { GameVersion } from "./GameVersion";
 import { MuteButton } from "./MuteButton";
 import { PlayButton } from "./PlayButton";
 
-interface DailyRewardInfo {
-	readonly streakDay: number;
+const enum Window {
+	Shop = "shop",
+	DailyReward = "dailyReward",
 }
 
 interface HomeProps {
@@ -30,26 +27,7 @@ interface HomeProps {
 
 export function Home({ visible }: HomeProps) {
 	const rem = useRem();
-	const [isShopOpen, setIsShopOpen] = useState(false);
-	const [dailyReward, setDailyReward] = useState<DailyRewardInfo | undefined>();
-	const currentStreak = useSelectorCreator(selectPlayerDailyStreak, USER_NAME);
-	const lastClaim = useSelectorCreator(selectPlayerLastDailyRewardClaim, USER_NAME);
-
-	const openDailyReward = () => {
-		const now = os.time();
-		const elapsed = now - lastClaim;
-
-		let streakDay: number;
-		if (lastClaim === 0 || elapsed >= DAILY_STREAK_WINDOW) {
-			streakDay = 1;
-		} else if (elapsed >= SECONDS_PER_DAY) {
-			streakDay = (currentStreak % DAILY_REWARD_CYCLE) + 1;
-		} else {
-			streakDay = currentStreak;
-		}
-
-		setDailyReward({ streakDay });
-	};
+	const [openWindow, setOpenWindow] = useState<Window | undefined>();
 
 	return (
 		<>
@@ -59,10 +37,18 @@ export function Home({ visible }: HomeProps) {
 					verticalAlignment={Enum.VerticalAlignment.Top}
 					spacing={rem(1)}
 				>
-					<MainButton onClick={() => setIsShopOpen(true)} size={new UDim2(0, rem(10), 0, rem(4))} fitContent>
+					<MainButton
+						onClick={() => setOpenWindow(Window.Shop)}
+						size={new UDim2(0, rem(10), 0, rem(4))}
+						fitContent
+					>
 						<ShopButtonTextWithIcon text="Shop" icon={assets.ui.icons.store} />
 					</MainButton>
-					<MainButton onClick={openDailyReward} size={new UDim2(0, rem(16), 0, rem(4))} fitContent>
+					<MainButton
+						onClick={() => setOpenWindow(Window.DailyReward)}
+						size={new UDim2(0, rem(16), 0, rem(4))}
+						fitContent
+					>
 						<ShopButtonTextWithIcon text="Daily Rewards" icon={assets.ui.icons.dailyRewards} />
 					</MainButton>
 				</HStack>
@@ -102,23 +88,21 @@ export function Home({ visible }: HomeProps) {
 				</HStack>
 			</SlideIn>
 
-			{isShopOpen && (
+			{openWindow === Window.Shop && (
 				<>
 					<ReactiveButton2
-						onClick={() => setIsShopOpen(false)}
+						onClick={() => setOpenWindow(undefined)}
 						backgroundTransparency={0.2}
 						backgroundColor={palette.teal}
 						size={new UDim2(1, 0, 1, 0)}
 						position={new UDim2(0, 0, 0, 0)}
 					/>
 
-					<ShopWindow onClose={() => setIsShopOpen(false)} />
+					<ShopWindow onClose={() => setOpenWindow(undefined)} />
 				</>
 			)}
 
-			{dailyReward && (
-				<DailyRewardScreen streakDay={dailyReward.streakDay} lastClaimTime={lastClaim} onDismiss={() => setDailyReward(undefined)} />
-			)}
+			{openWindow === Window.DailyReward && <DailyRewardScreen onDismiss={() => setOpenWindow(undefined)} />}
 		</>
 	);
 }

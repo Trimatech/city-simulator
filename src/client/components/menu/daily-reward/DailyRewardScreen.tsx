@@ -1,5 +1,6 @@
 import { useEventListener } from "@rbxts/pretty-react-hooks";
 import React, { useBinding, useEffect, useState } from "@rbxts/react";
+import { useSelectorCreator } from "@rbxts/react-reflex";
 import { RunService } from "@rbxts/services";
 import { HStack } from "@rbxts-ui/layout";
 import { Frame, Text } from "@rbxts-ui/primitives";
@@ -7,8 +8,10 @@ import { fonts } from "client/constants/fonts";
 import { useRem } from "client/ui/rem/useRem";
 import { SCROLLBAR_COLOR, SCROLLBAR_THICKNESS, SCROLLBAR_TRANSPARENCY } from "client/ui/scrollbar.constants";
 import assets from "shared/assets";
-import { DAILY_REWARD_CYCLE, getDailyRewardAmount, SECONDS_PER_DAY } from "shared/constants/daily-rewards";
+import { USER_NAME } from "shared/constants/core";
+import { DAILY_REWARD_CYCLE, DAILY_STREAK_WINDOW, getDailyRewardAmount, SECONDS_PER_DAY } from "shared/constants/daily-rewards";
 import { remotes } from "shared/remotes";
+import { selectPlayerDailyStreak, selectPlayerLastDailyRewardClaim } from "shared/store/saves";
 
 import { MainButton, ShopButtonText, shopItemButtonThemes } from "../../../ui/MainButton";
 import { GameWindow } from "../shop/GameWindow";
@@ -20,8 +23,6 @@ const TIMER_STROKE_FROM = Color3.fromHex("#005794");
 const TIMER_STROKE_TO = Color3.fromHex("#000000");
 
 interface DailyRewardScreenProps {
-	readonly streakDay: number;
-	readonly lastClaimTime: number;
 	readonly onDismiss: () => void;
 }
 
@@ -74,11 +75,22 @@ function ClaimTimerText({ deadlineTime }: { deadlineTime: number }) {
 	);
 }
 
-export function DailyRewardScreen({ streakDay, lastClaimTime, onDismiss }: DailyRewardScreenProps) {
+export function DailyRewardScreen({ onDismiss }: DailyRewardScreenProps) {
 	const rem = useRem();
 	const [claimed, setClaimed] = useState(false);
+	const currentStreak = useSelectorCreator(selectPlayerDailyStreak, USER_NAME);
+	const lastClaimTime = useSelectorCreator(selectPlayerLastDailyRewardClaim, USER_NAME);
 
-	const canClaim = lastClaimTime === 0 || os.time() - lastClaimTime >= SECONDS_PER_DAY;
+	const now = os.time();
+	const elapsed = now - lastClaimTime;
+	const streakDay =
+		lastClaimTime === 0 || elapsed >= DAILY_STREAK_WINDOW
+			? 1
+			: elapsed >= SECONDS_PER_DAY
+				? (currentStreak % DAILY_REWARD_CYCLE) + 1
+				: currentStreak;
+
+	const canClaim = lastClaimTime === 0 || elapsed >= SECONDS_PER_DAY;
 	const nextClaimDeadline = lastClaimTime + SECONDS_PER_DAY;
 
 	useEffect(() => {
