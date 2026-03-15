@@ -20,7 +20,6 @@ export function HealthView() {
 			position={new UDim2(0, ROBLOX_TOOLBAR_WIDTH, 0, 0)}
 			spacing={rem(0.5)}
 			padding={30}
-			verticalAlignment={Enum.VerticalAlignment.Center}
 		>
 			<imagelabel
 				Image={assets.ui.heart}
