@@ -4,7 +4,7 @@ import { useDeadlineTimer } from "client/hooks/use-deadline-timer";
 import { ProgressBar } from "./ProgressBar";
 
 export interface ProgressBarTimerProps {
-	/** Absolute deadline time (from tick()) */
+	/** Absolute deadline time (from Workspace.GetServerTimeNow()) */
 	deadlineTime: number;
 	/** Total duration in seconds (used to compute 0-1 progress) */
 	totalDuration: number;

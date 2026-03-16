@@ -1,5 +1,5 @@
 import { Falldown } from "@rbxts/falldown";
-import { Players } from "@rbxts/services";
+import { Players, Workspace } from "@rbxts/services";
 import { setTimeout } from "@rbxts/set-timeout";
 import { store } from "server/store";
 import { dropCandyOnDeath } from "server/world/services/candy/candy-utils";
@@ -136,8 +136,8 @@ export function onPlayerDeath(soldierId: string) {
 	store.clearSoldierTracers(soldierId);
 	clearOwnerTracersFromGrid(soldierId);
 
-	const deadline = tick() + DEATH_CHOICE_TIMEOUT_SEC;
-	warn(`[Death] onPlayerDeath(${soldierId}) — setting deathChoiceDeadline=${deadline} (tick=${tick()})`);
+	const deadline = Workspace.GetServerTimeNow() + DEATH_CHOICE_TIMEOUT_SEC;
+	warn(`[Death] onPlayerDeath(${soldierId}) — setting deathChoiceDeadline=${deadline} (serverTime=${Workspace.GetServerTimeNow()})`);
 	store.setSoldierDeathChoiceDeadline(soldierId, deadline);
 
 	// Verify the state was actually set

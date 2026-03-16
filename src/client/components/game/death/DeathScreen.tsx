@@ -8,6 +8,7 @@ import { springs } from "client/constants/springs";
 import { useMotion } from "client/hooks";
 import { MainButton, ShopButtonTextWithIcon } from "client/ui/MainButton";
 import { useRem } from "client/ui/rem/useRem";
+import { Workspace } from "@rbxts/services";
 import assets from "shared/assets";
 import { DEATH_CHOICE_TIMEOUT_SEC, USER_NAME } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
@@ -40,21 +41,23 @@ export function DeathScreen({ activeDeadline, persistent, onDismiss }: DeathScre
 	const rem = useRem();
 	const crystals = useSelectorCreator(selectPlayerCrystals, USER_NAME) ?? 0;
 
-	const effectiveDeadline = persistent && activeDeadline !== undefined ? tick() + 9999 : activeDeadline;
+	const effectiveDeadline =
+		persistent && activeDeadline !== undefined ? Workspace.GetServerTimeNow() + 9999 : activeDeadline;
 
 	const [isReviving, setIsReviving] = useState(false);
 	const [isExpired, setIsExpired] = useState(() => {
 		if (effectiveDeadline === undefined) return false;
-		const expired = effectiveDeadline - tick() <= 0;
+		const now = Workspace.GetServerTimeNow();
+		const expired = effectiveDeadline - now <= 0;
 		if (expired) {
-			warn(`[Death:DeathScreen] Initial state: already expired! deadline=${effectiveDeadline}, tick=${tick()}`);
+			warn(`[Death:DeathScreen] Initial state: already expired! deadline=${effectiveDeadline}, serverTime=${now}`);
 		}
 		return expired;
 	});
 
 	useEffect(() => {
 		if (effectiveDeadline !== undefined) {
-			const timeLeft = effectiveDeadline - tick();
+			const timeLeft = effectiveDeadline - Workspace.GetServerTimeNow();
 			const expired = timeLeft <= 0;
 			warn(
 				`[Death:DeathScreen] effectiveDeadline changed: ${effectiveDeadline}, timeLeft=${timeLeft}s, expired=${expired}`,

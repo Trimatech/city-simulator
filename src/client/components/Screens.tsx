@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
+import { Workspace } from "@rbxts/services";
 import { selectHasLocalSoldier, selectLocalDeathChoiceDeadline, selectLocalSoldier } from "shared/store/soldiers";
 
 import { DeathScreen } from "./game/death/DeathScreen";
@@ -17,7 +18,7 @@ export function Screens() {
 	useEffect(() => {
 		if (deathChoiceDeadline !== undefined) {
 			warn(
-				`[Death:Client] deathChoiceDeadline received: ${deathChoiceDeadline}, timeLeft=${deathChoiceDeadline - tick()}s`,
+				`[Death:Client] deathChoiceDeadline received: ${deathChoiceDeadline}, timeLeft=${deathChoiceDeadline - Workspace.GetServerTimeNow()}s`,
 			);
 			setCachedDeadline(deathChoiceDeadline);
 		}
