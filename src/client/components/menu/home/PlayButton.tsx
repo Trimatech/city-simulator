@@ -1,4 +1,4 @@
-import React from "@rbxts/react";
+import React, { useState } from "@rbxts/react";
 import { fonts } from "client/constants/fonts";
 import { AnimatedText } from "client/ui/AnimatedText";
 import { MainButton } from "client/ui/MainButton";
@@ -14,17 +14,20 @@ interface PlayButtonProps {
 
 export function PlayButton({ anchorPoint, size, position }: PlayButtonProps) {
 	const rem = useRem();
+	const [isLoading, setIsLoading] = useState(false);
+
 	const onClick = () => {
+		setIsLoading(true);
 		remotes.soldier.spawn.fire();
 	};
 
 	return (
-		<MainButton onClick={onClick} anchorPoint={anchorPoint} size={size} position={position}>
+		<MainButton onClick={onClick} anchorPoint={anchorPoint} size={size} position={position} enabled={!isLoading}>
 			<AnimatedText
 				font={fonts.fredokaOne.regular}
 				textColor={palette.white}
 				textSize={rem(2.2)}
-				text="Start Playing →"
+				text={isLoading ? "Loading..." : "Start Playing →"}
 				size={new UDim2(1, 0, 1, 0)}
 			/>
 		</MainButton>

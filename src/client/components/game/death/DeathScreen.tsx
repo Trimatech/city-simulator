@@ -215,12 +215,16 @@ export function DeathScreen({ activeDeadline, persistent, onDismiss }: DeathScre
 					>
 						<MainButton
 							fitContent
+							enabled={!isReviving}
 							onClick={() => {
 								setIsReviving(true);
 								remotes.soldier.continue.fire();
 							}}
 						>
-							<ShopButtonTextWithIcon text="Revive" icon={assets.ui.shards_icon_color} />
+							<ShopButtonTextWithIcon
+								text={isReviving ? "Loading..." : "Revive"}
+								icon={assets.ui.shards_icon_color}
+							/>
 						</MainButton>
 
 						<HStack
