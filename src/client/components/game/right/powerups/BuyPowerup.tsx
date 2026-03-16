@@ -187,8 +187,8 @@ export function BuyPowerup({ id, label, enabled, order, price, children }: Props
 					{/* Outer frame — colored background with dual strokes */}
 					<Frame
 						ref={frameRef}
-						backgroundColor={style.backgroundColor}
-						backgroundTransparency={0}
+						backgroundColor={palette.white}
+						backgroundTransparency={0.05}
 						cornerRadius={fullRound}
 						size={new UDim2(1, 0, 1, 0)}
 						clipsDescendants
