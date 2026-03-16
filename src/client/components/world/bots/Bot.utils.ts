@@ -1,6 +1,11 @@
 import { CollectionService, Players, Workspace } from "@rbxts/services";
 import { findSharedInstanceByPath } from "shared/SharedModelManager";
 
+const BOT_DEBUG = true;
+function botDebug(botId: string, ...args: unknown[]) {
+	if (BOT_DEBUG) print(`[Bot:${botId}]`, ...args);
+}
+
 const GROUND_TAG = "ground";
 
 export function sampleGroundYAt(position: Vector2): number {
@@ -33,33 +38,60 @@ export function getCharacterHalfSize(character: Model): number {
 	return 2;
 }
 
-function chooseRandomPlayer(): Player | undefined {
-	const players = Players.GetPlayers();
-	if (players.size() === 0) {
-		return undefined;
-	}
-	const random = new Random();
-	return players[random.NextInteger(1, players.size()) - 1];
+/**
+ * Validates that a character model has the minimum required parts to function as a bot.
+ */
+function isValidCharacterModel(model: Model): boolean {
+	const hrp = model.FindFirstChild("HumanoidRootPart");
+	const humanoid = model.FindFirstChildOfClass("Humanoid");
+	return hrp !== undefined && hrp.IsA("BasePart") && humanoid !== undefined;
 }
 
 export function tryCloneRandomPlayerCharacter(): Model | undefined {
-	const chosen = chooseRandomPlayer();
-
-	if (!chosen) {
-		warn("No player found");
-		return undefined;
-	}
-	const source = chosen.Character as Model;
-	if (!source) {
-		warn("No character found");
+	const players = Players.GetPlayers();
+	if (players.size() === 0) {
+		warn("[Bot] No players available to clone character from");
 		return undefined;
 	}
 
-	const prev = source.Archivable;
-	source.Archivable = true;
-	const clone = source.Clone();
-	source.Archivable = prev;
-	return clone;
+	// Shuffle players so we try different ones each time
+	const random = new Random();
+	const shuffled = [...players];
+	for (let i = shuffled.size() - 1; i > 0; i--) {
+		const j = random.NextInteger(0, i);
+		const tmp = shuffled[i];
+		shuffled[i] = shuffled[j];
+		shuffled[j] = tmp;
+	}
+
+	for (const player of shuffled) {
+		const source = player.Character;
+		if (!source) {
+			warn(`[Bot] Player ${player.Name} has no character loaded, skipping`);
+			continue;
+		}
+
+		if (!isValidCharacterModel(source)) {
+			warn(`[Bot] Player ${player.Name} character missing HRP or Humanoid, skipping`);
+			continue;
+		}
+
+		const prev = source.Archivable;
+		source.Archivable = true;
+		const clone = source.Clone();
+		source.Archivable = prev;
+
+		if (!isValidCharacterModel(clone)) {
+			warn(`[Bot] Cloned character from ${player.Name} is invalid (parts lost during clone), skipping`);
+			clone.Destroy();
+			continue;
+		}
+
+		return clone;
+	}
+
+	warn("[Bot] Could not clone any player character — all players either have no character or invalid models");
+	return undefined;
 }
 
 export interface BotRuntime {
@@ -99,15 +131,78 @@ export function setRunningAnimation(model: Model) {
 
 export async function initializeBotModel(id: string): Promise<Model> {
 	let source: Model | undefined;
+
+	// 1) Try reusing an existing model in Workspace (e.g. from a previous lifecycle)
 	const existing = Workspace.FindFirstChild(id);
 	if (existing && existing.IsA("Model")) {
+		botDebug(id, "Found existing model in Workspace, cloning");
 		const prev = existing.Archivable;
 		existing.Archivable = true;
 		source = existing.Clone();
 		existing.Archivable = prev;
+		if (source && !isValidCharacterModel(source)) {
+			warn(`[Bot:${id}] Existing model clone is invalid, discarding`);
+			source.Destroy();
+			source = undefined;
+		}
 	}
-	if (!source) source = tryCloneRandomPlayerCharacter();
-	if (!source) source = (await findSharedInstanceByPath<Model>("ReplicatedStorage/Models/Characters/Noob")).Clone();
+
+	// 2) Clone a random player character
+	if (!source) {
+		botDebug(id, "Trying to clone a random player character");
+		source = tryCloneRandomPlayerCharacter();
+		if (source) {
+			botDebug(id, "Successfully cloned player character");
+		}
+	}
+
+	// 3) Fallback to the Noob model with a timeout so we don't hang forever
+	if (!source) {
+		botDebug(id, "Falling back to Noob model from ReplicatedStorage");
+		const noobPromise = findSharedInstanceByPath<Model>("ReplicatedStorage/Models/Characters/Noob");
+		const timeoutPromise = new Promise<undefined>((resolve) => {
+			task.delay(10, () => resolve(undefined));
+		});
+		const result = await Promise.race([
+			noobPromise.then((m) => m),
+			timeoutPromise,
+		]);
+		if (result !== undefined) {
+			const prev = result.Archivable;
+			result.Archivable = true;
+			source = result.Clone();
+			result.Archivable = prev;
+			botDebug(id, "Successfully loaded Noob fallback model");
+		} else {
+			warn(`[Bot:${id}] Noob model load timed out after 10s`);
+		}
+	}
+
+	// 4) Last resort: create a minimal placeholder model so the bot still functions
+	if (!source) {
+		warn(`[Bot:${id}] All character sources failed — creating minimal placeholder`);
+		source = new Instance("Model");
+		source.Name = id;
+
+		const hrp = new Instance("Part");
+		hrp.Name = "HumanoidRootPart";
+		hrp.Size = new Vector3(2, 2, 1);
+		hrp.Transparency = 0;
+		hrp.Parent = source;
+
+		const head = new Instance("Part");
+		head.Name = "Head";
+		head.Size = new Vector3(1.2, 1.2, 1.2);
+		head.Shape = Enum.PartType.Ball;
+		head.Position = new Vector3(0, 2.5, 0);
+		head.Transparency = 0;
+		head.Parent = source;
+
+		const humanoid = new Instance("Humanoid");
+		humanoid.Parent = source;
+
+		source.PrimaryPart = hrp;
+	}
 
 	const model = source!;
 	model.Name = id;

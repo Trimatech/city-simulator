@@ -16,6 +16,9 @@ export function Screens() {
 
 	useEffect(() => {
 		if (deathChoiceDeadline !== undefined) {
+			warn(
+				`[Death:Client] deathChoiceDeadline received: ${deathChoiceDeadline}, timeLeft=${deathChoiceDeadline - tick()}s`,
+			);
 			setCachedDeadline(deathChoiceDeadline);
 		}
 	}, [deathChoiceDeadline]);
@@ -23,9 +26,18 @@ export function Screens() {
 	// If soldier is alive (revived), clear cache to hide death screen immediately
 	useEffect(() => {
 		if (soldier && !soldier.dead) {
+			if (cachedDeadline !== undefined) {
+				warn(`[Death:Client] Soldier alive, clearing cachedDeadline`);
+			}
 			setCachedDeadline(undefined);
 		}
 	}, [soldier, soldier?.dead]);
+
+	useEffect(() => {
+		warn(
+			`[Death:Client] State: spawned=${spawned}, dead=${soldier?.dead}, deadline=${deathChoiceDeadline}, cached=${cachedDeadline}, isDeathActive=${cachedDeadline !== undefined}`,
+		);
+	}, [spawned, soldier?.dead, deathChoiceDeadline, cachedDeadline]);
 
 	const isDeathActive = cachedDeadline !== undefined;
 	const gameUIVisible = spawned && !soldier?.dead;

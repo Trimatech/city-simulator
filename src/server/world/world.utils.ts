@@ -45,6 +45,8 @@ export function getCandy(candyId: string) {
 }
 
 export function getPlayerHumanoidByName(name: string) {
+	const isBot = string.sub(name, 1, 4) === "BOT_";
+
 	const player = Players.GetPlayers().find((player) => player.Name === name);
 	if (player) {
 		const humanoid = player.Character?.FindFirstChildOfClass("Humanoid");
@@ -59,7 +61,11 @@ export function getPlayerHumanoidByName(name: string) {
 		if (botHumanoid) {
 			return botHumanoid;
 		}
-		warn(`No player or bot found for name ${name}`);
+		// Bots are rendered client-side only and don't have server-side characters,
+		// so a missing humanoid is expected — only warn for real players
+		if (!isBot) {
+			warn(`No player found for name ${name}`);
+		}
 	}
 	return undefined;
 }
@@ -105,8 +111,12 @@ export function cancelDeathChoiceTimer(soldierId: string) {
 
 export function onPlayerDeath(soldierId: string) {
 	const existing = getSoldier(soldierId);
-	if (!existing || existing.dead) return;
+	if (!existing || existing.dead) {
+		warn(`[Death] onPlayerDeath(${soldierId}) skipped: exists=${existing !== undefined}, dead=${existing?.dead}`);
+		return;
+	}
 
+	warn(`[Death] onPlayerDeath(${soldierId}) — setting dead=true`);
 	store.setSoldierIsDead(soldierId);
 
 	const player = Players.FindFirstChild(soldierId);
@@ -127,11 +137,17 @@ export function onPlayerDeath(soldierId: string) {
 	clearOwnerTracersFromGrid(soldierId);
 
 	const deadline = tick() + DEATH_CHOICE_TIMEOUT_SEC;
+	warn(`[Death] onPlayerDeath(${soldierId}) — setting deathChoiceDeadline=${deadline} (tick=${tick()})`);
 	store.setSoldierDeathChoiceDeadline(soldierId, deadline);
+
+	// Verify the state was actually set
+	const verify = getSoldier(soldierId);
+	warn(`[Death] onPlayerDeath(${soldierId}) — verify: dead=${verify?.dead}, deadline=${verify?.deathChoiceDeadline}`);
 
 	const timer = task.delay(DEATH_CHOICE_TIMEOUT_SEC, () => {
 		deathChoiceTimers.delete(soldierId);
 		const soldier = getSoldier(soldierId);
+		warn(`[Death] deathChoiceTimer expired for ${soldierId} — exists=${soldier !== undefined}, dead=${soldier?.dead}`);
 		if (soldier?.dead) {
 			killSoldier(soldierId);
 		}
@@ -159,11 +175,8 @@ export function getPolygonCenterInside(soldierId: string): Vector2 | undefined {
 }
 
 export function killSoldier(soldierId: string) {
+	warn(`[Death] killSoldier(${soldierId}) called`);
 	cancelDeathChoiceTimer(soldierId);
-	// if (IS_LOCAL) {
-	// 	warn(`[DEBUG] Killing soldier ${soldierId} in local mode`);
-	// 	return;
-	// }
 	store.setSoldierIsDead(soldierId);
 
 	const humanoid = getPlayerHumanoidByName(soldierId);

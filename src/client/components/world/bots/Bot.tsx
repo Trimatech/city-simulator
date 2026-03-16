@@ -23,14 +23,33 @@ export function Bot({ id }: BotProps) {
 	const lastLookDirRef = useRef<Vector3>();
 
 	useEffect(() => {
-		(async () => {
-			const m = await initializeBotModel(id);
-			halfSize.current = getCharacterHalfSize(m);
-			modelRef.current = m;
-			setModel(m);
-		})();
+		let cancelled = false;
+
+		const tryInit = async (attempt: number) => {
+			if (cancelled) return;
+			try {
+				const m = await initializeBotModel(id);
+				if (cancelled) {
+					m.Destroy();
+					return;
+				}
+				halfSize.current = getCharacterHalfSize(m);
+				modelRef.current = m;
+				setModel(m);
+			} catch (err) {
+				warn(`[Bot:${id}] initializeBotModel failed (attempt ${attempt}):`, err);
+				if (!cancelled && attempt < 3) {
+					task.delay(2, () => tryInit(attempt + 1));
+				} else {
+					warn(`[Bot:${id}] Giving up after ${attempt} attempts`);
+				}
+			}
+		};
+
+		tryInit(1);
 
 		return () => {
+			cancelled = true;
 			tweenRef.current?.Cancel();
 			setModel(undefined);
 			const model = modelRef.current;
@@ -97,12 +116,15 @@ export function Bot({ id }: BotProps) {
 		const playTween = (targetCf: CFrame, duration: number) => {
 			const part = model.PrimaryPart;
 			if (!part) {
-				warn("No primary part found for bot, probably out of range");
+				const children = model
+					.GetChildren()
+					.map((c) => c.Name)
+					.join(", ");
+				warn(`[Bot:${id}] No primary part found — model children: ${children}`);
 				return;
 			}
 
 			if (part.CFrame.Position.sub(targetCf.Position).Magnitude <= 1e-4) {
-				warn("Position is already at target");
 				return;
 			}
 

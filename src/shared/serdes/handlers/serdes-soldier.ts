@@ -30,6 +30,12 @@ export function serializeSoldiers(state: SoldiersState): string {
 		buffer.WriteUInt(16, soldier.health);
 		buffer.WriteUInt(16, soldier.maxHealth);
 		buffer.WriteInt(16, soldier.zIndex);
+		// Write deathChoiceDeadline: 1 bit presence flag + optional float64
+		const hasDeadline = soldier.deathChoiceDeadline !== undefined;
+		buffer.WriteBool(hasDeadline);
+		if (hasDeadline) {
+			buffer.WriteFloat64(soldier.deathChoiceDeadline!);
+		}
 	}
 
 	return buffer.ToString();
@@ -45,27 +51,47 @@ export function deserializeSoldiers(data: string): SoldiersState {
 	for (const _ of $range(1, size)) {
 		const id = buffer.ReadString();
 
+		const name = buffer.ReadString();
+		const lastPosition = readVector2(buffer);
+		const position = readVector2(buffer);
+		const angle = buffer.ReadFloat32();
+		const desiredAngle = buffer.ReadFloat32();
+		const orbs = buffer.ReadUInt(32);
+		const skin = buffer.ReadString();
+		const dead = buffer.ReadBool();
+		const eliminations = buffer.ReadUInt(16);
+		const isInside = buffer.ReadBool();
+		const shieldActiveUntil = buffer.ReadFloat32();
+		const turboActiveUntil = buffer.ReadFloat32();
+		const health = buffer.ReadUInt(16);
+		const maxHealth = buffer.ReadUInt(16);
+		const zIndex = buffer.ReadInt(16);
+		// Read deathChoiceDeadline: 1 bit presence flag + optional float64
+		const hasDeadline = buffer.ReadBool();
+		const deathChoiceDeadline = hasDeadline ? buffer.ReadFloat64() : undefined;
+
 		state[id] = {
 			id,
-			name: buffer.ReadString(),
-			lastPosition: readVector2(buffer),
-			position: readVector2(buffer),
-			angle: buffer.ReadFloat32(),
-			desiredAngle: buffer.ReadFloat32(),
-			orbs: buffer.ReadUInt(32),
+			name,
+			lastPosition,
+			position,
+			angle,
+			desiredAngle,
+			orbs,
 			tracers: [],
 			polygon: [],
-			skin: buffer.ReadString(),
-			dead: buffer.ReadBool(),
-			eliminations: buffer.ReadUInt(16),
-			isInside: buffer.ReadBool(),
+			skin,
+			dead,
+			eliminations,
+			isInside,
 			polygonAreaSize: 0,
 			polygonBounds: defaultPolygonBounds,
-			shieldActiveUntil: buffer.ReadFloat32(),
-			turboActiveUntil: buffer.ReadFloat32(),
-			health: buffer.ReadUInt(16),
-			maxHealth: buffer.ReadUInt(16),
-			zIndex: buffer.ReadInt(16),
+			shieldActiveUntil,
+			turboActiveUntil,
+			health,
+			maxHealth,
+			zIndex,
+			deathChoiceDeadline,
 		};
 	}
 

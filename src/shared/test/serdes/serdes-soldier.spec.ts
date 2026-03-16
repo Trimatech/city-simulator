@@ -9,7 +9,7 @@ import { SoldierEntity, SoldiersState } from "shared/store/soldiers";
 import { fillArray } from "shared/utils/object-utils";
 
 export = () => {
-	function generateSoldier(id?: string): SoldierEntity {
+	function generateSoldier(id?: string, withDeadline = false): SoldierEntity {
 		const polygon = fillArray(10, () => new Vector2(math.random(), math.random()));
 		return {
 			id: id ?? HttpService.GenerateGUID(false),
@@ -32,6 +32,7 @@ export = () => {
 			health: 100,
 			maxHealth: 100,
 			zIndex: 0,
+			deathChoiceDeadline: withDeadline ? tick() + 6 : undefined,
 		};
 	}
 
@@ -85,6 +86,20 @@ export = () => {
 			expect(deserialized[id]).to.be.ok();
 			assertSoldierEqual(soldier, deserialized[id]!);
 		}
+	});
+
+	it("should serialize soldiers with deathChoiceDeadline", () => {
+		const state: SoldiersState = {
+			"1": generateSoldier("1", true),
+			"2": generateSoldier("2", false),
+		};
+
+		const serialized = serializeSoldiers(state);
+		const deserialized = deserializeSoldiers(serialized);
+
+		expect(deserialized["1"]!.deathChoiceDeadline).to.be.ok();
+		expect(deserialized["1"]!.deathChoiceDeadline).to.be.near(state["1"]!.deathChoiceDeadline!, 0.0001);
+		expect(deserialized["2"]!.deathChoiceDeadline).to.never.be.ok();
 	});
 
 	it("should compress the data", () => {

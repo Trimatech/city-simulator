@@ -45,12 +45,21 @@ export function DeathScreen({ activeDeadline, persistent, onDismiss }: DeathScre
 	const [isReviving, setIsReviving] = useState(false);
 	const [isExpired, setIsExpired] = useState(() => {
 		if (effectiveDeadline === undefined) return false;
-		return effectiveDeadline - tick() <= 0;
+		const expired = effectiveDeadline - tick() <= 0;
+		if (expired) {
+			warn(`[Death:DeathScreen] Initial state: already expired! deadline=${effectiveDeadline}, tick=${tick()}`);
+		}
+		return expired;
 	});
 
 	useEffect(() => {
 		if (effectiveDeadline !== undefined) {
-			setIsExpired(effectiveDeadline - tick() <= 0);
+			const timeLeft = effectiveDeadline - tick();
+			const expired = timeLeft <= 0;
+			warn(
+				`[Death:DeathScreen] effectiveDeadline changed: ${effectiveDeadline}, timeLeft=${timeLeft}s, expired=${expired}`,
+			);
+			setIsExpired(expired);
 		}
 	}, [effectiveDeadline]);
 
@@ -58,6 +67,7 @@ export function DeathScreen({ activeDeadline, persistent, onDismiss }: DeathScre
 
 	useEffect(() => {
 		if (effectiveDeadline !== undefined && !isExpired) {
+			warn(`[Death:DeathScreen] Animating IN (deadline=${effectiveDeadline}, isExpired=${isExpired})`);
 			positionMotion.set(new UDim2(0.5, 0, 2.5, 0));
 			positionMotion.spring(new UDim2(0.5, 0, 0.5, 0), springs.responsive);
 		}
@@ -65,8 +75,12 @@ export function DeathScreen({ activeDeadline, persistent, onDismiss }: DeathScre
 
 	useEffect(() => {
 		if (isExpired || isReviving) {
+			warn(`[Death:DeathScreen] Animating OUT (isExpired=${isExpired}, isReviving=${isReviving})`);
 			positionMotion.spring(new UDim2(0.5, 0, 2.5, 0), springs.responsive);
-			const thread = task.delay(1, () => onDismiss());
+			const thread = task.delay(1, () => {
+				warn(`[Death:DeathScreen] Calling onDismiss`);
+				onDismiss();
+			});
 			return () => task.cancel(thread);
 		}
 	}, [isExpired, isReviving]);
