@@ -378,7 +378,7 @@ export function executePowerupForSoldier(
 			const gen = (turboGeneration.get(soldierId) ?? 0) + 1;
 			turboGeneration.set(soldierId, gen);
 
-			const now = tick();
+			const now = Workspace.GetServerTimeNow();
 			const activeUntil =
 				math.max(store.getState(selectSoldierById(soldierId))?.turboActiveUntil ?? 0, now) +
 				POWERUP_DURATIONS.turbo;
@@ -402,7 +402,7 @@ export function executePowerupForSoldier(
 			break;
 		}
 		case "shield": {
-			const now = tick();
+			const now = Workspace.GetServerTimeNow();
 			const activeUntil =
 				math.max(store.getState(selectSoldierById(soldierId))?.shieldActiveUntil ?? 0, now) +
 				POWERUP_DURATIONS.shield;
