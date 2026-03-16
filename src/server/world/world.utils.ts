@@ -2,7 +2,7 @@ import { Falldown } from "@rbxts/falldown";
 import { Players, Workspace } from "@rbxts/services";
 import { setTimeout } from "@rbxts/set-timeout";
 import { store } from "server/store";
-import { dropCandyOnDeath } from "server/world/services/candy/candy-utils";
+import { dropCandyAlongPath, dropCandyOnDeath } from "server/world/services/candy/candy-utils";
 import { clearOwnerFromGrid, clearOwnerTracersFromGrid } from "server/world/services/soldiers/soldier-grid";
 import { getRandomPointInWorld, getSoldier } from "server/world/world-query.utils";
 import {
@@ -131,6 +131,16 @@ export function onPlayerDeath(soldierId: string) {
 				character.Destroy();
 			}
 		});
+	}
+
+	// Drop small orbs along tracers immediately (10% of orbs)
+	const soldierTracers = existing.tracers;
+	if (soldierTracers.size() >= 2) {
+		const tracerOrbs = math.ceil(math.max(0, existing.orbs) * 0.1);
+		if (tracerOrbs > 0) {
+			dropCandyAlongPath(soldierTracers, tracerOrbs);
+			store.decrementSoldierOrbs(soldierId, tracerOrbs);
+		}
 	}
 
 	store.clearSoldierTracers(soldierId);

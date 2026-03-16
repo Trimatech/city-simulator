@@ -290,84 +290,61 @@ function sampleCandySize(maxAvailable: number) {
 	return math.min(size, maxAvailable);
 }
 
-export function dropCandyOnDeath(id: string): void {
-	const soldier = getSoldier(id);
+const CANDY_SPACING = 5;
+const MAX_CANDY_DROPS = 200;
 
-	if (!soldier) {
-		return;
+/**
+ * Drops candy loot evenly along a path of points.
+ * Minimizes candy count by increasing size per candy when orbs are plentiful.
+ */
+export function dropCandyAlongPath(path: readonly Vector2[], orbBudget: number): void {
+	if (path.size() < 2 || orbBudget <= 0) return;
+
+	// Calculate total path length
+	let totalLength = 0;
+	for (let i = 0; i < path.size() - 1; i++) {
+		totalLength += path[i + 1].sub(path[i]).Magnitude;
 	}
+	if (totalLength <= 0) return;
 
-	const polygon = soldier.polygon as Vector2[];
-	const hasPolygon = polygon.size() > 2;
+	// Determine number of positions based on path length, capped by budget and max
+	const positionCount = math.clamp(math.ceil(totalLength / CANDY_SPACING), 2, MAX_CANDY_DROPS);
+	// Size per candy: spread orbs across positions, clamped 1-5
+	const sizePerCandy = math.clamp(math.floor(orbBudget / positionCount), 1, 5);
+	// Actual count we can afford at this size
+	const candyCount = math.min(positionCount, math.floor(orbBudget / sizePerCandy));
+	const spacing = totalLength / (candyCount + 1);
 
-	let remainingOrbs = math.max(0, soldier.orbs);
 	const candies: CandyEntity[] = [];
+	let traveled = 0;
+	let segIndex = 0;
+	let placed = 0;
+	let nextTarget = spacing;
 
-	const pushWithBudget = (position: Vector2) => {
-		if (remainingOrbs <= 0) return false;
-		const size = sampleCandySize(remainingOrbs);
-		candies.push(
-			createCandy({
-				position,
-				type: CandyType.Loot,
-				size,
-			}),
-		);
-		remainingOrbs -= size;
-		return remainingOrbs > 0;
-	};
+	while (placed < candyCount && segIndex < path.size() - 1) {
+		const segStart = path[segIndex];
+		const segEnd = path[segIndex + 1];
+		const segLen = segEnd.sub(segStart).Magnitude;
 
-	if (hasPolygon) {
-		print(`Soldier ${soldier.id} has polygon, dropping candy`);
-		// Determine total candy count to drop (density based on orbs)
-		const desired = math.clamp(math.ceil(math.log10(soldier.orbs + 1) * 25), 3, 200);
-
-		// 1) Place candies on vertices first
-		const vertexCount = polygon.size();
-		for (let i = 0; i < math.min(desired, vertexCount); i++) {
-			if (!pushWithBudget(polygon[i])) break;
+		while (nextTarget <= traveled + segLen && placed < candyCount) {
+			const t = (nextTarget - traveled) / segLen;
+			const pos = segStart.add(segEnd.sub(segStart).mul(t));
+			candies.push(
+				createCandy({
+					position: pos,
+					type: CandyType.Loot,
+					size: sizePerCandy,
+				}),
+			);
+			placed++;
+			nextTarget += spacing;
 		}
 
-		// 2) If candies remain, distribute equally across edges
-		const remaining = math.max(0, desired - candies.size());
-		if (remaining > 0) {
-			const edges: Array<{ a: Vector2; b: Vector2 }> = [];
-			for (let i = 0; i < vertexCount; i++) {
-				const a = polygon[i];
-				const b = polygon[(i + 1) % vertexCount];
-				edges.push({ a, b });
-			}
-
-			const basePerEdge = math.floor(remaining / edges.size());
-			const extra = remaining % edges.size();
-
-			for (let e = 0; e < edges.size(); e++) {
-				const edge = edges[e];
-				const countOnEdge = basePerEdge + (e < extra ? 1 : 0);
-				if (countOnEdge <= 0) continue;
-
-				// Evenly spaced along the segment, avoiding exact vertices
-				for (let i = 1; i <= countOnEdge; i++) {
-					if (remainingOrbs <= 0) break;
-					const t = i / (countOnEdge + 1);
-					const pos = edge.a.add(edge.b.sub(edge.a).mul(t));
-					if (!pushWithBudget(pos)) break;
-				}
-			}
-		}
-	} else {
-		warn("Soldier has no polygon, dropping candy at base radius");
-		const radius = SOLDIER_RADIUS_BASE;
-		const fallbackCount = 20;
-		for (const _ of $range(1, fallbackCount)) {
-			const x = random.NextNumber(-1, 1) * radius;
-			const y = random.NextNumber(-1, 1) * radius;
-			if (!pushWithBudget(soldier.position.add(new Vector2(x, y)))) break;
-		}
+		traveled += segLen;
+		segIndex++;
 	}
-	// Add created candies to in-memory and replicated grid
-	print(`[DEBUG] dropCandyOnDeath: Created ${candies.size()} candies for soldier ${id}`);
-	print(`[DEBUG] Candy IDs: ${candies.map((c) => c.id).join(", ")}`);
+
+	if (candies.size() === 0) return;
 
 	addCandies(candies);
 	const state = store.getState();
@@ -387,6 +364,64 @@ export function dropCandyOnDeath(id: string): void {
 			current[nid as string] = entity as CandyEntity;
 		}
 		store.setCandyCell(cellKey as string, current);
+	}
+}
+
+function polygonToPath(polygon: readonly Vector2[]): Vector2[] {
+	// Close the polygon loop: [v0, v1, ..., vN, v0]
+	return [...polygon, polygon[0]];
+}
+
+export function dropCandyOnDeath(id: string): void {
+	const soldier = getSoldier(id);
+	if (!soldier) return;
+
+	const polygon = soldier.polygon as Vector2[];
+	const orbBudget = math.max(0, soldier.orbs);
+
+	if (polygon.size() > 2) {
+		dropCandyAlongPath(polygonToPath(polygon), orbBudget);
+	} else {
+		// No polygon — scatter around position
+		const radius = SOLDIER_RADIUS_BASE;
+		const candies: CandyEntity[] = [];
+		let remaining = orbBudget;
+		const fallbackCount = 20;
+		for (const _ of $range(1, fallbackCount)) {
+			if (remaining <= 0) break;
+			const size = sampleCandySize(remaining);
+			const x = random.NextNumber(-1, 1) * radius;
+			const y = random.NextNumber(-1, 1) * radius;
+			candies.push(
+				createCandy({
+					position: soldier.position.add(new Vector2(x, y)),
+					type: CandyType.Loot,
+					size,
+				}),
+			);
+			remaining -= size;
+		}
+		if (candies.size() === 0) return;
+
+		addCandies(candies);
+		const state = store.getState();
+		const resolution = selectCandyGridResolution({ candyGrid: state.candyGrid });
+		const res = resolution > 0 ? resolution : candyGrid.resolution;
+		const byCell: { [cellKey: string]: { [id: string]: CandyEntity } } = {};
+		for (const c of candies) {
+			const cx = math.floor(c.position.X / res);
+			const cy = math.floor(c.position.Y / res);
+			const key = `${cx},${cy}`;
+			(byCell[key] ||= {})[c.id] = c;
+		}
+		const cells = selectCandyGridCells({ candyGrid: store.getState().candyGrid });
+		for (const [cellKey, newIds] of pairs(byCell)) {
+			const current = { ...(cells[cellKey as string] ?? {}) } as { [id: string]: CandyEntity | undefined };
+			for (const [nid, entity] of pairs(newIds as unknown as { [id: string]: CandyEntity })) {
+				current[nid as string] = entity as CandyEntity;
+			}
+			store.setCandyCell(cellKey as string, current);
+		}
 	}
 }
 
