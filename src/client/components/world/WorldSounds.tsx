@@ -184,7 +184,7 @@ function WorldSoundsComponent() {
 	// Tracer/trail wall placement sound (local player only)
 	useEffect(() => {
 		if (!hasLocalSoldier) {
-			warn("no local soldier");
+			print("no local soldier in world sounds");
 			return;
 		}
 		if (lastTracerPoint === undefined) {

@@ -21,11 +21,13 @@ async function loadPlayerSave(player: Player) {
 		const document = await collection.load(`${player.UserId}`);
 
 		if (!player.IsDescendantOf(Players)) {
+			print(`player ${player.Name} is not a descendant of Players..........`);
 			return document.close();
 		}
 
 		const disconnect = store.subscribe(selectPlayerSave(player.Name), (newSave) => {
 			if (newSave) {
+				print(`saving ${player.Name} with ${newSave}..........`);
 				document.write(newSave);
 			}
 		});
@@ -37,6 +39,7 @@ async function loadPlayerSave(player: Player) {
 		});
 
 		const data = document.read();
+		print(`loading ${player.Name} with ${data}..........`);
 		store.setPlayerSave(player.Name, { ...defaultPlayerSave, ...data });
 	} catch (e) {
 		warn(`Failed to load data for ${player.Name}: ${e}`);
