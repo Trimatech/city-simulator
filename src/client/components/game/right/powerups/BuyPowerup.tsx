@@ -1,26 +1,18 @@
 import { useKeyPress, useMotion } from "@rbxts/pretty-react-hooks";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "@rbxts/react";
-import { useSelector } from "@rbxts/react-reflex";
 import { GuiService, UserInputService } from "@rbxts/services";
 import { ReactiveButton2 } from "@rbxts-ui/components";
 import { HStack, Transition } from "@rbxts-ui/layout";
 import { Frame, Image, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
-import { useDeadlineTimer } from "client/hooks/use-deadline-timer";
 import { Particles } from "client/ui/Particles/Particles";
 import { ParticleEmitter2DConfig } from "client/ui/Particles/Particles.interfaces";
 import { useRem } from "client/ui/rem/useRem";
 import assets from "shared/assets";
 import { palette, textStrokeGradient } from "shared/constants/palette";
-import {
-	POWERUP_BUTTON_STYLES,
-	POWERUP_DURATIONS,
-	POWERUP_OUTER_BORDER_COLOR,
-	PowerupId,
-} from "shared/constants/powerups";
+import { POWERUP_BUTTON_STYLES, POWERUP_OUTER_BORDER_COLOR, PowerupId } from "shared/constants/powerups";
 import { remotes } from "shared/remotes";
-import { selectLocalShieldActiveUntil, selectLocalTurboActiveUntil } from "shared/store/soldiers";
 import { brighten } from "shared/utils/color-utils";
 
 interface Props {
@@ -29,6 +21,7 @@ interface Props {
 	readonly enabled: boolean;
 	readonly order: number;
 	readonly price: number;
+	readonly children?: React.Element;
 }
 
 const POWERUP_ICONS: Record<PowerupId, string> = {
@@ -80,20 +73,9 @@ function getOrbFountainConfig(price: number): ParticleEmitter2DConfig {
 	};
 }
 
-export function BuyPowerup({ id, label, enabled, order, price }: Props) {
+export function BuyPowerup({ id, label, enabled, order, price, children }: Props) {
 	const rem = useRem();
 	const style = POWERUP_BUTTON_STYLES[id];
-
-	const turboActiveUntil = useSelector(selectLocalTurboActiveUntil);
-	const isTurboActive = id === "turbo" && turboActiveUntil > 0;
-	const { secondsLeft: turboSecondsLeft } = useDeadlineTimer(turboActiveUntil, POWERUP_DURATIONS.turbo);
-
-	const shieldActiveUntil = useSelector(selectLocalShieldActiveUntil);
-	const isShieldActive = id === "shield" && shieldActiveUntil > 0;
-	const { secondsLeft: shieldSecondsLeft } = useDeadlineTimer(shieldActiveUntil, POWERUP_DURATIONS.shield);
-
-	const isTimerActive = isTurboActive || isShieldActive;
-	const timerSecondsLeft = isTurboActive ? turboSecondsLeft : shieldSecondsLeft;
 
 	const HEIGHT = rem(CIRCLE_SIZE);
 	const WIDTH = HEIGHT;
@@ -300,23 +282,7 @@ export function BuyPowerup({ id, label, enabled, order, price }: Props) {
 									backgroundTransparency={1}
 								/>
 
-								{isTimerActive && (
-									<Text
-										position={new UDim2(0, 0, 0, 0)}
-										size={new UDim2(1, 0, 1, 0)}
-										text={timerSecondsLeft}
-										font={fonts.fredokaOne.regular}
-										textColor={palette.white}
-										textSize={rem(3)}
-										textXAlignment="Center"
-										textYAlignment="Center"
-										zIndex={5}
-									>
-										<uistroke Thickness={rem(0.1)} Color={palette.white}>
-											<uigradient Color={textStrokeGradient} Rotation={90} />
-										</uistroke>
-									</Text>
-								)}
+								{children}
 							</Frame>
 						</HStack>
 					</Frame>

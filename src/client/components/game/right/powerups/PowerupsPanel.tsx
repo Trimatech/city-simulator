@@ -7,6 +7,8 @@ import { selectLocalOrbs } from "shared/store/soldiers";
 
 import { BuyPowerup } from "./BuyPowerup";
 import { OrbsMeter } from "./OrbsMeter";
+import { ShieldTimer } from "./ShieldTimer";
+import { TurboTimer } from "./TurboTimer";
 
 interface Props {
 	readonly anchorPoint: Vector2;
@@ -60,7 +62,9 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 					enabled={orbs >= POWERUP_PRICES.shield}
 					order={3}
 					price={POWERUP_PRICES.shield}
-				/>
+				>
+					<ShieldTimer />
+				</BuyPowerup>
 
 				<BuyPowerup
 					id="tower"
@@ -76,7 +80,9 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 					enabled={orbs >= POWERUP_PRICES.turbo}
 					order={5}
 					price={POWERUP_PRICES.turbo}
-				/>
+				>
+					<TurboTimer />
+				</BuyPowerup>
 			</VStack>
 			<OrbsMeter anchorPoint={new Vector2(0, 0)} position={new UDim2(0, 0, 0, 0)} />
 		</HStack>
