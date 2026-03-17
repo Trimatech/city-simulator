@@ -14,7 +14,7 @@ export const RANDOM_SKIN = "__random__";
 
 export const defaultPlayerSave: PlayerSave = {
 	balance: 100,
-	crystals: 3,
+	crystals: 33,
 	skins: [RANDOM_SKIN, ...freeWallSkins.map((skin) => skin.id)],
 	skin: RANDOM_SKIN,
 	dailyStreak: 0,
