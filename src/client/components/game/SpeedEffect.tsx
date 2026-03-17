@@ -16,8 +16,8 @@ interface SpikeData {
 	readonly thicknessFactor: number;
 }
 
-const LENGTH_POOL = [0.12, 0.18, 0.1, 0.16, 0.14, 0.19, 0.11, 0.17];
-const THICKNESS_POOL = [0.025, 0.035, 0.02, 0.03, 0.028, 0.04, 0.022, 0.032];
+const LENGTH_POOL = [0.22, 0.32, 0.18, 0.28, 0.25, 0.35, 0.2, 0.3];
+const THICKNESS_POOL = [0.012, 0.035, 0.01, 0.03, 0.014, 0.04, 0.011, 0.032];
 
 function generateGroup(groupIndex: number): SpikeData[] {
 	const angleStep = 360 / SPIKES_PER_GROUP;
@@ -191,7 +191,7 @@ export function SpeedEffect({ paused = false }: Props) {
 								endX={spike.tipX}
 								endY={spike.tipY}
 								thickness={spike.thickness}
-								transparency={0.05}
+								transparency={0.45}
 								zIndex={5}
 							/>
 						))}
