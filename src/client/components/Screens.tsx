@@ -5,6 +5,7 @@ import { selectHasLocalSoldier, selectLocalDeathChoiceDeadline, selectLocalSoldi
 
 import { DeathScreen } from "./game/death/DeathScreen";
 import { GameUI } from "./game/GameUI";
+import { SpeedEffect } from "./game/SpeedEffect";
 import { Home } from "./menu/home/home";
 
 export function Screens() {
@@ -49,6 +50,9 @@ export function Screens() {
 			{spawned && <GameUI visible={gameUIVisible} />}
 			<DeathScreen activeDeadline={cachedDeadline} onDismiss={() => setCachedDeadline(undefined)} />
 			{!spawned && <Home visible={homeVisible} />}
+			<frame Size={new UDim2(1, 0, 1, 0)} AnchorPoint={new Vector2(0, 0)} BackgroundTransparency={1}>
+				<SpeedEffect />
+			</frame>
 		</>
 	);
 }
