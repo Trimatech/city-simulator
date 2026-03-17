@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { Workspace } from "@rbxts/services";
-import { selectHasLocalSoldier, selectLocalDeathChoiceDeadline, selectLocalSoldier } from "shared/store/soldiers";
+import {
+	selectHasLocalSoldier,
+	selectLocalDeathChoiceDeadline,
+	selectLocalSoldier,
+	selectLocalTurboActiveUntil,
+} from "shared/store/soldiers";
 
 import { DeathScreen } from "./game/death/DeathScreen";
 import { GameUI } from "./game/GameUI";
@@ -41,6 +46,8 @@ export function Screens() {
 		);
 	}, [spawned, soldier?.dead, deathChoiceDeadline, cachedDeadline]);
 
+	const turboActiveUntil = useSelector(selectLocalTurboActiveUntil);
+
 	const isDeathActive = cachedDeadline !== undefined;
 	const gameUIVisible = spawned && !soldier?.dead;
 	const homeVisible = !spawned && !isDeathActive;
@@ -50,9 +57,16 @@ export function Screens() {
 			{spawned && <GameUI visible={gameUIVisible} />}
 			<DeathScreen activeDeadline={cachedDeadline} onDismiss={() => setCachedDeadline(undefined)} />
 			{!spawned && <Home visible={homeVisible} />}
-			<frame Size={new UDim2(1, 0, 1, 0)} AnchorPoint={new Vector2(0, 0)} BackgroundTransparency={1}>
-				<SpeedEffect />
-			</frame>
+			{turboActiveUntil > 0 && (
+				<frame
+					key={`speed-${turboActiveUntil}`}
+					Size={new UDim2(1, 0, 1, 0)}
+					AnchorPoint={new Vector2(0, 0)}
+					BackgroundTransparency={1}
+				>
+					<SpeedEffect />
+				</frame>
+			)}
 		</>
 	);
 }

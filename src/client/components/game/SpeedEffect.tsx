@@ -1,9 +1,6 @@
 import React, { useBinding, useEffect, useMemo, useRef, useState } from "@rbxts/react";
-import { useSelector } from "@rbxts/react-reflex";
-import { Workspace } from "@rbxts/services";
 import { setInterval } from "@rbxts/set-timeout";
 import { SpikeLine } from "client/ui/SpikeLine";
-import { selectLocalTurboActiveUntil } from "shared/store/soldiers";
 
 const GROUP_COUNT = 4;
 const SPIKES_PER_GROUP = 16;
@@ -86,8 +83,6 @@ interface Props {
 
 export function SpeedEffect({ paused = false }: Props) {
 	const frameRef = useRef<Frame>();
-	const turboActiveUntil = useSelector(selectLocalTurboActiveUntil);
-	const [currentTime, setCurrentTime] = useBinding(Workspace.GetServerTimeNow());
 	const [frameSize, setFrameSize] = useState(new Vector2(0, 0));
 
 	const groupTransparencies: [React.Binding<number>, (val: number) => void][] = [];
@@ -120,28 +115,11 @@ export function SpeedEffect({ paused = false }: Props) {
 		};
 	}, []);
 
-	// Reset time when turbo changes
-	useEffect(() => {
-		setCurrentTime(Workspace.GetServerTimeNow());
-	}, [turboActiveUntil]);
-
 	// Flipbook animation: cycle active group
 	useEffect(() => {
-		const now = Workspace.GetServerTimeNow();
-		setCurrentTime(now);
-
-		if (turboActiveUntil <= now) {
-			return;
-		}
+		if (paused) return;
 
 		const clearInterval = setInterval(() => {
-			const latestTime = Workspace.GetServerTimeNow();
-			setCurrentTime(latestTime);
-
-			if (latestTime >= turboActiveUntil || paused) {
-				return;
-			}
-
 			const prev = activeGroupRef.current;
 			const nexta = (prev + 1) % GROUP_COUNT;
 			activeGroupRef.current = nexta;
@@ -152,7 +130,7 @@ export function SpeedEffect({ paused = false }: Props) {
 		}, FRAME_INTERVAL);
 
 		return clearInterval;
-	}, [paused, turboActiveUntil]);
+	}, [paused]);
 
 	// Pre-compute all spike positions per group (only changes on resize)
 	const groupPositions = useMemo(() => {
@@ -162,15 +140,12 @@ export function SpeedEffect({ paused = false }: Props) {
 		return GROUPS.map((spikes) => computeGroupPositions(spikes, frameSize.X, frameSize.Y));
 	}, [frameSize]);
 
-	const isActive = currentTime.map((t) => turboActiveUntil > t);
-
 	return (
 		<frame
 			ref={frameRef}
 			Size={new UDim2(1, 0, 1, 0)}
 			BackgroundTransparency={1}
 			Active={false}
-			Visible={isActive}
 			ZIndex={5}
 			ClipsDescendants={false}
 		>
