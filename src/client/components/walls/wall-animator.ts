@@ -55,6 +55,13 @@ function applySkin(part: BasePart): void {
 function animateWallUp(part: BasePart): void {
 	const targetCFrame = getTargetCFrame(part);
 
+	// Position at ground level (Y=0) before animating up, matching tracer wall behavior
+	const currentPos = part.Position;
+	const groundCFrame = new CFrame(new Vector3(currentPos.X, 0, currentPos.Z)).mul(
+		part.CFrame.sub(part.Position), // Preserve rotation
+	);
+	part.CFrame = groundCFrame;
+
 	const tweenInfo = new TweenInfo(ANIMATION_DURATION, Enum.EasingStyle.Quad, Enum.EasingDirection.Out);
 	const tween = TweenService.Create(part, tweenInfo, { CFrame: targetCFrame });
 
