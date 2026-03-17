@@ -87,6 +87,7 @@ declare const assets: {
 		skin_indicator: string
 		skin_indicator_locked: string
 		skulls_bg: string
+		speed_spike: string
 		spot_glow: string
 		sunburst: string
 		tile_stripes: string
