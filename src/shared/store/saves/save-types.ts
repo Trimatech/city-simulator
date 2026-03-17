@@ -1,4 +1,5 @@
 import { t } from "@rbxts/t";
+import { POWERUP_PRICES } from "shared/constants/powerups";
 import { freeWallSkins } from "shared/constants/skins";
 
 export interface PlayerSave {
@@ -13,7 +14,7 @@ export interface PlayerSave {
 export const RANDOM_SKIN = "__random__";
 
 export const defaultPlayerSave: PlayerSave = {
-	balance: 100,
+	balance: POWERUP_PRICES.turbo - 5,
 	crystals: 33,
 	skins: [RANDOM_SKIN, ...freeWallSkins.map((skin) => skin.id)],
 	skin: RANDOM_SKIN,
