@@ -16,7 +16,7 @@ const root = createRoot(new Instance("Folder"));
 const target = Players.LocalPlayer.WaitForChild("PlayerGui");
 
 // Limit max camera zoom-out for the local player
-Players.LocalPlayer.CameraMaxZoomDistance = IS_LOCAL ? 400 : 25;
+Players.LocalPlayer.CameraMaxZoomDistance = IS_LOCAL ? 400 : 40;
 
 root.render(
 	createPortal(

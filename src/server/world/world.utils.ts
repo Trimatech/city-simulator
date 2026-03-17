@@ -9,6 +9,7 @@ import {
 	DEATH_CHOICE_TIMEOUT_SEC,
 	INITIAL_POLYGON_DIAMETER,
 	INITIAL_POLYGON_ITEMS,
+	IS_LOCAL,
 	WORLD_BOUNDS,
 } from "shared/constants/core";
 import { calculatePolygonOperation, isPointInPolygon, vector2ToPoint } from "shared/polybool/poly-utils";
@@ -328,8 +329,8 @@ function getPolygonBoundingBox(polygon: ReadonlyArray<Vector2>): { min: Vector2;
 	};
 }
 
-const BOT_SPAWN_MIN_DISTANCE = 60;
-const BOT_SPAWN_MAX_DISTANCE = 200;
+const BOT_SPAWN_MIN_DISTANCE = IS_LOCAL ? 60 : 150;
+const BOT_SPAWN_MAX_DISTANCE = IS_LOCAL ? 200 : 400;
 
 /**
  * Returns a spawn point near a player's polygon bounding box (60-200 studs away)
