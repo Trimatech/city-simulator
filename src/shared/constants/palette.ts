@@ -22,46 +22,6 @@ export const accents = {
 } as const;
 
 /**
- * Catppuccin Frappe Accents (prefixed)
- */
-export const accentsFrappe = {
-	frappe_rosewater: Color3.fromRGB(242, 213, 207),
-	frappe_flamingo: Color3.fromRGB(238, 190, 190),
-	frappe_pink: Color3.fromRGB(244, 184, 228),
-	frappe_mauve: Color3.fromRGB(202, 158, 230),
-	frappe_red: Color3.fromRGB(231, 130, 132),
-	frappe_maroon: Color3.fromRGB(234, 153, 156),
-	frappe_peach: Color3.fromRGB(239, 159, 118),
-	frappe_yellow: Color3.fromRGB(229, 200, 144),
-	frappe_green: Color3.fromRGB(166, 209, 137),
-	frappe_teal: Color3.fromRGB(129, 200, 190),
-	frappe_sky: Color3.fromRGB(153, 209, 219),
-	frappe_sapphire: Color3.fromRGB(133, 193, 220),
-	frappe_blue: Color3.fromRGB(140, 170, 238),
-	frappe_lavender: Color3.fromRGB(186, 187, 241),
-} as const;
-
-/**
- * Catppuccin Macchiato Accents (prefixed)
- */
-export const accentsMacchiato = {
-	macchiato_rosewater: Color3.fromRGB(244, 219, 214),
-	macchiato_flamingo: Color3.fromRGB(240, 198, 198),
-	macchiato_pink: Color3.fromRGB(245, 189, 230),
-	macchiato_mauve: Color3.fromRGB(198, 160, 246),
-	macchiato_red: Color3.fromRGB(237, 135, 150),
-	macchiato_maroon: Color3.fromRGB(238, 153, 160),
-	macchiato_peach: Color3.fromRGB(245, 169, 127),
-	macchiato_yellow: Color3.fromRGB(238, 212, 159),
-	macchiato_green: Color3.fromRGB(166, 218, 149),
-	macchiato_teal: Color3.fromRGB(139, 213, 202),
-	macchiato_sky: Color3.fromRGB(145, 215, 227),
-	macchiato_sapphire: Color3.fromRGB(125, 196, 228),
-	macchiato_blue: Color3.fromRGB(138, 173, 244),
-	macchiato_lavender: Color3.fromRGB(183, 189, 248),
-} as const;
-
-/**
  * Catppuccin Latte Accents (prefixed)
  */
 export const accentsLatte = {
@@ -133,8 +93,6 @@ export const palette = {
  * Bot-only accents (prefixed variants)
  */
 export const botAccents = {
-	...accentsFrappe,
-	...accentsMacchiato,
 	...accentsLatte,
 } as const;
 
