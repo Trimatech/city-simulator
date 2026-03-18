@@ -10,11 +10,11 @@ export function RightSide() {
 	return (
 		<Group
 			name="RightSide"
-			anchorPoint={new Vector2(1, 1)}
-			size={new UDim2(0, rem(10), 0, rem(10))}
+			anchorPoint={new Vector2(1, 0.5)}
+			size={new UDim2(0, rem(8), 1, 0)}
 			position={new UDim2(1, 0, 0.5, 0)}
 		>
-			<PowerupsPanel anchorPoint={new Vector2(0.5, 0.5)} position={new UDim2(0.5, 0, 0.75, 0)} />
+			<PowerupsPanel />
 		</Group>
 	);
 }

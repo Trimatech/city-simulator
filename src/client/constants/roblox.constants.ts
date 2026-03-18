@@ -1,0 +1,2 @@
+export const ROBLOX_TOOLBAR_HEIGHT = 68;
+export const ROBLOX_TOOLBAR_WIDTH = 150;

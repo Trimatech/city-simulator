@@ -2,6 +2,7 @@ import React, { useState } from "@rbxts/react";
 import { HStack } from "@rbxts-ui/layout";
 import { Frame } from "@rbxts-ui/primitives";
 import { HomeStats } from "client/components/stats/HomeStats";
+import { ROBLOX_TOOLBAR_HEIGHT } from "client/constants/roblox.constants";
 import { MainButton, ShopButtonTextWithIcon } from "client/ui/MainButton";
 import { Overlay } from "client/ui/Overlay";
 import { useRem } from "client/ui/rem/useRem";
@@ -32,7 +33,7 @@ export function Home({ visible }: HomeProps) {
 		<>
 			<SlideIn visible={visible} direction="left">
 				<HStack
-					position={new UDim2(0, rem(ROOT_PADDING), 0, rem(ROOT_PADDING) + rem(4))}
+					position={new UDim2(0, rem(ROOT_PADDING), 0, ROBLOX_TOOLBAR_HEIGHT)}
 					verticalAlignment={Enum.VerticalAlignment.Top}
 					spacing={rem(1)}
 				>

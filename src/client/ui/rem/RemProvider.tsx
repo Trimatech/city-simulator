@@ -9,7 +9,7 @@ export interface RemProviderProps extends React.PropsWithChildren {
 }
 
 export const DEFAULT_REM = 16;
-export const MIN_REM = 5;
+export const MIN_REM = 8;
 export const MAX_REM = 16;
 const BASE_RESOLUTION = new Vector2(2560, 1440);
 const MAX_ASPECT_RATIO = 19 / 9;

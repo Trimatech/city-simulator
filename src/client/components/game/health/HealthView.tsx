@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { HStack } from "@rbxts-ui/layout";
 import { Frame } from "@rbxts-ui/primitives";
+import { ROBLOX_TOOLBAR_HEIGHT, ROBLOX_TOOLBAR_WIDTH } from "client/constants/roblox.constants";
 import { Particles } from "client/ui/Particles/Particles";
 import { ParticleEmitter2DConfig } from "client/ui/Particles/Particles.interfaces";
 import { useRem } from "client/ui/rem/useRem";
@@ -9,9 +10,6 @@ import assets from "shared/assets";
 import { selectLocalHealth } from "shared/store/soldiers";
 
 import { HealthBar } from "./HealthBar";
-
-const ROBLOX_TOOLBAR_HEIGHT = 68;
-const ROBLOX_TOOLBAR_WIDTH = 150;
 
 const BURST_LIFETIME_MAX = 2;
 const BURST_EMIT_DURATION = 0.3;
@@ -74,7 +72,7 @@ export function HealthView() {
 	return (
 		<HStack
 			name="HealthView"
-			size={new UDim2(0, rem(25), 0, ROBLOX_TOOLBAR_HEIGHT)}
+			size={new UDim2(0, rem(35), 0, ROBLOX_TOOLBAR_HEIGHT)}
 			position={new UDim2(0, ROBLOX_TOOLBAR_WIDTH, 0, 0)}
 			spacing={rem(0.5)}
 			padding={30}

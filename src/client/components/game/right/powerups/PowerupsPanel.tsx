@@ -15,7 +15,7 @@ interface Props {
 	readonly position: UDim2;
 }
 
-export function PowerupsPanel({ anchorPoint, position }: Props) {
+export function PowerupsPanel() {
 	const rem = useRem();
 	const height = rem(36);
 	const width = rem(8);
@@ -23,14 +23,7 @@ export function PowerupsPanel({ anchorPoint, position }: Props) {
 	const orbs = useSelector(selectLocalOrbs) ?? 0;
 
 	return (
-		<HStack
-			name="powerups-panel"
-			anchorPoint={anchorPoint}
-			position={position}
-			size={size}
-			verticalAlignment={Enum.VerticalAlignment.Bottom}
-			spacing={rem(1)}
-		>
+		<HStack name="powerups-panel" size={size} verticalAlignment={Enum.VerticalAlignment.Bottom} spacing={rem(1)}>
 			<VStack
 				name="buy-powerups-stack"
 				size={new UDim2(0, rem(5), 1, 0)}

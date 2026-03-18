@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "@rbxts/react";
 import { useSelectorCreator } from "@rbxts/react-reflex";
+import { Workspace } from "@rbxts/services";
 import { HStack, VStack } from "@rbxts-ui/layout";
 import { Frame, Image, Text } from "@rbxts-ui/primitives";
 import { ProgressBarTimer } from "client/components/ProgressBarTimer";
@@ -8,10 +9,9 @@ import { springs } from "client/constants/springs";
 import { useMotion } from "client/hooks";
 import { MainButton, ShopButtonTextWithIcon } from "client/ui/MainButton";
 import { useRem } from "client/ui/rem/useRem";
-import { Workspace } from "@rbxts/services";
 import assets from "shared/assets";
 import { DEATH_CHOICE_TIMEOUT_SEC, USER_NAME } from "shared/constants/core";
-import { palette } from "shared/constants/palette";
+import { BORDER_GRADIENT, palette } from "shared/constants/palette";
 import { remotes } from "shared/remotes";
 import { selectPlayerCrystals } from "shared/store/saves";
 
@@ -19,15 +19,8 @@ const WINDOW_OUTER_BORDER = Color3.fromHex("#000000");
 const GRADIENT_TOP = Color3.fromHex("#44b3de");
 const GRADIENT_BOTTOM = Color3.fromHex("#096db3");
 
-const BORDER_GRADIENT = new ColorSequence([
-	new ColorSequenceKeypoint(0, Color3.fromHex("#C1E3FF")),
-	new ColorSequenceKeypoint(0.5, Color3.fromHex("#43B9F7")),
-	new ColorSequenceKeypoint(1, Color3.fromHex("#326FB6")),
-]);
-
 const BG_GRADIENT = new ColorSequence(GRADIENT_TOP, GRADIENT_BOTTOM);
 
-const DARK_BORDER_COLOR = Color3.fromHex("#01253B");
 const DARK_BORDER_THICKNESS = 0.2;
 const BORDER_THICKNESS = 0.3;
 
@@ -58,7 +51,9 @@ export function DeathScreen({ activeDeadline, persistent, onDismiss }: DeathScre
 		const now = Workspace.GetServerTimeNow();
 		const expired = effectiveDeadline - now <= 0;
 		if (expired) {
-			warn(`[Death:DeathScreen] Initial state: already expired! deadline=${effectiveDeadline}, serverTime=${now}`);
+			warn(
+				`[Death:DeathScreen] Initial state: already expired! deadline=${effectiveDeadline}, serverTime=${now}`,
+			);
 		}
 		return expired;
 	});
@@ -124,7 +119,7 @@ export function DeathScreen({ activeDeadline, persistent, onDismiss }: DeathScre
 				<uicorner CornerRadius={windowRadius} />
 				<uigradient Color={BG_GRADIENT} Rotation={90} />
 				<uistroke
-					Color={DARK_BORDER_COLOR}
+					Color={palette.darkBorderColor}
 					Thickness={rem(DARK_BORDER_THICKNESS + BORDER_THICKNESS)}
 					ZIndex={1}
 					BorderStrokePosition={Enum.BorderStrokePosition.Outer}

@@ -3,21 +3,15 @@ import { VStack } from "@rbxts-ui/layout";
 import { Frame } from "@rbxts-ui/primitives";
 import { useRem } from "client/ui/rem/useRem";
 import assets from "shared/assets";
-import { palette } from "shared/constants/palette";
+import { BORDER_GRADIENT, palette } from "shared/constants/palette";
 
 const WINDOW_BG = Color3.fromHex("#3a90dd");
 const WINDOW_OUTER_BORDER = Color3.fromHex("#000000");
 
 const DARK_BORDER_THICKNESS = 0.2;
-const DARK_BORDER_COLOR = Color3.fromHex("#01253B");
 const DARK_BG = Color3.fromHex("#00334e");
 
 const BORDER_THICKNESS = 0.3;
-const BORDER_GRADIENT = new ColorSequence([
-	new ColorSequenceKeypoint(0, Color3.fromHex("#C1E3FF")),
-	new ColorSequenceKeypoint(0.5, Color3.fromHex("#43B9F7")),
-	new ColorSequenceKeypoint(1, Color3.fromHex("#326FB6")),
-]);
 
 interface GameWindowProps {
 	readonly header: React.Element;
@@ -50,7 +44,7 @@ export function GameWindow({ header, children }: GameWindowProps) {
 			>
 				<uicorner CornerRadius={windowRadius} />
 				<uistroke
-					Color={DARK_BORDER_COLOR}
+					Color={palette.darkBorderColor}
 					Thickness={rem(DARK_BORDER_THICKNESS + BORDER_THICKNESS)}
 					ZIndex={1}
 				/>
@@ -85,7 +79,7 @@ export function GameWindow({ header, children }: GameWindowProps) {
 					>
 						{/* <uiflexitem FlexMode={Enum.UIFlexMode.Fill} /> */}
 						<uicorner CornerRadius={contentRadius} />
-						<uistroke Color={DARK_BORDER_COLOR} Thickness={rem(DARK_BORDER_THICKNESS)} ZIndex={2} />
+						<uistroke Color={palette.darkBorderColor} Thickness={rem(DARK_BORDER_THICKNESS)} ZIndex={2} />
 						<uistroke
 							Color={palette.white}
 							Thickness={rem(BORDER_THICKNESS + DARK_BORDER_THICKNESS)}

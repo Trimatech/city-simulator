@@ -76,6 +76,7 @@ const otherColors = {
 	textStrokeFrom: Color3.fromRGB(10, 60, 130),
 	textStrokeTo: Color3.fromRGB(5, 40, 100),
 	claimYellow: Color3.fromHex("#F9CB4E"),
+	darkBorderColor: Color3.fromHex("#01253B"),
 } as const;
 
 /**
@@ -103,3 +104,9 @@ export function getRandomAccent(): Color3 {
 }
 
 export const textStrokeGradient = new ColorSequence(palette.textStrokeFrom, palette.textStrokeTo);
+
+export const BORDER_GRADIENT = new ColorSequence([
+	new ColorSequenceKeypoint(0, Color3.fromHex("#C1E3FF")),
+	new ColorSequenceKeypoint(0.5, Color3.fromHex("#43B9F7")),
+	new ColorSequenceKeypoint(1, Color3.fromHex("#326FB6")),
+]);
