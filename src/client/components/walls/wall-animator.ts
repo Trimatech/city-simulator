@@ -8,6 +8,7 @@ import {
 	WALL_TAG,
 } from "shared/constants/core";
 import { getWallSkin } from "shared/constants/skins";
+import { loadSharedCloneByPath } from "shared/SharedModelManager";
 
 const ANIMATION_DURATION = 0.8;
 const WALL_ANIMATION_DISTANCE_THRESHOLD = 150; // Don't animate walls farther than this
@@ -48,8 +49,24 @@ function applySkin(part: BasePart): void {
 	if (!skinId) return;
 
 	const skin = getWallSkin(skinId);
-	// Apply the tint color (works for both tint and part skins since part skins also have a tint)
-	part.Color = skin.tint;
+
+	if (skin.type === "part") {
+		// Clone the skin model and transfer its visual children to the wall part
+		loadSharedCloneByPath<BasePart>(skin.modelPath).then((skinModel) => {
+			// Transfer all children (SurfaceGuis, Textures, Decals, etc.) from the cloned model
+			for (const child of skinModel.GetChildren()) {
+				child.Parent = part;
+			}
+			// Copy visual properties from the skin model
+			part.Color = skinModel.Color;
+			part.Material = skinModel.Material;
+			part.Transparency = skinModel.Transparency;
+			skinModel.Destroy();
+		});
+	} else {
+		// Simple tint skin — just apply color
+		part.Color = skin.tint;
+	}
 }
 
 function animateWallUp(part: BasePart): void {
