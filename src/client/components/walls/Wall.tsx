@@ -174,7 +174,7 @@ function WallComponent({
 			yOffsetExtra,
 		);
 
-		part.Size = new Vector3(width, height, thickness);
+		part.Size = new Vector3(width, height, thickness + yOffsetExtra);
 
 		const targetPartCFrame = new CFrame(center).mul(rotation);
 		const targetCylinderCFrame = new CFrame(startPosition).mul(CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90)));

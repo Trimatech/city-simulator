@@ -200,7 +200,7 @@ function updateWallPartGeometry(compositeKey: string): void {
 	const yOffset = getSoldierYOffset(line.ownerId);
 	const { width, center, rotation } = calculateWallTransform(line.a, line.b, height, false, extA, extB, yOffset);
 
-	part.Size = new Vector3(width, height, WALL_THICKNESS);
+	part.Size = new Vector3(width, height, WALL_THICKNESS + yOffset);
 	part.CFrame = new CFrame(center).mul(rotation);
 }
 
@@ -269,7 +269,7 @@ function createWallPart(cellKey: string, edgeId: string, line: GridLine): BasePa
 	}
 
 	part.Name = `wall_${cellKey}_${edgeId}`;
-	part.Size = new Vector3(width, height, WALL_THICKNESS);
+	part.Size = new Vector3(width, height, WALL_THICKNESS + yOffset);
 	part.CFrame = new CFrame(center).mul(rotation);
 	part.Anchored = true;
 	part.CanCollide = false;
