@@ -15,4 +15,5 @@ export interface ParticleEmitter2DConfig {
 	dragForce?: number; // New property to control drag force
 	acceleration: NumberRange; // Acceleration applied to particles as a range
 	emit?: number; // Initial amount of particles to generate
+	aspectRatio?: number; // Width / height ratio (default 1 = square). < 1 makes particles taller.
 }

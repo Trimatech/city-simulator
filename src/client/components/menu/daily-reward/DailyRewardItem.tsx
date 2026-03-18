@@ -122,6 +122,7 @@ export function DailyRewardItem({
 			zOffset: 10,
 			gravityStrength: 350,
 			dragForce: 0.6,
+			aspectRatio: 0.65,
 		}),
 		[icon],
 	);

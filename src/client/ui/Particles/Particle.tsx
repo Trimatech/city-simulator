@@ -16,8 +16,9 @@ new Instance("ParticleEmitter") as ParticleEmitter;
 export function Particle({ config, initialPosition }: Props) {
 	const rem = useRem();
 	const [position, setPosition] = useBinding(new UDim2(0, initialPosition.X, 0, initialPosition.Y));
+	const ar = config.aspectRatio ?? 1;
 	const [size, setSize] = useBinding(
-		new UDim2(0, evaluateNumberSequence(config.size, 0), 0, evaluateNumberSequence(config.size, 0)),
+		new UDim2(0, evaluateNumberSequence(config.size, 0) * ar, 0, evaluateNumberSequence(config.size, 0)),
 	);
 	const [rotation, setRotation] = useBinding(0);
 	const [transparency, setTransparency] = useBinding(evaluateNumberSequence(config.transparency, 0));
@@ -81,7 +82,7 @@ export function Particle({ config, initialPosition }: Props) {
 
 			// Update size
 			const currentSize = evaluateNumberSequence(config.size, alpha);
-			setSize(new UDim2(0, rem(currentSize, "pixel"), 0, rem(currentSize, "pixel")));
+			setSize(new UDim2(0, rem(currentSize * ar, "pixel"), 0, rem(currentSize, "pixel")));
 
 			// Update transparency
 			setTransparency(evaluateNumberSequence(config.transparency, alpha));
