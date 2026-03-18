@@ -92,6 +92,7 @@ declare const assets: {
 		sunburst: string
 		tile_stripes: string
 		vignette: string
+		world_bg: string
 	}
 }
 

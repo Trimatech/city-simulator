@@ -92,6 +92,7 @@ local assets = {
 		sunburst = "rbxassetid://135843462366109",
 		tile_stripes = "rbxassetid://104600821714577",
 		vignette = "rbxassetid://101589580529343",
+		world_bg = "rbxassetid://109465517537994",
 	},
 }
 
