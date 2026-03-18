@@ -33,10 +33,8 @@ export interface RewardConfig {
 	readonly beamColor: Color3;
 	readonly initialCount: number;
 	readonly initialDelay: number;
-	readonly spawnCount: number;
-	readonly spawnInterval: number;
+	readonly respawnDelay: number;
 	readonly crystalReward: number;
-	readonly test: boolean;
 }
 
 export const REWARD_CONFIGS: { readonly [K in RewardType]: RewardConfig } = {
@@ -47,9 +45,7 @@ export const REWARD_CONFIGS: { readonly [K in RewardType]: RewardConfig } = {
 		beamColor: palette.sapphire,
 		initialCount: 1,
 		initialDelay: 5,
-		spawnCount: 1,
-		spawnInterval: 300,
+		respawnDelay: 300,
 		crystalReward: 1,
-		test: true,
 	},
 };

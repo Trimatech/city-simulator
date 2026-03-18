@@ -2,9 +2,11 @@ import { Players } from "@rbxts/services";
 import { setTimeout } from "@rbxts/set-timeout";
 import { store } from "server/store";
 import { getRandomPointInWorld, getSoldier } from "server/world/world-query.utils";
+import { IS_LOCAL } from "shared/constants/core";
 import { REWARD_CONFIGS, REWARD_PICKUP_RADIUS, RewardConfig, RewardType } from "shared/constants/rewards";
 import { selectSoldiersById } from "shared/store/soldiers";
 
+import { IS_TESTING_STUFF } from "../../constants";
 import { createRewardPart, markRewardCollected, removeRewardPart, type RewardPartData } from "./reward-part-manager";
 
 export interface RewardEntity {
@@ -58,9 +60,7 @@ export function spawnRewardAt(rewardType: RewardType, position: Vector2): Reward
 }
 
 export function spawnReward(rewardType: RewardType): RewardEntity {
-	const config = REWARD_CONFIGS[rewardType];
-
-	if (config.test) {
+	if (IS_LOCAL && IS_TESTING_STUFF) {
 		return spawnRewardNearPlayer(rewardType);
 	}
 
@@ -104,6 +104,16 @@ export function populateRewards(rewardType: RewardType): void {
 	}
 }
 
+function scheduleRespawn(rewardType: RewardType): void {
+	const config = REWARD_CONFIGS[rewardType];
+	setTimeout(() => {
+		if (getActiveRewardCount(rewardType) === 0) {
+			spawnReward(rewardType);
+			print(`[Rewards] Respawned ${rewardType} after ${config.respawnDelay}s cooldown`);
+		}
+	}, config.respawnDelay);
+}
+
 export function collectReward(rewardId: string, soldierId: string): void {
 	const reward = rewardsById.get(rewardId);
 	if (!reward || reward.collected) return;
@@ -123,10 +133,15 @@ export function collectReward(rewardId: string, soldierId: string): void {
 
 	markRewardCollected(rewardId);
 
+	const rewardType = reward.rewardType;
+
 	setTimeout(() => {
 		rewardsById.delete(rewardId);
 		removeRewardPart(rewardId);
 	}, REMOVAL_DELAY);
+
+	// Schedule respawn after the configured delay
+	scheduleRespawn(rewardType);
 }
 
 export function checkRewardPickups(): void {
