@@ -34,19 +34,13 @@ export function Minimap() {
 					shadowTransparency={0}
 				/>
 
-				<Frame
-					backgroundColor={palette.white}
+				<Image
+					image={assets.ui.world_bg}
 					cornerRadius={cornerRadius}
 					size={new UDim2(1, 0, 1, 0)}
-					backgroundTransparency={0}
-				>
-					<uigradient
-						Color={new ColorSequence(palette.crust, palette.mantle)}
-						Transparency={new NumberSequence(0.3, 0.1)}
-						Rotation={-45}
-					/>
-					<uistroke Color={palette.lavender} Transparency={0.9} Thickness={rem(0.25)} />
-				</Frame>
+					scaleType="Fit"
+					rotation={180}
+				/>
 
 				<Frame
 					backgroundTransparency={1}
@@ -56,13 +50,6 @@ export function Minimap() {
 				>
 					<uistroke Color={palette.text} Transparency={0.85} Thickness={rem(0.05)} />
 				</Frame>
-
-				<Image
-					image={assets.ui.map_crosshair}
-					anchorPoint={new Vector2(0.5, 0.5)}
-					size={new UDim2(0, rem(1), 0, rem(1))}
-					position={new UDim2(0.5, 0, 0.5, 0)}
-				/>
 
 				<MinimapNodes />
 				<Outline cornerRadius={cornerRadius} innerTransparency={0} outerTransparency={1} />

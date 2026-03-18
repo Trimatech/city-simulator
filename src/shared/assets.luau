@@ -34,7 +34,6 @@ local assets = {
 		backdrop = "rbxassetid://101405698758958",
 		blur = "rbxassetid://108121237220095",
 		button_glow_top = "rbxassetid://95372204523717",
-		circle = "rbxassetid://99378336767827",
 		clouds_bg = "rbxassetid://115538629850538",
 		crystals = {
 			crystals_1 = "rbxassetid://111697274501125",
@@ -54,8 +53,6 @@ local assets = {
 			store = "rbxassetid://81647999213259",
 		},
 		leader_pointer = "rbxassetid://119911225006035",
-		map_crosshair = "rbxassetid://102698198392446",
-		map_cursor = "rbxassetid://101291771113849",
 		menu_title = "rbxassetid://81914962844346",
 		patterns = {
 			dots_pattern = "rbxassetid://109011352852234",
@@ -92,7 +89,7 @@ local assets = {
 		sunburst = "rbxassetid://135843462366109",
 		tile_stripes = "rbxassetid://104600821714577",
 		vignette = "rbxassetid://101589580529343",
-		world_bg = "rbxassetid://109465517537994",
+		world_bg = "rbxassetid://73794884086855",
 	},
 }
 

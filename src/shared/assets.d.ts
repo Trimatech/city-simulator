@@ -34,7 +34,6 @@ declare const assets: {
 		backdrop: string
 		blur: string
 		button_glow_top: string
-		circle: string
 		clouds_bg: string
 		crystals: {
 			crystals_1: string
@@ -54,8 +53,6 @@ declare const assets: {
 			store: string
 		}
 		leader_pointer: string
-		map_crosshair: string
-		map_cursor: string
 		menu_title: string
 		patterns: {
 			dots_pattern: string
