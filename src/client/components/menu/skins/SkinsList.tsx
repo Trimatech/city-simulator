@@ -11,12 +11,13 @@ const SKIN_LIST = [RANDOM_SKIN, ...allWallSkins.map((skin) => skin.id)];
 export function SkinsList() {
 	const rem = useRem();
 
-	const cellSize = rem(15);
+	const cellSize = rem(14);
+	const cellHeight = cellSize + rem(4.5);
 
 	return (
-		<GridScrolling name="SkinsList" padding={rem(2)} spacing={rem(2)} cellSize={cellSize}>
+		<GridScrolling name="SkinsList" padding={rem(2)} spacing={rem(2)} cellSize={cellSize} cellHeight={cellHeight}>
 			{SKIN_LIST.map((skin) => {
-				return <SkinButton key={skin} id={skin} cellSize={cellSize} />;
+				return <SkinButton key={skin} id={skin} />;
 			})}
 		</GridScrolling>
 	);

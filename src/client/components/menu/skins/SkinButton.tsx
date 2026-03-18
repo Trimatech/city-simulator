@@ -2,6 +2,7 @@ import React, { useMemo } from "@rbxts/react";
 import { useSelectorCreator } from "@rbxts/react-reflex";
 import { Frame } from "@rbxts-ui/primitives";
 import { useMotion } from "client/hooks";
+import { useRem } from "client/ui/rem/useRem";
 import { formatInteger } from "client/utils/format-integer";
 import assets from "shared/assets";
 import { playSound } from "shared/assetsFolder";
@@ -16,10 +17,10 @@ import { SkinThumbnail } from "./SkinThumbnail";
 
 interface SkinButtonProps {
 	readonly id: string;
-	readonly cellSize: number;
 }
 
-export function SkinButton({ id, cellSize }: SkinButtonProps) {
+export function SkinButton({ id }: SkinButtonProps) {
+	const rem = useRem();
 	const skin = getWallSkin(id);
 
 	const [transparency, _transparencyMotion] = useMotion(0);
@@ -60,21 +61,24 @@ export function SkinButton({ id, cellSize }: SkinButtonProps) {
 	}, [owns, isEquipped]);
 
 	return (
-		<ShopItem
-			title={capitalizeFirst(skin.id)}
-			buttonText={actionLabel}
-			theme={theme}
-			onButtonClick={onAction}
-			size={new UDim2(0, cellSize, 0, cellSize)}
-		>
-			<Frame
-				size={new UDim2(0.7, 0, 0.7, 0)}
-				backgroundTransparency={1}
-				position={new UDim2(0.5, 0, 0.5, 0)}
-				anchorPoint={new Vector2(0.5, 0.5)}
+		<Frame size={new UDim2(1, 0, 1, 0)} backgroundTransparency={1}>
+			<uipadding PaddingBottom={new UDim(0, rem(1.5))} />
+			<ShopItem
+				title={capitalizeFirst(skin.id)}
+				buttonText={actionLabel}
+				theme={theme}
+				onButtonClick={onAction}
+				size={new UDim2(1, 0, 1, 0)}
 			>
-				<SkinThumbnail active={false} skin={skin} transparency={transparency} />
-			</Frame>
-		</ShopItem>
+				<Frame
+					size={new UDim2(0.7, 0, 0.7, 0)}
+					backgroundTransparency={1}
+					position={new UDim2(0.5, 0, 0.5, 0)}
+					anchorPoint={new Vector2(0.5, 0.5)}
+				>
+					<SkinThumbnail active={false} skin={skin} transparency={transparency} />
+				</Frame>
+			</ShopItem>
+		</Frame>
 	);
 }

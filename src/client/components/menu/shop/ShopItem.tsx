@@ -283,11 +283,11 @@ export function ShopItem({
 							</Text>
 						)}
 
-						{/* Button — Figma: y=287 in 308h → ~93.2%, overflows bottom */}
+						{/* Button — positioned below the card */}
 						<MainButton
 							onClick={onButtonClick}
 							theme={buttonTheme}
-							size={new UDim2(0.685, 0, 0, rem(4))}
+							fitContent
 							position={new UDim2(0.5, 0, 1, -rem(1))}
 							anchorPoint={new Vector2(0.5, 0)}
 						>

@@ -32,7 +32,7 @@ export function GameWindow({ header, children }: GameWindowProps) {
 
 	return (
 		<Frame
-			size={new UDim2(0.9, 0, 0, 0)}
+			size={new UDim2(0.9, 0, 0.9, 0)}
 			name="GameWindow"
 			position={new UDim2(0.5, 0, 0.5, 0)}
 			anchorPoint={new Vector2(0.5, 0.5)}
@@ -41,6 +41,7 @@ export function GameWindow({ header, children }: GameWindowProps) {
 			cornerRadius={windowRadius}
 			automaticSize={Enum.AutomaticSize.Y}
 		>
+			<uisizeconstraint MaxSize={new Vector2(rem(70), rem(50))} />
 			<Frame
 				backgroundColor={WINDOW_BG}
 				backgroundTransparency={0}

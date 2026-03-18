@@ -13,6 +13,7 @@ export interface GridScrollingProps extends ScrollingFrameProps {
 	paddingLeft?: number;
 	paddingRight?: number;
 	cellSize: number;
+	cellHeight?: number;
 }
 
 export function GridScrolling(props: GridScrollingProps) {
@@ -28,6 +29,7 @@ export function GridScrolling(props: GridScrollingProps) {
 		paddingLeft,
 		paddingRight,
 		cellSize,
+		cellHeight,
 	} = props;
 
 	const rest = omit(props, [
@@ -42,6 +44,7 @@ export function GridScrolling(props: GridScrollingProps) {
 		"verticalAlignment",
 		"name",
 		"cellSize",
+		"cellHeight",
 	]);
 
 	return (
@@ -59,7 +62,7 @@ export function GridScrolling(props: GridScrollingProps) {
 		>
 			<uigridlayout
 				CellPadding={new UDim2(0, spacing, 0, spacing)}
-				CellSize={new UDim2(0, cellSize, 0, cellSize)}
+				CellSize={new UDim2(0, cellSize, 0, cellHeight ?? cellSize)}
 				FillDirection={Enum.FillDirection.Horizontal}
 				HorizontalAlignment={horizontalAlignment ?? Enum.HorizontalAlignment.Left}
 				VerticalAlignment={verticalAlignment ?? Enum.VerticalAlignment.Top}
