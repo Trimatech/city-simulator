@@ -1,4 +1,4 @@
-import { CollectionService, Workspace } from "@rbxts/services";
+import { CollectionService, ReplicatedStorage, Workspace } from "@rbxts/services";
 import { store } from "server/store";
 import {
 	TRACER_PIECE_HEIGHT,
@@ -13,6 +13,7 @@ import {
 	WALL_THICKNESS,
 	WALL_UNDERGROUND_OFFSET,
 } from "shared/constants/core";
+import { getWallSkin } from "shared/constants/skins";
 import { selectGridResolution } from "shared/store/grid/grid-selectors";
 import type { GridCellsByEdgeId, GridLine } from "shared/store/grid/grid-types";
 import { selectSoldiersById, selectSoldierZIndex } from "shared/store/soldiers";
@@ -233,6 +234,15 @@ function getSoldierYOffset(ownerId: string): number {
 	return store.getState(selectSoldierZIndex(ownerId)) * 0.0001;
 }
 
+function cloneSkinModel(modelName: WallSkinModelName): BasePart {
+	const source = ReplicatedStorage.Models.Walls[modelName];
+	const prev = source.Archivable;
+	source.Archivable = true;
+	const clone = source.Clone();
+	source.Archivable = prev;
+	return clone;
+}
+
 function createWallPart(cellKey: string, edgeId: string, line: GridLine): BasePart {
 	const compositeKey = getCompositeKey(cellKey, edgeId);
 
@@ -246,7 +256,18 @@ function createWallPart(cellKey: string, edgeId: string, line: GridLine): BasePa
 	const { width, center, rotation } = calculateWallTransform(line.a, line.b, height, true, extA, extB, yOffset);
 	const targetY = height / 2 - 1 + yOffset;
 
-	const part = new Instance("Part");
+	const skinId = getSoldierSkin(line.ownerId);
+	const skin = getWallSkin(skinId);
+
+	// Clone model for "part" skins (preserves SurfaceGuis, Textures, etc.), plain Part for "tint" skins
+	let part: BasePart;
+	if (skin.type === "part") {
+		part = cloneSkinModel(skin.modelName);
+	} else {
+		part = new Instance("Part");
+		part.Color = skin.tint;
+	}
+
 	part.Name = `wall_${cellKey}_${edgeId}`;
 	part.Size = new Vector3(width, height, WALL_THICKNESS);
 	part.CFrame = new CFrame(center).mul(rotation);
@@ -254,10 +275,6 @@ function createWallPart(cellKey: string, edgeId: string, line: GridLine): BasePa
 	part.CanCollide = false;
 	part.TopSurface = Enum.SurfaceType.Smooth;
 	part.BottomSurface = Enum.SurfaceType.Smooth;
-	part.Material = Enum.Material.SmoothPlastic;
-	part.Color = new Color3(1, 1, 1);
-
-	const skinId = getSoldierSkin(line.ownerId);
 
 	part.SetAttribute(WALL_ATTR_TIME_ADDED, Workspace.GetServerTimeNow());
 	part.SetAttribute(WALL_ATTR_KIND, line.kind);

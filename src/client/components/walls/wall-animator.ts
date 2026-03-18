@@ -2,13 +2,10 @@ import { CollectionService, TweenService, Workspace } from "@rbxts/services";
 import { getObserverPosition2D } from "client/utils/camera-position.utils";
 import {
 	WALL_ANIMATION_THRESHOLD,
-	WALL_ATTR_SKIN_ID,
 	WALL_ATTR_TARGET_Y,
 	WALL_ATTR_TIME_ADDED,
 	WALL_TAG,
 } from "shared/constants/core";
-import { getWallSkin } from "shared/constants/skins";
-import { loadSharedCloneByPath } from "shared/SharedModelManager";
 
 const ANIMATION_DURATION = 0.8;
 const WALL_ANIMATION_DISTANCE_THRESHOLD = 150; // Don't animate walls farther than this
@@ -42,31 +39,6 @@ function getTargetCFrame(part: BasePart): CFrame {
 	return new CFrame(new Vector3(currentPos.X, targetY, currentPos.Z)).mul(
 		part.CFrame.sub(part.Position), // Preserve rotation
 	);
-}
-
-function applySkin(part: BasePart): void {
-	const skinId = part.GetAttribute(WALL_ATTR_SKIN_ID) as string | undefined;
-	if (!skinId) return;
-
-	const skin = getWallSkin(skinId);
-
-	if (skin.type === "part") {
-		// Clone the skin model and transfer its visual children to the wall part
-		loadSharedCloneByPath<BasePart>(skin.modelPath).then((skinModel) => {
-			// Transfer all children (SurfaceGuis, Textures, Decals, etc.) from the cloned model
-			for (const child of skinModel.GetChildren()) {
-				child.Parent = part;
-			}
-			// Copy visual properties from the skin model
-			part.Color = skinModel.Color;
-			part.Material = skinModel.Material;
-			part.Transparency = skinModel.Transparency;
-			skinModel.Destroy();
-		});
-	} else {
-		// Simple tint skin — just apply color
-		part.Color = skin.tint;
-	}
 }
 
 function animateWallUp(part: BasePart): void {
@@ -130,9 +102,6 @@ function processWallPart(part: BasePart): void {
 	if (!part.IsDescendantOf(Workspace)) {
 		warn(`[WallAnimator] Part "${part.Name}" is not in Workspace yet (streaming issue?)`);
 	}
-
-	// Apply skin color
-	applySkin(part);
 
 	const timeAdded = part.GetAttribute(WALL_ATTR_TIME_ADDED) as number | undefined;
 	if (timeAdded === undefined) {

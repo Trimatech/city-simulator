@@ -20,7 +20,9 @@ interface Appearance {
 	transparency: number;
 }
 
-type ResolvedWallSkin = { type: "tint"; appearance: Appearance } | { type: "part"; modelPath: string };
+type ResolvedWallSkin =
+	| { type: "tint"; appearance: Appearance }
+	| { type: "part"; modelName: WallSkinModelName };
 
 function resolveWallSkin({
 	skinId,
@@ -34,7 +36,7 @@ function resolveWallSkin({
 	if (skinId !== undefined) {
 		const wallSkin = getWallSkin(skinId);
 		if (wallSkin?.type === "part") {
-			return { type: "part", modelPath: wallSkin.modelPath };
+			return { type: "part", modelName: wallSkin.modelName };
 		}
 
 		if (wallSkin?.type === "tint") {
@@ -95,7 +97,7 @@ function WallComponent({
 		if (isCrumbling) return;
 
 		let cancelled = false;
-		(async () => {
+		(() => {
 			const folder = ensureFolder(folderName);
 
 			const yOffsetExtra = (zIndex ?? 0) * 0.0001;
@@ -113,17 +115,17 @@ function WallComponent({
 
 			let part: BasePart;
 			if (resolved.type === "part") {
-				part = await createWallPartOld({
+				part = createWallPartOld({
 					folderName,
 					width,
 					height,
 					thickness,
 					center,
 					rotation,
-					modelPath: resolved.modelPath,
+					modelName: resolved.modelName,
 				});
 			} else {
-				part = await createWallPartOld({
+				part = createWallPartOld({
 					folderName,
 					width,
 					height,

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "@rbxts/react";
 import { PartViewer } from "client/components/partViewer/PartViewer";
 import { WallSkin } from "shared/constants/skins";
-import { loadSharedCloneByPath } from "shared/SharedModelManager";
+import { cloneSharedInstance } from "shared/SharedModelManager";
 
 interface SkinThumbnailProps {
 	readonly skin: WallSkin;
@@ -28,35 +28,22 @@ export function SkinThumbnail({ skin, active: _active, transparency: _transparen
 		// reset while loading
 		setSelectedParts(undefined);
 
-		(async () => {
-			if (skin.type === "tint") {
-				const part = new Instance("Part");
-				part.Name = "SkinPreview_Part";
-				part.Size = new Vector3(6, 12.1, 1);
-				part.Color = skin.tint;
-				part.Material = Enum.Material.SmoothPlastic;
-				part.TopSurface = Enum.SurfaceType.Smooth;
-				part.BottomSurface = Enum.SurfaceType.Smooth;
-				createdPartRef.current = part;
-
-				// guard if superseded
-				if (myLoadId !== loadIdRef.current) {
-					part.Destroy();
-					return;
-				}
-				setSelectedParts([part]);
-				return;
-			}
-
-			// part skin
-			const modelOrPart = await loadSharedCloneByPath<Instance>(skin.modelPath);
-			// guard if superseded
-			if (myLoadId !== loadIdRef.current) {
-				modelOrPart.Destroy();
-				return;
-			}
-			setSelectedParts([modelOrPart]);
-		})();
+		if (skin.type === "tint") {
+			const part = new Instance("Part");
+			part.Name = "SkinPreview_Part";
+			part.Size = new Vector3(6, 12.1, 1);
+			part.Color = skin.tint;
+			part.Material = Enum.Material.SmoothPlastic;
+			part.TopSurface = Enum.SurfaceType.Smooth;
+			part.BottomSurface = Enum.SurfaceType.Smooth;
+			createdPartRef.current = part;
+			setSelectedParts([part]);
+		} else {
+			// part skin — wait for model then clone
+			const clone = cloneSharedInstance<Part>("Walls", skin.modelName);
+			createdPartRef.current = clone;
+			setSelectedParts([clone]);
+		}
 
 		return () => {
 			// destroy transient created part on unmount/change

@@ -4,7 +4,7 @@ export interface WallSkinPart {
 	readonly tint: Color3; // Need tint for part type for  minimap
 
 	readonly type: "part";
-	readonly modelPath: string;
+	readonly modelName: WallSkinModelName;
 }
 
 export interface SimpleWallSkin {

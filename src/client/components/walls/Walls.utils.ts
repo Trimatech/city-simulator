@@ -1,7 +1,7 @@
 import { Debris, TweenService, Workspace } from "@rbxts/services";
 import { CollisionGroups } from "shared/constants/collision-groups";
 import { sliceArray } from "shared/polybool/poly-utils";
-import { loadSharedCloneByPath } from "shared/SharedModelManager";
+import { cloneSharedInstance } from "shared/SharedModelManager";
 import { getCellAABBFromCoord } from "shared/utils/cell-key";
 
 export const FORCE_MULTIPLIER = 15;
@@ -344,24 +344,28 @@ interface WallPartOptions {
 	transparency?: number;
 	material?: Enum.Material;
 	/**
-	 * Optional: when provided, a BasePart will be cloned from this path
-	 * in ReplicatedStorage instead of creating a plain Part.
+	 * Optional: when provided, a BasePart will be cloned from this model
+	 * in ReplicatedStorage.Models.Walls instead of creating a plain Part.
 	 */
-	modelPath?: string;
+	modelName?: WallSkinModelName;
 }
 
-export async function createWallPartOld(options: WallPartOptions) {
-	const { folderName, width, height, thickness, center, rotation, color, transparency, material, modelPath } =
+export function createWallPartOld(options: WallPartOptions) {
+	const { folderName, width, height, thickness, center, rotation, color, transparency, material, modelName } =
 		options;
 
-	const part =
-		modelPath !== undefined ? await loadSharedCloneByPath<BasePart>(modelPath) : (new Instance("Part") as BasePart);
+	let part: BasePart;
+	if (modelName !== undefined) {
+		part = cloneSharedInstance<BasePart>("Walls", modelName);
+	} else {
+		part = new Instance("Part") as BasePart;
+	}
 
 	part.Name = `${folderName}_wall`;
 	part.Size = new Vector3(width, height, thickness);
 
-	// Only apply appearance overrides for simple tinted walls (no modelPath)
-	if (modelPath === undefined) {
+	// Only apply appearance overrides for simple tinted walls (no model)
+	if (modelName === undefined) {
 		if (color !== undefined) part.Color = color;
 		if (transparency !== undefined) part.Transparency = transparency;
 		if (material !== undefined) part.Material = material;
