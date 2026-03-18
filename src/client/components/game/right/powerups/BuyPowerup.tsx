@@ -6,6 +6,7 @@ import { HStack, Transition } from "@rbxts-ui/layout";
 import { Frame, Image, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
+import { useMotion as useMotionMapped } from "client/hooks";
 import { Particles } from "client/ui/Particles/Particles";
 import { ParticleEmitter2DConfig } from "client/ui/Particles/Particles.interfaces";
 import { useRem } from "client/ui/rem/useRem";
@@ -86,8 +87,31 @@ export function BuyPowerup({ id, label, enabled, order, price, children }: Props
 	const burstCounter = useRef(0);
 	const frameRef = useRef<Frame>();
 	const wrapperRef = useRef<Frame>();
+	const prevEnabled = useRef(enabled);
+	const [showShimmer, setShowShimmer] = useState(false);
 
 	const [size, sizeMotion] = useMotion(new UDim2(0, WIDTH, 0, HEIGHT));
+	const [scale, scaleMotion] = useMotion(1);
+	const [shimmerGradientOffset, shimmerMotion] = useMotionMapped(-150, (v: number) => new Vector2(v, 0));
+
+	// Bounce + shimmer when powerup becomes affordable
+	useEffect(() => {
+		if (enabled && !prevEnabled.current) {
+			// Scale bounce
+			scaleMotion.spring(1.25, springs.bubbly);
+			task.delay(0.15, () => scaleMotion.spring(1, springs.bubbly));
+
+			// Shimmer sweep via gradient offset
+			setShowShimmer(true);
+			shimmerMotion.spring(0, { tension: 1000, friction: 100 });
+			task.delay(0, () => shimmerMotion.spring(1, { tension: 120, friction: 20 }));
+			task.delay(1, () => {
+				setShowShimmer(false);
+				shimmerMotion.spring(0, { tension: 1000, friction: 100 });
+			});
+		}
+		prevEnabled.current = enabled;
+	}, [enabled]);
 
 	// useEffect(() => {
 	// 	transparencyMotion.spring(enabled ? 0 : 0.4, springs.slow);
@@ -147,6 +171,7 @@ export function BuyPowerup({ id, label, enabled, order, price, children }: Props
 			layoutOrder={order}
 			clipsDescendants={false}
 		>
+			<uiscale Scale={scale} />
 			{bursts.map((burst) => (
 				<Frame
 					key={`burst-${burst.key}`}
@@ -218,6 +243,32 @@ export function BuyPowerup({ id, label, enabled, order, price, children }: Props
 						>
 							<uicorner CornerRadius={fullRound} />
 						</Image>
+
+						{/* Shimmer sweep overlay — gradient offset animates across */}
+						{showShimmer && (
+							<Frame
+								key="shimmer"
+								size={new UDim2(1, 0, 1, 0)}
+								backgroundTransparency={0}
+								backgroundColor={palette.white}
+								cornerRadius={fullRound}
+								zIndex={5}
+							>
+								<uigradient
+									Transparency={
+										new NumberSequence([
+											new NumberSequenceKeypoint(0, 1),
+											new NumberSequenceKeypoint(0.35, 0.6),
+											new NumberSequenceKeypoint(0.5, 0.5),
+											new NumberSequenceKeypoint(0.65, 0.6),
+											new NumberSequenceKeypoint(1, 1),
+										])
+									}
+									Offset={shimmerGradientOffset}
+									Rotation={15}
+								/>
+							</Frame>
+						)}
 
 						{/* Content */}
 

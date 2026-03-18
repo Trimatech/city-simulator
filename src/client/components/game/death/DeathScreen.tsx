@@ -45,6 +45,14 @@ export function DeathScreen({ activeDeadline, persistent, onDismiss }: DeathScre
 		persistent && activeDeadline !== undefined ? Workspace.GetServerTimeNow() + 9999 : activeDeadline;
 
 	const [isReviving, setIsReviving] = useState(false);
+
+	// Reset reviving state when a new death occurs (new deadline)
+	useEffect(() => {
+		if (effectiveDeadline !== undefined) {
+			setIsReviving(false);
+		}
+	}, [effectiveDeadline]);
+
 	const [isExpired, setIsExpired] = useState(() => {
 		if (effectiveDeadline === undefined) return false;
 		const now = Workspace.GetServerTimeNow();
