@@ -17,6 +17,10 @@ import { GoogleGenAI } from "@google/genai";
 import mime from "mime";
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // ---------------------------------------------------------------------------
 // Types
@@ -173,8 +177,8 @@ function slugify(str: string): string {
 
 async function main() {
 	const opts = parseArgs();
-	const mdPath = path.resolve(__dirname, "../docs/badges.md");
-	const outputDir = path.resolve(__dirname, "../assets/badges");
+	const mdPath = path.resolve(__dirname, "../../docs/badges.md");
+	const outputDir = path.resolve(__dirname, "../../assets/badges");
 
 	const { stylePrompt, badges } = parseBadges(mdPath);
 

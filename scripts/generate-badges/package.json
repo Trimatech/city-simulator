@@ -1,0 +1,18 @@
+{
+	"name": "generate-badges",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"generate": "tsx index.ts",
+		"dry-run": "tsx index.ts --dry-run"
+	},
+	"dependencies": {
+		"@google/genai": "^1.46.0",
+		"mime": "^4.1.0"
+	},
+	"devDependencies": {
+		"tsx": "^4.21.0",
+		"@types/node": "^22.0.0"
+	}
+}
