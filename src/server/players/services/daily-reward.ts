@@ -1,5 +1,7 @@
 import { Players } from "@rbxts/services";
+import { tryGrantBadge } from "server/rewards/services/badges";
 import { store } from "server/store";
+import { Badge } from "shared/assetsFolder";
 import assets from "shared/assets";
 import {
 	DAILY_REWARD_CYCLE,
@@ -66,6 +68,11 @@ function processClaim(player: Player) {
 	const now = os.time();
 
 	store.claimDailyReward(player.Name, newStreak, rewardAmount, now);
+
+	// Dedicated badge: complete a 7-day streak
+	if (newStreak >= 7) {
+		tryGrantBadge(player.Name, Badge.DEDICATED);
+	}
 
 	remotes.client.alert.fire(player, {
 		emoji: "🎁",

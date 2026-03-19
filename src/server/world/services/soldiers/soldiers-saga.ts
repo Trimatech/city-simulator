@@ -115,6 +115,7 @@ export async function initSoldierService() {
 		}
 
 		store.spendPlayerCrystals(soldierId, REVIVE_CRYSTAL_COST);
+		store.incrementMilestoneReviveCount(soldierId);
 		await reloadCharacterAsync(player);
 
 		const character = player.Character as Model;

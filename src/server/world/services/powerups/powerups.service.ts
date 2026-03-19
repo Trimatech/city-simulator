@@ -2,6 +2,8 @@ import Object from "@rbxts/object-utils";
 import { Workspace } from "@rbxts/services";
 import { setTimeout } from "@rbxts/set-timeout";
 import { store } from "server/store";
+import { tryGrantBadge } from "server/rewards/services/badges";
+import { Badge } from "shared/assetsFolder";
 import {
 	ensureForceFieldOnPlayerName,
 	getPlayerHumanoidByName,
@@ -369,7 +371,10 @@ export function executePowerupForSoldier(
 			if (player) alertMessage(player, "Not enough orbs!", palette.red);
 			return;
 		}
+		// Track orbs spent and powerup usage for badges
+		store.addMilestoneOrbsSpent(soldierId, cost);
 	}
+	store.addMilestonePowerupUsed(soldierId, powerupId);
 
 	const center = soldier.position;
 
@@ -445,17 +450,23 @@ export function executePowerupForSoldier(
 			);
 			const size = new Vector3(cfg.width, 5, cfg.length);
 
+			let laserHitEnemy = false;
 			const soldiers = store.getState(selectSoldiersById);
 			for (const [, s] of Object.entries(soldiers)) {
 				if (!s || s.dead || s.id === soldierId) continue;
 				if (isPointInRectangleWithCFrame(s.position, cframe, size)) {
+					laserHitEnemy = true;
 					const h = getPlayerHumanoidByName(s.id);
 					if (h) {
 						pushHumanoidAway(h, new Vector3(bombCenter2D.X, 0, bombCenter2D.Y), 80);
 					}
 					const h2 = getPlayerHumanoidByName(s.id);
 					if (h2) h2.TakeDamage(cfg.damage);
+					store.setMilestoneLastDamageAt(s.id, Workspace.GetServerTimeNow());
 				}
+			}
+			if (laserHitEnemy) {
+				tryGrantBadge(soldierId, Badge.LASER_PRECISION);
 			}
 
 			const towers = store.getState(selectTowersById);
@@ -463,6 +474,7 @@ export function executePowerupForSoldier(
 				if (!t || t.ownerId === soldierId) continue;
 				if (isPointInRectangleWithCFrame(t.position, cframe, size)) {
 					store.removeTower(`${id}`);
+					store.setMilestoneTowerDestroyed(soldierId);
 				}
 			}
 
@@ -485,6 +497,7 @@ export function executePowerupForSoldier(
 				if (!t || t.ownerId === soldierId) continue;
 				if (magnitude2D(t.position, center) <= cfg.radius) {
 					store.removeTower(`${id}`);
+					store.setMilestoneTowerDestroyed(soldierId);
 				}
 			}
 			const damagePolygon = createCircularExplosionPolygonFromPart(center, cfg.radius);

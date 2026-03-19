@@ -9,6 +9,23 @@ export interface MilestoneEntity {
 	readonly topArea?: ScoreMilestone;
 	readonly topRank: number;
 	readonly lastKilled?: string;
+
+	// Badge tracking (per-life, reset on death)
+	readonly eliminationCount: number;
+	readonly botKillCount: number;
+	readonly candyCollected: number;
+	readonly orbsSpentOnPowerups: number;
+	readonly powerupsUsed: readonly string[];
+	readonly headOnVictory: boolean;
+	readonly giantSlain: boolean;
+	readonly towerDestroyed: boolean;
+	readonly shieldBlockedDeath: boolean;
+	readonly lastDamageAt: number;
+
+	// Session-level tracking (persists across lives)
+	readonly reviveCount: number;
+	readonly rank1Count: number;
+	readonly rank1Since: number;
 }
 
 export type ScoreMilestone = (typeof SCORE_MILESTONES)[number];

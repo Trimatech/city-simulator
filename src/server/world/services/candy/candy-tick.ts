@@ -21,6 +21,7 @@ export function onCandyTick() {
 
 		if (nearest) {
 			eatCandy(nearest.metadata.id, soldier.id);
+			store.incrementMilestoneCandyCollected(soldier.id);
 		}
 	}
 }

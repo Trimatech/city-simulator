@@ -1,4 +1,5 @@
 import Object from "@rbxts/object-utils";
+import { Workspace } from "@rbxts/services";
 import { store } from "server/store";
 import { killSoldier } from "server/world/world.utils";
 import { selectSoldiersById } from "shared/store/soldiers";
@@ -43,6 +44,7 @@ export function onTowerTick(dt: number) {
 
 		const damage = tower.damage * dt;
 		store.decrementSoldierHealth(nearestId, damage);
+		store.setMilestoneLastDamageAt(nearestId, Workspace.GetServerTimeNow());
 
 		const updated = store.getState(selectSoldiersById)[nearestId];
 		if (updated && updated.health <= 0 && !updated.dead) {

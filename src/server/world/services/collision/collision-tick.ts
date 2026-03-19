@@ -1,6 +1,6 @@
 import { store } from "server/store";
 import { killSoldier, onPlayerDeath } from "server/world/world.utils";
-import { selectSoldiers, selectSoldiersById } from "shared/store/soldiers";
+import { selectSoldiers, selectSoldierRanking, selectSoldiersById } from "shared/store/soldiers";
 
 import { soldierIsInsideChanged } from "../soldiers/soldier-events";
 import {
@@ -75,11 +75,18 @@ export function onCollisionTick() {
 				onPlayerDeath(soldier.id);
 				store.playerKilledSoldier(enemyId, soldier.id);
 				store.incrementSoldierEliminations(enemyId);
+				// Shield blocked a death for the tracer owner
+				store.setMilestoneShieldBlockedDeath(enemyId);
 			} else {
 				print(`Collided with enemy tracer, kill owner ${enemyId}`);
 				onPlayerDeath(enemyId);
 				store.playerKilledSoldier(soldier.id, enemyId);
 				store.incrementSoldierEliminations(soldier.id);
+				// Check if the killed player was rank 1 (Giant Slayer)
+				const enemyRank = store.getState(selectSoldierRanking(enemyId));
+				if (enemyRank === 1) {
+					store.setMilestoneGiantSlain(soldier.id);
+				}
 			}
 			continue;
 		}
@@ -102,6 +109,13 @@ export function onCollisionTick() {
 			onPlayerDeath(enemy.id);
 			store.playerKilledSoldier(soldier.id, enemy.id);
 			store.incrementSoldierEliminations(soldier.id);
+			// Head-on collision badge
+			store.setMilestoneHeadOnVictory(soldier.id);
+			// Check if the killed player was rank 1 (Giant Slayer)
+			const enemyRank = store.getState(selectSoldierRanking(enemy.id));
+			if (enemyRank === 1) {
+				store.setMilestoneGiantSlain(soldier.id);
+			}
 		}
 		debug.profileend();
 	}

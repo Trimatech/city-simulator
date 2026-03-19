@@ -1,6 +1,8 @@
 import { createCollection } from "@rbxts/lapis";
 import { Players } from "@rbxts/services";
+import { tryGrantBadge } from "server/rewards/services/badges";
 import { store } from "server/store";
+import { Badge } from "shared/assetsFolder";
 import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 import { remotes } from "shared/remotes";
@@ -41,6 +43,9 @@ async function loadPlayerSave(player: Player) {
 		const data = document.read();
 		print(`loading ${player.Name} with ${data}..........`);
 		store.setPlayerSave(player.Name, { ...defaultPlayerSave, ...data });
+
+		// Welcome badge — granted on every join (Roblox only awards it once)
+		tryGrantBadge(player.Name, Badge.WELCOME);
 	} catch (e) {
 		warn(`Failed to load data for ${player.Name}: ${e}`);
 		fallbackPlayerSave(player);

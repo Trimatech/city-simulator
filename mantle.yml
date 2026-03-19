@@ -68,35 +68,203 @@ target:
 
                     maxPlayerCount: 25
         badges:
-            1-area-25000:
-                name: ✨ 25,000 studs² area
-                description: Nothing can stop you now! Hit a area of 25,000 studs².
-                icon: assets/badges/area_25000.png
+            # --- Territory Milestones ---
+            territory-settler:
+                name: 🏠 Settler
+                description: Claim your first big plot! Reach 100,000 studs² of territory.
+                icon: assets/badges/territory-milestones/settler.png
                 enabled: true
-            2-area-50000:
-                name: 🔥 50,000 studs² area
-                description: You're on track to becoming the largest. Hit a area of 50,000 studs².
-                icon: assets/badges/area_50000.png
+            territory-landlord:
+                name: 🏘️ Landlord
+                description: Your land empire grows! Reach 250,000 studs² of territory.
+                icon: assets/badges/territory-milestones/landlord.png
                 enabled: true
-            3-area-100000:
-                name: 🚀 100,000 studs² area
-                description: You're breaking records! Hit a area of 100,000 studs².
-                icon: assets/badges/area_100000.png
+            territory-conqueror:
+                name: 👑 Conqueror
+                description: You dominate the grid! Reach 500,000 studs² of territory.
+                icon: assets/badges/territory-milestones/conqueror.png
                 enabled: true
-            4-3rd-place:
-                name: 🥉 3rd Place
-                description: You're among the greatest! Become the third largest in the server.
-                icon: assets/badges/third_place.png
+            territory-empire:
+                name: 🏰 Empire
+                description: An empire of legendary proportions! Reach 1,000,000 studs² of territory.
+                icon: assets/badges/territory-milestones/empire.png
                 enabled: true
-            5-2nd-place:
-                name: 🥈 2nd Place
-                description: Blaze through the competition! Become the second largest in the server.
-                icon: assets/badges/second_place.png
+            territory-world-dominator:
+                name: 🌍 World Dominator
+                description: The entire world bows to you! Reach 2,500,000 studs² of territory.
+                icon: assets/badges/territory-milestones/world-dominator.png
                 enabled: true
-            6-1st-place:
-                name: 🥇 1st Place
-                description: You're on top of the world! Become the largest in the server.
-                icon: assets/badges/first_place.png
+
+            # --- Ranking ---
+            ranking-podium:
+                name: 🥉 Podium
+                description: You made it to the podium! Finish in 3rd place.
+                icon: assets/badges/ranking/podium.png
+                enabled: true
+            ranking-runner-up:
+                name: 🥈 Runner Up
+                description: So close to the top! Finish in 2nd place.
+                icon: assets/badges/ranking/runner-up.png
+                enabled: true
+            ranking-champion:
+                name: 🥇 Champion
+                description: You're the champion! Finish in 1st place.
+                icon: assets/badges/ranking/champion.png
+                enabled: true
+            ranking-repeat-champion:
+                name: 🏆 Repeat Champion
+                description: A true legend! Reach 1st place 10 times.
+                icon: assets/badges/ranking/repeat-champion.png
+                enabled: true
+            ranking-undefeated:
+                name: 👑 Undefeated
+                description: Unstoppable! Hold 1st place for 5 minutes straight.
+                icon: assets/badges/ranking/undefeated.png
+                enabled: true
+
+            # --- Eliminations ---
+            elim-first-blood:
+                name: 🩸 First Blood
+                description: Draw first blood! Get your first elimination.
+                icon: assets/badges/eliminations/first-blood.png
+                enabled: true
+            elim-bounty-hunter:
+                name: 🎯 Bounty Hunter
+                description: A skilled hunter! Get 10 eliminations in a single life.
+                icon: assets/badges/eliminations/bounty-hunter.png
+                enabled: true
+            elim-executioner:
+                name: ⚔️ Executioner
+                description: No mercy! Get 50 eliminations in a single life.
+                icon: assets/badges/eliminations/executioner.png
+                enabled: true
+            elim-massacre:
+                name: 💀 Massacre
+                description: Total annihilation! Get 100 eliminations in a single life.
+                icon: assets/badges/eliminations/massacre.png
+                enabled: true
+            elim-killing-spree:
+                name: ⚡ Killing Spree
+                description: Unstoppable streak! Get 5 kills in one life.
+                icon: assets/badges/eliminations/killing-spree.png
+                enabled: true
+            elim-head-on-victor:
+                name: 💥 Head-On Victor
+                description: Fearless! Win a head-on collision with another player.
+                icon: assets/badges/eliminations/head-on-victor.png
+                enabled: true
+            elim-giant-slayer:
+                name: 🗡️ Giant Slayer
+                description: David vs Goliath! Eliminate the #1 ranked player.
+                icon: assets/badges/eliminations/giant-slayer.png
+                enabled: true
+
+            # --- Powerups ---
+            powerup-speed-demon:
+                name: 🚀 Speed Demon
+                description: Gotta go fast! Use the Turbo powerup.
+                icon: assets/badges/powerups/speed-demon.png
+                enabled: true
+            powerup-shielded:
+                name: 🛡️ Shielded
+                description: Impenetrable defense! Block a death with Shield.
+                icon: assets/badges/powerups/shielded.png
+                enabled: true
+            powerup-architect:
+                name: 🏗️ Architect
+                description: Master builder! Place your first Tower.
+                icon: assets/badges/powerups/architect.png
+                enabled: true
+            powerup-laser-precision:
+                name: 🔴 Laser Precision
+                description: Precision strike! Hit an enemy with Laser Beam.
+                icon: assets/badges/powerups/laser-precision.png
+                enabled: true
+            powerup-nuclear-option:
+                name: ☢️ Nuclear Option
+                description: Total destruction! Use the Nuclear Explosion powerup.
+                icon: assets/badges/powerups/nuclear-option.png
+                enabled: true
+            powerup-arsenal:
+                name: 🌟 Arsenal
+                description: Master of all weapons! Use all 5 powerups in one life.
+                icon: assets/badges/powerups/arsenal.png
+                enabled: true
+
+            # --- Survival ---
+            survival-second-chance:
+                name: 💖 Second Chance
+                description: Back from the brink! Revive for the first time.
+                icon: assets/badges/survival/second-chance.png
+                enabled: true
+            survival-cats-nine-lives:
+                name: 🐱 Cat's Nine Lives
+                description: You just won't stay down! Revive 9 times in one session.
+                icon: assets/badges/survival/cats-nine-lives.png
+                enabled: true
+            survival-untouchable:
+                name: 👻 Untouchable
+                description: Can't touch this! Survive 5 minutes without taking damage.
+                icon: assets/badges/survival/untouchable.png
+                enabled: true
+            survival-close-call:
+                name: 💔 Close Call
+                description: Living on the edge! Survive at under 10 HP.
+                icon: assets/badges/survival/close-call.png
+                enabled: true
+
+            # --- Economy & Progression ---
+            economy-welcome:
+                name: 👋 Welcome
+                description: Welcome to Zone Wars! Thanks for joining!
+                icon: assets/badges/economy-progression/welcome.png
+                enabled: true
+            economy-dedicated:
+                name: 🔥 Dedicated
+                description: Dedication pays off! Complete a 7-day login streak.
+                icon: assets/badges/economy-progression/dedicated.png
+                enabled: true
+            economy-big-spender:
+                name: 💸 Big Spender
+                description: Money talks! Spend 1,000 orbs on powerups in a single life.
+                icon: assets/badges/economy-progression/big-spender.png
+                enabled: true
+            economy-wealthy:
+                name: 💰 Wealthy
+                description: Stacking cash! Reach a balance of $50,000.
+                icon: assets/badges/economy-progression/wealthy.png
+                enabled: true
+            economy-high-roller:
+                name: 🏦 High Roller
+                description: The vault overflows! Reach a balance of $100,000.
+                icon: assets/badges/economy-progression/high-roller.png
+                enabled: true
+            economy-fashionista:
+                name: 🎨 Fashionista
+                description: Looking good! Equip a non-default skin.
+                icon: assets/badges/economy-progression/fashionista.png
+                enabled: true
+
+            # --- Special / Rare ---
+            special-collector:
+                name: 🍬 Collector
+                description: Sweet tooth! Pick up 500 candy in a single life.
+                icon: assets/badges/special-rare/collector.png
+                enabled: true
+            special-tower-destroyer:
+                name: 💣 Tower Destroyer
+                description: Demolition expert! Destroy an enemy tower with a powerup.
+                icon: assets/badges/special-rare/tower-destroyer.png
+                enabled: true
+            special-claimed:
+                name: 🤠 Claimed
+                description: Bounty collected! Earn your first kill bounty.
+                icon: assets/badges/special-rare/claimed.png
+                enabled: true
+            special-bot-buster:
+                name: 🤖 Bot Buster
+                description: Exterminator! Eliminate 10 bots in a single life.
+                icon: assets/badges/special-rare/bot-buster.png
                 enabled: true
         products:
             money-100:

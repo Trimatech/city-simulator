@@ -9,13 +9,16 @@ import {
 } from "server/store/milestones";
 import { ScoreMilestone } from "server/store/milestones/milestone-utils";
 import { getSoldier } from "server/world";
+import { Badge } from "shared/assetsFolder";
 import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 import { remotes } from "shared/remotes";
+import { selectPlayerSave } from "shared/store/saves";
 import { selectSoldierRanking } from "shared/store/soldiers";
 import { getPlayerByName } from "shared/utils/player-utils";
 
 import { grantMoney, shouldGrantReward } from "../utils";
+import { tryGrantBadge } from "./badges";
 
 const SCORE_REWARDS: { readonly [K in ScoreMilestone]: number } = {
 	5_000: 50,
@@ -82,9 +85,30 @@ function observeMilestone(id: string) {
 			const length = enemy.polygonAreaSize;
 			const bounty = math.ceil(length / 3);
 			grantMoneyReward(id, bounty, `eliminating <font color="#fff">${enemy.name}</font>`, true);
+
+			// Claimed badge: earn first kill bounty
+			tryGrantBadge(id, Badge.CLAIMED);
 		}
 
 		store.clearMilestoneKillScore(id);
+	});
+
+	// Balance-based badges: Wealthy ($50K) and High Roller ($100K)
+	const unsubscribeBalance = store.subscribe(
+		(state) => state.saves[id]?.balance,
+		(balance) => {
+			if (balance === undefined) return;
+			if (balance >= 50_000) tryGrantBadge(id, Badge.WEALTHY);
+			if (balance >= 100_000) tryGrantBadge(id, Badge.HIGH_ROLLER);
+		},
+	);
+
+	// Fashionista badge: equip a non-default skin
+	const unsubscribeSkin = store.subscribe(selectPlayerSave(id), (save) => {
+		if (!save) return;
+		if (save.skin !== "__random__") {
+			tryGrantBadge(id, Badge.FASHIONISTA);
+		}
 	});
 
 	// While the player is in the top 3, grant them a reward every minute
@@ -109,6 +133,8 @@ function observeMilestone(id: string) {
 		unsubscribeArea();
 		unsubscribeKill();
 		unsubscribePassive();
+		unsubscribeBalance();
+		unsubscribeSkin();
 	};
 }
 
