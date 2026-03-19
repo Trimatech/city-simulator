@@ -9,6 +9,7 @@ import { CRYSTAL_OFFERS } from "shared/constants/shopPrices";
 import { ShopItem, shopItemThemes } from "./ShopItem";
 
 function promptPurchase(productId: number) {
+	print(`[Shop] Prompting crystal purchase for product ID: ${productId}`);
 	MarketplaceService.PromptProductPurchase(Players.LocalPlayer, productId);
 }
 

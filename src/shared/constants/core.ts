@@ -14,7 +14,7 @@ export const SOLDIER_MAX_ORBS = 400;
 
 export const REMOTE_TICK = 1 / 20; // Roblox limits
 
-export const IS_PROD = game.PlaceId === 14162747150;
+export const IS_PROD = game.PlaceId === 137091142050829;
 export const IS_CANARY = !IS_PROD;
 export const IS_EDITOR = RunService.IsStudio() && !RunService.IsRunning();
 export const IS_LOCAL = RunService.IsStudio() && RunService.IsRunning();

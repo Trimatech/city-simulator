@@ -9,6 +9,17 @@ import { MONEY_OFFERS } from "shared/constants/shopPrices";
 import { ShopItem, shopItemThemes } from "./ShopItem";
 
 function promptPurchase(productId: number) {
+	print(`[Shop] PlaceId: ${game.PlaceId}, GameId: ${game.GameId}`);
+	print(`[Shop] Prompting purchase for product ID: ${productId}`);
+
+	const [ok, info] = pcall(() => MarketplaceService.GetProductInfo(productId, Enum.InfoType.Product));
+	if (ok) {
+		const product = info as { Name: string; IsForSale: boolean; Creator: { CreatorTargetId: number } };
+		print(`[Shop] Product found: Name="${product.Name}", IsForSale=${product.IsForSale}, CreatorId=${product.Creator.CreatorTargetId}`);
+	} else {
+		warn(`[Shop] GetProductInfo FAILED for ${productId}: ${info}`);
+	}
+
 	MarketplaceService.PromptProductPurchase(Players.LocalPlayer, productId);
 }
 

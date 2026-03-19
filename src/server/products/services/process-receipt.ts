@@ -5,25 +5,47 @@ type ProductHandler = (player: Player) => void;
 const productHandlers = new Map<number, ProductHandler>();
 
 export async function initProcessReceiptService() {
-	MarketplaceService.ProcessReceipt = (receipt) => {
-		const player = Players.GetPlayerByUserId(receipt.PlayerId);
-		const handler = productHandlers.get(receipt.ProductId);
+	print(`[ProcessReceipt] Initializing. Registered product IDs: ${productHandlers.size()}`);
+	for (const [id] of productHandlers) {
+		print(`[ProcessReceipt]   Registered product ID: ${id}`);
+	}
 
-		if (!player || !handler) {
+	MarketplaceService.ProcessReceipt = (receipt) => {
+		print(
+			`[ProcessReceipt] Received receipt: ProductId=${receipt.ProductId}, PlayerId=${receipt.PlayerId}, PurchaseId=${receipt.PurchaseId}`,
+		);
+
+		const player = Players.GetPlayerByUserId(receipt.PlayerId);
+		if (!player) {
+			warn(`[ProcessReceipt] Player not found for UserId ${receipt.PlayerId}`);
 			return Enum.ProductPurchaseDecision.NotProcessedYet;
 		}
 
+		const handler = productHandlers.get(receipt.ProductId);
+		if (!handler) {
+			warn(
+				`[ProcessReceipt] No handler for ProductId ${receipt.ProductId}. Registered IDs: ${productHandlers.size()}`,
+			);
+			for (const [id] of productHandlers) {
+				warn(`[ProcessReceipt]   Have handler for: ${id}`);
+			}
+			return Enum.ProductPurchaseDecision.NotProcessedYet;
+		}
+
+		print(`[ProcessReceipt] Found handler for ProductId ${receipt.ProductId}, executing...`);
 		const [success, message] = pcall(handler, player);
 
 		if (!success) {
-			warn(message);
+			warn(`[ProcessReceipt] Handler failed for ProductId ${receipt.ProductId}: ${message}`);
 			return Enum.ProductPurchaseDecision.NotProcessedYet;
 		}
 
+		print(`[ProcessReceipt] Purchase granted for ProductId ${receipt.ProductId}, player ${player.Name}`);
 		return Enum.ProductPurchaseDecision.PurchaseGranted;
 	};
 }
 
 export function createProduct(id: number, handler: ProductHandler) {
+	print(`[ProcessReceipt] Registering product handler for ID: ${id}`);
 	productHandlers.set(id, handler);
 }

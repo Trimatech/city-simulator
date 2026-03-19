@@ -14,7 +14,9 @@ export function initCrystalsService() {
 }
 
 function giveCrystals(player: Player, amount: number) {
+	print(`[Crystals] Granting ${amount} crystals to ${player.Name}`);
 	store.givePlayerCrystals(player.Name, amount);
+	print(`[Crystals] Crystals granted to ${player.Name}`);
 
 	remotes.client.alert.fire(player, {
 		scope: "money",
