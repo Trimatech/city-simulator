@@ -4,9 +4,11 @@
 
 ```
 2D illustrated game icon, 512x512, hand-painted cartoon style, soft shading with bold colors,
-thick clean outlines, highly saturated vibrant palette, slight painterly texture, soft gradient
-background (warm pastel tones), clean and readable at small sizes, exaggerated proportions,
-mobile game UI art style, Roblox simulator shop icon aesthetic, no text
+thick clean outlines, highly saturated vibrant palette, slight painterly texture,
+clean and readable at small sizes, exaggerated proportions, mobile game UI art style,
+Roblox simulator shop icon aesthetic, no text, no rounded corners, no button shape,
+no badge frame, no circular border, plain flat solid color background, single color backdrop,
+easily croppable background, subject centered with padding around edges
 ```
 
 ---
@@ -17,11 +19,11 @@ Badges for reaching territory area thresholds. Progressive tier feel — small t
 
 | Badge | Condition | Subject Prompt |
 |-------|-----------|----------------|
-| **Settler** | 10,000 studs² | `Small green colored polygon shape on a dark grid, thin neon border glow, single tiny pin marker in center, beginner tier, green tones` |
-| **Landlord** | 25,000 studs² | `Medium blue colored polygon shape filling more of the grid, brighter neon border glow, silver shimmer accents` |
-| **Conqueror** | 50,000 studs² | `Large purple colored polygon shape dominating the grid, golden crown icon above it, gold sparkle particles, epic tier glow` |
-| **Empire** | 100,000 studs² | `Massive red colored polygon shape filling nearly the entire grid, golden star emblem in center, imperial gold neon border, legendary tier` |
-| **World Dominator** | 250,000 studs² | `Rainbow prismatic polygon shape covering the whole grid, engulfing a small globe icon, mythic tier, intense radiant neon energy, diamond sparkles` |
+| **Settler** | 100,000 studs² | `Small green colored polygon shape on a dark grid, thin neon border glow, single tiny pin marker in center, beginner tier, green tones` |
+| **Landlord** | 250,000 studs² | `Medium blue colored polygon shape filling more of the grid, brighter neon border glow, silver shimmer accents` |
+| **Conqueror** | 500,000 studs² | `Large purple colored polygon shape dominating the grid, golden crown icon above it, gold sparkle particles, epic tier glow` |
+| **Empire** | 1,000,000 studs² | `Massive red colored polygon shape filling nearly the entire grid, golden star emblem in center, imperial gold neon border, legendary tier` |
+| **World Dominator** | 2,500,000 studs² | `Rainbow prismatic polygon shape covering the whole grid, engulfing a small globe icon, mythic tier, intense radiant neon energy, diamond sparkles` |
 
 ---
 
