@@ -8,6 +8,7 @@ import { ErrorHandler } from "../components/error-handler";
 import { BackgroundMusic } from "../components/music/BackgroundMusic";
 import { Preloader } from "../components/preloader";
 import { Screens } from "../components/Screens";
+import { ImpactOverlay } from "../components/game/ImpactOverlay";
 import { World } from "../components/world/World";
 
 export function App() {
@@ -25,6 +26,7 @@ export function App() {
 
 			<Layer>
 				<Screens />
+				<ImpactOverlay />
 			</Layer>
 
 			<Layer>
