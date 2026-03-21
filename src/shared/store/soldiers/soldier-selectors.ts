@@ -1,11 +1,24 @@
 import Object from "@rbxts/object-utils";
 import { createSelector, shallowEqual } from "@rbxts/reflex";
+import { WORLD_BOUNDS } from "shared/constants/core";
 import { USER_NAME } from "shared/constants/core";
 import { SharedState } from "shared/store";
 import { mapProperties } from "shared/utils/object-utils";
 import { getPlayerByName } from "shared/utils/player-utils";
 
-import { SoldierEntity } from "./soldier-slice";
+import { SoldierEntity, SoldiersState } from "./soldier-slice";
+
+const WORLD_AREA = math.pi * math.pow(WORLD_BOUNDS, 2);
+
+export interface CompetitionEntry {
+	readonly id: string;
+	readonly name: string;
+	readonly area: number;
+	readonly share: number;
+	readonly eliminations: number;
+	readonly rank: number;
+	readonly isLocal: boolean;
+}
 
 export const identifySoldier = (soldier: SoldierEntity) => {
 	return soldier.id;
@@ -116,6 +129,18 @@ export const selectLocalPolygonAreaSize = (state: SharedState) => {
 	return state.soldiers[USER_NAME]?.polygonAreaSize;
 };
 
+export const selectSoldierAreaShare = (id: string) => {
+	return (state: SharedState) => {
+		const area = state.soldiers[id]?.polygonAreaSize;
+		return area !== undefined ? area / WORLD_AREA : undefined;
+	};
+};
+
+export const selectLocalAreaShare = (state: SharedState) => {
+	const area = state.soldiers[USER_NAME]?.polygonAreaSize;
+	return area !== undefined ? area / WORLD_AREA : undefined;
+};
+
 export const selectLocalDeathChoiceDeadline = (state: SharedState) => {
 	return state.soldiers[USER_NAME]?.deathChoiceDeadline;
 };
@@ -128,17 +153,35 @@ export const selectSoldiers = createSelector(selectSoldiersById, (soldiersById) 
 	return Object.values(soldiersById);
 });
 
+/**
+ * Highest polygon area among alive soldiers. Skips removed slots (`undefined`) and dead soldiers.
+ * (Dead entries can remain in the table with large area; they must not win "leader".)
+ */
+export function resolveTopSoldierEntity(soldiersById: SoldiersState): SoldierEntity | undefined {
+	let topSoldier: SoldierEntity | undefined;
+
+	for (const [, soldier] of pairs(soldiersById)) {
+		if (soldier === undefined || soldier.dead) {
+			continue;
+		}
+
+		if (topSoldier === undefined || soldier.polygonAreaSize > topSoldier.polygonAreaSize) {
+			topSoldier = soldier;
+		}
+	}
+
+	return topSoldier;
+}
+
+/** Plain selector — use with `store.getState(selectLeaderId)` (reliable with combined producers). */
+export const selectLeaderId = (state: SharedState): string | undefined => {
+	return resolveTopSoldierEntity(state.soldiers)?.id;
+};
+
 export const selectTopSoldier = createSelector(
 	[selectSoldiersById],
 	(soldiersById) => {
-		let topSoldier: SoldierEntity | undefined;
-
-		for (const [, soldier] of pairs(soldiersById)) {
-			if (topSoldier === undefined || soldier.polygonAreaSize > topSoldier.polygonAreaSize) {
-				topSoldier = soldier;
-			}
-		}
-
+		const topSoldier = resolveTopSoldierEntity(soldiersById);
 		return topSoldier ? { id: topSoldier.id, position: topSoldier.position } : undefined;
 	},
 	(a, b) => {
@@ -149,15 +192,7 @@ export const selectTopSoldier = createSelector(
 );
 
 export const selectTopSoldierPosition = createSelector(selectSoldiersById, (soldiersById) => {
-	let topSoldier: SoldierEntity | undefined;
-
-	for (const [, soldier] of pairs(soldiersById)) {
-		if (topSoldier === undefined || soldier.polygonAreaSize > topSoldier.polygonAreaSize) {
-			topSoldier = soldier;
-		}
-	}
-
-	return topSoldier?.position;
+	return resolveTopSoldierEntity(soldiersById)?.position;
 });
 
 export const selectSoldiersSorted = (comparator: (current: SoldierEntity, existing: SoldierEntity) => boolean) => {
@@ -165,6 +200,10 @@ export const selectSoldiersSorted = (comparator: (current: SoldierEntity, existi
 		const topSoldiers: SoldierEntity[] = [];
 
 		for (const [, soldier] of pairs(soldiersById)) {
+			if (soldier === undefined) {
+				continue;
+			}
+
 			const index = topSoldiers.findIndex((topSoldier) => comparator(soldier, topSoldier));
 
 			if (index === -1) {
@@ -294,4 +333,43 @@ export const selectRankForDisplay = (state: SharedState) => {
 	} else {
 		return `${ranking}th`;
 	}
+};
+
+export const selectTopCompetitionEntries = (limit = 5) => {
+	return createSelector(selectSoldiersById, (soldiersById) => {
+		const leaders: CompetitionEntry[] = [];
+
+		for (const [, soldier] of pairs(soldiersById)) {
+			if (!soldier || soldier.dead) {
+				continue;
+			}
+
+			const entry: CompetitionEntry = {
+				id: soldier.id,
+				name: soldier.name,
+				area: soldier.polygonAreaSize,
+				share: soldier.polygonAreaSize / WORLD_AREA,
+				eliminations: soldier.eliminations,
+				rank: 0,
+				isLocal: soldier.id === USER_NAME,
+			};
+
+			const index = leaders.findIndex((leader) => entry.area > leader.area);
+
+			if (index === -1) {
+				leaders.push(entry);
+			} else {
+				leaders.insert(index, entry);
+			}
+
+			if (leaders.size() > limit) {
+				leaders.pop();
+			}
+		}
+
+		return leaders.map((leader, index) => ({
+			...leader,
+			rank: index + 1,
+		}));
+	});
 };
