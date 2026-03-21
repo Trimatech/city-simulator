@@ -1,15 +1,15 @@
 import Object from "@rbxts/object-utils";
 import { Workspace } from "@rbxts/services";
 import { setTimeout } from "@rbxts/set-timeout";
-import { store } from "server/store";
 import { tryGrantBadge } from "server/rewards/services/badges";
-import { Badge } from "shared/assetsFolder";
+import { store } from "server/store";
 import {
 	ensureForceFieldOnPlayerName,
 	getPlayerHumanoidByName,
 	killSoldier,
 	removeForceFieldFromPlayerName,
 } from "server/world/world.utils";
+import { Badge } from "shared/assetsFolder";
 import { SOLDIER_MIN_AREA, SOLDIER_SPEED } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
 import type { PowerupId } from "shared/constants/powerups";
@@ -25,6 +25,7 @@ import { calculatePolygonArea } from "shared/polygon-extra.utils";
 import { remotes } from "shared/remotes";
 import { selectSoldierById, selectSoldierOrbs, selectSoldiersById } from "shared/store/soldiers";
 import { selectTowersById } from "shared/store/towers/tower-selectors";
+import { placeTower } from "./placeTower";
 
 /** Tracks the turbo generation per soldier so stacked activations extend duration correctly. */
 const turboGeneration = new Map<string, number>();
@@ -351,8 +352,6 @@ const POWERUP_ALERT_MESSAGES: Record<PowerupId, string> = {
 	nuclearExplosion: "Nuclear Explosion detonated!",
 };
 
-let towerId = 0;
-
 export function executePowerupForSoldier(
 	soldierId: string,
 	powerupId: PowerupId,
@@ -424,19 +423,13 @@ export function executePowerupForSoldier(
 			break;
 		}
 		case "tower": {
+			if (!player) {
+				warn(`Cannot place tower: no player provided for ${soldierId}`);
+				break;
+			}
 			const dir = directionToward.Magnitude > 0.001 ? directionToward.Unit : new Vector2(0, 1);
 			const towerPos = center.add(dir.mul(10));
-			store.placeTower({
-				id: `${towerId++}`,
-				position: towerPos,
-				ownerId: soldierId,
-				damage: 15,
-				range: 50,
-				lastAttackTime: 0,
-				lastAttackPlayerName: undefined,
-				currentTargetId: undefined,
-				hasEnemyInRange: false,
-			});
+			placeTower(player, { skipCost: true, position: towerPos });
 			break;
 		}
 		case "laserBeam": {
@@ -511,7 +504,8 @@ export function executePowerupForSoldier(
 			warn(`Unknown powerup id ${powerupId}`);
 	}
 
-	if (player) alertMessage(player, POWERUP_ALERT_MESSAGES[powerupId], palette.green);
+	// placeTower handles its own alerts (including failure cases)
+	if (player && powerupId !== "tower") alertMessage(player, POWERUP_ALERT_MESSAGES[powerupId], palette.green);
 }
 
 function getPlayerLookDirection(player: Player): Vector2 | undefined {

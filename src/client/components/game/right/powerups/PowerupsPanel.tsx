@@ -3,7 +3,7 @@ import { useSelector } from "@rbxts/react-reflex";
 import { HStack, VStack } from "@rbxts-ui/layout";
 import { useRem } from "client/ui/rem/useRem";
 import { POWERUP_PRICES } from "shared/constants/powerups";
-import { selectLocalOrbs } from "shared/store/soldiers";
+import { selectLocalOrbs, selectLocalSoldier } from "shared/store/soldiers";
 
 import { BuyPowerup } from "./BuyPowerup";
 import { OrbsMeter } from "./OrbsMeter";
@@ -21,6 +21,8 @@ export function PowerupsPanel() {
 	const width = rem(8);
 	const size = new UDim2(0, width, 0, height);
 	const orbs = useSelector(selectLocalOrbs) ?? 0;
+	const localSoldier = useSelector(selectLocalSoldier);
+	const isInsideTerritory = localSoldier?.isInside ?? false;
 
 	return (
 		<HStack name="powerups-panel" size={size} verticalAlignment={Enum.VerticalAlignment.Bottom} spacing={rem(1)}>
@@ -62,9 +64,10 @@ export function PowerupsPanel() {
 				<BuyPowerup
 					id="tower"
 					label="Tower"
-					enabled={orbs >= POWERUP_PRICES.tower}
+					enabled={orbs >= POWERUP_PRICES.tower && isInsideTerritory}
 					order={4}
 					price={POWERUP_PRICES.tower}
+					disabledReason={!isInsideTerritory ? "Can't place" : undefined}
 				/>
 
 				<BuyPowerup

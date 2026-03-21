@@ -69,7 +69,7 @@ export async function runScenarioTower(player: Player, botCount = 3) {
 		position: towerPos,
 		ownerId: TOWER_SCENARIO_ENEMY_OWNER,
 		damage: 15,
-		range: 50,
+		shootRange: 50,
 		lastAttackTime: 0,
 		lastAttackPlayerName: undefined,
 		currentTargetId: undefined,

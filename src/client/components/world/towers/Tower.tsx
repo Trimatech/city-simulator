@@ -19,7 +19,7 @@ const emptyTower: TowerEntity = {
 	id: "",
 	position: new Vector2(0, 0),
 	ownerId: "",
-	range: 0,
+	shootRange: 0,
 	damage: 0,
 	lastAttackTime: 0,
 	lastAttackPlayerName: undefined,
@@ -36,8 +36,6 @@ export function Tower({ towerId, parentFolder }: TowerProps) {
 
 	useEffect(() => {
 		const loadTower = async () => {
-			//warn("loadTower", tower);
-			// Load the tower model
 			const towerModel = await loadSharedCloneByPath<Model>("ReplicatedStorage/Models/Gameplay/Tower");
 			const primaryPart = await waitForPrimaryPart(towerModel);
 
@@ -49,7 +47,7 @@ export function Tower({ towerId, parentFolder }: TowerProps) {
 
 			const rangeIndicatorPosition = new Vector3(tower.position.X, 2, tower.position.Y);
 			// Create range indicator (neutral by default)
-			const rangeIndicator = createRangeIndicator(tower.range, rangeIndicatorPosition);
+			const rangeIndicator = createRangeIndicator(tower.shootRange, rangeIndicatorPosition);
 			rangeIndicator.Transparency = 0.85;
 			rangeIndicator.Color = palette.surface1;
 			rangeIndicator.Parent = towerModel;
@@ -75,14 +73,12 @@ export function Tower({ towerId, parentFolder }: TowerProps) {
 		if (!part) return;
 		if (tower.hasEnemyInRange) {
 			part.Color = palette.red;
-			part.Transparency = 0.65;
+			part.Transparency = 0.5;
 		} else {
-			part.Color = palette.surface1;
-			part.Transparency = 0.85;
+			part.Color = palette.blue;
+			part.Transparency = 0.75;
 		}
 	}, [tower.hasEnemyInRange]);
-
-	print("currentTargetId", tower.currentTargetId);
 
 	// Continuous beam while a target exists
 	useEffect(() => {

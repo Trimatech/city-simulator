@@ -2,6 +2,7 @@ import Object from "@rbxts/object-utils";
 import { Workspace } from "@rbxts/services";
 import { store } from "server/store";
 import { killSoldier } from "server/world/world.utils";
+import { isPointInPolygon, vector2ToPoint, vectorsToPoints } from "shared/polybool/poly-utils";
 import { selectSoldiersById } from "shared/store/soldiers";
 import { selectTowersById } from "shared/store/towers/tower-selectors";
 
@@ -11,6 +12,18 @@ export function onTowerTick(dt: number) {
 	const soldiers = store.getState(selectSoldiersById);
 
 	for (const [, tower] of Object.entries(towers)) {
+		// Destroy tower if it's no longer inside the owner's territory
+		const owner = soldiers[tower.ownerId];
+		if (!owner || owner.dead || owner.polygon.size() === 0) {
+			store.removeTower(tower.id);
+			continue;
+		}
+
+		const polygon = vectorsToPoints(owner.polygon as Vector2[]);
+		if (!isPointInPolygon(vector2ToPoint(tower.position), polygon)) {
+			store.removeTower(tower.id);
+			continue;
+		}
 		let nearestId: string | undefined = undefined;
 		let nearestDist = math.huge;
 
@@ -18,7 +31,7 @@ export function onTowerTick(dt: number) {
 			if (!soldier || soldier.dead || soldier.id === tower.ownerId) continue;
 
 			const distance = tower.position.sub(soldier.position).Magnitude;
-			if (distance <= tower.range && distance < nearestDist) {
+			if (distance <= tower.shootRange && distance < nearestDist) {
 				nearestDist = distance;
 				nearestId = soldier.id;
 			}
