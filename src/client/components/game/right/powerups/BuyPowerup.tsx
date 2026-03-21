@@ -22,6 +22,7 @@ interface Props {
 	readonly enabled: boolean;
 	readonly order: number;
 	readonly price: number;
+	readonly disabledReason?: string;
 	readonly children?: React.Element;
 }
 
@@ -74,7 +75,7 @@ function getOrbFountainConfig(price: number): ParticleEmitter2DConfig {
 	};
 }
 
-export function BuyPowerup({ id, label, enabled, order, price, children }: Props) {
+export function BuyPowerup({ id, label, enabled, order, price, disabledReason, children }: Props) {
 	const rem = useRem();
 	const style = POWERUP_BUTTON_STYLES[id];
 
@@ -332,6 +333,26 @@ export function BuyPowerup({ id, label, enabled, order, price, children }: Props
 									position={new UDim2(0.5, 0, 0.5, 0)}
 									backgroundTransparency={1}
 								/>
+
+								{disabledReason !== undefined && (
+									<Text
+										text={disabledReason}
+										size={new UDim2(1, 0, 0, rem(1))}
+										position={new UDim2(0.5, 0, 1, rem(0.25))}
+										anchorPoint={new Vector2(0.5, 0)}
+										font={fonts.fredokaOne.regular}
+										textColor={palette.red1}
+										textSize={rem(0.7)}
+										textXAlignment="Center"
+										textYAlignment="Center"
+										backgroundTransparency={1}
+										zIndex={10}
+									>
+										<uistroke Thickness={rem(0.1)} Color={palette.white}>
+											<uigradient Color={textStrokeGradient} Rotation={90} />
+										</uistroke>
+									</Text>
+								)}
 
 								{children}
 							</Frame>
