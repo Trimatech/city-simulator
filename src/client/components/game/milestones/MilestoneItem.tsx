@@ -79,27 +79,21 @@ export function MilestoneItem({ data, celebrating }: MilestoneItemProps) {
 	const percentText = `${math.floor(progress * 100)}%`;
 
 	const [showBurst, setShowBurst] = useState(false);
-	const [scale, scaleMotion] = useMotion(1);
+
 	const [glow, glowMotion] = useMotion(0);
-	const [contentOpacity, contentOpacityMotion] = useMotion(0);
+
 	const prevCelebrating = useRef(false);
 
 	useEffect(() => {
 		if (celebrating && !prevCelebrating.current) {
 			setShowBurst(true);
-			scaleMotion.spring(1.08, springs.bubbly);
 			glowMotion.spring(1, springs.bubbly);
 
-			task.delay(0.3, () => scaleMotion.spring(1, springs.gentle));
 			task.delay(0.5, () => glowMotion.spring(0, springs.gentle));
 			task.delay(BURST_EMIT_DURATION + BURST_LIFETIME_MAX + 0.3, () => setShowBurst(false));
 		}
 		prevCelebrating.current = celebrating;
 	}, [celebrating]);
-
-	useEffect(() => {
-		contentOpacityMotion.spring(1, springs.gentle);
-	}, []);
 
 	const outerCorner = new UDim(0, rem(OUTER_CORNER));
 
@@ -107,13 +101,17 @@ export function MilestoneItem({ data, celebrating }: MilestoneItemProps) {
 		<Frame size={new UDim2(1, 0, 0, 0)} backgroundTransparency={1} automaticSize={Enum.AutomaticSize.Y}>
 			{/* Outer border frame */}
 			<Frame
-				backgroundColor={INNER_BG_COLOR}
-				backgroundTransparency={INNER_BG_TRANSPARENCY}
+				backgroundColor={glow.map((g) => INNER_BG_COLOR.Lerp(accent, g * 0.15))}
+				backgroundTransparency={glow.map((g) => INNER_BG_TRANSPARENCY - g * 0.2)}
 				cornerRadius={outerCorner}
 				size={new UDim2(1, 0, 0, 0)}
 				automaticSize={Enum.AutomaticSize.Y}
 			>
-				<uistroke Color={OUTER_BORDER_COLOR} Transparency={OUTER_BORDER_TRANSPARENCY} Thickness={rem(0.4)} />
+				<uistroke
+					Color={glow.map((g) => OUTER_BORDER_COLOR.Lerp(accent, g))}
+					Transparency={glow.map((g) => OUTER_BORDER_TRANSPARENCY - g * 0.3)}
+					Thickness={rem(0.4)}
+				/>
 				<uistroke Color={palette.white} Transparency={0.45} Thickness={rem(0.1)}>
 					<uigradient Color={INNER_BORDER_GRADIENT} Rotation={90} />
 				</uistroke>
@@ -130,17 +128,6 @@ export function MilestoneItem({ data, celebrating }: MilestoneItemProps) {
 				>
 					<uicorner CornerRadius={outerCorner} />
 				</Image>
-
-				{/* Glow overlay */}
-				{/* <Frame
-					size={new UDim2(1, rem(1.6), 1, rem(1))}
-					position={new UDim2(0, rem(-0.8), 0, rem(-0.5))}
-					backgroundColor={accent}
-					backgroundTransparency={glow.map((g) => 1 - g * 0.35)}
-					zIndex={0}
-				>
-					<uicorner CornerRadius={innerCorner} />
-				</Frame> */}
 
 				<VStack size={new UDim2(1, 0, 1, 0)} spacing={rem(1)} backgroundTransparency={1} padding={rem(1)}>
 					{/* Title row: action text + progress count */}
