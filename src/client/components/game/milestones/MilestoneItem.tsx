@@ -10,6 +10,7 @@ import { useRem } from "client/ui/rem/useRem";
 import assets from "shared/assets";
 import { formatThreshold, getMilestoneActionText, MilestoneCategoryDef } from "shared/constants/lifetime-milestones";
 import { palette } from "shared/constants/palette";
+import { MilestoneProgressBar } from "./MilestoneProgressBar";
 
 const BURST_EMIT_DURATION = 0.3;
 const BURST_LIFETIME_MAX = 1.2;
@@ -25,11 +26,7 @@ const INNER_BORDER_COLOR = Color3.fromRGB(55, 55, 55);
 const INNER_BORDER_TRANSPARENCY = 0.55;
 const INNER_CORNER = 0.8;
 
-const PROGRESS_BG_COLOR = Color3.fromRGB(40, 40, 40);
-const PROGRESS_BG_TRANSPARENCY = 0.45;
-const PROGRESS_BORDER_COLOR = Color3.fromRGB(119, 119, 119);
 const PROGRESS_HEIGHT = 0.85;
-const PROGRESS_CORNER = 1;
 
 const CARD_HEIGHT = 4.5;
 
@@ -208,30 +205,9 @@ export function MilestoneItem({ data, celebrating }: MilestoneItemProps) {
 						<Frame
 							size={new UDim2(1, 0, 0, rem(PROGRESS_HEIGHT))}
 							position={new UDim2(0, 0, 1, rem(-PROGRESS_HEIGHT - 0.1))}
-							backgroundColor={PROGRESS_BG_COLOR}
-							backgroundTransparency={PROGRESS_BG_TRANSPARENCY}
+							backgroundTransparency={1}
 						>
-							<uicorner CornerRadius={new UDim(0, rem(PROGRESS_CORNER))} />
-							<uistroke Color={PROGRESS_BORDER_COLOR} Thickness={rem(0.07)} />
-
-							{/* Fill */}
-							<Frame
-								size={new UDim2(progress, 0, 1, 0)}
-								backgroundColor={GOLD}
-								backgroundTransparency={0}
-							>
-								<uicorner CornerRadius={new UDim(0, rem(PROGRESS_CORNER))} />
-							</Frame>
-
-							{/* Percentage label */}
-							<Text
-								font={fonts.fredokaOne.regular}
-								text={percentText}
-								textColor={palette.white}
-								textSize={rem(0.7)}
-								size={new UDim2(1, 0, 1, 0)}
-								backgroundTransparency={1}
-							/>
+							<MilestoneProgressBar progress={progress} percentText={percentText} />
 						</Frame>
 
 						{/* Particle burst */}
