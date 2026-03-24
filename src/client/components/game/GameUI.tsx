@@ -10,6 +10,7 @@ import { SlideIn } from "client/ui/slide-in";
 import { Stats } from "../stats/Stats";
 import { Compass } from "./compass";
 import { HealthView } from "./health/HealthView";
+import { MilestoneWidget } from "./milestones/MilestoneWidget";
 import { MinimapArea } from "./minimap/MinimapArea";
 import { PowerupsPanel } from "./right/powerups/PowerupsPanel";
 
@@ -31,6 +32,7 @@ export function GameUI({ visible }: GameUIProps) {
 			<SlideIn visible={visible} direction="left">
 				<HealthView />
 				<Stats />
+				<MilestoneWidget />
 			</SlideIn>
 			<SlideIn visible={visible} direction="right">
 				<VStack

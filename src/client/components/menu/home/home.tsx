@@ -11,6 +11,7 @@ import assets from "shared/assets";
 import { ROOT_PADDING } from "shared/constants/theme";
 
 import { DailyRewardScreen } from "../daily-reward/DailyRewardScreen";
+import { ProgressWindow } from "../progress/ProgressWindow";
 import { ShopWindow } from "../shop/ShopWindow";
 import { GameVersion } from "./GameVersion";
 import { MuteButton } from "./MuteButton";
@@ -19,6 +20,7 @@ import { PlayButton } from "./PlayButton";
 const enum Window {
 	Shop = "shop",
 	DailyReward = "dailyReward",
+	Progress = "progress",
 }
 
 interface HomeProps {
@@ -50,6 +52,13 @@ export function Home({ visible }: HomeProps) {
 						fitContent
 					>
 						<ShopButtonTextWithIcon text="Daily Rewards" icon={assets.ui.icons.dailyRewards} />
+					</MainButton>
+					<MainButton
+						onClick={() => setOpenWindow(Window.Progress)}
+						size={new UDim2(0, rem(13), 0, rem(4))}
+						fitContent
+					>
+						<ShopButtonTextWithIcon text="Progress" icon={assets.ui.icons.rank} />
 					</MainButton>
 				</HStack>
 			</SlideIn>
@@ -101,6 +110,14 @@ export function Home({ visible }: HomeProps) {
 					<DailyRewardScreen onDismiss={() => setOpenWindow(undefined)} />
 				</>
 			)}
+
+			{openWindow === Window.Progress && (
+				<>
+					<Overlay onClick={() => setOpenWindow(undefined)} />
+					<ProgressWindow onClose={() => setOpenWindow(undefined)} />
+				</>
+			)}
+
 		</>
 	);
 }

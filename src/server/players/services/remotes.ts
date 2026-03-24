@@ -1,9 +1,10 @@
 import { store } from "server/store";
 import assets from "shared/assets";
+import { allMilestonesComplete } from "shared/constants/lifetime-milestones";
 import { palette } from "shared/constants/palette";
 import { findSoldierSkin } from "shared/constants/skins";
 import { remotes } from "shared/remotes";
-import { RANDOM_SKIN, selectPlayerBalance, selectPlayerSkins } from "shared/store/saves";
+import { RANDOM_SKIN, selectPlayerBalance, selectPlayerMilestoneProgress, selectPlayerSkins } from "shared/store/saves";
 
 export async function initRemoteService() {
 	remotes.save.buySkin.connect((player, skinId) => {
@@ -54,6 +55,30 @@ export async function initRemoteService() {
 				sound: assets.sounds.alert_bad,
 			});
 		}
+	});
+
+	// Ascension / Prestige
+	remotes.save.ascend.connect((player) => {
+		const progress = store.getState(selectPlayerMilestoneProgress(player.Name));
+		if (!allMilestonesComplete(progress)) {
+			remotes.client.alert.fire(player, {
+				emoji: "🚨",
+				color: palette.red,
+				message: "You haven't completed all milestones yet!",
+				sound: assets.sounds.alert_bad,
+			});
+			return;
+		}
+
+		store.performAscension(player.Name);
+
+		remotes.client.alert.fire(player, {
+			emoji: "⭐",
+			color: palette.yellow,
+			colorSecondary: palette.peach,
+			message: `You have <font color="#fff">Ascended</font>! All milestones reset. Exclusive rewards unlocked.`,
+			sound: assets.sounds.alert_money,
+		});
 	});
 
 	// Handle bird camera position updates for streaming

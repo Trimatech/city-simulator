@@ -11,6 +11,7 @@ import { ScoreMilestone } from "server/store/milestones/milestone-utils";
 import { getSoldier } from "server/world";
 import { Badge } from "shared/assetsFolder";
 import assets from "shared/assets";
+import { KILL_BOUNTY_CAP } from "shared/constants/lifetime-milestones";
 import { palette } from "shared/constants/palette";
 import { remotes } from "shared/remotes";
 import { selectPlayerSave } from "shared/store/saves";
@@ -81,9 +82,7 @@ function observeMilestone(id: string) {
 		const enemy = getSoldier(enemyId);
 
 		if (enemy && shouldGrantReward()) {
-			// TODO: Calculate from area??
-			const length = enemy.polygonAreaSize;
-			const bounty = math.ceil(length / 3);
+			const bounty = math.min(math.ceil(enemy.polygonAreaSize / 3), KILL_BOUNTY_CAP);
 			grantMoneyReward(id, bounty, `eliminating <font color="#fff">${enemy.name}</font>`, true);
 
 			// Claimed badge: earn first kill bounty

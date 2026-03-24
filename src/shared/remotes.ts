@@ -23,6 +23,7 @@ export const remotes = createRemotes({
 	save: namespace({
 		setSkin: remote<Server, [skin: string]>(t.string),
 		buySkin: remote<Server, [skin: string]>(t.string),
+		ascend: remote<Server>(),
 	}),
 
 	client: namespace({
