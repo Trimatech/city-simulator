@@ -41,6 +41,8 @@ target:
         socialLinks:
             - title: 🤝・Community
               url: https://www.roblox.com/groups/34579161/Trimatech-Games#!/about
+            - title: Discord
+              url: https://discord.gg/byDu926vnA
         configuration:
             playableDevices: [computer, console, phone, tablet]
             privateServers:
