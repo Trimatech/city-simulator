@@ -4,6 +4,7 @@ import { Frame, Image, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
 import { useMotion } from "client/hooks";
+import { Particles } from "client/ui/Particles/Particles";
 import { ParticleEmitter2DConfig } from "client/ui/Particles/Particles.interfaces";
 import { useRem } from "client/ui/rem/useRem";
 import assets from "shared/assets";
@@ -13,7 +14,7 @@ import { palette } from "shared/constants/palette";
 import { MilestoneProgressBar } from "./MilestoneProgressBar";
 
 const BURST_EMIT_DURATION = 0.3;
-const BURST_LIFETIME_MAX = 1.2;
+const BURST_LIFETIME_MAX = 2.2;
 
 const OUTER_BORDER_COLOR = Color3.fromRGB(61, 39, 19);
 const OUTER_BORDER_TRANSPARENCY = 0.64;
@@ -40,9 +41,9 @@ function getBurstConfig(accent: Color3): ParticleEmitter2DConfig {
 			new NumberSequenceKeypoint(0.5, 5),
 			new NumberSequenceKeypoint(1, 2),
 		]),
-		texture: assets.ui.heart,
+		texture: assets.ui.icons.orb,
 		acceleration: new NumberRange(0),
-		spreadAngle: new NumberRange(-180, 180),
+		spreadAngle: new NumberRange(-45, 45),
 		rotation: new NumberRange(-30, 30),
 		rotSpeed: new NumberRange(-60, 60),
 		transparency: new NumberSequence([
@@ -50,7 +51,7 @@ function getBurstConfig(accent: Color3): ParticleEmitter2DConfig {
 			new NumberSequenceKeypoint(0.5, 0.3),
 			new NumberSequenceKeypoint(1, 1),
 		]),
-		color: new ColorSequence([new ColorSequenceKeypoint(0, accent), new ColorSequenceKeypoint(1, palette.yellow)]),
+		color: new ColorSequence([new ColorSequenceKeypoint(0, accent), new ColorSequenceKeypoint(1, accent)]),
 		zOffset: 10,
 		gravityStrength: 60,
 	};
@@ -103,12 +104,7 @@ export function MilestoneItem({ data, celebrating }: MilestoneItemProps) {
 	const outerCorner = new UDim(0, rem(OUTER_CORNER));
 
 	return (
-		<Frame
-			size={new UDim2(1, 0, 0, 0)}
-			backgroundTransparency={1}
-			clipsDescendants={false}
-			automaticSize={Enum.AutomaticSize.Y}
-		>
+		<Frame size={new UDim2(1, 0, 0, 0)} backgroundTransparency={1} automaticSize={Enum.AutomaticSize.Y}>
 			{/* Outer border frame */}
 			<Frame
 				backgroundColor={INNER_BG_COLOR}
@@ -116,7 +112,6 @@ export function MilestoneItem({ data, celebrating }: MilestoneItemProps) {
 				cornerRadius={outerCorner}
 				size={new UDim2(1, 0, 0, 0)}
 				automaticSize={Enum.AutomaticSize.Y}
-				clipsDescendants
 			>
 				<uistroke Color={OUTER_BORDER_COLOR} Transparency={OUTER_BORDER_TRANSPARENCY} Thickness={rem(0.4)} />
 				<uistroke Color={palette.white} Transparency={0.45} Thickness={rem(0.1)}>
@@ -190,25 +185,24 @@ export function MilestoneItem({ data, celebrating }: MilestoneItemProps) {
 						backgroundTransparency={1}
 					>
 						<MilestoneProgressBar progress={progress} percentText={percentText} color={accent} />
+						{/* Particle burst — anchored to the right end of the progress bar */}
+						{showBurst && (
+							<Frame
+								position={new UDim2(1, -rem(0.5), 0, 0)}
+								anchorPoint={new Vector2(0.5, 0.5)}
+								size={new UDim2(0, 0, 0, 0)}
+								backgroundTransparency={1}
+								zIndex={20}
+							>
+								<Particles
+									config={getBurstConfig(accent)}
+									size={new UDim2(0, rem(1), 0, rem(1))}
+									emitDuration={BURST_EMIT_DURATION}
+								/>
+							</Frame>
+						)}
 					</Frame>
 				</VStack>
-
-				{/* Particle burst */}
-				{/* {showBurst && (
-					<Frame
-						position={new UDim2(0.5, 0, 0.5, 0)}
-						anchorPoint={new Vector2(0.5, 0.5)}
-						size={new UDim2(0, 1, 0, 1)}
-						backgroundTransparency={1}
-						zIndex={20}
-					>
-						<Particles
-							config={getBurstConfig(accent)}
-							size={new UDim2(0, 1, 0, 1)}
-							emitDuration={BURST_EMIT_DURATION}
-						/>
-					</Frame>
-				)} */}
 			</Frame>
 		</Frame>
 	);
