@@ -1,5 +1,5 @@
 import { composeBindings } from "@rbxts/pretty-react-hooks";
-import React, { useEffect } from "@rbxts/react";
+import React, { useEffect, useMemo } from "@rbxts/react";
 import { Frame, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
@@ -7,31 +7,35 @@ import { useMotion } from "client/hooks";
 import { useRem } from "client/ui/rem/useRem";
 import { palette } from "shared/constants/palette";
 import { cornerRadiusFull } from "shared/constants/sizes";
+import { brighten, darken } from "shared/utils/color-utils";
 
-const OUTER_BORDER_COLOR = Color3.fromRGB(119, 119, 119);
 const BG_COLOR = Color3.fromRGB(40, 40, 40);
-const FILL_COLOR = Color3.fromRGB(246, 197, 78);
 
-const OUTER_STROKE_GRADIENT = new ColorSequence(Color3.fromRGB(119, 119, 119), Color3.fromRGB(100, 100, 100));
+function buildGradients(color: Color3) {
+	const outerStroke = new ColorSequence(darken(color, 0.6), darken(color, 0.7));
 
-const FILL_STROKE_GRADIENT = new ColorSequence([
-	new ColorSequenceKeypoint(0, FILL_COLOR),
-	new ColorSequenceKeypoint(0.64, FILL_COLOR),
-	new ColorSequenceKeypoint(1, Color3.fromRGB(255, 220, 100)),
-]);
+	const fillStroke = new ColorSequence([
+		new ColorSequenceKeypoint(0, color),
+		new ColorSequenceKeypoint(0.5, color),
+		new ColorSequenceKeypoint(1, brighten(color, 0.9)),
+	]);
 
-const INNER_STROKE_GRADIENT = new ColorSequence([
-	new ColorSequenceKeypoint(0, Color3.fromRGB(80, 60, 20)),
-	new ColorSequenceKeypoint(0.48, Color3.fromRGB(120, 90, 30)),
-	new ColorSequenceKeypoint(1, Color3.fromRGB(150, 115, 40)),
-]);
+	const innerStroke = new ColorSequence([
+		new ColorSequenceKeypoint(0, darken(color, 0.5)),
+		new ColorSequenceKeypoint(0.48, darken(color, 0.3)),
+		new ColorSequenceKeypoint(1, darken(color, 0.15)),
+	]);
+
+	return { outerStroke, fillStroke, innerStroke };
+}
 
 interface MilestoneProgressBarProps {
 	readonly progress: number;
 	readonly percentText: string;
+	readonly color: Color3;
 }
 
-export function MilestoneProgressBar({ progress, percentText }: MilestoneProgressBarProps) {
+export function MilestoneProgressBar({ progress, percentText, color }: MilestoneProgressBarProps) {
 	const rem = useRem();
 
 	const [progressValue, progressMotion] = useMotion(0);
@@ -45,13 +49,15 @@ export function MilestoneProgressBar({ progress, percentText }: MilestoneProgres
 		return new UDim2(math.clamp(p, 0, 1) - 1, 0, 0.5, 0);
 	});
 
+	const gradients = useMemo(() => buildGradients(color), [color]);
+
 	const height = rem(0.85);
 	const thickness = rem(0.1);
 
 	return (
 		<Frame
 			name="MilestoneProgressBarOuter"
-			backgroundColor={OUTER_BORDER_COLOR}
+			backgroundColor={darken(color, 0.6)}
 			backgroundTransparency={0}
 			size={new UDim2(1, 0, 0, height + rem(0.2))}
 			cornerRadius={cornerRadiusFull}
@@ -60,18 +66,18 @@ export function MilestoneProgressBar({ progress, percentText }: MilestoneProgres
 				<uicorner CornerRadius={cornerRadiusFull} />
 				<uistroke
 					Color={palette.black}
-					Thickness={rem(0.15)}
+					Thickness={rem(0.1)}
 					BorderStrokePosition={Enum.BorderStrokePosition.Outer}
 					ZIndex={1}
 				/>
-				<uistroke
+				{/* <uistroke
 					Color={Color3.fromHex("#ffffff")}
 					Thickness={thickness}
 					BorderStrokePosition={Enum.BorderStrokePosition.Outer}
 					ZIndex={2}
 				>
-					<uigradient Color={OUTER_STROKE_GRADIENT} Rotation={90} />
-				</uistroke>
+					<uigradient Color={gradients.outerStroke} Rotation={90} />
+				</uistroke> */}
 
 				{/* Filled portion — full width, slides via Position X so roundness is preserved */}
 				<canvasgroup
@@ -79,7 +85,7 @@ export function MilestoneProgressBar({ progress, percentText }: MilestoneProgres
 					Position={fillPosition}
 					Size={new UDim2(1, 0, 1, -thickness * 2)}
 					AnchorPoint={new Vector2(0, 0.5)}
-					BackgroundColor3={FILL_COLOR}
+					BackgroundColor3={color}
 					ZIndex={2}
 				>
 					<uicorner CornerRadius={cornerRadiusFull} />
@@ -88,7 +94,7 @@ export function MilestoneProgressBar({ progress, percentText }: MilestoneProgres
 						Thickness={rem(0.1)}
 						BorderStrokePosition={Enum.BorderStrokePosition.Outer}
 					>
-						<uigradient Color={FILL_STROKE_GRADIENT} Rotation={0} />
+						<uigradient Color={gradients.fillStroke} Rotation={0} />
 					</uistroke>
 				</canvasgroup>
 
@@ -106,7 +112,7 @@ export function MilestoneProgressBar({ progress, percentText }: MilestoneProgres
 						Thickness={rem(0.1)}
 						BorderStrokePosition={Enum.BorderStrokePosition.Outer}
 					>
-						<uigradient Color={INNER_STROKE_GRADIENT} Rotation={90} />
+						<uigradient Color={gradients.innerStroke} Rotation={90} />
 					</uistroke>
 				</canvasgroup>
 
@@ -119,7 +125,9 @@ export function MilestoneProgressBar({ progress, percentText }: MilestoneProgres
 					size={new UDim2(1, 0, 1, 0)}
 					backgroundTransparency={1}
 					zIndex={3}
-				/>
+				>
+					<uistroke Color={palette.black} Thickness={rem(0.05)} />
+				</Text>
 			</canvasgroup>
 		</Frame>
 	);
