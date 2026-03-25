@@ -1,18 +1,11 @@
 import React from "@rbxts/react";
-import { useSelector } from "@rbxts/react-reflex";
 import { HStack } from "@rbxts-ui/layout";
 import { Frame } from "@rbxts-ui/primitives";
-import { store } from "client/store";
-import { MenuWindow, selectOpenMenuWindow } from "client/store/screen";
 import { HomeStats } from "client/components/stats/HomeStats";
-import { Overlay } from "client/ui/Overlay";
 import { useRem } from "client/ui/rem/useRem";
 import { SlideIn } from "client/ui/slide-in";
 import { ROOT_PADDING } from "shared/constants/theme";
 
-import { DailyRewardScreen } from "../daily-reward/DailyRewardScreen";
-import { ProgressWindow } from "../progress/ProgressWindow";
-import { ShopWindow } from "../shop/ShopWindow";
 import { GameVersion } from "./GameVersion";
 import { MuteButton } from "./MuteButton";
 import { PlayButton } from "./PlayButton";
@@ -23,8 +16,6 @@ interface HomeProps {
 
 export function Home({ visible }: HomeProps) {
 	const rem = useRem();
-	const openMenuWindow = useSelector(selectOpenMenuWindow);
-
 	return (
 		<>
 			<SlideIn visible={visible} direction="right">
@@ -60,27 +51,6 @@ export function Home({ visible }: HomeProps) {
 					<HomeStats />
 				</HStack>
 			</SlideIn>
-
-			{openMenuWindow === MenuWindow.Shop && (
-				<>
-					<Overlay onClick={() => store.setOpenMenuWindow(undefined)} />
-					<ShopWindow onClose={() => store.setOpenMenuWindow(undefined)} />
-				</>
-			)}
-
-			{openMenuWindow === MenuWindow.DailyReward && (
-				<>
-					<Overlay onClick={() => store.setOpenMenuWindow(undefined)} />
-					<DailyRewardScreen onDismiss={() => store.setOpenMenuWindow(undefined)} />
-				</>
-			)}
-
-			{openMenuWindow === MenuWindow.Progress && (
-				<>
-					<Overlay onClick={() => store.setOpenMenuWindow(undefined)} />
-					<ProgressWindow onClose={() => store.setOpenMenuWindow(undefined)} />
-				</>
-			)}
 		</>
 	);
 }

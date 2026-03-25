@@ -7,6 +7,7 @@ import { Controller } from "../components/controller";
 import { ErrorHandler } from "../components/error-handler";
 import { ImpactOverlay } from "../components/game/ImpactOverlay";
 import { BackgroundMusic } from "../components/music/BackgroundMusic";
+import { OverlayScreens } from "../components/OverlayScreens";
 import { Preloader } from "../components/preloader";
 import { Screens } from "../components/Screens";
 import { TopbarScreens } from "../components/TopbarScreens";
@@ -31,6 +32,7 @@ export function App() {
 				<BirdCamera />
 				<Controller />
 				<World />
+				<ImpactOverlay />
 			</Layer>
 
 			<screengui
@@ -54,7 +56,17 @@ export function App() {
 				ScreenInsets={Enum.ScreenInsets.DeviceSafeInsets}
 			>
 				<Screens />
-				<ImpactOverlay />
+			</screengui>
+
+			<screengui
+				key="overlay-screens"
+				ResetOnSpawn={false}
+				IgnoreGuiInset
+				ZIndexBehavior="Sibling"
+				DisplayOrder={4}
+				ScreenInsets={Enum.ScreenInsets.None}
+			>
+				<OverlayScreens />
 			</screengui>
 
 			<Layer>
