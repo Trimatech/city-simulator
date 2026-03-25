@@ -9,14 +9,12 @@ import { SCROLLBAR_COLOR, SCROLLBAR_THICKNESS, SCROLLBAR_TRANSPARENCY } from "cl
 import { formatInteger } from "client/utils/format-integer";
 import assets from "shared/assets";
 import { USER_NAME } from "shared/constants/core";
-import { DAILY_REWARD_CYCLE, getDailyRewardAmount } from "shared/constants/daily-rewards";
 import { palette } from "shared/constants/palette";
 import { allWallSkins } from "shared/constants/skins";
-import { selectPlayerBalance, selectPlayerDailyStreak, selectPlayerSkins } from "shared/store/saves";
+import { selectPlayerBalance } from "shared/store/saves";
 
 import { LifetimeMilestones } from "./components/LifetimeMilestones";
 import { ProgressCardItem } from "./components/ProgressCardItem";
-import { SectionHeader } from "./components/SectionHeader";
 import { QUEST_TARGETS } from "./constants";
 
 interface ProgressWindowProps {
@@ -42,12 +40,6 @@ function getNextSkin(ownedSkins: readonly string[]) {
 export function ProgressWindow({ onClose }: ProgressWindowProps) {
 	const rem = useRem();
 	const balance = useSelectorCreator(selectPlayerBalance, USER_NAME) ?? 0;
-	const streak = useSelectorCreator(selectPlayerDailyStreak, USER_NAME) ?? 0;
-	const ownedSkins = useSelectorCreator(selectPlayerSkins, USER_NAME) ?? [];
-
-	const nextSkin = getNextSkin(ownedSkins);
-	const nextDailyDay = (streak % DAILY_REWARD_CYCLE) + 1;
-	const nextDailyReward = getDailyRewardAmount(nextDailyDay);
 
 	const questIcons: Record<string, string> = {
 		area: assets.ui.icons.area,
@@ -99,25 +91,6 @@ export function ProgressWindow({ onClose }: ProgressWindowProps) {
 							))}
 
 							<LifetimeMilestones />
-
-							<Frame size={new UDim2(1, 0, 0, rem(0.6))} backgroundTransparency={1} />
-							<SectionHeader text="Next Goals" />
-							<ProgressCardItem
-								title={nextSkin ? `Unlock: ${nextSkin.id}` : "All skins owned!"}
-								subtitle={
-									nextSkin
-										? `Save $${formatInteger(nextSkin.price)} for a new trail`
-										: "You own every skin in the shop"
-								}
-								accent={palette.mauve}
-								progress={nextSkin ? balance / nextSkin.price : 1}
-								valueText={
-									nextSkin
-										? `$${formatInteger(balance)}/$${formatInteger(nextSkin.price)}`
-										: "Complete"
-								}
-								progressLabel={`${math.floor(math.clamp(nextSkin ? balance / nextSkin.price : 1, 0, 1) * 100)}%`}
-							/>
 						</VStack>
 					</Frame>
 				</scrollingframe>
