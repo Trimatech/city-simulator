@@ -3,6 +3,7 @@ import React, { useBinding, useEffect, useMemo, useRef } from "@rbxts/react";
 import { RunService } from "@rbxts/services";
 import { ReactiveButton2 } from "@rbxts-ui/components";
 import { CanvasGroup, Frame, Image, Text } from "@rbxts-ui/primitives";
+import { StylizedBox } from "client/components/StylizedBox";
 import { fonts } from "client/constants/fonts";
 import { useMotion } from "client/hooks";
 import { Particles } from "client/ui/Particles/Particles";
@@ -129,16 +130,10 @@ export function DailyRewardItem({
 
 	const baseCardSize = size ?? new UDim2(0, rem(16), 0, rem(24));
 	const cardSize = isCurrent ? new UDim2(0, rem(18), 0, rem(26)) : baseCardSize;
-	const outerRadius = new UDim(0, rem(1.8));
-	const whiteRadius = new UDim(0, rem(1.5));
 	const innerRadius = new UDim(0, rem(1.2));
-	const gradientSequence = new ColorSequence(theme.gradientFrom, theme.gradientTo);
-	const innerBorderGradient = new ColorSequence(theme.innerBorderFrom, theme.innerBorderTo);
 	const titleStrokeGradient = new ColorSequence(SUBTITLE_STROKE_FROM, SUBTITLE_STROKE_TO);
 	const labelStrokeGradient = new ColorSequence(SUBTITLE_STROKE_FROM, SUBTITLE_STROKE_TO);
 	const strokeThickness = rem(0.15);
-	const borderPad = new UDim(0, rem(0.3));
-	const whitePad = new UDim(0, rem(0.3));
 
 	const iconSize = lerpBinding(hover, new UDim2(0.8, 0, 0.55, 0), new UDim2(0.95, 0, 0.65, 0));
 
@@ -150,125 +145,82 @@ export function DailyRewardItem({
 			onHover={(hovered) => hoverMotion.spring(hovered ? 1 : 0)}
 			name="DailyRewardItem"
 		>
-			{/* Layer 1: Outer border */}
-			<Frame
-				backgroundColor={theme.outerBorderColor}
-				cornerRadius={outerRadius}
-				size={new UDim2(1, 0, 1, 0)}
-				backgroundTransparency={0}
-			>
-				<uipadding
-					PaddingTop={borderPad}
-					PaddingBottom={borderPad}
-					PaddingLeft={borderPad}
-					PaddingRight={borderPad}
+			<StylizedBox theme={theme} size={new UDim2(1, 0, 1, 0)}>
+				{/* Rays texture overlay */}
+				<RotatingRays
+					image={assets.ui.shop_item_rays}
+					transparency={theme.raysTransparency}
+					tint={theme.rayTint}
+					cornerRadius={innerRadius}
+					isActive={isCurrent}
+					speedRef={raysSpeedRef}
+				/>
+				<Image
+					image={assets.ui.spot_glow}
+					size={new UDim2(1, 0, 1, 0)}
+					imageTransparency={theme.raysTransparency}
+					zIndex={1}
+					scaleType="Fit"
+					imageColor3={theme.rayTint}
 				/>
 
-				{/* Layer 2: White/cream band */}
-				<Frame
-					backgroundColor={theme.whiteBorderColor}
-					cornerRadius={whiteRadius}
-					size={new UDim2(1, 0, 1, 0)}
-					backgroundTransparency={0}
-				>
-					<uipadding
-						PaddingTop={whitePad}
-						PaddingBottom={whitePad}
-						PaddingLeft={whitePad}
-						PaddingRight={whitePad}
+				{/* Icon */}
+				{icon !== undefined && (
+					<Image
+						image={icon}
+						size={iconSize}
+						position={new UDim2(0.5, 0, 0.45, 0)}
+						anchorPoint={new Vector2(0.5, 0.5)}
+						scaleType="Fit"
+						zIndex={2}
 					/>
+				)}
 
-					{/* Layer 3: Inner gradient area */}
+				{/* Title — "DAY N" */}
+				<Text
+					text={title}
+					font={fonts.fredokaOne.regular}
+					textColor={palette.white}
+					textSize={rem(2.4)}
+					size={new UDim2(1, 0, 0, rem(2.8))}
+					position={new UDim2(0, 0, 0.03, 0)}
+					textXAlignment="Center"
+					textYAlignment="Center"
+					zIndex={3}
+				>
+					<uistroke Thickness={strokeThickness} Color={palette.white}>
+						<uigradient Color={titleStrokeGradient} Rotation={90} />
+					</uistroke>
+				</Text>
+
+				{/* Label — "N Crystal(s)" */}
+				<Text
+					text={isClaimed ? `<s>${label}</s>` : label}
+					richText={isClaimed}
+					font={fonts.fredokaOne.regular}
+					textColor={LABEL_COLOR}
+					textSize={rem(2)}
+					size={new UDim2(1, 0, 0, rem(2.4))}
+					position={new UDim2(0, 0, 0.85, 0)}
+					textXAlignment="Center"
+					textYAlignment="Center"
+					zIndex={3}
+				>
+					<uistroke Thickness={strokeThickness} Color={palette.white}>
+						<uigradient Color={labelStrokeGradient} Rotation={90} />
+					</uistroke>
+				</Text>
+				{/* Dim overlay for claimed items */}
+				{isClaimed && (
 					<Frame
-						backgroundColor={palette.white}
-						cornerRadius={innerRadius}
+						backgroundColor={Color3.fromRGB(79, 0, 194)}
+						backgroundTransparency={0.7}
 						size={new UDim2(1, 0, 1, 0)}
-						backgroundTransparency={0}
-						name="DailyRewardItemInner"
-						clipsDescendants={true}
-					>
-						<uistroke Color={palette.white} Thickness={rem(0.15)}>
-							<uigradient Color={innerBorderGradient} Rotation={90} />
-						</uistroke>
-						<uigradient Color={gradientSequence} Rotation={90} />
-
-						{/* Rays texture overlay */}
-						<RotatingRays
-							image={assets.ui.shop_item_rays}
-							transparency={theme.raysTransparency}
-							tint={theme.rayTint}
-							cornerRadius={innerRadius}
-							isActive={isCurrent}
-							speedRef={raysSpeedRef}
-						/>
-						<Image
-							image={assets.ui.spot_glow}
-							size={new UDim2(1, 0, 1, 0)}
-							imageTransparency={theme.raysTransparency}
-							zIndex={1}
-							scaleType="Fit"
-							imageColor3={theme.rayTint}
-						/>
-
-						{/* Icon */}
-						{icon !== undefined && (
-							<Image
-								image={icon}
-								size={iconSize}
-								position={new UDim2(0.5, 0, 0.45, 0)}
-								anchorPoint={new Vector2(0.5, 0.5)}
-								scaleType="Fit"
-								zIndex={2}
-							/>
-						)}
-
-						{/* Title — "DAY N" */}
-						<Text
-							text={title}
-							font={fonts.fredokaOne.regular}
-							textColor={palette.white}
-							textSize={rem(2.4)}
-							size={new UDim2(1, 0, 0, rem(2.8))}
-							position={new UDim2(0, 0, 0.03, 0)}
-							textXAlignment="Center"
-							textYAlignment="Center"
-							zIndex={3}
-						>
-							<uistroke Thickness={strokeThickness} Color={palette.white}>
-								<uigradient Color={titleStrokeGradient} Rotation={90} />
-							</uistroke>
-						</Text>
-
-						{/* Label — "N Crystal(s)" */}
-						<Text
-							text={isClaimed ? `<s>${label}</s>` : label}
-							richText={isClaimed}
-							font={fonts.fredokaOne.regular}
-							textColor={LABEL_COLOR}
-							textSize={rem(2)}
-							size={new UDim2(1, 0, 0, rem(2.4))}
-							position={new UDim2(0, 0, 0.85, 0)}
-							textXAlignment="Center"
-							textYAlignment="Center"
-							zIndex={3}
-						>
-							<uistroke Thickness={strokeThickness} Color={palette.white}>
-								<uigradient Color={labelStrokeGradient} Rotation={90} />
-							</uistroke>
-						</Text>
-						{/* Dim overlay for claimed items */}
-						{isClaimed && (
-							<Frame
-								backgroundColor={Color3.fromRGB(79, 0, 194)}
-								backgroundTransparency={0.7}
-								size={new UDim2(1, 0, 1, 0)}
-								cornerRadius={innerRadius}
-								zIndex={4}
-							/>
-						)}
-					</Frame>
-				</Frame>
-			</Frame>
+						cornerRadius={innerRadius}
+						zIndex={4}
+					/>
+				)}
+			</StylizedBox>
 
 			{/* Crystal particles burst on claim — positioned at icon center, overflows card */}
 			{justClaimed && (

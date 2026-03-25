@@ -99,11 +99,7 @@ export function MilestoneCard({
 				size={scale.map((s) => new UDim2(s, 0, s, 0))}
 				position={scale.map((s) => new UDim2((1 - s) / 2, 0, (1 - s) / 2, 0))}
 			>
-				<Frame
-					size={new UDim2(1, 0, 1, 0)}
-					backgroundColor={accentDark}
-					backgroundTransparency={0.1}
-				>
+				<Frame size={new UDim2(1, 0, 1, 0)} backgroundColor={accentDark} backgroundTransparency={0.1}>
 					<uicorner CornerRadius={new UDim(0, rem(1.2))} />
 					<uistroke Color={accent} Thickness={rem(0.12)} Transparency={done ? 0 : 0.4} />
 
@@ -152,11 +148,7 @@ export function MilestoneCard({
 									size={new UDim2(1, 0, 0, rem(1.2))}
 									backgroundTransparency={1}
 								>
-									<uistroke
-										Thickness={rem(0.08)}
-										Color={Color3.fromHex("#000")}
-										Transparency={0.5}
-									/>
+									<uistroke Thickness={rem(0.08)} Color={Color3.fromHex("#000")} Transparency={0.5} />
 								</Text>
 								<Text
 									font={fonts.inter.regular}

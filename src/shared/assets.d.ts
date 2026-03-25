@@ -56,6 +56,8 @@ declare const assets: {
 		menu_title: string
 		patterns: {
 			dots_pattern: string
+			progress_content_bg: string
+			progress_window_bg: string
 			water_noise_pattern: string
 		}
 		powerups: {

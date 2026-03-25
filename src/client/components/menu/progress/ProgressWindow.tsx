@@ -7,6 +7,7 @@ import { GameWindowTitleHeader } from "client/components/menu/shop/GameWindowTit
 import { useRem } from "client/ui/rem/useRem";
 import { SCROLLBAR_COLOR, SCROLLBAR_THICKNESS, SCROLLBAR_TRANSPARENCY } from "client/ui/scrollbar.constants";
 import { formatInteger } from "client/utils/format-integer";
+import assets from "shared/assets";
 import { USER_NAME } from "shared/constants/core";
 import { DAILY_REWARD_CYCLE, getDailyRewardAmount } from "shared/constants/daily-rewards";
 import { palette } from "shared/constants/palette";
@@ -14,9 +15,10 @@ import { allWallSkins } from "shared/constants/skins";
 import { selectPlayerBalance, selectPlayerDailyStreak, selectPlayerSkins } from "shared/store/saves";
 
 import { LifetimeMilestones } from "./components/LifetimeMilestones";
-import { MilestoneCard } from "./components/MilestoneCard";
+import { ProgressCardItem } from "./components/ProgressCardItem";
 import { QuestProgressBar } from "./components/QuestProgressBar";
 import { SectionHeader } from "./components/SectionHeader";
+import { QUEST_TARGETS } from "./constants";
 
 interface ProgressWindowProps {
 	readonly onClose: () => void;
@@ -48,8 +50,14 @@ export function ProgressWindow({ onClose }: ProgressWindowProps) {
 	const nextDailyDay = (streak % DAILY_REWARD_CYCLE) + 1;
 	const nextDailyReward = getDailyRewardAmount(nextDailyDay);
 
+	const questIcons: Record<string, string> = {
+		area: assets.ui.icons.area,
+		eliminations: assets.ui.icons.kills,
+		orbs: assets.ui.icons.orb,
+	};
+
 	return (
-		<GameWindow header={<GameWindowTitleHeader title="PROGRESS" onClose={onClose} />}>
+		<GameWindow header={<GameWindowTitleHeader title="PROGRESS" onClose={onClose} />} variant="progress">
 			<Frame size={new UDim2(1, 0, 0, rem(37))} backgroundTransparency={1}>
 				<scrollingframe
 					BackgroundTransparency={1}
@@ -76,29 +84,40 @@ export function ProgressWindow({ onClose }: ProgressWindowProps) {
 						<VStack
 							size={new UDim2(1, 0, 0, 0)}
 							automaticSize={Enum.AutomaticSize.Y}
-							spacing={rem(0.9)}
+							spacing={rem(1.5)}
 							horizontalAlignment={Enum.HorizontalAlignment.Left}
 						>
+							{QUEST_TARGETS.map((quest, index) => (
+								<ProgressCardItem
+									key={quest.id}
+									title={quest.title}
+									valueText={`0/${formatInteger(quest.target)}`}
+									icon={questIcons[quest.id]}
+									progress={0}
+									progressLabel="0%"
+									layoutOrder={index}
+								/>
+							))}
+
 							<LifetimeMilestones />
 
 							<Frame size={new UDim2(1, 0, 0, rem(0.6))} backgroundTransparency={1} />
 							<SectionHeader text="Next Goals" />
-							<MilestoneCard
+							<ProgressCardItem
 								title={nextSkin ? `Unlock: ${nextSkin.id}` : "All skins owned!"}
 								subtitle={
 									nextSkin
 										? `Save $${formatInteger(nextSkin.price)} for a new trail`
 										: "You own every skin in the shop"
 								}
-								emoji="🎨"
 								accent={palette.mauve}
-								accentDark={Color3.fromHex("#3c1f5c")}
 								progress={nextSkin ? balance / nextSkin.price : 1}
-								progressLabel={
+								valueText={
 									nextSkin
 										? `$${formatInteger(balance)}/$${formatInteger(nextSkin.price)}`
 										: "Complete"
 								}
+								progressLabel={`${math.floor(math.clamp(nextSkin ? balance / nextSkin.price : 1, 0, 1) * 100)}%`}
 							/>
 							<QuestProgressBar
 								progress={streak / DAILY_REWARD_CYCLE}

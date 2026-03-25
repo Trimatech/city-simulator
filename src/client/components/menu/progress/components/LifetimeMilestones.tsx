@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "@rbxts/react";
+import React from "@rbxts/react";
 import { useSelectorCreator } from "@rbxts/react-reflex";
 import { formatInteger } from "client/utils/format-integer";
 import { USER_NAME } from "shared/constants/core";
@@ -10,7 +10,6 @@ import {
 	getNextTier,
 	MILESTONE_CATEGORIES,
 	MilestoneCategory,
-	MilestoneProgress,
 } from "shared/constants/lifetime-milestones";
 import { palette } from "shared/constants/palette";
 import {
@@ -19,12 +18,10 @@ import {
 	selectPlayerMilestoneProgress,
 } from "shared/store/saves";
 
-import { MILESTONE_DARK_ACCENTS, MILESTONE_EMOJIS } from "../constants";
-import { MilestoneCard } from "./MilestoneCard";
+import { MILESTONE_EMOJIS } from "../constants";
+import { ProgressCardItem } from "./ProgressCardItem";
 import { QuestProgressBar } from "./QuestProgressBar";
 import { SectionHeader } from "./SectionHeader";
-
-const CELEBRATION_DELAY = 1.8;
 
 export function LifetimeMilestones() {
 	const progress = useSelectorCreator(selectPlayerMilestoneProgress, USER_NAME);
@@ -48,31 +45,6 @@ export function LifetimeMilestones() {
 		gamesPlayed: gamesPlayed ?? 0,
 	};
 
-	// Track previous progress to detect tier completions
-	const prevProgressRef = useRef<MilestoneProgress | undefined>(undefined);
-	const [celebratingCategories, setCelebratingCategories] = useState<Set<MilestoneCategory>>(new Set());
-
-	useEffect(() => {
-		const prev = prevProgressRef.current;
-		if (prev && progress) {
-			const newCelebrations = new Set<MilestoneCategory>();
-			for (const cat of MILESTONE_CATEGORIES) {
-				const prevTier = prev[cat.id] ?? 0;
-				const currentTier = progress[cat.id] ?? 0;
-				if (currentTier > prevTier) {
-					newCelebrations.add(cat.id);
-				}
-			}
-			if (newCelebrations.size() > 0) {
-				setCelebratingCategories(newCelebrations);
-				task.delay(CELEBRATION_DELAY, () => {
-					setCelebratingCategories(new Set());
-				});
-			}
-		}
-		prevProgressRef.current = progress;
-	}, [progress]);
-
 	const allComplete = progress ? allMilestonesComplete(progress) : false;
 
 	return (
@@ -85,21 +57,17 @@ export function LifetimeMilestones() {
 				const current = statValues[category.id];
 				const accent = Color3.fromHex(category.accent);
 				const emoji = MILESTONE_EMOJIS[category.id];
-				const accentDark = MILESTONE_DARK_ACCENTS[category.id];
-				const isCelebrating = celebratingCategories.has(category.id);
 
 				if (!followingTier) {
 					return (
-						<MilestoneCard
+						<ProgressCardItem
 							key={category.id}
-							title={`${currentName ?? category.label} - Complete!`}
+							title={`${emoji} ${currentName ?? category.label} - Complete!`}
 							subtitle="All tiers completed"
-							emoji={emoji}
 							accent={accent}
-							accentDark={accentDark}
 							progress={1}
-							progressLabel="MAX"
-							celebrating={isCelebrating}
+							valueText="MAX"
+							progressLabel="100%"
 						/>
 					);
 				}
@@ -116,16 +84,14 @@ export function LifetimeMilestones() {
 				if (followingTier.orbReward > 0) rewardParts.push(`${followingTier.orbReward} orbs`);
 
 				return (
-					<MilestoneCard
+					<ProgressCardItem
 						key={category.id}
-						title={actionText}
+						title={`${emoji} ${actionText}`}
 						subtitle={`${followingTier.name} | ${rewardParts.join(" + ")}`}
-						emoji={emoji}
 						accent={accent}
-						accentDark={accentDark}
 						progress={progressRatio}
-						progressLabel={`${formatThreshold(category, math.min(current, followingTier.threshold))} / ${formatThreshold(category, followingTier.threshold)}`}
-						celebrating={isCelebrating}
+						valueText={`${formatThreshold(category, math.min(current, followingTier.threshold))} / ${formatThreshold(category, followingTier.threshold)}`}
+						progressLabel={`${math.floor(math.clamp(progressRatio, 0, 1) * 100)}%`}
 					/>
 				);
 			})}
