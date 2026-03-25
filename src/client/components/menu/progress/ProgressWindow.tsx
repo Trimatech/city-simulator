@@ -11,11 +11,7 @@ import { USER_NAME } from "shared/constants/core";
 import { DAILY_REWARD_CYCLE, getDailyRewardAmount } from "shared/constants/daily-rewards";
 import { palette } from "shared/constants/palette";
 import { allWallSkins } from "shared/constants/skins";
-import {
-	selectPlayerBalance,
-	selectPlayerDailyStreak,
-	selectPlayerSkins,
-} from "shared/store/saves";
+import { selectPlayerBalance, selectPlayerDailyStreak, selectPlayerSkins } from "shared/store/saves";
 
 import { LifetimeMilestones } from "./components/LifetimeMilestones";
 import { MilestoneCard } from "./components/MilestoneCard";

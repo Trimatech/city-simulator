@@ -77,9 +77,7 @@ export function LifetimeMilestones() {
 
 	return (
 		<>
-			<SectionHeader
-				text={ascension > 0 ? `Lifetime (Ascension ${ascension})` : "Lifetime Milestones"}
-			/>
+			<SectionHeader text={ascension > 0 ? `Lifetime (Ascension ${ascension})` : "Lifetime Milestones"} />
 			{MILESTONE_CATEGORIES.map((category) => {
 				const completedTier = progress?.[category.id] ?? 0;
 				const followingTier = getNextTier(category, completedTier);
