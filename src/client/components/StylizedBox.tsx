@@ -91,7 +91,7 @@ export function StylizedBox({
 							ImageColor3={palette.white}
 							ImageTransparency={0.96}
 							ScaleType={Enum.ScaleType.Tile}
-							TileSize={new UDim2(0, rem(4), 0, rem(4))}
+							TileSize={new UDim2(0, rem(10), 0, rem(10))}
 							Size={new UDim2(1, 0, 0, 0)}
 							AutomaticSize={automaticSize}
 							BackgroundTransparency={1}

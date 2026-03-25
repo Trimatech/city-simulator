@@ -53,7 +53,7 @@ export function ProgressCardItem({
 	const rem = useRem();
 	const clamped = math.clamp(progress, 0, 1);
 	const theme = useMemo(() => (accent ? themeFromAccent(accent) : shopItemThemes.blue), [accent]);
-	const strokeColor = accent ? darken(accent, 0.6) : Color3.fromHex("#005794");
+	const strokeColor = accent ? darken(accent, 2) : Color3.fromHex("#005794");
 
 	return (
 		<StylizedBox
@@ -63,14 +63,15 @@ export function ProgressCardItem({
 			layoutOrder={layoutOrder}
 		>
 			<VStack
+				name="ProgressCardItemContent"
 				size={new UDim2(1, 0, 0, 0)}
 				automaticSize={Enum.AutomaticSize.Y}
-				spacing={rem(1.4)}
-				padding={rem(1.4)}
+				spacing={rem(1)}
+				padding={rem(1)}
 			>
 				<HStack
 					size={new UDim2(1, 0, 0, rem(5.5))}
-					spacing={rem(1.2)}
+					spacing={rem(1)}
 					verticalAlignment={Enum.VerticalAlignment.Center}
 				>
 					{icon !== undefined && (
@@ -78,7 +79,7 @@ export function ProgressCardItem({
 					)}
 					<VStack
 						size={new UDim2(1, 0, 1, 0)}
-						spacing={rem(0.2)}
+						spacing={rem(0.5)}
 						verticalAlignment={Enum.VerticalAlignment.Center}
 						horizontalAlignment={Enum.HorizontalAlignment.Left}
 					>
@@ -89,7 +90,7 @@ export function ProgressCardItem({
 							textColor={palette.white}
 							textSize={rem(2.3)}
 							textXAlignment="Left"
-							size={new UDim2(1, 0, 0, rem(2.5))}
+							automaticSize={Enum.AutomaticSize.XY}
 							backgroundTransparency={1}
 						>
 							<uistroke Thickness={rem(0.12)} Color={strokeColor} Transparency={0.3} />
@@ -98,14 +99,14 @@ export function ProgressCardItem({
 							<Text
 								font={fonts.fredokaOne.regular}
 								text={subtitle}
-								textColor={brighten(accent ?? Color3.fromHex("#5bc6ff"), 0.5)}
-								textSize={rem(1.1)}
+								textColor={brighten(accent ?? Color3.fromHex("#5bc6ff"), 2)}
+								textSize={rem(1.3)}
 								textXAlignment="Left"
 								textWrapped={true}
-								size={new UDim2(1, 0, 0, rem(1.3))}
+								automaticSize={Enum.AutomaticSize.XY}
 								backgroundTransparency={1}
 							>
-								<uistroke Thickness={rem(0.08)} Color={strokeColor} Transparency={0.5} />
+								<uistroke Thickness={rem(0.1)} Color={strokeColor} Transparency={0.5} />
 							</Text>
 						)}
 					</VStack>
@@ -124,19 +125,19 @@ export function ProgressCardItem({
 				</HStack>
 
 				<frame Size={new UDim2(1, 0, 0, 0)} AutomaticSize={Enum.AutomaticSize.Y} BackgroundTransparency={1}>
-					<ProgressBar progress={clamped} accent={accent} />
+					<ProgressBar progress={clamped} accent={accent} height={rem(1.5)} />
 					<Text
 						font={fonts.fredokaOne.regular}
 						text={progressLabel}
 						textColor={palette.white}
-						textSize={rem(0.85)}
+						textSize={rem(1.5)}
 						size={new UDim2(1, 0, 1, 0)}
 						textXAlignment="Center"
 						textYAlignment="Center"
 						zIndex={5}
 						backgroundTransparency={1}
 					>
-						<uistroke Thickness={rem(0.06)} Color={Color3.fromHex("#0e2a4e")} />
+						<uistroke Thickness={rem(0.1)} Color={Color3.fromHex("#0e2a4e")} />
 					</Text>
 				</frame>
 			</VStack>

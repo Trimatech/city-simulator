@@ -16,7 +16,6 @@ import { selectPlayerBalance, selectPlayerDailyStreak, selectPlayerSkins } from 
 
 import { LifetimeMilestones } from "./components/LifetimeMilestones";
 import { ProgressCardItem } from "./components/ProgressCardItem";
-import { QuestProgressBar } from "./components/QuestProgressBar";
 import { SectionHeader } from "./components/SectionHeader";
 import { QUEST_TARGETS } from "./constants";
 
@@ -71,7 +70,7 @@ export function ProgressWindow({ onClose }: ProgressWindowProps) {
 					ScrollBarImageTransparency={SCROLLBAR_TRANSPARENCY}
 				>
 					<Frame
-						size={new UDim2(1, rem(-1), 0, 0)}
+						size={new UDim2(1, rem(0.4), 0, 0)}
 						automaticSize={Enum.AutomaticSize.Y}
 						backgroundTransparency={1}
 					>
@@ -118,14 +117,6 @@ export function ProgressWindow({ onClose }: ProgressWindowProps) {
 										: "Complete"
 								}
 								progressLabel={`${math.floor(math.clamp(nextSkin ? balance / nextSkin.price : 1, 0, 1) * 100)}%`}
-							/>
-							<QuestProgressBar
-								progress={streak / DAILY_REWARD_CYCLE}
-								accent={palette.sapphire}
-								accentDark={Color3.fromHex("#002f4e")}
-								label={`Day ${nextDailyDay}: +${nextDailyReward} crystals`}
-								emoji="📅"
-								valueText={`${streak}/${DAILY_REWARD_CYCLE}`}
 							/>
 						</VStack>
 					</Frame>

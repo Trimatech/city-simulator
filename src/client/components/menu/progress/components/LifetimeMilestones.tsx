@@ -11,7 +11,6 @@ import {
 	MILESTONE_CATEGORIES,
 	MilestoneCategory,
 } from "shared/constants/lifetime-milestones";
-import { palette } from "shared/constants/palette";
 import {
 	selectPlayerAscensionLevel,
 	selectPlayerLifetimeStat,
@@ -20,7 +19,6 @@ import {
 
 import { MILESTONE_EMOJIS } from "../constants";
 import { ProgressCardItem } from "./ProgressCardItem";
-import { QuestProgressBar } from "./QuestProgressBar";
 import { SectionHeader } from "./SectionHeader";
 
 export function LifetimeMilestones() {
@@ -95,16 +93,6 @@ export function LifetimeMilestones() {
 					/>
 				);
 			})}
-			{allComplete && (
-				<QuestProgressBar
-					progress={1}
-					accent={palette.yellow}
-					accentDark={Color3.fromHex("#4e3c00")}
-					label="Ready to Ascend!"
-					emoji="⭐"
-					valueText="TAP"
-				/>
-			)}
 		</>
 	);
 }

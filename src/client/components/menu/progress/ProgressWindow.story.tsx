@@ -1,8 +1,9 @@
 import "client/app/react-config";
 
-import React, { useCallback, useEffect, useRef, useState } from "@rbxts/react";
+import React, { useCallback, useEffect, useState } from "@rbxts/react";
 import ReactRoblox from "@rbxts/react-roblox";
 import { InferFusionProps, Number } from "@rbxts/ui-labs";
+import { VStack } from "@rbxts-ui/layout";
 import { Frame, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { RootProvider } from "client/providers/root-provider";
@@ -99,7 +100,13 @@ function StoryContent(props: StoryContentProps) {
 	}, [killTier, updateSave]);
 
 	return (
-		<>
+		<VStack
+			size={new UDim2(1, 0, 1, 0)}
+			automaticSize={Enum.AutomaticSize.Y}
+			spacing={rem(3)}
+			horizontalAlignment={Enum.HorizontalAlignment.Center}
+			padding={rem(3)}
+		>
 			<ProgressWindow onClose={() => {}} />
 
 			{/* Trigger completion button — overlaid at bottom */}
@@ -131,7 +138,7 @@ function StoryContent(props: StoryContentProps) {
 					</Text>
 				</Frame>
 			</textbutton>
-		</>
+		</VStack>
 	);
 }
 
