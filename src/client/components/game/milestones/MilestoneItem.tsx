@@ -70,6 +70,11 @@ interface MilestoneItemProps {
 	readonly celebrating: boolean;
 }
 
+const initialSweepRotation = 5;
+const rotationAnimationDuration = 0.9;
+
+const finalSweepTransparency = 0.1;
+
 export function MilestoneItem({ data, celebrating }: MilestoneItemProps) {
 	const rem = useRem();
 	const progress = math.clamp(data.current / data.target, 0, 1);
@@ -81,8 +86,11 @@ export function MilestoneItem({ data, celebrating }: MilestoneItemProps) {
 	const [showBurst, setShowBurst] = useState(false);
 
 	const [glow, glowMotion] = useMotion(0);
+	const [sweepRotation, sweepRotationMotion] = useMotion(initialSweepRotation);
+	const [sweepTransparency, sweepTransparencyMotion] = useMotion(1);
 
 	const prevCelebrating = useRef(false);
+	const prevTarget = useRef(data.target);
 
 	useEffect(() => {
 		if (celebrating && !prevCelebrating.current) {
@@ -94,6 +102,22 @@ export function MilestoneItem({ data, celebrating }: MilestoneItemProps) {
 		}
 		prevCelebrating.current = celebrating;
 	}, [celebrating]);
+
+	useEffect(() => {
+		if (data.target !== prevTarget.current) {
+			sweepRotationMotion.set(initialSweepRotation);
+			sweepRotationMotion.tween(initialSweepRotation + 160, {
+				time: rotationAnimationDuration,
+				style: Enum.EasingStyle.Sine,
+			});
+			sweepTransparencyMotion.set(1);
+			sweepTransparencyMotion.tween(finalSweepTransparency, { time: 0.3 });
+			task.delay(rotationAnimationDuration - 0.5, () => {
+				sweepTransparencyMotion.tween(1, { time: 0.5 });
+			});
+			prevTarget.current = data.target;
+		}
+	}, [data.target]);
 
 	const outerCorner = new UDim(0, rem(OUTER_CORNER));
 
@@ -111,9 +135,31 @@ export function MilestoneItem({ data, celebrating }: MilestoneItemProps) {
 					Color={glow.map((g) => OUTER_BORDER_COLOR.Lerp(accent, g))}
 					Transparency={glow.map((g) => OUTER_BORDER_TRANSPARENCY - g * 0.3)}
 					Thickness={rem(0.4)}
+					ZIndex={1}
 				/>
-				<uistroke Color={palette.white} Transparency={0.45} Thickness={rem(0.1)}>
+				<uistroke Color={palette.white} Transparency={0.45} Thickness={rem(0.2)} ZIndex={2}>
 					<uigradient Color={INNER_BORDER_GRADIENT} Rotation={90} />
+				</uistroke>
+				<uistroke Color={accent} Transparency={sweepTransparency} Thickness={rem(0.2)} ZIndex={3}>
+					<uigradient
+						Color={
+							new ColorSequence([
+								new ColorSequenceKeypoint(0, accent),
+								new ColorSequenceKeypoint(0.5, palette.white),
+								new ColorSequenceKeypoint(1, accent),
+							])
+						}
+						Transparency={
+							new NumberSequence([
+								new NumberSequenceKeypoint(0, 1),
+								new NumberSequenceKeypoint(0.3, 0.3),
+								new NumberSequenceKeypoint(0.5, 0),
+								new NumberSequenceKeypoint(0.7, 0.3),
+								new NumberSequenceKeypoint(1, 1),
+							])
+						}
+						Rotation={sweepRotation}
+					/>
 				</uistroke>
 
 				{/* Background pattern */}
