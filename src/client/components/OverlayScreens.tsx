@@ -2,7 +2,7 @@ import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { store } from "client/store";
 import { MenuWindow, selectOpenMenuWindow } from "client/store/screen";
-import { Overlay } from "client/ui/Overlay";
+import { palette } from "shared/constants/palette";
 
 import { DailyRewardScreen } from "./menu/daily-reward/DailyRewardScreen";
 import { ProgressWindow } from "./menu/progress/ProgressWindow";
@@ -17,7 +17,15 @@ export function OverlayScreens() {
 
 	return (
 		<>
-			<Overlay onClick={() => store.setOpenMenuWindow(undefined)} />
+			<textbutton
+				key="backdrop"
+				Size={new UDim2(1, 0, 1, 0)}
+				BackgroundColor3={palette.teal}
+				BackgroundTransparency={0.2}
+				Text=""
+				AutoButtonColor={false}
+				Active={true}
+			/>
 
 			{openMenuWindow === MenuWindow.Shop && (
 				<ShopWindow onClose={() => store.setOpenMenuWindow(undefined)} />
