@@ -94,7 +94,7 @@ export function ProgressWindow({ onClose }: ProgressWindowProps) {
 									icon={questIcons[quest.id]}
 									progress={0}
 									progressLabel="0%"
-									layoutOrder={index}
+									accent={palette.blue}
 								/>
 							))}
 

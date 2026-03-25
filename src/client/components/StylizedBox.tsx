@@ -1,4 +1,4 @@
-import React from "@rbxts/react";
+import React, { useEffect, useRef } from "@rbxts/react";
 import { Frame } from "@rbxts-ui/primitives";
 import { useRem } from "client/ui/rem/useRem";
 import assets from "shared/assets";
@@ -25,6 +25,9 @@ export function StylizedBox({
 }: StylizedBoxProps) {
 	const rem = useRem();
 
+	const parentRef = useRef<Frame>();
+	const patternRef = useRef<ImageLabel>();
+
 	const outerRadius = new UDim(0, rem(1.8));
 	const whiteRadius = new UDim(0, rem(1.5));
 	const innerRadius = new UDim(0, rem(1.2));
@@ -32,6 +35,12 @@ export function StylizedBox({
 	const innerBorderGradient = new ColorSequence(theme.innerBorderFrom, theme.innerBorderTo);
 	const borderPad = new UDim(0, rem(0.3));
 	const whitePad = new UDim(0, rem(0.3));
+
+	useEffect(() => {
+		if (parentRef.current && patternRef.current) {
+			patternRef.current.Size = new UDim2(1, 0, 0, parentRef.current.AbsoluteSize.Y);
+		}
+	}, [parentRef.current, patternRef.current]);
 
 	return (
 		<Frame
@@ -60,7 +69,7 @@ export function StylizedBox({
 				<Frame
 					backgroundColor={theme.whiteBorderColor}
 					cornerRadius={whiteRadius}
-					size={new UDim2(1, 0, 1, 0)}
+					size={new UDim2(1, 0, 0, 0)}
 					backgroundTransparency={0}
 					automaticSize={automaticSize}
 				>
@@ -73,32 +82,32 @@ export function StylizedBox({
 
 					{/* Layer 3: Inner gradient area */}
 					<Frame
-						backgroundColor={palette.white}
-						cornerRadius={innerRadius}
-						size={new UDim2(1, 0, 1, 0)}
-						backgroundTransparency={0}
+						size={new UDim2(1, 0, 0, 0)}
 						name="StylizedBoxInner"
-						clipsDescendants={true}
 						automaticSize={automaticSize}
+						cornerRadius={innerRadius}
+						backgroundColor={palette.white}
+						backgroundTransparency={0}
 					>
 						<uistroke Color={palette.white} Thickness={rem(0.15)}>
 							<uigradient Color={innerBorderGradient} Rotation={90} />
 						</uistroke>
 						<uigradient Color={gradientSequence} Rotation={90} />
-
 						<imagelabel
+							ref={patternRef}
 							Image={assets.ui.patterns.dots_pattern}
 							ImageColor3={palette.white}
 							ImageTransparency={0.96}
 							ScaleType={Enum.ScaleType.Tile}
 							TileSize={new UDim2(0, rem(10), 0, rem(10))}
 							Size={new UDim2(1, 0, 0, 0)}
-							AutomaticSize={automaticSize}
 							BackgroundTransparency={1}
 						>
-							<uicorner CornerRadius={outerRadius} />
-							{children}
+							<uicorner CornerRadius={innerRadius} />
 						</imagelabel>
+						<Frame ref={parentRef} size={new UDim2(1, 0, 0, 0)} automaticSize={automaticSize}>
+							{children}
+						</Frame>
 					</Frame>
 				</Frame>
 			</Frame>
