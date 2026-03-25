@@ -4,11 +4,13 @@ import { useMountEffect } from "@rbxts/pretty-react-hooks";
 import React from "@rbxts/react";
 import ReactRoblox from "@rbxts/react-roblox";
 import { Home } from "client/components/menu/home/home";
+import { TopbarScreens } from "client/components/TopbarScreens";
 import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
 import { USER_NAME } from "shared/constants/core";
 import { defaultPlayerSave } from "shared/store/saves";
 
+import { FakeTopbar } from "../utils/FakeTopbar";
 import { useMockRemotes } from "../utils/use-mock-remotes";
 
 function HomeStoryContent() {
@@ -20,7 +22,9 @@ function HomeStoryContent() {
 
 	return (
 		<RootProvider>
-			<Home visible />
+			<FakeTopbar header={<TopbarScreens />}>
+				<Home visible />
+			</FakeTopbar>
 		</RootProvider>
 	);
 }

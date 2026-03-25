@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { HStack } from "@rbxts-ui/layout";
 import { Frame } from "@rbxts-ui/primitives";
-import { ROBLOX_TOOLBAR_HEIGHT, ROBLOX_TOOLBAR_WIDTH } from "client/constants/roblox.constants";
+import { ROBLOX_TOOLBAR_HEIGHT } from "client/constants/roblox.constants";
 import { Particles } from "client/ui/Particles/Particles";
 import { ParticleEmitter2DConfig } from "client/ui/Particles/Particles.interfaces";
 import { useRem } from "client/ui/rem/useRem";
@@ -73,7 +73,6 @@ export function HealthView() {
 		<HStack
 			name="HealthView"
 			size={new UDim2(0, rem(35), 0, ROBLOX_TOOLBAR_HEIGHT)}
-			position={new UDim2(0, ROBLOX_TOOLBAR_WIDTH, 0, 0)}
 			spacing={rem(0.5)}
 			padding={30}
 		>

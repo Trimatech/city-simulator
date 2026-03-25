@@ -9,7 +9,6 @@ import { SlideIn } from "client/ui/slide-in";
 
 import { Stats } from "../stats/Stats";
 import { Compass } from "./compass";
-import { HealthView } from "./health/HealthView";
 import { MilestoneWidget } from "./milestones/MilestoneWidget";
 import { MinimapArea } from "./minimap/MinimapArea";
 import { PowerupsPanel } from "./right/powerups/PowerupsPanel";
@@ -30,7 +29,6 @@ export function GameUI({ visible }: GameUIProps) {
 	return (
 		<Transition groupTransparency={lerpBinding(transition, 1, 0)} size={new UDim2(1, 0, 1, 0)}>
 			<SlideIn visible={visible} direction="left">
-				<HealthView />
 				<Stats />
 				<MilestoneWidget />
 			</SlideIn>

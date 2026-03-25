@@ -65,7 +65,12 @@ export function MilestoneWidget() {
 	}
 
 	return (
-		<VStack size={new UDim2(0, rem(22), 0, 0)} spacing={rem(1)} automaticSize={Enum.AutomaticSize.Y}>
+		<VStack
+			size={new UDim2(0, rem(26), 0, 0)}
+			spacing={rem(1)}
+			automaticSize={Enum.AutomaticSize.Y}
+			padding={rem(3)}
+		>
 			{milestones.map((data) => (
 				<MilestoneItem
 					key={data.category.id}

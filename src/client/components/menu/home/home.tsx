@@ -1,13 +1,13 @@
-import React, { useState } from "@rbxts/react";
+import React from "@rbxts/react";
+import { useSelector } from "@rbxts/react-reflex";
 import { HStack } from "@rbxts-ui/layout";
 import { Frame } from "@rbxts-ui/primitives";
+import { store } from "client/store";
+import { MenuWindow, selectOpenMenuWindow } from "client/store/screen";
 import { HomeStats } from "client/components/stats/HomeStats";
-import { ROBLOX_TOOLBAR_HEIGHT } from "client/constants/roblox.constants";
-import { MainButton, ShopButtonTextWithIcon } from "client/ui/MainButton";
 import { Overlay } from "client/ui/Overlay";
 import { useRem } from "client/ui/rem/useRem";
 import { SlideIn } from "client/ui/slide-in";
-import assets from "shared/assets";
 import { ROOT_PADDING } from "shared/constants/theme";
 
 import { DailyRewardScreen } from "../daily-reward/DailyRewardScreen";
@@ -17,52 +17,16 @@ import { GameVersion } from "./GameVersion";
 import { MuteButton } from "./MuteButton";
 import { PlayButton } from "./PlayButton";
 
-const enum Window {
-	Shop = "shop",
-	DailyReward = "dailyReward",
-	Progress = "progress",
-}
-
 interface HomeProps {
 	visible: boolean;
 }
 
 export function Home({ visible }: HomeProps) {
 	const rem = useRem();
-	const [openWindow, setOpenWindow] = useState<Window | undefined>();
+	const openMenuWindow = useSelector(selectOpenMenuWindow);
 
 	return (
 		<>
-			<SlideIn visible={visible} direction="left">
-				<HStack
-					position={new UDim2(0, rem(ROOT_PADDING), 0, ROBLOX_TOOLBAR_HEIGHT)}
-					verticalAlignment={Enum.VerticalAlignment.Top}
-					spacing={rem(1)}
-				>
-					<MainButton
-						onClick={() => setOpenWindow(Window.Shop)}
-						size={new UDim2(0, rem(10), 0, rem(4))}
-						fitContent
-					>
-						<ShopButtonTextWithIcon text="Shop" icon={assets.ui.icons.store} />
-					</MainButton>
-					<MainButton
-						onClick={() => setOpenWindow(Window.DailyReward)}
-						size={new UDim2(0, rem(16), 0, rem(4))}
-						fitContent
-					>
-						<ShopButtonTextWithIcon text="Daily Rewards" icon={assets.ui.icons.dailyRewards} />
-					</MainButton>
-					<MainButton
-						onClick={() => setOpenWindow(Window.Progress)}
-						size={new UDim2(0, rem(13), 0, rem(4))}
-						fitContent
-					>
-						<ShopButtonTextWithIcon text="Progress" icon={assets.ui.icons.rank} />
-					</MainButton>
-				</HStack>
-			</SlideIn>
-
 			<SlideIn visible={visible} direction="right">
 				<Frame
 					anchorPoint={new Vector2(1, 1)}
@@ -97,27 +61,26 @@ export function Home({ visible }: HomeProps) {
 				</HStack>
 			</SlideIn>
 
-			{openWindow === Window.Shop && (
+			{openMenuWindow === MenuWindow.Shop && (
 				<>
-					<Overlay onClick={() => setOpenWindow(undefined)} />
-					<ShopWindow onClose={() => setOpenWindow(undefined)} />
+					<Overlay onClick={() => store.setOpenMenuWindow(undefined)} />
+					<ShopWindow onClose={() => store.setOpenMenuWindow(undefined)} />
 				</>
 			)}
 
-			{openWindow === Window.DailyReward && (
+			{openMenuWindow === MenuWindow.DailyReward && (
 				<>
-					<Overlay onClick={() => setOpenWindow(undefined)} />
-					<DailyRewardScreen onDismiss={() => setOpenWindow(undefined)} />
+					<Overlay onClick={() => store.setOpenMenuWindow(undefined)} />
+					<DailyRewardScreen onDismiss={() => store.setOpenMenuWindow(undefined)} />
 				</>
 			)}
 
-			{openWindow === Window.Progress && (
+			{openMenuWindow === MenuWindow.Progress && (
 				<>
-					<Overlay onClick={() => setOpenWindow(undefined)} />
-					<ProgressWindow onClose={() => setOpenWindow(undefined)} />
+					<Overlay onClick={() => store.setOpenMenuWindow(undefined)} />
+					<ProgressWindow onClose={() => store.setOpenMenuWindow(undefined)} />
 				</>
 			)}
-
 		</>
 	);
 }
