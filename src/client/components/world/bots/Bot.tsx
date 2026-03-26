@@ -2,8 +2,9 @@ import React, { useEffect, useRef, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { RunService, TweenService } from "@rbxts/services";
 import { WORLD_TICK } from "shared/constants/core";
-import { selectSoldierPosition } from "shared/store/soldiers";
+import { selectSoldierById, selectSoldierPosition } from "shared/store/soldiers";
 import { RAGDOLL_DURATION_SEC } from "shared/utils/ragdoll";
+import { NAME_DISPLAY_DISTANCE } from "../glow/label-constants";
 
 import { SoldierGlow } from "../glow/SoldierGlow";
 import { computeDesiredLookDirection, getCharacterHalfSize, initializeBotModel, sampleGroundYAt } from "./Bot.utils";
@@ -14,6 +15,7 @@ interface BotProps {
 
 export function Bot({ id }: BotProps) {
 	const position = useSelector(selectSoldierPosition(id));
+	const soldier = useSelector(selectSoldierById(id));
 	const modelRef = useRef<Model>();
 	const [model, setModel] = useState<Model>();
 	const lastPosRef = useRef<Vector2>(position);
@@ -32,6 +34,12 @@ export function Bot({ id }: BotProps) {
 				if (cancelled) {
 					m.Destroy();
 					return;
+				}
+				// Set bot display name and increase label visibility distance
+				const humanoid = m.FindFirstChildOfClass("Humanoid");
+				if (humanoid) {
+					humanoid.DisplayName = soldier?.name ?? id;
+					humanoid.NameDisplayDistance = NAME_DISPLAY_DISTANCE;
 				}
 				halfSize.current = getCharacterHalfSize(m);
 				modelRef.current = m;

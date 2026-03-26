@@ -11,6 +11,7 @@ import { getRandomBotSkin } from "shared/constants/skins";
 import { selectAliveSoldiersById, selectSoldiersById } from "shared/store/soldiers";
 import { createScheduler } from "shared/utils/scheduler";
 
+import { getRandomBotName } from "../bots/bot-names";
 import { applyInitialPolygonClaim } from "../soldiers/soldier-claims";
 import { soldierIsInsideChanged } from "../soldiers/soldier-events";
 import { registerSoldierInput } from "../soldiers/soldier-tick";
@@ -115,7 +116,7 @@ async function spawnBot(botId: string, forceTargetPlayerId?: string) {
 	const randomSkinId = getRandomBotSkin().id;
 	print(`Bot ${botId} using skin ${randomSkinId}`);
 	store.addSoldier(botId, {
-		name: `Bot ${botId}`,
+		name: getRandomBotName(),
 		position: spawnPoint,
 		lastPosition: spawnPoint,
 		orbs: DEFAULT_ORBS,
