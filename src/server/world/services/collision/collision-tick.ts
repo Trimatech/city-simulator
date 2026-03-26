@@ -1,7 +1,8 @@
 import { store } from "server/store";
 import { killSoldier, onPlayerDeath } from "server/world/world.utils";
-import { selectSoldiers, selectSoldierRanking, selectSoldiersById } from "shared/store/soldiers";
+import { selectSoldierRanking, selectSoldiers, selectSoldiersById } from "shared/store/soldiers";
 
+import { getLastIsInsideCheckPosition, setLastIsInsideCheckPosition, invalidateIsInsideCache } from "./collision-cache";
 import { soldierIsInsideChanged } from "../soldiers/soldier-events";
 import {
 	isCollidingWithEnemyTracers,
@@ -11,8 +12,6 @@ import {
 	isInsidePolygon,
 } from "./collision-tick.utils";
 
-// Track last position where we checked isInside for spatial optimization
-const lastIsInsideCheckPosition = new Map<string, Vector2>();
 // Only recheck isInside if soldier moved more than this distance
 const INSIDE_CHECK_DISTANCE_THRESHOLD = 1;
 
@@ -24,7 +23,7 @@ export function onCollisionTick() {
 	for (const soldier of soldiers) {
 		if (soldier.dead) {
 			// Clean up tracking map for dead soldiers
-			lastIsInsideCheckPosition.delete(soldier.id);
+			invalidateIsInsideCache(soldier.id);
 			continue;
 		}
 
@@ -39,7 +38,7 @@ export function onCollisionTick() {
 
 		// Spatial optimization: only check isInside if soldier has moved significantly
 		// or if we haven't checked yet
-		const lastCheckPos = lastIsInsideCheckPosition.get(soldier.id);
+		const lastCheckPos = getLastIsInsideCheckPosition(soldier.id);
 		let shouldCheckInside = true;
 
 		if (lastCheckPos !== undefined) {
@@ -52,7 +51,7 @@ export function onCollisionTick() {
 
 		if (shouldCheckInside) {
 			const isInside = isInsidePolygon(soldier);
-			lastIsInsideCheckPosition.set(soldier.id, soldier.position);
+			setLastIsInsideCheckPosition(soldier.id, soldier.position);
 
 			const hasChanged = soldier.isInside !== isInside;
 			if (hasChanged) {

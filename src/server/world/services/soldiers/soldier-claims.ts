@@ -16,6 +16,7 @@ import { calculatePolygonArea } from "shared/polygon-extra.utils";
 import { selectSoldiersById } from "shared/store/soldiers";
 
 import { candyGrid, eatCandies } from "../candy/candy-utils";
+import { invalidateIsInsideCache } from "../collision/collision-cache";
 import { updateAreaGridForPolygon } from "./soldier-grid";
 export function cutOthersByNewArea(ownerId: string, newCutPolygon: Polygon) {
 	const state = store.getState();
@@ -41,6 +42,7 @@ export function cutOthersByNewArea(ownerId: string, newCutPolygon: Polygon) {
 				const updatedArea = calculatePolygonArea(updatedPolygon);
 				store.setSoldierPolygon(otherId, updatedPolygon, updatedArea);
 				store.setSoldierPolygonAreaSize(otherId, updatedArea);
+				invalidateIsInsideCache(otherId);
 
 				updateAreaGridForPolygon({
 					ownerId: otherId,
@@ -55,6 +57,7 @@ export function cutOthersByNewArea(ownerId: string, newCutPolygon: Polygon) {
 			}
 		} else {
 			updateAreaGridForPolygon({ ownerId: otherId, polygon: [] as Vector2[], dropTracers: false });
+			invalidateIsInsideCache(otherId);
 			store.setSoldierPolygon(otherId, [], 0, true);
 			store.setSoldierPolygonAreaSize(otherId, 0);
 			killSoldier(otherId);
