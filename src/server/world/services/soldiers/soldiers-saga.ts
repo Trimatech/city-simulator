@@ -4,7 +4,7 @@ import { DEFAULT_ORBS, SOLDIER_TICK_PHASE } from "server/world/constants";
 import {
 	cancelDeathChoiceTimer,
 	getPolygonCenterInside,
-	getSafePointOutsideSoldierPolygons,
+	getSpawnPointNearAnyPlayer,
 	killSoldier,
 	playerIsSpawned,
 } from "server/world/world.utils";
@@ -53,7 +53,7 @@ export async function initSoldierService() {
 		const randomSkin = save.skins[math.random(1, save.skins.size() - 1)];
 		const currentSkin = save.skin;
 
-		const safePoint = getSafePointOutsideSoldierPolygons();
+		const safePoint = getSpawnPointNearAnyPlayer();
 
 		await reloadCharacterAsync(player);
 

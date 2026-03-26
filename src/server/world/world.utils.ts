@@ -332,6 +332,9 @@ function getPolygonBoundingBox(polygon: ReadonlyArray<Vector2>): { min: Vector2;
 const BOT_SPAWN_MIN_DISTANCE = IS_LOCAL ? 60 : 150;
 const BOT_SPAWN_MAX_DISTANCE = IS_LOCAL ? 200 : 400;
 
+const PLAYER_SPAWN_MIN_DISTANCE = IS_LOCAL ? 80 : 120;
+const PLAYER_SPAWN_MAX_DISTANCE = IS_LOCAL ? 250 : 350;
+
 /**
  * Returns a spawn point near a player's polygon bounding box (60-200 studs away)
  * Ensures the point is within world bounds and doesn't overlap existing polygons
@@ -418,4 +421,72 @@ export function getAliveRealPlayers(): string[] {
 		}
 	}
 	return ids;
+}
+
+/**
+ * Returns a spawn point near another real player. If no real players are alive,
+ * falls back to spawning near a bot. If neither exists, falls back to
+ * getSafePointOutsideSoldierPolygons.
+ */
+export function getSpawnPointNearAnyPlayer(maxTries = 25): Vector2 {
+	const aliveById = store.getState(selectAliveSoldiersById);
+	const random = new Random();
+
+	// Collect alive real players and bots separately
+	const realPlayerIds: string[] = [];
+	const botIds: string[] = [];
+	for (const [, soldier] of pairs(aliveById)) {
+		if ((soldier as { dead?: boolean }).dead) continue;
+		const pos = (soldier as { position?: Vector2 }).position;
+		if (!pos) continue;
+		if (string.sub(soldier.id, 1, 4) === "BOT_") {
+			botIds.push(soldier.id);
+		} else {
+			realPlayerIds.push(soldier.id);
+		}
+	}
+
+	// Try spawning near a real player first, then near a bot
+	const targetIds = realPlayerIds.size() > 0 ? realPlayerIds : botIds;
+
+	if (targetIds.size() > 0) {
+		for (const _ of $range(1, maxTries)) {
+			const targetId = targetIds[random.NextInteger(0, targetIds.size() - 1)];
+			const target = aliveById[targetId];
+			if (!target) continue;
+
+			const polygon = target.polygon as ReadonlyArray<Vector2> | undefined;
+			const minDist = PLAYER_SPAWN_MIN_DISTANCE;
+			const maxDist = PLAYER_SPAWN_MAX_DISTANCE;
+
+			let candidate: Vector2;
+
+			if (polygon && polygon.size() >= 3) {
+				const bbox = getPolygonBoundingBox(polygon);
+				const bboxCenter = bbox.min.add(bbox.max).div(2);
+				const angle = random.NextNumber(0, math.pi * 2);
+				const distance = random.NextNumber(minDist, maxDist);
+				const direction = new Vector2(math.cos(angle), math.sin(angle));
+				const bboxHalfWidth = (bbox.max.X - bbox.min.X) / 2;
+				const bboxHalfHeight = (bbox.max.Y - bbox.min.Y) / 2;
+				const edgeOffset = new Vector2(direction.X * bboxHalfWidth, direction.Y * bboxHalfHeight);
+				candidate = bboxCenter.add(edgeOffset).add(direction.mul(distance));
+			} else {
+				const pos = target.position;
+				if (!pos) continue;
+				const angle = random.NextNumber(0, math.pi * 2);
+				const distance = random.NextNumber(minDist, maxDist);
+				const direction = new Vector2(math.cos(angle), math.sin(angle));
+				candidate = pos.add(direction.mul(distance));
+			}
+
+			if (candidate.Magnitude > WORLD_BOUNDS * RANDOM_POINT_MARGIN) continue;
+			if (!isInsideAnySoldierPolygon(candidate) && !intersectsAnySoldierPolygon(candidate)) {
+				return candidate;
+			}
+		}
+	}
+
+	// Fallback if no valid spot found near players/bots
+	return getSafePointOutsideSoldierPolygons();
 }
