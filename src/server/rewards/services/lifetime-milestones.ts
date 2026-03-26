@@ -4,7 +4,6 @@ import { store } from "server/store";
 import {
 	identifyMilestone,
 	selectMilestoneEliminationCount,
-	selectMilestoneLastKilled,
 	selectMilestoneRanking,
 	selectMilestones,
 } from "server/store/milestones";
@@ -12,18 +11,13 @@ import assets from "shared/assets";
 import {
 	getNextTier,
 	getPassiveOrbRate,
-	KILL_BOUNTY_CAP,
-	MilestoneCategory,
 	MILESTONE_CATEGORIES,
+	MilestoneCategory,
 	PASSIVE_ORB_INTERVAL,
 } from "shared/constants/lifetime-milestones";
 import { palette } from "shared/constants/palette";
 import { remotes } from "shared/remotes";
-import {
-	selectPlayerBankedOrbs,
-	selectPlayerLifetimeStat,
-	selectPlayerMilestoneProgress,
-} from "shared/store/saves";
+import { selectPlayerBankedOrbs, selectPlayerLifetimeStat, selectPlayerMilestoneProgress } from "shared/store/saves";
 import { selectSoldierArea, selectSoldierById, selectSoldierOrbs } from "shared/store/soldiers";
 import { getPlayerByName } from "shared/utils/player-utils";
 
@@ -42,47 +36,59 @@ export function initLifetimeMilestoneService() {
 	});
 }
 
-function observeLifetimeMilestones(id: string) {
+function observeLifetimeMilestones(playerId: string) {
 	// --- Games Played: increment on first spawn ---
-	store.incrementLifetimeGamesPlayed(id);
+	store.incrementLifetimeGamesPlayed(playerId);
 
 	// --- Spawn time tracking ---
-	spawnTimes.set(id, Workspace.GetServerTimeNow());
+	spawnTimes.set(playerId, Workspace.GetServerTimeNow());
+
+	// --- Area claimed: track increases in real-time like kills/orbs ---
+	let prevArea = 0;
+	const unsubscribeArea = store.subscribe(selectSoldierArea(playerId), (area) => {
+		if (area === undefined) return;
+		const delta = area - prevArea;
+		if (delta > 0) {
+			store.addLifetimeArea(playerId, math.floor(delta));
+			checkMilestoneTiers(playerId, "area");
+		}
+		prevArea = area;
+	});
 
 	// --- Kills: subscribe to elimination count changes ---
 	let prevKills = 0;
-	const unsubscribeKills = store.subscribe(selectMilestoneEliminationCount(id), (count) => {
+	const unsubscribeKills = store.subscribe(selectMilestoneEliminationCount(playerId), (count) => {
 		if (count === undefined) return;
 		const delta = count - prevKills;
 		if (delta > 0) {
-			store.addLifetimeKills(id, delta);
-			checkMilestoneTiers(id, "kills");
+			store.addLifetimeKills(playerId, delta);
+			checkMilestoneTiers(playerId, "kills");
 		}
 		prevKills = count;
 	});
 
 	// --- Orbs earned: track orb increases on the soldier ---
-	const unsubscribeOrbs = store.subscribe(selectSoldierOrbs(id), (orbs) => {
+	const unsubscribeOrbs = store.subscribe(selectSoldierOrbs(playerId), (orbs) => {
 		if (orbs === undefined) return;
-		const prev = lastOrbCount.get(id) ?? 0;
+		const prev = lastOrbCount.get(playerId) ?? 0;
 		if (orbs > prev) {
 			const gained = orbs - prev;
-			store.addLifetimeOrbsEarned(id, gained);
-			checkMilestoneTiers(id, "orbsEarned");
+			store.addLifetimeOrbsEarned(playerId, gained);
+			checkMilestoneTiers(playerId, "orbsEarned");
 		}
-		lastOrbCount.set(id, orbs);
+		lastOrbCount.set(playerId, orbs);
 	});
 
 	// --- Orbs spent: subscribe to milestone orbs spent ---
 	let prevOrbsSpent = 0;
 	const unsubscribeOrbsSpent = store.subscribe(
-		(state) => state.milestones[id]?.orbsSpentOnPowerups,
+		(state) => state.milestones[playerId]?.orbsSpentOnPowerups,
 		(spent) => {
 			if (spent === undefined) return;
 			const delta = spent - prevOrbsSpent;
 			if (delta > 0) {
-				store.addLifetimeOrbsSpent(id, delta);
-				checkMilestoneTiers(id, "orbsSpent");
+				store.addLifetimeOrbsSpent(playerId, delta);
+				checkMilestoneTiers(playerId, "orbsSpent");
 			}
 			prevOrbsSpent = spent;
 		},
@@ -90,38 +96,38 @@ function observeLifetimeMilestones(id: string) {
 
 	// --- Rank 1 tracking (lifetime) ---
 	let wasRank1 = false;
-	const unsubscribeRank1 = store.subscribe(selectMilestoneRanking(id), (ranking) => {
+	const unsubscribeRank1 = store.subscribe(selectMilestoneRanking(playerId), (ranking) => {
 		if (ranking === 1 && !wasRank1) {
-			store.incrementLifetimeRank1(id);
-			checkMilestoneTiers(id, "rank1");
+			store.incrementLifetimeRank1(playerId);
+			checkMilestoneTiers(playerId, "rank1");
 		}
 		wasRank1 = ranking === 1;
 	});
 
 	// --- Passive orb income from territory ---
 	const unsubscribePassiveOrbs = store.observeWhile(
-		selectSoldierById(id),
+		selectSoldierById(playerId),
 		(soldier) => soldier !== undefined && !soldier.dead,
 		() => {
 			return setInterval(() => {
-				const soldier = store.getState(selectSoldierById(id));
+				const soldier = store.getState(selectSoldierById(playerId));
 				if (!soldier || soldier.dead) return;
 
 				const orbRate = getPassiveOrbRate(soldier.polygonAreaSize);
 				if (orbRate > 0) {
-					store.incrementSoldierOrbs(id, orbRate);
+					store.incrementSoldierOrbs(playerId, orbRate);
 				}
 			}, PASSIVE_ORB_INTERVAL);
 		},
 	);
 
 	// --- Banked orbs: deposit on spawn ---
-	const banked = store.getState(selectPlayerBankedOrbs(id));
+	const banked = store.getState(selectPlayerBankedOrbs(playerId));
 	if (banked > 0) {
-		store.incrementSoldierOrbs(id, banked);
-		store.consumeBankedOrbs(id);
+		store.incrementSoldierOrbs(playerId, banked);
+		store.consumeBankedOrbs(playerId);
 
-		const player = getPlayerByName(id);
+		const player = getPlayerByName(playerId);
 		if (player) {
 			remotes.client.alert.fire(player, {
 				scope: "money",
@@ -134,14 +140,14 @@ function observeLifetimeMilestones(id: string) {
 	}
 
 	// Check games played milestone immediately
-	checkMilestoneTiers(id, "gamesPlayed");
+	checkMilestoneTiers(playerId, "gamesPlayed");
 
 	// --- Time alive: periodic accumulation ---
 	const timeAliveInterval = setInterval(() => {
-		const soldier = store.getState(selectSoldierById(id));
+		const soldier = store.getState(selectSoldierById(playerId));
 		if (!soldier || soldier.dead) return;
-		store.addLifetimeTimeAlive(id, 60);
-		checkMilestoneTiers(id, "timeAlive");
+		store.addLifetimeTimeAlive(playerId, 60);
+		checkMilestoneTiers(playerId, "timeAlive");
 	}, 60);
 
 	return () => {
@@ -150,29 +156,23 @@ function observeLifetimeMilestones(id: string) {
 		unsubscribeOrbsSpent();
 		unsubscribeRank1();
 		unsubscribePassiveOrbs();
+		unsubscribeArea();
 		timeAliveInterval();
 
 		// On death/disconnect: accumulate area + remaining time
-		const soldier = store.getState(selectSoldierById(id));
-		const spawnTime = spawnTimes.get(id);
+		const spawnTime = spawnTimes.get(playerId);
 
-		if (soldier && spawnTime) {
-			// Accumulate area claimed this life
-			if (soldier.polygonAreaSize > 0) {
-				store.addLifetimeArea(id, math.floor(soldier.polygonAreaSize));
-				checkMilestoneTiers(id, "area");
-			}
-
+		if (spawnTime) {
 			// Accumulate remaining partial-minute time alive
 			const elapsed = Workspace.GetServerTimeNow() - spawnTime;
 			const remainderSeconds = elapsed % 60;
 			if (remainderSeconds > 0) {
-				store.addLifetimeTimeAlive(id, math.floor(remainderSeconds));
+				store.addLifetimeTimeAlive(playerId, math.floor(remainderSeconds));
 			}
 		}
 
-		spawnTimes.delete(id);
-		lastOrbCount.delete(id);
+		spawnTimes.delete(playerId);
+		lastOrbCount.delete(playerId);
 	};
 }
 
