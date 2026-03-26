@@ -1,3 +1,5 @@
+import { Badge } from "shared/assetsFolder";
+
 import { WORLD_BOUNDS } from "./core";
 
 export type MilestoneCategory = "kills" | "area" | "orbsEarned" | "timeAlive" | "rank1" | "orbsSpent" | "gamesPlayed";
@@ -8,6 +10,7 @@ export interface MilestoneTier {
 	readonly cashReward: number;
 	readonly crystalReward: number;
 	readonly orbReward: number;
+	readonly badge?: Badge;
 }
 
 export interface MilestoneCategoryDef {
@@ -22,8 +25,8 @@ export interface MilestoneCategoryDef {
 	readonly tiers: readonly MilestoneTier[];
 }
 
-function tier(name: string, threshold: number, cash: number, crystals = 0, orbs = 0): MilestoneTier {
-	return { name, threshold, cashReward: cash, crystalReward: crystals, orbReward: orbs };
+function tier(name: string, threshold: number, cash: number, crystals = 0, orbs = 0, badge?: Badge): MilestoneTier {
+	return { name, threshold, cashReward: cash, crystalReward: crystals, orbReward: orbs, badge };
 }
 
 export const MILESTONE_CATEGORIES: readonly MilestoneCategoryDef[] = [
@@ -35,11 +38,11 @@ export const MILESTONE_CATEGORIES: readonly MilestoneCategoryDef[] = [
 		action: "Eliminate",
 		unit: "players",
 		tiers: [
-			tier("First Strike", 1, 50),
-			tier("Fighter", 10, 150),
+			tier("First Strike", 1, 50, 0, 0, Badge.FIRST_BLOOD),
+			tier("Fighter", 10, 150, 0, 0, Badge.BOUNTY_HUNTER),
 			tier("Warrior", 25, 300, 0, 50),
-			tier("Slayer", 50, 500),
-			tier("Destroyer", 100, 1_000, 1),
+			tier("Slayer", 50, 500, 0, 0, Badge.EXECUTIONER),
+			tier("Destroyer", 100, 1_000, 1, 0, Badge.MASSACRE),
 			tier("Annihilator", 250, 2_000),
 			tier("Warlord", 500, 3_500, 0, 100),
 			tier("Reaper", 1_000, 5_000, 3),
@@ -57,8 +60,11 @@ export const MILESTONE_CATEGORIES: readonly MilestoneCategoryDef[] = [
 		tiers: [
 			tier("Newcomer", 10_000, 50),
 			tier("Homesteader", 50_000, 200),
-			tier("Landowner", 250_000, 500, 0, 50),
-			tier("Baron", 1_000_000, 1_500),
+			tier("Settler", 100_000, 350, 0, 0, Badge.SETTLER),
+			tier("Landowner", 250_000, 500, 0, 50, Badge.LANDLORD),
+			tier("Conqueror", 500_000, 900, 1, 0, Badge.CONQUEROR),
+			tier("Baron", 1_000_000, 1_500, 0, 0, Badge.EMPIRE),
+			tier("World Dominator", 2_500_000, 2_000, 0, 0, Badge.WORLD_DOMINATOR),
 			tier("Duke", 5_000_000, 3_000, 2),
 			tier("Sovereign", 15_000_000, 5_000),
 			tier("Emperor", 50_000_000, 10_000, 0, 100),
@@ -111,7 +117,7 @@ export const MILESTONE_CATEGORIES: readonly MilestoneCategoryDef[] = [
 		action: "Reach #1",
 		unit: "times",
 		tiers: [
-			tier("Contender", 1, 100),
+			tier("Contender", 1, 100, 0, 0, Badge.CHAMPION),
 			tier("Victor", 5, 300, 0, 50),
 			tier("Dominant", 15, 800, 2),
 			tier("Supremacy", 50, 2_000),
@@ -142,6 +148,7 @@ export const MILESTONE_CATEGORIES: readonly MilestoneCategoryDef[] = [
 		unit: "games",
 		accent: "#94e2d5",
 		tiers: [
+			tier("Newcomer", 1, 25, 0, 0, Badge.WELCOME),
 			tier("Rookie", 5, 50),
 			tier("Regular", 25, 200),
 			tier("Dedicated", 100, 500, 1),

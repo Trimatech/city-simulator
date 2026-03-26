@@ -1,2 +1,22 @@
-export * from "./milestone-selectors";
-export * from "./milestone-slice";
+export {
+	identifyMilestone,
+	milestoneSlice,
+	selectMilestone,
+	selectMilestoneArea,
+	selectMilestoneBotKillCount,
+	selectMilestoneCandyCollected,
+	selectMilestoneEliminationCount,
+	selectMilestoneGiantSlain,
+	selectMilestoneHeadOnVictory,
+	selectMilestoneLastKilled,
+	selectMilestoneOrbsSpent,
+	selectMilestonePowerupsUsed,
+	selectMilestoneRank1Count,
+	selectMilestoneRank1Since,
+	selectMilestoneRanking,
+	selectMilestoneReviveCount,
+	selectMilestones,
+	selectMilestoneShieldBlockedDeath,
+	selectMilestoneTowerDestroyed,
+} from "shared/store/milestones";
+export type { MilestoneEntity, MilestoneState, ScoreMilestone } from "shared/store/milestones";

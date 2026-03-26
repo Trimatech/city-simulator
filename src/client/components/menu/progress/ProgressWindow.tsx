@@ -13,6 +13,7 @@ import { palette } from "shared/constants/palette";
 import { allWallSkins } from "shared/constants/skins";
 import { selectPlayerBalance } from "shared/store/saves";
 
+import { BadgeTargets } from "./components/BadgeTargets";
 import { LifetimeMilestones } from "./components/LifetimeMilestones";
 import { ProgressCardItem } from "./components/ProgressCardItem";
 import { QUEST_TARGETS } from "./constants";
@@ -91,6 +92,8 @@ export function ProgressWindow({ onClose }: ProgressWindowProps) {
 							))}
 
 							<LifetimeMilestones />
+
+							<BadgeTargets />
 						</VStack>
 					</Frame>
 				</scrollingframe>

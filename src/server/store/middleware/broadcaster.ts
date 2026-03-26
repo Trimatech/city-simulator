@@ -17,6 +17,10 @@ const excludedActions = [
 	// Candy grid data is now server-side only; candies are rendered via server-created Parts
 	"setCandyCell",
 	"clearCandyGrid",
+	// Internal milestone fields not needed on client
+	"clearMilestoneKillScore",
+	"setMilestoneLastDamageAt",
+	"setMilestoneRank1Since",
 ];
 
 /** Actions sent only to the player they target (arg[0] = player/soldier name) */

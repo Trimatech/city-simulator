@@ -28,6 +28,7 @@ import { selectSoldierArea, selectSoldierById, selectSoldierOrbs } from "shared/
 import { getPlayerByName } from "shared/utils/player-utils";
 
 import { grantMoney, shouldGrantReward } from "../utils";
+import { tryGrantBadge } from "./badges";
 
 /** Track spawn time per player for time-alive accumulation. */
 const spawnTimes = new Map<string, number>();
@@ -191,6 +192,11 @@ function checkMilestoneTiers(playerId: string, category: MilestoneCategory) {
 
 	// Tier crossed! Grant rewards and advance tier.
 	store.setMilestoneTier(playerId, category, currentTier + 1);
+
+	// Grant badge if this tier has one
+	if (nextTier.badge !== undefined) {
+		tryGrantBadge(playerId, nextTier.badge);
+	}
 
 	const player = getPlayerByName(playerId);
 

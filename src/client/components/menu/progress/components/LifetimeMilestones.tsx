@@ -80,6 +80,7 @@ export function LifetimeMilestones() {
 					);
 				}
 				if (followingTier.orbReward > 0) rewardParts.push(`${followingTier.orbReward} orbs`);
+				if (followingTier.badge !== undefined) rewardParts.push("Badge");
 
 				return (
 					<ProgressCardItem
