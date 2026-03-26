@@ -48,6 +48,7 @@ export function shallowEqualCell(a?: GridCellsByEdgeId, b?: GridCellsByEdgeId) {
 export function buildAreaLinesByCell(points: Vector2[], resolution: number, kind: "area" | "area2" = "area") {
 	const areaLinesByCell = new Map<string, Map<string, GridLine>>();
 	const quantQ = getQuantizationStep(resolution);
+	const edgeAssigned = new Set<string>();
 
 	for (let i = 0; i < points.size(); i++) {
 		const a = points[i];
@@ -60,6 +61,11 @@ export function buildAreaLinesByCell(points: Vector2[], resolution: number, kind
 		const minC = getCellCoordFromPos(new Vector2(minX, minY), resolution);
 		const maxC = getCellCoordFromPos(new Vector2(maxX, maxY), resolution);
 
+		const qa = quantizeVector2(a, quantQ);
+		const qb = quantizeVector2(b, quantQ);
+		const edgeId = getEdgeId({ a: qa, b: qb });
+		if (edgeAssigned.has(edgeId)) continue;
+
 		for (const ix of $range(minC.X, maxC.X)) {
 			for (const iy of $range(minC.Y, maxC.Y)) {
 				const key = getCellKeyFromCoord(new Vector2(ix, iy));
@@ -71,11 +77,10 @@ export function buildAreaLinesByCell(points: Vector2[], resolution: number, kind
 					cell = new Map<string, GridLine>();
 					areaLinesByCell.set(key, cell);
 				}
-				const qa = quantizeVector2(a, quantQ);
-				const qb = quantizeVector2(b, quantQ);
-				const edgeId = getEdgeId({ a: qa, b: qb });
 				// Store original geometry; use quantized only for stable ids
 				cell.set(edgeId, { a, b, ownerId: "", kind });
+				edgeAssigned.add(edgeId);
+				break;
 			}
 		}
 	}
@@ -91,6 +96,7 @@ function buildSegmentLinesByCell(
 ) {
 	const byCell = new Map<string, Map<string, GridLine>>();
 	const quantQ = getQuantizationStep(resolution);
+	const edgeAssigned = new Set<string>();
 
 	for (let i = 0; i < segments.size() - 1; i++) {
 		const a = segments[i];
@@ -103,6 +109,11 @@ function buildSegmentLinesByCell(
 		const minC = getCellCoordFromPos(new Vector2(minX, minY), resolution);
 		const maxC = getCellCoordFromPos(new Vector2(maxX, maxY), resolution);
 
+		const qa = quantizeVector2(a, quantQ);
+		const qb = quantizeVector2(b, quantQ);
+		const edgeId = getEdgeId({ a: qa, b: qb });
+		if (edgeAssigned.has(edgeId)) continue;
+
 		for (const ix of $range(minC.X, maxC.X)) {
 			for (const iy of $range(minC.Y, maxC.Y)) {
 				const key = getCellKeyFromCoord(new Vector2(ix, iy));
@@ -114,11 +125,10 @@ function buildSegmentLinesByCell(
 					cell = new Map<string, GridLine>();
 					byCell.set(key, cell);
 				}
-				const qa = quantizeVector2(a, quantQ);
-				const qb = quantizeVector2(b, quantQ);
-				const edgeId = getEdgeId({ a: qa, b: qb });
 				// Store original geometry; use quantized only for stable ids
 				cell.set(edgeId, { a, b, ownerId, kind });
+				edgeAssigned.add(edgeId);
+				break;
 			}
 		}
 	}
