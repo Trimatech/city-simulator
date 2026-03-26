@@ -1,17 +1,27 @@
-import React from "@rbxts/react";
+import React, { useEffect, useRef } from "@rbxts/react";
 import { Layer } from "@rbxts-ui/layout";
 
 import { Alerts } from "../components/alerts";
 import { BirdCamera } from "../components/camera/BirdCamera";
 import { Controller } from "../components/controller";
 import { ErrorHandler } from "../components/error-handler";
+import { ImpactOverlay } from "../components/game/ImpactOverlay";
 import { BackgroundMusic } from "../components/music/BackgroundMusic";
+import { OverlayScreens } from "../components/OverlayScreens";
 import { Preloader } from "../components/preloader";
 import { Screens } from "../components/Screens";
-import { ImpactOverlay } from "../components/game/ImpactOverlay";
+import { TopbarScreens } from "../components/TopbarScreens";
 import { World } from "../components/world/World";
 
 export function App() {
+	const mainScreenGuiRef = useRef<ScreenGui>();
+
+	useEffect(() => {
+		if (mainScreenGuiRef.current) {
+			mainScreenGuiRef.current.ScreenInsets = Enum.ScreenInsets.CoreUISafeInsets;
+		}
+	}, [mainScreenGuiRef.current]);
+
 	return (
 		<ErrorHandler>
 			<BackgroundMusic />
@@ -22,12 +32,42 @@ export function App() {
 				<BirdCamera />
 				<Controller />
 				<World />
-			</Layer>
-
-			<Layer>
-				<Screens />
 				<ImpactOverlay />
 			</Layer>
+
+			<screengui
+				key="topbar-screens"
+				ResetOnSpawn={false}
+				IgnoreGuiInset
+				ZIndexBehavior="Sibling"
+				DisplayOrder={2}
+				ScreenInsets={Enum.ScreenInsets.TopbarSafeInsets}
+			>
+				<TopbarScreens />
+			</screengui>
+
+			<screengui
+				key="main-screens"
+				ref={mainScreenGuiRef}
+				ResetOnSpawn={false}
+				IgnoreGuiInset
+				ZIndexBehavior="Sibling"
+				DisplayOrder={3}
+				ScreenInsets={Enum.ScreenInsets.DeviceSafeInsets}
+			>
+				<Screens />
+			</screengui>
+
+			<screengui
+				key="overlay-screens"
+				ResetOnSpawn={false}
+				IgnoreGuiInset
+				ZIndexBehavior="Sibling"
+				DisplayOrder={4}
+				ScreenInsets={Enum.ScreenInsets.None}
+			>
+				<OverlayScreens />
+			</screengui>
 
 			<Layer>
 				<Alerts />

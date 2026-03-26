@@ -4,12 +4,14 @@ import { useInterval, useTimeout } from "@rbxts/pretty-react-hooks";
 import React, { useEffect } from "@rbxts/react";
 import ReactRoblox from "@rbxts/react-roblox";
 import { GameUI } from "client/components/game/GameUI";
+import { TopbarScreens } from "client/components/TopbarScreens";
 import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
 import { USER_NAME, WORLD_BOUNDS } from "shared/constants/core";
 import { getRandomBotSkin } from "shared/constants/skins";
 import { fillArray } from "shared/utils/object-utils";
 
+import { FakeTopbar } from "../utils/FakeTopbar";
 import { useMockRemotes } from "../utils/use-mock-remotes";
 
 const IDS = [USER_NAME, ...fillArray(10, (index) => `${index}`)];
@@ -32,18 +34,6 @@ function GameUIStoryContent() {
 				orbs: math.random(0, 5000),
 			});
 		}
-		// store.populateCandy(
-		// 	fillArray(512, (index) => ({
-		// 		id: `test-${index}`,
-		// 		type: CandyType.Default,
-		// 		position: new Vector2(
-		// 			(math.random() * 2 - 1) * WORLD_BOUNDS * 0.2,
-		// 			(math.random() * 2 - 1) * WORLD_BOUNDS * 0.2,
-		// 		),
-		// 		size: math.random(1, 10),
-		// 		color: getRandomAccent(),
-		// 	})),
-		// );
 	}, []);
 
 	useTimeout(() => {
@@ -62,7 +52,9 @@ function GameUIStoryContent() {
 
 	return (
 		<RootProvider>
-			<GameUI visible />
+			<FakeTopbar header={<TopbarScreens />}>
+				<GameUI visible />
+			</FakeTopbar>
 		</RootProvider>
 	);
 }

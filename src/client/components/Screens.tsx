@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "@rbxts/react";
+import React, { useEffect } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { Workspace } from "@rbxts/services";
+import { store } from "client/store";
+import { selectCachedDeadline } from "client/store/screen";
 import {
 	selectHasLocalSoldier,
 	selectLocalDeathChoiceDeadline,
@@ -8,35 +10,33 @@ import {
 	selectLocalTurboActiveUntil,
 } from "shared/store/soldiers";
 
-import { DeathScreen } from "./game/death/DeathScreen";
 import { GameUI } from "./game/GameUI";
 import { SpeedEffect } from "./game/SpeedEffect";
+import { DeathScreen } from "./game/death/DeathScreen";
 import { Home } from "./menu/home/home";
 
 export function Screens() {
 	const soldier = useSelector(selectLocalSoldier);
 	const deathChoiceDeadline = useSelector(selectLocalDeathChoiceDeadline);
 	const spawned = useSelector(selectHasLocalSoldier);
-
-	// Cache deadline locally so the death screen persists even if soldier is removed from store mid-timer
-	const [cachedDeadline, setCachedDeadline] = useState<number | undefined>();
+	const cachedDeadline = useSelector(selectCachedDeadline);
+	const turboActiveUntil = useSelector(selectLocalTurboActiveUntil);
 
 	useEffect(() => {
 		if (deathChoiceDeadline !== undefined) {
 			warn(
 				`[Death:Client] deathChoiceDeadline received: ${deathChoiceDeadline}, timeLeft=${deathChoiceDeadline - Workspace.GetServerTimeNow()}s`,
 			);
-			setCachedDeadline(deathChoiceDeadline);
+			store.setCachedDeadline(deathChoiceDeadline);
 		}
 	}, [deathChoiceDeadline]);
 
-	// If soldier is alive (revived), clear cache to hide death screen immediately
 	useEffect(() => {
 		if (soldier && !soldier.dead) {
 			if (cachedDeadline !== undefined) {
 				warn(`[Death:Client] Soldier alive, clearing cachedDeadline`);
 			}
-			setCachedDeadline(undefined);
+			store.setCachedDeadline(undefined);
 		}
 	}, [soldier, soldier?.dead]);
 
@@ -46,8 +46,6 @@ export function Screens() {
 		);
 	}, [spawned, soldier?.dead, deathChoiceDeadline, cachedDeadline]);
 
-	const turboActiveUntil = useSelector(selectLocalTurboActiveUntil);
-
 	const isDeathActive = cachedDeadline !== undefined;
 	const gameUIVisible = spawned && !soldier?.dead;
 	const homeVisible = !spawned && !isDeathActive;
@@ -55,7 +53,7 @@ export function Screens() {
 	return (
 		<>
 			{spawned && <GameUI visible={gameUIVisible} />}
-			<DeathScreen activeDeadline={cachedDeadline} onDismiss={() => setCachedDeadline(undefined)} />
+			<DeathScreen activeDeadline={cachedDeadline} onDismiss={() => store.setCachedDeadline(undefined)} />
 			{!spawned && <Home visible={homeVisible} />}
 			{turboActiveUntil > 0 && (
 				<frame

@@ -56,6 +56,8 @@ local assets = {
 		menu_title = "rbxassetid://81914962844346",
 		patterns = {
 			dots_pattern = "rbxassetid://109011352852234",
+			progress_content_bg = "rbxassetid://118342756208012",
+			progress_window_bg = "rbxassetid://118190005386122",
 			water_noise_pattern = "rbxassetid://116904224511881",
 		},
 		powerups = {

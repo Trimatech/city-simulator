@@ -3,6 +3,7 @@ import { alertSlice } from "@rbxts-ui/alerts";
 import { slices } from "shared/store";
 
 import { receiverMiddleware } from "./middleware/receiver";
+import { screenSlice } from "./screen";
 import { settingsSlice } from "./settings/settingsSlice";
 import { worldSlice } from "./world";
 
@@ -14,6 +15,7 @@ export function createStore() {
 	const store = combineProducers({
 		...slices,
 		alert: alertSlice,
+		screen: screenSlice,
 		settings: settingsSlice,
 		world: worldSlice,
 	});

@@ -1,25 +1,14 @@
-import React, { useState } from "@rbxts/react";
+import React from "@rbxts/react";
 import { HStack } from "@rbxts-ui/layout";
 import { Frame } from "@rbxts-ui/primitives";
 import { HomeStats } from "client/components/stats/HomeStats";
-import { ROBLOX_TOOLBAR_HEIGHT } from "client/constants/roblox.constants";
-import { MainButton, ShopButtonTextWithIcon } from "client/ui/MainButton";
-import { Overlay } from "client/ui/Overlay";
 import { useRem } from "client/ui/rem/useRem";
 import { SlideIn } from "client/ui/slide-in";
-import assets from "shared/assets";
 import { ROOT_PADDING } from "shared/constants/theme";
 
-import { DailyRewardScreen } from "../daily-reward/DailyRewardScreen";
-import { ShopWindow } from "../shop/ShopWindow";
 import { GameVersion } from "./GameVersion";
 import { MuteButton } from "./MuteButton";
 import { PlayButton } from "./PlayButton";
-
-const enum Window {
-	Shop = "shop",
-	DailyReward = "dailyReward",
-}
 
 interface HomeProps {
 	visible: boolean;
@@ -27,33 +16,8 @@ interface HomeProps {
 
 export function Home({ visible }: HomeProps) {
 	const rem = useRem();
-	const [openWindow, setOpenWindow] = useState<Window | undefined>();
-
 	return (
 		<>
-			<SlideIn visible={visible} direction="left">
-				<HStack
-					position={new UDim2(0, rem(ROOT_PADDING), 0, ROBLOX_TOOLBAR_HEIGHT)}
-					verticalAlignment={Enum.VerticalAlignment.Top}
-					spacing={rem(1)}
-				>
-					<MainButton
-						onClick={() => setOpenWindow(Window.Shop)}
-						size={new UDim2(0, rem(10), 0, rem(4))}
-						fitContent
-					>
-						<ShopButtonTextWithIcon text="Shop" icon={assets.ui.icons.store} />
-					</MainButton>
-					<MainButton
-						onClick={() => setOpenWindow(Window.DailyReward)}
-						size={new UDim2(0, rem(16), 0, rem(4))}
-						fitContent
-					>
-						<ShopButtonTextWithIcon text="Daily Rewards" icon={assets.ui.icons.dailyRewards} />
-					</MainButton>
-				</HStack>
-			</SlideIn>
-
 			<SlideIn visible={visible} direction="right">
 				<Frame
 					anchorPoint={new Vector2(1, 1)}
@@ -87,20 +51,6 @@ export function Home({ visible }: HomeProps) {
 					<HomeStats />
 				</HStack>
 			</SlideIn>
-
-			{openWindow === Window.Shop && (
-				<>
-					<Overlay onClick={() => setOpenWindow(undefined)} />
-					<ShopWindow onClose={() => setOpenWindow(undefined)} />
-				</>
-			)}
-
-			{openWindow === Window.DailyReward && (
-				<>
-					<Overlay onClick={() => setOpenWindow(undefined)} />
-					<DailyRewardScreen onDismiss={() => setOpenWindow(undefined)} />
-				</>
-			)}
 		</>
 	);
 }

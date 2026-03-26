@@ -41,6 +41,8 @@ target:
         socialLinks:
             - title: 🤝・Community
               url: https://www.roblox.com/groups/34579161/Trimatech-Games#!/about
+            - title: Discord
+              url: https://discord.gg/byDu926vnA
         configuration:
             playableDevices: [computer, console, phone, tablet]
             privateServers:
@@ -106,16 +108,16 @@ target:
                 description: You're the champion! Finish in 1st place.
                 icon: assets/badges/ranking/champion.png
                 enabled: true
-            # ranking-runner-up:
-            #     name: 🥈 Runner Up
-            #     description: So close to the top! Finish in 2nd place.
-            #     icon: assets/badges/ranking/runner-up.png
-            #     enabled: true
-            # ranking-repeat-champion:
-            #     name: 🏆 Repeat Champion
-            #     description: A true legend! Reach 1st place 10 times.
-            #     icon: assets/badges/ranking/repeat-champion.png
-            #     enabled: true
+            ranking-runner-up:
+                name: 🥈 Runner Up
+                description: So close to the top! Finish in 2nd place.
+                icon: assets/badges/ranking/runner-up.png
+                enabled: true
+            ranking-repeat-champion:
+                name: 🏆 Repeat Champion
+                description: A true legend! Reach 1st place 10 times.
+                icon: assets/badges/ranking/repeat-champion.png
+                enabled: true
             # ranking-undefeated:
             #     name: 👑 Undefeated
             #     description: Unstoppable! Hold 1st place for 5 minutes straight.

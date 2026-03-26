@@ -105,6 +105,8 @@ export function getRandomAccent(): Color3 {
 
 export const textStrokeGradient = new ColorSequence(palette.textStrokeFrom, palette.textStrokeTo);
 
+export const heading1Gradient = new ColorSequence(Color3.fromHex("#FFEF77"), Color3.fromHex("#FFC916"));
+
 export const BORDER_GRADIENT = new ColorSequence([
 	new ColorSequenceKeypoint(0, Color3.fromHex("#C1E3FF")),
 	new ColorSequenceKeypoint(0.5, Color3.fromHex("#43B9F7")),

@@ -3,7 +3,7 @@ import { Group } from "@rbxts-ui/primitives";
 import { springs } from "client/constants/springs";
 import { useMotion } from "client/hooks";
 
-type SlideDirection = "left" | "right" | "bottom";
+type SlideDirection = "left" | "right" | "bottom" | "top";
 
 interface SlideInProps extends React.PropsWithChildren {
 	visible: boolean;
@@ -14,6 +14,7 @@ const HIDDEN_POSITIONS: Record<SlideDirection, UDim2> = {
 	left: new UDim2(-0.5, 0, 0, 0),
 	right: new UDim2(0.5, 0, 0, 0),
 	bottom: new UDim2(0, 0, 0.5, 0),
+	top: new UDim2(0, 0, -1.5, 0),
 };
 
 const VISIBLE_POSITION = new UDim2();

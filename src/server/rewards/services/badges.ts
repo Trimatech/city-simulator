@@ -19,7 +19,6 @@ import {
 	selectMilestoneShieldBlockedDeath,
 	selectMilestoneTowerDestroyed,
 } from "server/store/milestones";
-import { ScoreMilestone } from "server/store/milestones/milestone-utils";
 import { Badge } from "shared/assetsFolder";
 import { selectSoldierById, selectSoldierRanking } from "shared/store/soldiers";
 import { getPlayerByName } from "shared/utils/player-utils";
@@ -28,13 +27,13 @@ import { shouldGrantBadge } from "../utils";
 
 // --- Territory Milestones ---
 
-const AREA_BADGES: { [K in ScoreMilestone]?: Badge } = {
-	100_000: Badge.SETTLER,
-	250_000: Badge.LANDLORD,
-	500_000: Badge.CONQUEROR,
-	1_000_000: Badge.EMPIRE,
-	2_500_000: Badge.WORLD_DOMINATOR,
-};
+const AREA_BADGES: { threshold: number; badge: Badge }[] = [
+	{ threshold: 100_000, badge: Badge.SETTLER },
+	{ threshold: 250_000, badge: Badge.LANDLORD },
+	{ threshold: 500_000, badge: Badge.CONQUEROR },
+	{ threshold: 1_000_000, badge: Badge.EMPIRE },
+	{ threshold: 2_500_000, badge: Badge.WORLD_DOMINATOR },
+];
 
 // --- Ranking ---
 
@@ -91,8 +90,11 @@ function observeMilestone(id: string) {
 
 	// --- Area badges ---
 	const unsubscribeArea = store.subscribe(selectMilestoneArea(id), (area) => {
-		if (area !== undefined && area in AREA_BADGES) {
-			tryGrantBadge(id, AREA_BADGES[area]!);
+		if (area === undefined) return;
+		for (const { threshold, badge } of AREA_BADGES) {
+			if (area >= threshold) {
+				tryGrantBadge(id, badge);
+			}
 		}
 	});
 
