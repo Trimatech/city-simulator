@@ -16,7 +16,7 @@ export function HomeTopbar({ visible }: HomeTopbarProps) {
 	const rem = useRem();
 
 	return (
-		<SlideIn visible={visible} direction="left">
+		<SlideIn visible={visible} direction="top">
 			<HStack
 				verticalAlignment={Enum.VerticalAlignment.Center}
 				spacing={rem(1)}

@@ -8,6 +8,11 @@ import { CRYSTAL_OFFERS } from "shared/constants/shopPrices";
 
 import { ShopItem, shopItemThemes } from "./ShopItem";
 
+function formatBonus(bonus: number): string | undefined {
+	if (bonus <= 0) return undefined;
+	return `${RobloxEmoji.Premium} +${bonus} Bonus`;
+}
+
 function promptPurchase(productId: number) {
 	print(`[Shop] Prompting crystal purchase for product ID: ${productId}`);
 	MarketplaceService.PromptProductPurchase(Players.LocalPlayer, productId);
@@ -80,7 +85,7 @@ export function CrystalProducts() {
 						/>
 						<ShopItem
 							title="5 Crystals"
-							subtitle="+1 Bonus"
+							subtitle={formatBonus(c5.bonusCrystals)}
 							label="CRYSTAL PACK"
 							buttonText={`${RobloxEmoji.Robux} ${c5.robuxPrice}`}
 							icon={assets.ui.crystals.crystals_5}
@@ -90,7 +95,7 @@ export function CrystalProducts() {
 						/>
 						<ShopItem
 							title="15 Crystals"
-							subtitle="+3 Bonus"
+							subtitle={formatBonus(c15.bonusCrystals)}
 							label="SHARD CRATE"
 							buttonText={`${RobloxEmoji.Robux} ${c15.robuxPrice}`}
 							icon={assets.ui.crystals.crystals_15}
@@ -110,7 +115,7 @@ export function CrystalProducts() {
 						/>
 						<ShopItem
 							title="25 Crystals"
-							subtitle="+5 Bonus"
+							subtitle={formatBonus(c25.bonusCrystals)}
 							label="CRYSTAL VAULT"
 							buttonText={`${RobloxEmoji.Robux} ${c25.robuxPrice}`}
 							icon={assets.ui.crystals.crystals_25}

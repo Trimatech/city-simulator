@@ -1,17 +1,19 @@
 import { grantMoney } from "server/rewards";
 import assets from "shared/assets";
-import { DevProduct } from "shared/assetsFolder";
 import { palette } from "shared/constants/palette";
+import { MONEY_OFFERS } from "shared/constants/shopPrices";
 import { remotes } from "shared/remotes";
 
 import { createProduct } from "./process-receipt";
 
 export async function initMoneyService() {
-	createProduct(DevProduct.MONEY_100, (player) => giveMoney(player, 100 + 10));
-	createProduct(DevProduct.MONEY_500, (player) => giveMoney(player, 500 + 100));
-	createProduct(DevProduct.MONEY_2500, (player) => giveMoney(player, 2500 + 200));
-	createProduct(DevProduct.MONEY_10000, (player) => giveMoney(player, 10000 + 10000));
-	createProduct(DevProduct.MONEY_100000, (player) => giveMoney(player, 100000 + 10000));
+	for (const offer of MONEY_OFFERS) {
+		createProduct(offer.productId, (player) => {
+			const isPremium = player.MembershipType === Enum.MembershipType.Premium;
+			const total = offer.cash + (isPremium ? offer.bonusCash : 0);
+			giveMoney(player, total);
+		});
+	}
 }
 
 function giveMoney(player: Player, amount: number) {

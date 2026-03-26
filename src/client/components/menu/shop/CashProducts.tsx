@@ -8,6 +8,12 @@ import { MONEY_OFFERS } from "shared/constants/shopPrices";
 
 import { ShopItem, shopItemThemes } from "./ShopItem";
 
+function formatBonus(bonus: number): string | undefined {
+	if (bonus <= 0) return undefined;
+	const label = bonus >= 1000 ? `${bonus / 1000}K` : `${bonus}`;
+	return `${RobloxEmoji.Premium} +${label} Bonus`;
+}
+
 function promptPurchase(productId: number) {
 	print(`[Shop] PlaceId: ${game.PlaceId}, GameId: ${game.GameId}`);
 	print(`[Shop] Prompting purchase for product ID: ${productId}`);
@@ -81,7 +87,7 @@ export function CashProducts() {
 						/>
 						<ShopItem
 							title="$100 Cash"
-							subtitle="+10 Bonus"
+							subtitle={formatBonus(m100.bonusCash)}
 							label="STARTER PACK"
 							buttonText={`${RobloxEmoji.Robux} ${m100.robuxPrice}`}
 							icon={assets.ui.shop.Cash100Large}
@@ -91,7 +97,7 @@ export function CashProducts() {
 						/>
 						<ShopItem
 							title="$500 Cash"
-							subtitle="+100 Bonus"
+							subtitle={formatBonus(m500.bonusCash)}
 							label="BONUS BOOST"
 							buttonText={`${RobloxEmoji.Robux} ${m500.robuxPrice}`}
 							icon={assets.ui.shop.Cash500Large}
@@ -101,7 +107,7 @@ export function CashProducts() {
 						/>
 						<ShopItem
 							title="$2500 Cash"
-							subtitle="+200 Bonus"
+							subtitle={formatBonus(m2500.bonusCash)}
 							label="WEALTH CRATE"
 							buttonText={`${RobloxEmoji.Robux} ${m2500.robuxPrice}`}
 							icon={assets.ui.shop.Cash250Large}
@@ -121,7 +127,7 @@ export function CashProducts() {
 						/>
 						<ShopItem
 							title="$10K Cash"
-							subtitle="+10K Bonus"
+							subtitle={formatBonus(m10000.bonusCash)}
 							label="TREASURE CHEST"
 							buttonText={`${RobloxEmoji.Robux} ${m10000.robuxPrice}`}
 							icon={assets.ui.shop.Cash10kLarge}
@@ -131,7 +137,7 @@ export function CashProducts() {
 						/>
 						<ShopItem
 							title="$100K Cash"
-							subtitle="+10K Bonus"
+							subtitle={formatBonus(m100000.bonusCash)}
 							label="BANK VAULT"
 							buttonText={`${RobloxEmoji.Robux} ${m100000.robuxPrice}`}
 							icon={assets.ui.shop.Cash100kLarge}
