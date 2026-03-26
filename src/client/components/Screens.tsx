@@ -7,11 +7,9 @@ import {
 	selectHasLocalSoldier,
 	selectLocalDeathChoiceDeadline,
 	selectLocalSoldier,
-	selectLocalTurboActiveUntil,
 } from "shared/store/soldiers";
 
 import { GameUI } from "./game/GameUI";
-import { SpeedEffect } from "./game/SpeedEffect";
 import { DeathScreen } from "./game/death/DeathScreen";
 import { Home } from "./menu/home/home";
 
@@ -20,9 +18,7 @@ export function Screens() {
 	const deathChoiceDeadline = useSelector(selectLocalDeathChoiceDeadline);
 	const spawned = useSelector(selectHasLocalSoldier);
 	const cachedDeadline = useSelector(selectCachedDeadline);
-	const turboActiveUntil = useSelector(selectLocalTurboActiveUntil);
-
-	useEffect(() => {
+useEffect(() => {
 		if (deathChoiceDeadline !== undefined) {
 			warn(
 				`[Death:Client] deathChoiceDeadline received: ${deathChoiceDeadline}, timeLeft=${deathChoiceDeadline - Workspace.GetServerTimeNow()}s`,
@@ -55,16 +51,6 @@ export function Screens() {
 			{spawned && <GameUI visible={gameUIVisible} />}
 			<DeathScreen activeDeadline={cachedDeadline} onDismiss={() => store.setCachedDeadline(undefined)} />
 			{!spawned && <Home visible={homeVisible} />}
-			{turboActiveUntil > 0 && (
-				<frame
-					key={`speed-${turboActiveUntil}`}
-					Size={new UDim2(1, 0, 1, 0)}
-					AnchorPoint={new Vector2(0, 0)}
-					BackgroundTransparency={1}
-				>
-					<SpeedEffect />
-				</frame>
-			)}
 		</>
 	);
 }

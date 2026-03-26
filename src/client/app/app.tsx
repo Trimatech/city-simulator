@@ -6,6 +6,7 @@ import { BirdCamera } from "../components/camera/BirdCamera";
 import { Controller } from "../components/controller";
 import { ErrorHandler } from "../components/error-handler";
 import { ImpactOverlay } from "../components/game/ImpactOverlay";
+import { TurboOverlay } from "../components/game/TurboOverlay";
 import { BackgroundMusic } from "../components/music/BackgroundMusic";
 import { OverlayScreens } from "../components/OverlayScreens";
 import { Preloader } from "../components/preloader";
@@ -15,8 +16,7 @@ import { World } from "../components/world/World";
 
 export function App() {
 	const mainScreenGuiRef = useRef<ScreenGui>();
-
-	useEffect(() => {
+useEffect(() => {
 		if (mainScreenGuiRef.current) {
 			mainScreenGuiRef.current.ScreenInsets = Enum.ScreenInsets.CoreUISafeInsets;
 		}
@@ -33,6 +33,7 @@ export function App() {
 				<Controller />
 				<World />
 				<ImpactOverlay />
+				<TurboOverlay />
 			</Layer>
 
 			<screengui
