@@ -4,6 +4,7 @@ import React from "@rbxts/react";
 import { createPortal, createRoot } from "@rbxts/react-roblox";
 import { Players } from "@rbxts/services";
 import { initializeWallAnimator } from "client/components/walls/wall-animator";
+import { initializeWallGateEffect } from "client/components/walls/wall-gate-effect";
 import { initializeCandyAnimator } from "client/components/world/candies/candy-animator";
 import { initializeExplosionEffects } from "client/components/world/explosions/explosion-events";
 import { initializeRewardAnimator } from "client/components/world/rewards/reward-animator";
@@ -34,6 +35,9 @@ initializeExplosionEffects();
 
 // Initialize server-side wall animation (CollectionService-based)
 initializeWallAnimator();
+
+// Lift own walls near the player to create a walkable "gate" arch
+initializeWallGateEffect();
 
 // Initialize server-side candy animation (CollectionService-based)
 initializeCandyAnimator();
