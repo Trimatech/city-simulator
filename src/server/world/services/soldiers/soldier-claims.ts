@@ -18,6 +18,7 @@ import { selectSoldiersById } from "shared/store/soldiers";
 import { candyGrid, eatCandies } from "../candy/candy-utils";
 import { invalidateIsInsideCache } from "../collision/collision-cache";
 import { updateAreaGridForPolygon } from "./soldier-grid";
+
 export function cutOthersByNewArea(ownerId: string, newCutPolygon: Polygon) {
 	const state = store.getState();
 	const soldiersById = selectSoldiersById(state);
@@ -49,8 +50,11 @@ export function cutOthersByNewArea(ownerId: string, newCutPolygon: Polygon) {
 					polygon: updatedPolygon as Vector2[],
 					dropTracers: false,
 				});
-				const isInsideClaimedArea = isPointInPolygon(vector2ToPoint(soldier.position), newCutPoints);
-				if (updatedArea < SOLDIER_MIN_AREA || isInsideClaimedArea) {
+
+				// We are checking if player is in its area and surrounded by other player trail and then he claimed it.
+				const isStillInside =
+					!soldier.isInside || isPointInPolygon(vector2ToPoint(soldier.position), bestRegion);
+				if (updatedArea < SOLDIER_MIN_AREA || !isStillInside) {
 					killSoldier(otherId);
 					store.playerKilledSoldier(ownerId, otherId);
 					store.incrementSoldierEliminations(ownerId);
