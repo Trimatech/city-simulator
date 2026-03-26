@@ -20,8 +20,10 @@ export interface MilestoneCategoryDef {
 	readonly accent: string;
 	/** Short action verb for the widget, e.g. "Eliminate" */
 	readonly action: string;
-	/** Unit noun for formatting, e.g. "players", "studs²" */
-	readonly unit: string;
+	/** Singular unit noun, e.g. "player" */
+	readonly unitSingular: string;
+	/** Plural unit noun, e.g. "players" */
+	readonly unitPlural: string;
 	readonly tiers: readonly MilestoneTier[];
 }
 
@@ -36,7 +38,8 @@ export const MILESTONE_CATEGORIES: readonly MilestoneCategoryDef[] = [
 		icon: "skull",
 		accent: "#f38ba8",
 		action: "Eliminate",
-		unit: "players",
+		unitSingular: "player",
+		unitPlural: "players",
 		tiers: [
 			tier("First Strike", 1, 50, 0, 0, Badge.FIRST_BLOOD),
 			tier("Fighter", 10, 150, 0, 0, Badge.BOUNTY_HUNTER),
@@ -56,7 +59,8 @@ export const MILESTONE_CATEGORIES: readonly MilestoneCategoryDef[] = [
 		icon: "map",
 		accent: "#a6e3a1",
 		action: "Claim",
-		unit: "studs² total",
+		unitSingular: "studs² total",
+		unitPlural: "studs² total",
 		tiers: [
 			tier("Newcomer", 10_000, 50),
 			tier("Homesteader", 50_000, 200),
@@ -79,7 +83,8 @@ export const MILESTONE_CATEGORIES: readonly MilestoneCategoryDef[] = [
 		icon: "orb",
 		accent: "#cba6f7",
 		action: "Collect",
-		unit: "orbs",
+		unitSingular: "orb",
+		unitPlural: "orbs",
 		tiers: [
 			tier("Scavenger", 200, 50, 0, 30),
 			tier("Forager", 1_000, 150),
@@ -97,7 +102,8 @@ export const MILESTONE_CATEGORIES: readonly MilestoneCategoryDef[] = [
 		icon: "clock",
 		accent: "#89b4fa",
 		action: "Survive",
-		unit: "total",
+		unitSingular: "total",
+		unitPlural: "total",
 		tiers: [
 			tier("Survivor", 300, 50),
 			tier("Tenacious", 1_800, 200),
@@ -115,7 +121,8 @@ export const MILESTONE_CATEGORIES: readonly MilestoneCategoryDef[] = [
 		icon: "crown",
 		accent: "#f9e2af",
 		action: "Reach #1",
-		unit: "times",
+		unitSingular: "time",
+		unitPlural: "times",
 		tiers: [
 			tier("Contender", 1, 100, 0, 0, Badge.CHAMPION),
 			tier("Victor", 5, 300, 0, 50),
@@ -131,7 +138,8 @@ export const MILESTONE_CATEGORIES: readonly MilestoneCategoryDef[] = [
 		icon: "zap",
 		accent: "#fab387",
 		action: "Spend",
-		unit: "orbs on powerups",
+		unitSingular: "orb on powerups",
+		unitPlural: "orbs on powerups",
 		tiers: [
 			tier("Tactician", 500, 100),
 			tier("Strategist", 2_000, 300, 0, 50),
@@ -145,7 +153,8 @@ export const MILESTONE_CATEGORIES: readonly MilestoneCategoryDef[] = [
 		label: "Total Games Played",
 		icon: "play",
 		action: "Play",
-		unit: "games",
+		unitSingular: "game",
+		unitPlural: "games",
 		accent: "#94e2d5",
 		tiers: [
 			tier("Newcomer", 1, 25, 0, 0, Badge.WELCOME),
@@ -192,7 +201,8 @@ export function formatThreshold(category: MilestoneCategoryDef, value: number): 
 /** Build an action-oriented description like "Eliminate 25 players" */
 export function getMilestoneActionText(category: MilestoneCategoryDef, threshold: number): string {
 	const amount = formatThreshold(category, threshold);
-	return `${category.action} ${amount} ${category.unit}`;
+	const unit = threshold === 1 ? category.unitSingular : category.unitPlural;
+	return `${category.action} ${amount} ${unit}`;
 }
 
 /** Check if all categories are at max tier. */

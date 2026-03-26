@@ -10,13 +10,13 @@ import { palette } from "shared/constants/palette";
 import { selectPlayerMilestoneProgress } from "shared/store/saves";
 
 import { MilestoneItem } from "./MilestoneItem";
-import { useClosestMilestones } from "./useClosestMilestones";
+import { usePrioritizedMilestones } from "./useClosestMilestones";
 
 const NEXT_MILESTONE_DELAY = 2.0;
 
 export function MilestoneWidget() {
 	const rem = useRem();
-	const milestones = useClosestMilestones(2);
+	const { fixed, rotating } = usePrioritizedMilestones(2);
 	const progress = useSelectorCreator(selectPlayerMilestoneProgress, USER_NAME);
 
 	const prevProgressRef = useRef<MilestoneProgress | undefined>(undefined);
@@ -43,7 +43,7 @@ export function MilestoneWidget() {
 		prevProgressRef.current = progress;
 	}, [progress]);
 
-	if (milestones.size() === 0) {
+	if (fixed.size() === 0 && rotating === undefined) {
 		return (
 			<Frame
 				position={new UDim2(0, 0, 0.5, 0)}
@@ -71,13 +71,20 @@ export function MilestoneWidget() {
 			automaticSize={Enum.AutomaticSize.Y}
 			padding={rem(3)}
 		>
-			{milestones.map((data) => (
+			{fixed.map((data) => (
 				<MilestoneItem
 					key={data.category.id}
 					data={data}
 					celebrating={celebratingCategories.has(data.category.id)}
 				/>
 			))}
+			{rotating && (
+				<MilestoneItem
+					key={rotating.category.id}
+					data={rotating}
+					celebrating={celebratingCategories.has(rotating.category.id)}
+				/>
+			)}
 		</VStack>
 	);
 }
