@@ -1,6 +1,9 @@
 {
 	"name": "zone-wars",
-	"globIgnorePaths": ["**/package.json", "**/tsconfig.json"],
+	"globIgnorePaths": [
+		"**/package.json",
+		"**/tsconfig.json"
+	],
 	"tree": {
 		"$className": "DataModel",
 		"ServerScriptService": {
@@ -47,7 +50,6 @@
 				}
 			}
 		},
-
 		"Players": {
 			"$className": "Players",
 			"$properties": {
@@ -65,7 +67,6 @@
 				}
 			}
 		},
-
 		"Workspace": {
 			"$className": "Workspace",
 			"Place": {
@@ -78,7 +79,7 @@
 			},
 			"$properties": {
 				"StreamingEnabled": true,
-				"StreamingMinRadius": 120,
+				"StreamingMinRadius": 150,
 				"StreamingTargetRadius": 300,
 				"SignalBehavior2": {
 					"Enum": 2
@@ -88,7 +89,6 @@
 		"Lighting": {
 			"$path": "assets/lighting.rbxmx"
 		},
-
 		"TextChatService": {
 			"$className": "TextChatService",
 			"$properties": {
