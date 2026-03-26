@@ -4,6 +4,7 @@ import React from "@rbxts/react";
 import { createPortal, createRoot } from "@rbxts/react-roblox";
 import { Players } from "@rbxts/services";
 import { initializeWallAnimator } from "client/components/walls/wall-animator";
+import { initializeEnemyWallProximity } from "client/components/walls/enemy-wall-proximity";
 import { initializeWallGateEffect } from "client/components/walls/wall-gate-effect";
 import { initializeCandyAnimator } from "client/components/world/candies/candy-animator";
 import { initializeExplosionEffects } from "client/components/world/explosions/explosion-events";
@@ -38,6 +39,9 @@ initializeWallAnimator();
 
 // Lift own walls near the player to create a walkable "gate" arch
 initializeWallGateEffect();
+
+// Track proximity to enemy walls for breach overlay + crumble effects
+initializeEnemyWallProximity();
 
 // Initialize server-side candy animation (CollectionService-based)
 initializeCandyAnimator();
