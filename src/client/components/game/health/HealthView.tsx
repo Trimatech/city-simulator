@@ -70,12 +70,7 @@ export function HealthView() {
 	}, [health]);
 
 	return (
-		<HStack
-			name="HealthView"
-			size={new UDim2(0, rem(35), 0, ROBLOX_TOOLBAR_HEIGHT)}
-			spacing={rem(0.5)}
-			padding={30}
-		>
+		<HStack name="HealthView" size={new UDim2(0, rem(35), 0, ROBLOX_TOOLBAR_HEIGHT)} spacing={rem(0.5)}>
 			<frame BackgroundTransparency={1} Size={new UDim2(0, iconSize, 0, iconSize)} ClipsDescendants={false}>
 				<imagelabel
 					Image={assets.ui.heart}
