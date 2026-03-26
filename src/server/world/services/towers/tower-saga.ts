@@ -1,6 +1,4 @@
-import { store } from "server/store";
 import { WORLD_TICK } from "shared/constants/core";
-import { identifySoldier, selectAliveSoldiersById } from "shared/store/soldiers";
 import { createScheduler } from "shared/utils/scheduler";
 
 import { onTowerTick } from "./tower-tick";
@@ -15,10 +13,6 @@ export async function initTowerService() {
 		onTick: onTowerTick,
 	});
 
-	// Clean up towers when their owner dies
-	store.observe(selectAliveSoldiersById, identifySoldier, ({ id }) => {
-		return () => {
-			store.removeTowersByOwnerId(id);
-		};
-	});
+	// Towers are cleaned up in killSoldier() when the player is fully eliminated.
+	// We intentionally do NOT remove towers on death, because the player may revive.
 }

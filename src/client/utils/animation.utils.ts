@@ -3,7 +3,7 @@ import { TweenService } from "@rbxts/services";
 export function fadeModelOut(model: Model) {
 	model.GetDescendants().forEach((descendant) => {
 		if (descendant.IsA("BasePart")) {
-			descendant.CanCollide = true;
+			descendant.CanCollide = false;
 			descendant.Anchored = false;
 
 			// Fade away in 2 seconds

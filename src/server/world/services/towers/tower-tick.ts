@@ -14,7 +14,7 @@ export function onTowerTick(dt: number) {
 	for (const [, tower] of Object.entries(towers)) {
 		// Destroy tower if it's no longer inside the owner's territory
 		const owner = soldiers[tower.ownerId];
-		if (!owner || owner.dead || owner.polygon.size() === 0) {
+		if (!owner || owner.polygon.size() === 0) {
 			store.removeTower(tower.id);
 			continue;
 		}
