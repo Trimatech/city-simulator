@@ -1,4 +1,4 @@
-import { Players } from "@rbxts/services";
+import { Players, Workspace } from "@rbxts/services";
 import { store } from "server/store";
 import { DEFAULT_ORBS, SOLDIER_TICK_PHASE } from "server/world/constants";
 import {
@@ -96,14 +96,25 @@ export async function initSoldierService() {
 
 	remotes.soldier.continue.connect(async (player) => {
 		const soldierId = player.Name;
+		warn(`[Revive] continue received from ${soldierId}`);
 		const soldier = store.getState(selectSoldierById(soldierId));
-		if (!soldier || !soldier.dead) return;
+		if (!soldier || !soldier.dead) {
+			warn(`[Revive] REJECTED: soldier=${soldier !== undefined}, dead=${soldier?.dead}`);
+			return;
+		}
 
 		const crystals = store.getState(selectPlayerCrystals(soldierId)) ?? 0;
-		if (crystals < REVIVE_CRYSTAL_COST) return;
+		if (crystals < REVIVE_CRYSTAL_COST) {
+			warn(`[Revive] REJECTED: crystals=${crystals}, need=${REVIVE_CRYSTAL_COST}`);
+			return;
+		}
 
 		const deadline = soldier.deathChoiceDeadline;
-		if (deadline === undefined || tick() > deadline) return;
+		const now = Workspace.GetServerTimeNow();
+		if (deadline === undefined || now > deadline) {
+			warn(`[Revive] REJECTED: deadline=${deadline}, serverTime=${now}, expired=${deadline !== undefined && now > deadline}`);
+			return;
+		}
 
 		cancelDeathChoiceTimer(soldierId);
 

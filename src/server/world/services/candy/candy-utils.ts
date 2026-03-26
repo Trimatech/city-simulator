@@ -45,9 +45,9 @@ export function createCandy(patch?: Partial<CandyEntity>): CandyEntity {
 		...patch,
 	};
 
-	print(
-		`[DEBUG] Creating candy ID: ${candy.id}, Position: (${candy.position.X}, ${candy.position.Y}), Type: ${candy.type}`,
-	);
+	// print(
+	// 	`[DEBUG] Creating candy ID: ${candy.id}, Position: (${candy.position.X}, ${candy.position.Y}), Type: ${candy.type}`,
+	// );
 
 	candyGrid.insert(candy.position, { id: candy.id });
 	addCandyLocal(candy);
