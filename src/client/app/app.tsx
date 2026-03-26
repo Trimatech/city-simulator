@@ -16,7 +16,7 @@ import { World } from "../components/world/World";
 
 export function App() {
 	const mainScreenGuiRef = useRef<ScreenGui>();
-useEffect(() => {
+	useEffect(() => {
 		if (mainScreenGuiRef.current) {
 			mainScreenGuiRef.current.ScreenInsets = Enum.ScreenInsets.CoreUISafeInsets;
 		}
