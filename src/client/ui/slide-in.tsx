@@ -21,7 +21,7 @@ const VISIBLE_POSITION = new UDim2();
 
 export function SlideIn({ visible, direction, children }: SlideInProps) {
 	const hidden = HIDDEN_POSITIONS[direction];
-	const [position, positionMotion] = useMotion(visible ? VISIBLE_POSITION : hidden);
+	const [position, positionMotion] = useMotion(hidden);
 
 	useEffect(() => {
 		positionMotion.spring(visible ? VISIBLE_POSITION : hidden, springs.gentle);

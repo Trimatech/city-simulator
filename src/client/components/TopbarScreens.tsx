@@ -27,8 +27,8 @@ export function TopbarScreens() {
 
 	return (
 		<>
-			<GameTopbar visible={!homeVisible} />
-			<HomeTopbar visible={homeVisible} />
+			{spawned && <GameTopbar visible={gameUIVisible} />}
+			{!spawned && <HomeTopbar visible={homeVisible} />}
 		</>
 	);
 }
