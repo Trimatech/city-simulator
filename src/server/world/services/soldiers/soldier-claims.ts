@@ -49,7 +49,8 @@ export function cutOthersByNewArea(ownerId: string, newCutPolygon: Polygon) {
 					polygon: updatedPolygon as Vector2[],
 					dropTracers: false,
 				});
-				if (updatedArea < SOLDIER_MIN_AREA) {
+				const isInsideClaimedArea = isPointInPolygon(vector2ToPoint(soldier.position), newCutPoints);
+				if (updatedArea < SOLDIER_MIN_AREA || isInsideClaimedArea) {
 					killSoldier(otherId);
 					store.playerKilledSoldier(ownerId, otherId);
 					store.incrementSoldierEliminations(ownerId);
