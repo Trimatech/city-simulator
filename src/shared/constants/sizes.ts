@@ -18,7 +18,8 @@ export const sizes = {
 		medium: 3,
 	},
 	fontSize: {
-		large: 2.25, // 36px
+		xxs: 1.75, // 28px
+		large: 2.25, //48px
 	},
 	buttonSize: {
 		xs: 1.438, // 23px
