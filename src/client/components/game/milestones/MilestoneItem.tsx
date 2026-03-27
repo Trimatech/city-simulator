@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "@rbxts/react";
 import { HStack, VStack } from "@rbxts-ui/layout";
-import { Frame, Image, Text } from "@rbxts-ui/primitives";
+import { Frame, Text } from "@rbxts-ui/primitives";
+import { StylizedBox2 } from "client/components/game/StylizedBox2";
+import { SweepStroke } from "client/components/game/SweepStroke";
 import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
 import { useMotion } from "client/hooks";
@@ -19,15 +21,9 @@ const BURST_LIFETIME_MAX = 2.2;
 const OUTER_BORDER_COLOR = Color3.fromRGB(61, 39, 19);
 const OUTER_BORDER_TRANSPARENCY = 0.64;
 const OUTER_CORNER = 1;
-const INNER_PADDING = 0.1;
 
 const INNER_BG_COLOR = Color3.fromRGB(0, 0, 0);
 const INNER_BG_TRANSPARENCY = 0.42;
-
-const INNER_BORDER_GRADIENT = new ColorSequence([
-	new ColorSequenceKeypoint(0, Color3.fromHex("#373737")),
-	new ColorSequenceKeypoint(1, Color3.fromHex("#000000")),
-]);
 
 const PROGRESS_HEIGHT = 0.85;
 
@@ -70,11 +66,6 @@ interface MilestoneItemProps {
 	readonly celebrating: boolean;
 }
 
-const initialSweepRotation = 5;
-const rotationAnimationDuration = 0.9;
-
-const finalSweepTransparency = 0.1;
-
 export function MilestoneItem({ data, celebrating }: MilestoneItemProps) {
 	const rem = useRem();
 	const progress = math.clamp(data.current / data.target, 0, 1);
@@ -86,11 +77,8 @@ export function MilestoneItem({ data, celebrating }: MilestoneItemProps) {
 	const [showBurst, setShowBurst] = useState(false);
 
 	const [glow, glowMotion] = useMotion(0);
-	const [sweepRotation, sweepRotationMotion] = useMotion(initialSweepRotation);
-	const [sweepTransparency, sweepTransparencyMotion] = useMotion(1);
 
 	const prevCelebrating = useRef(false);
-	const prevTarget = useRef(data.target);
 
 	useEffect(() => {
 		if (celebrating && !prevCelebrating.current) {
@@ -103,78 +91,16 @@ export function MilestoneItem({ data, celebrating }: MilestoneItemProps) {
 		prevCelebrating.current = celebrating;
 	}, [celebrating]);
 
-	useEffect(() => {
-		if (data.target !== prevTarget.current) {
-			sweepRotationMotion.set(initialSweepRotation);
-			sweepRotationMotion.tween(initialSweepRotation + 160, {
-				time: rotationAnimationDuration,
-				style: Enum.EasingStyle.Sine,
-			});
-			sweepTransparencyMotion.set(1);
-			sweepTransparencyMotion.tween(finalSweepTransparency, { time: 0.3 });
-			task.delay(rotationAnimationDuration - 0.5, () => {
-				sweepTransparencyMotion.tween(1, { time: 0.5 });
-			});
-			prevTarget.current = data.target;
-		}
-	}, [data.target]);
-
-	const outerCorner = new UDim(0, rem(OUTER_CORNER));
-
 	return (
 		<Frame size={new UDim2(1, 0, 0, 0)} backgroundTransparency={1} automaticSize={Enum.AutomaticSize.Y}>
-			{/* Outer border frame */}
-			<Frame
+			<StylizedBox2
+				borderColor={glow.map((g) => OUTER_BORDER_COLOR.Lerp(accent, g))}
+				borderTransparency={glow.map((g) => OUTER_BORDER_TRANSPARENCY - g * 0.3)}
 				backgroundColor={glow.map((g) => INNER_BG_COLOR.Lerp(accent, g * 0.15))}
 				backgroundTransparency={glow.map((g) => INNER_BG_TRANSPARENCY - g * 0.2)}
-				cornerRadius={outerCorner}
-				size={new UDim2(1, 0, 0, 0)}
-				automaticSize={Enum.AutomaticSize.Y}
+				cornerRadius={OUTER_CORNER}
+				extraStrokes={<SweepStroke color={accent} trigger={data.target} />}
 			>
-				<uistroke
-					Color={glow.map((g) => OUTER_BORDER_COLOR.Lerp(accent, g))}
-					Transparency={glow.map((g) => OUTER_BORDER_TRANSPARENCY - g * 0.3)}
-					Thickness={rem(0.4)}
-					ZIndex={1}
-				/>
-				<uistroke Color={palette.white} Transparency={0.45} Thickness={rem(0.2)} ZIndex={2}>
-					<uigradient Color={INNER_BORDER_GRADIENT} Rotation={90} />
-				</uistroke>
-				<uistroke Color={accent} Transparency={sweepTransparency} Thickness={rem(0.2)} ZIndex={3}>
-					<uigradient
-						Color={
-							new ColorSequence([
-								new ColorSequenceKeypoint(0, accent),
-								new ColorSequenceKeypoint(0.5, palette.white),
-								new ColorSequenceKeypoint(1, accent),
-							])
-						}
-						Transparency={
-							new NumberSequence([
-								new NumberSequenceKeypoint(0, 1),
-								new NumberSequenceKeypoint(0.3, 0.3),
-								new NumberSequenceKeypoint(0.5, 0),
-								new NumberSequenceKeypoint(0.7, 0.3),
-								new NumberSequenceKeypoint(1, 1),
-							])
-						}
-						Rotation={sweepRotation}
-					/>
-				</uistroke>
-
-				{/* Background pattern */}
-				<Image
-					image={assets.ui.patterns.dots_pattern}
-					imageColor3={palette.white}
-					imageTransparency={0.96}
-					scaleType="Tile"
-					tileSize={new UDim2(0, rem(4), 0, rem(4))}
-					size={new UDim2(1, rem(2 * INNER_PADDING), 1, rem(2 * INNER_PADDING))}
-					position={new UDim2(0, rem(-INNER_PADDING), 0, rem(-INNER_PADDING))}
-				>
-					<uicorner CornerRadius={outerCorner} />
-				</Image>
-
 				<VStack size={new UDim2(1, 0, 1, 0)} spacing={rem(1)} backgroundTransparency={1} padding={rem(1)}>
 					{/* Title row: action text + progress count */}
 					<HStack
@@ -236,7 +162,7 @@ export function MilestoneItem({ data, celebrating }: MilestoneItemProps) {
 						)}
 					</Frame>
 				</VStack>
-			</Frame>
+			</StylizedBox2>
 		</Frame>
 	);
 }

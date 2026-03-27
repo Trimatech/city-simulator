@@ -12,7 +12,7 @@ const ORBS_HINT_DELAY_SECONDS = 3;
 const MAX_GAMES_FOR_HINTS = 3;
 
 const HINT_AREA =
-	"Leave your area to claim new ground! Orbs inside will be auto-collected. Tip: don't grab too much at once - if an enemy touches your trail wall, you're eliminated!";
+	"Leave your area to claim new ground! Orbs inside will be auto-collected. <font color='#ffea00'>Tip:</font> don't grab too much at once - if an enemy touches your trail wall, you're eliminated!";
 const HINT_ORBS =
 	"Use collected orbs for abilities! Check the powerup buttons on the right to activate shields, turbo, lasers and more.";
 
