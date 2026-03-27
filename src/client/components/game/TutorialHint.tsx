@@ -12,12 +12,17 @@ import { TypeWriter } from "client/ui/TypeWriter";
 import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 
-const HINT_WIDTH = 450;
-const HINT_BORDER_COLOR = Color3.fromRGB(255, 234, 0);
-const HINT_BG_COLOR = palette.black;
-const HINT_BORDER_TRANSPARENCY = 0.1;
-const HINT_BG_TRANSPARENCY = 0.42;
-const HINT_CORNER = 1;
+const accent = Color3.fromRGB(255, 234, 0);
+
+const HINT_WIDTH = 500;
+const HINT_BORDER_COLOR = accent;
+
+const OUTER_BORDER_COLOR = accent;
+const OUTER_BORDER_TRANSPARENCY = 0.64;
+const OUTER_CORNER = 1;
+
+const INNER_BG_COLOR = Color3.fromRGB(0, 0, 0);
+const INNER_BG_TRANSPARENCY = 0.42;
 
 interface TutorialHintProps {
 	text: string;
@@ -27,6 +32,7 @@ interface TutorialHintProps {
 
 export function TutorialHint({ text, visible, onDismiss }: TutorialHintProps) {
 	const rem = useRem();
+
 	const [transparency, transparencyMotion] = useMotion(1);
 	const [glow, glowMotion] = useMotion(0);
 	const prevVisible = useRef(false);
@@ -54,13 +60,11 @@ export function TutorialHint({ text, visible, onDismiss }: TutorialHintProps) {
 			automaticSize={Enum.AutomaticSize.Y}
 		>
 			<StylizedBox2
-				borderColor={glow.map((g) => HINT_BORDER_COLOR.Lerp(palette.white, g * 0.3))}
-				borderTransparency={glow.map((g) => HINT_BORDER_TRANSPARENCY - g * 0.1)}
-				borderThickness={0.3}
-				backgroundColor={glow.map((g) => HINT_BG_COLOR.Lerp(HINT_BORDER_COLOR, g * 0.15))}
-				backgroundTransparency={glow.map((g) => HINT_BG_TRANSPARENCY - g * 0.2)}
-				cornerRadius={HINT_CORNER}
-				size={UDim2.fromScale(1, 0)}
+				borderColor={glow.map((g) => OUTER_BORDER_COLOR.Lerp(accent, g))}
+				borderTransparency={glow.map((g) => OUTER_BORDER_TRANSPARENCY - g * 0.3)}
+				backgroundColor={glow.map((g) => INNER_BG_COLOR.Lerp(accent, g * 0.15))}
+				backgroundTransparency={glow.map((g) => INNER_BG_TRANSPARENCY - g * 0.2)}
+				cornerRadius={OUTER_CORNER}
 				extraStrokes={<SweepStroke color={HINT_BORDER_COLOR} trigger={text} />}
 			>
 				<VStack size={new UDim2(1, 0, 1, 0)} spacing={rem(0.1)} backgroundTransparency={1} padding={rem(1)}>
@@ -68,7 +72,7 @@ export function TutorialHint({ text, visible, onDismiss }: TutorialHintProps) {
 						text={text}
 						richText={true}
 						textSize={rem(1.8)}
-						font={fonts.inter.medium}
+						font={fonts.mplus.regular}
 						textColor={palette.white}
 						textTransparency={transparency}
 						textXAlignment="Left"

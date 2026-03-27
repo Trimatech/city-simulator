@@ -41,7 +41,7 @@ export function GameUI({ visible }: GameUIProps) {
 					padding={rem(3)}
 					spacing={rem(3)}
 				>
-					<PowerupsPanel />
+					<PowerupsPanel visible={visible} />
 					<MinimapArea />
 				</VStack>
 			</SlideIn>

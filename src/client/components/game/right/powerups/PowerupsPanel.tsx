@@ -11,11 +11,10 @@ import { ShieldTimer } from "./ShieldTimer";
 import { TurboTimer } from "./TurboTimer";
 
 interface Props {
-	readonly anchorPoint: Vector2;
-	readonly position: UDim2;
+	readonly visible: boolean;
 }
 
-export function PowerupsPanel() {
+export function PowerupsPanel({ visible }: Props) {
 	const rem = useRem();
 	const height = rem(36);
 	const width = rem(8);
@@ -41,6 +40,7 @@ export function PowerupsPanel() {
 					enabled={orbs >= POWERUP_PRICES.nuclearExplosion}
 					order={1}
 					price={POWERUP_PRICES.nuclearExplosion}
+					panelVisible={visible}
 				/>
 
 				<BuyPowerup
@@ -49,6 +49,7 @@ export function PowerupsPanel() {
 					enabled={orbs >= POWERUP_PRICES.laserBeam}
 					order={2}
 					price={POWERUP_PRICES.laserBeam}
+					panelVisible={visible}
 				/>
 
 				<BuyPowerup
@@ -57,6 +58,7 @@ export function PowerupsPanel() {
 					enabled={orbs >= POWERUP_PRICES.shield}
 					order={3}
 					price={POWERUP_PRICES.shield}
+					panelVisible={visible}
 				>
 					<ShieldTimer />
 				</BuyPowerup>
@@ -68,6 +70,7 @@ export function PowerupsPanel() {
 					order={4}
 					price={POWERUP_PRICES.tower}
 					disabledReason={!isInsideTerritory ? "Can't place" : undefined}
+					panelVisible={visible}
 				/>
 
 				<BuyPowerup
@@ -76,6 +79,7 @@ export function PowerupsPanel() {
 					enabled={orbs >= POWERUP_PRICES.turbo}
 					order={5}
 					price={POWERUP_PRICES.turbo}
+					panelVisible={visible}
 				>
 					<TurboTimer />
 				</BuyPowerup>

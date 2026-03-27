@@ -3,18 +3,18 @@ import { useSelector, useSelectorCreator } from "@rbxts/react-reflex";
 import { RunService } from "@rbxts/services";
 import { USER_NAME } from "shared/constants/core";
 import { selectPlayerLifetimeGamesPlayed, selectPlayerLifetimeOrbsSpent } from "shared/store/saves/save-selectors";
-import { selectLocalSoldier } from "shared/store/soldiers";
+import { selectLocalPolygonAreaSize, selectLocalSoldier } from "shared/store/soldiers";
 
 import { TutorialHint } from "./TutorialHint";
 
-const SHOW_DELAY_SECONDS = 4;
+const SHOW_DELAY_SECONDS = 2;
 const ORBS_HINT_DELAY_SECONDS = 3;
 const MAX_GAMES_FOR_HINTS = 3;
 
 const HINT_AREA =
-	"Leave your area to claim new ground! Orbs inside will be auto-collected. <font color='#ffea00'>Tip:</font> don't grab too much at once - if an enemy touches your trail wall, you're eliminated!";
+	"Welcome to Zone Wars! Here's how to expand your territory:\n\n• Go <b>outside</b> your zone.\n• A <b>wall</b> trails behind you as you move.\n• <b>Loop back</b> to claim the enclosed land.\n• <font color='#ffea00'>Danger:</font> enemies can hit your <b>trail wall</b> before you return";
 const HINT_ORBS =
-	"Use collected orbs for abilities! Check the powerup buttons on the right to activate shields, turbo, lasers and more.";
+	"You've got <b>orbs</b>! Spend them on <b>abilities</b> using the buttons on the right: Shields, turbo, laser and more";
 
 type HintId = "area" | "orbs";
 
@@ -23,14 +23,29 @@ export function TutorialHints() {
 	const orbsSpent = useSelectorCreator(selectPlayerLifetimeOrbsSpent, USER_NAME);
 	const soldier = useSelector(selectLocalSoldier);
 
+	const areaSize = useSelector(selectLocalPolygonAreaSize);
+
 	const dismissedRef = useRef<Record<HintId, boolean>>({ area: false, orbs: false });
+	const initialAreaRef = useRef<number | undefined>(undefined);
 	const [activeHint, setActiveHint] = useState<HintId | undefined>(undefined);
 
 	const isNewPlayer = gamesPlayed < MAX_GAMES_FOR_HINTS;
 	const isAlive = soldier !== undefined && !soldier.dead;
-	const hasLeftArea = soldier !== undefined && !soldier.isInside;
 	const hasOrbs = (soldier?.orbs ?? 0) > 0;
 	const hasSpentOrbs = orbsSpent > 0;
+
+	// Capture the initial area size when the soldier spawns
+	useEffect(() => {
+		if (isAlive && areaSize !== undefined && initialAreaRef.current === undefined) {
+			initialAreaRef.current = areaSize;
+		}
+		if (!isAlive) {
+			initialAreaRef.current = undefined;
+		}
+	}, [isAlive, areaSize]);
+
+	const hasClaimedLand =
+		areaSize !== undefined && initialAreaRef.current !== undefined && areaSize > initialAreaRef.current;
 
 	// Tip 1: Show area claiming hint after a delay when spawned
 	useEffect(() => {
@@ -47,24 +62,17 @@ export function TutorialHints() {
 		return () => connection.Disconnect();
 	}, [isNewPlayer, isAlive]);
 
-	// Auto-dismiss area hint when player leaves their area
+	// Auto-dismiss area hint when player claims new land
 	useEffect(() => {
-		if (activeHint === "area" && hasLeftArea) {
+		if (activeHint === "area" && hasClaimedLand) {
 			dismissedRef.current.area = true;
 			setActiveHint(undefined);
 		}
-	}, [activeHint, hasLeftArea]);
+	}, [activeHint, hasClaimedLand]);
 
-	// Tip 2: Show orbs hint after area hint is dismissed and player has orbs
+	// Tip 2: Show orbs hint after player has claimed land and has orbs
 	useEffect(() => {
-		if (
-			!isNewPlayer ||
-			!isAlive ||
-			dismissedRef.current.orbs ||
-			!dismissedRef.current.area ||
-			!hasOrbs ||
-			hasSpentOrbs
-		)
+		if (!isNewPlayer || !isAlive || dismissedRef.current.orbs || !hasClaimedLand || !hasOrbs || hasSpentOrbs)
 			return;
 
 		const startTime = os.clock();
@@ -76,7 +84,7 @@ export function TutorialHints() {
 		});
 
 		return () => connection.Disconnect();
-	}, [isNewPlayer, isAlive, hasOrbs, hasSpentOrbs, dismissedRef.current.area]);
+	}, [isNewPlayer, isAlive, hasOrbs, hasSpentOrbs, hasClaimedLand]);
 
 	// Auto-dismiss orbs hint when player spends orbs
 	useEffect(() => {

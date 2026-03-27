@@ -23,6 +23,7 @@ interface Props {
 	readonly order: number;
 	readonly price: number;
 	readonly disabledReason?: string;
+	readonly panelVisible?: boolean;
 	readonly children?: React.Element;
 }
 
@@ -75,7 +76,7 @@ function getOrbFountainConfig(price: number): ParticleEmitter2DConfig {
 	};
 }
 
-export function BuyPowerup({ id, label, enabled, order, price, disabledReason, children }: Props) {
+export function BuyPowerup({ id, label, enabled, order, price, disabledReason, panelVisible, children }: Props) {
 	const rem = useRem();
 	const style = POWERUP_BUTTON_STYLES[id];
 
@@ -84,11 +85,13 @@ export function BuyPowerup({ id, label, enabled, order, price, disabledReason, c
 	const FULL_WIDTH = WIDTH + rem(TOOLTIP_WIDTH);
 
 	const [showTooltip, setShowTooltip] = useState(false);
+	const [introLocked, setIntroLocked] = useState(false);
 	const [bursts, setBursts] = useState<Array<{ key: number; pos: Vector2 }>>([]);
 	const burstCounter = useRef(0);
 	const frameRef = useRef<Frame>();
 	const wrapperRef = useRef<Frame>();
 	const prevEnabled = useRef(enabled);
+	const prevPanelVisible = useRef<boolean | undefined>(undefined);
 	const [showShimmer, setShowShimmer] = useState(false);
 
 	const [size, sizeMotion] = useMotion(new UDim2(0, WIDTH, 0, HEIGHT));
@@ -121,6 +124,25 @@ export function BuyPowerup({ id, label, enabled, order, price, disabledReason, c
 	// useEffect(() => {
 	// 	bgColorMotion.spring(enabled ? style.backgroundColor : palette.overlay2, springs.slow);
 	// }, [enabled, style.backgroundColor]);
+
+	// When panel slides in, delay 1s, stagger tooltips in and out per button
+	useEffect(() => {
+		if (panelVisible && !prevPanelVisible.current) {
+			const stagger = (order - 1) * 0.15;
+			task.delay(1 + stagger, () => {
+				setShowTooltip(true);
+				setIntroLocked(true);
+			});
+			task.delay(4 + stagger, () => {
+				setShowTooltip(false);
+				setIntroLocked(false);
+			});
+		}
+		if (!panelVisible) {
+			setIntroLocked(false);
+		}
+		prevPanelVisible.current = panelVisible;
+	}, [panelVisible]);
 
 	useEffect(() => {
 		sizeMotion.spring(new UDim2(0, showTooltip ? FULL_WIDTH : WIDTH, 0, HEIGHT), springs.gentle);
@@ -207,7 +229,7 @@ export function BuyPowerup({ id, label, enabled, order, price, disabledReason, c
 				size={size}
 				anchorPoint={new Vector2(1, 0)}
 				onMouseEnter={() => setShowTooltip(true)}
-				onMouseLeave={() => setShowTooltip(false)}
+				onMouseLeave={() => !introLocked && setShowTooltip(false)}
 			>
 				<Transition groupTransparency={0} size={new UDim2(1, 0, 1, 0)}>
 					{/* Outer frame — colored background with dual strokes */}

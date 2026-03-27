@@ -44,8 +44,8 @@ function CustomComponent({
 
 	return (
 		<RootProvider>
-			<frame BackgroundTransparency={1} Size={new UDim2(1, 0, 1, 0)} Position={new UDim2(0, 0, 0, 0)}>
-				<PowerupsPanel />
+			<frame BackgroundTransparency={1} Size={new UDim2(1, 0, 1, 0)} Position={new UDim2(0.5, 0, 0, 0)}>
+				<PowerupsPanel visible={true} />
 			</frame>
 		</RootProvider>
 	);
