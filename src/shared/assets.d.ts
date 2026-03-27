@@ -7,6 +7,7 @@ declare const assets: {
 		alert_dismiss: string
 		alert_money: string
 		alert_neutral: string
+		bfh1_rock_falling_02: string
 		bg_013_Another_August: string
 		bg_beautiful_day: string
 		bg_bugmintide: string
@@ -22,6 +23,7 @@ declare const assets: {
 		error_3: string
 		explosionCrunch_003: string
 		explosion_effect: string
+		"generated-004_medium": string
 		laser3: string
 		laser_beam: string
 		navigate: string

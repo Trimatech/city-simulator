@@ -10,6 +10,8 @@
  */
 
 import { CollectionService, Players, RunService, Workspace } from "@rbxts/services";
+import assets from "shared/assets";
+import { playSound } from "shared/assetsFolder";
 import { CollisionGroups } from "shared/constants/collision-groups";
 import { WALL_ATTR_OWNER_ID, WALL_ATTR_TIME_ADDED, WALL_TAG } from "shared/constants/core";
 
@@ -140,6 +142,9 @@ function subdivideRect(fullW: number, fullH: number): Rect[] {
 
 // ── Shard data ──────────────────────────────────────────────────────────
 
+/** Max random delay (seconds) before a wall's crumble sound plays. */
+const SOUND_STAGGER = 0.4;
+
 interface Shard {
 	part: BasePart;
 	restCFrame: CFrame;
@@ -150,6 +155,11 @@ interface WallEffect {
 	originalPart: BasePart;
 	originalTransparency: number;
 	shards: Shard[];
+	/** Index of the largest shard — sound is parented here. */
+	largestShardIdx: number;
+	sound: Sound | undefined;
+	soundDelay: number;
+	wasMoving: boolean;
 }
 
 const enemyWalls = new Set<BasePart>();
@@ -210,6 +220,7 @@ function makeShard(
 	p.BottomSurface = Enum.SurfaceType.Smooth;
 	p.CFrame = restCF;
 	p.Parent = folder;
+
 	return { part: p, restCFrame: restCF, explodedCFrame: explodedCF };
 }
 
@@ -262,11 +273,31 @@ function createEffect(wall: BasePart, playerPos: Vector2): WallEffect {
 		shards.push(makeShard(folder, r.w, r.h, sz.Z, wall.Color, wall.Material, origT, restCF, explodedCF));
 	}
 
-	return { originalPart: wall, originalTransparency: origT, shards };
+	let largestIdx = 0;
+	let largestArea = 0;
+	for (let i = 0; i < shards.size(); i++) {
+		const s = shards[i];
+		const area = s.part.Size.X * s.part.Size.Y;
+		if (area > largestArea) {
+			largestArea = area;
+			largestIdx = i;
+		}
+	}
+
+	return {
+		originalPart: wall,
+		originalTransparency: origT,
+		shards,
+		largestShardIdx: largestIdx,
+		sound: undefined,
+		soundDelay: 0,
+		wasMoving: false,
+	};
 }
 
 function destroyEffect(effect: WallEffect): void {
 	showOriginal(effect.originalPart, effect.originalTransparency);
+	if (effect.sound) effect.sound.Destroy();
 	for (const s of effect.shards) s.part.Destroy();
 }
 
@@ -347,7 +378,40 @@ function syncEffects(nearby: Map<BasePart, number>, playerPos: Vector2): void {
 			activeEffects.delete(part);
 			continue;
 		}
-		lerpShards(effect.shards, proximityFactor(dist));
+
+		const factor = proximityFactor(dist);
+		lerpShards(effect.shards, factor);
+
+		const isMoving = factor > 0.01;
+		const soundParent = effect.shards[effect.largestShardIdx].part;
+
+		// Staggered crumble sound when shards start moving.
+		if (isMoving && !effect.sound) {
+			if (effect.soundDelay <= 0) {
+				effect.soundDelay = math.random() * SOUND_STAGGER;
+			}
+			effect.soundDelay -= UPDATE_INTERVAL;
+			if (effect.soundDelay <= 0) {
+				effect.sound = playSound(assets.sounds.bfh1_rock_falling_02, {
+					parent: soundParent,
+					volume: 0.3,
+				});
+			}
+		} else if (!isMoving) {
+			// Play sound when shards settle back.
+			if (effect.wasMoving) {
+				playSound(assets.sounds.bfh1_rock_falling_02, {
+					parent: soundParent,
+					volume: 0.3,
+				});
+			}
+			if (effect.sound) {
+				effect.sound.Destroy();
+				effect.sound = undefined;
+			}
+			effect.soundDelay = 0;
+		}
+		effect.wasMoving = isMoving;
 	}
 }
 

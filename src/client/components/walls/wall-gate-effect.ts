@@ -1,4 +1,6 @@
 import { CollectionService, Players, RunService, Workspace } from "@rbxts/services";
+import assets from "shared/assets";
+import { playSound } from "shared/assetsFolder";
 import {
 	WALL_ATTR_KIND,
 	WALL_ATTR_OWNER_ID,
@@ -23,9 +25,17 @@ const USER_NAME = Players.LocalPlayer.Name;
 
 // ── Per-wall bookkeeping ────────────────────────────────────────────────
 
+/** Max random delay (seconds) before a wall's crumble sound plays. */
+const SOUND_STAGGER = 0.4;
+
 interface WallEntry {
 	part: BasePart;
 	targetY: number;
+	sound: Sound | undefined;
+	/** Remaining delay before the sound fires. Reset each time lifting begins. */
+	soundDelay: number;
+	/** Whether the wall was lifting last frame. */
+	wasLifting: boolean;
 }
 
 /** Only walls owned by the local player. */
@@ -74,11 +84,15 @@ function tryRegister(instance: Instance): void {
 	if (kind === "tracer") return;
 	const targetY = instance.GetAttribute(WALL_ATTR_TARGET_Y) as number | undefined;
 	if (targetY === undefined) return;
-	ownedWalls.set(instance, { part: instance, targetY });
+	ownedWalls.set(instance, { part: instance, targetY, sound: undefined, soundDelay: 0, wasLifting: false });
 }
 
 function unregister(instance: Instance): void {
 	if (instance.IsA("BasePart")) {
+		const entry = ownedWalls.get(instance);
+		if (entry?.sound) {
+			entry.sound.Destroy();
+		}
 		ownedWalls.delete(instance);
 	}
 }
@@ -106,6 +120,36 @@ function update(): void {
 
 		const desiredY = targetY + lift;
 		const curY = part.Position.Y;
+		const isLifting = lift > 0.05;
+
+		// Staggered crumble sound — each wall gets a random delay when lifting starts.
+		if (isLifting && !entry.sound) {
+			if (entry.soundDelay <= 0) {
+				// First frame lifting — assign a random delay.
+				entry.soundDelay = math.random() * SOUND_STAGGER;
+			}
+			entry.soundDelay -= UPDATE_INTERVAL;
+			if (entry.soundDelay <= 0) {
+				entry.sound = playSound(assets.sounds.bfh1_rock_falling_02, {
+					parent: part,
+					volume: 0.3,
+				});
+			}
+		} else if (!isLifting) {
+			// Play sound when wall starts coming back down.
+			if (entry.wasLifting) {
+				playSound(assets.sounds.bfh1_rock_falling_02, {
+					parent: part,
+					volume: 0.3,
+				});
+			}
+			if (entry.sound) {
+				entry.sound.Destroy();
+				entry.sound = undefined;
+			}
+			entry.soundDelay = 0;
+		}
+		entry.wasLifting = isLifting;
 
 		// Only touch CFrame when the delta is visible.
 		if (math.abs(curY - desiredY) > 0.05) {
@@ -149,6 +193,9 @@ export function cleanupWallGateEffect(): void {
 	heartbeatConn?.Disconnect();
 	addedConn?.Disconnect();
 	removedConn?.Disconnect();
+	for (const [, entry] of ownedWalls) {
+		if (entry.sound) entry.sound.Destroy();
+	}
 	ownedWalls.clear();
 	elapsed = 0;
 }

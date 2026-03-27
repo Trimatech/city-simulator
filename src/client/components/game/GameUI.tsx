@@ -12,6 +12,7 @@ import { Compass } from "./compass";
 import { MilestoneWidget } from "./milestones/MilestoneWidget";
 import { MinimapArea } from "./minimap/MinimapArea";
 import { PowerupsPanel } from "./right/powerups/PowerupsPanel";
+import { TutorialHints } from "./TutorialHints";
 
 interface GameUIProps {
 	visible: boolean;
@@ -45,6 +46,7 @@ export function GameUI({ visible }: GameUIProps) {
 				</VStack>
 			</SlideIn>
 			<Compass />
+			<TutorialHints />
 		</Transition>
 	);
 }
