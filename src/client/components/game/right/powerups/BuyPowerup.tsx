@@ -2,7 +2,7 @@ import { useKeyPress, useMotion } from "@rbxts/pretty-react-hooks";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "@rbxts/react";
 import { GuiService, UserInputService } from "@rbxts/services";
 import { ReactiveButton2 } from "@rbxts-ui/components";
-import { HStack, Transition } from "@rbxts-ui/layout";
+import { HStack, Transition, VStack } from "@rbxts-ui/layout";
 import { Frame, Image, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { springs } from "client/constants/springs";
@@ -24,6 +24,7 @@ interface Props {
 	readonly price: number;
 	readonly disabledReason?: string;
 	readonly panelVisible?: boolean;
+	readonly expandDirection?: "left" | "top";
 	readonly children?: React.Element;
 }
 
@@ -37,6 +38,7 @@ const POWERUP_ICONS: Record<PowerupId, string> = {
 
 const CIRCLE_SIZE = 5;
 const TOOLTIP_WIDTH = 7;
+const TOOLTIP_HEIGHT = 5;
 const OUTER_STROKE_THICKNESS = 0.2;
 const INNER_STROKE_THICKNESS = 0.15;
 
@@ -76,13 +78,25 @@ function getOrbFountainConfig(price: number): ParticleEmitter2DConfig {
 	};
 }
 
-export function BuyPowerup({ id, label, enabled, order, price, disabledReason, panelVisible, children }: Props) {
+export function BuyPowerup({
+	id,
+	label,
+	enabled,
+	order,
+	price,
+	disabledReason,
+	panelVisible,
+	expandDirection = "left",
+	children,
+}: Props) {
 	const rem = useRem();
 	const style = POWERUP_BUTTON_STYLES[id];
+	const isTop = expandDirection === "top";
 
 	const HEIGHT = rem(CIRCLE_SIZE);
 	const WIDTH = HEIGHT;
 	const FULL_WIDTH = WIDTH + rem(TOOLTIP_WIDTH);
+	const FULL_HEIGHT = HEIGHT + rem(TOOLTIP_HEIGHT);
 
 	const [showTooltip, setShowTooltip] = useState(false);
 	const [introLocked, setIntroLocked] = useState(false);
@@ -142,8 +156,12 @@ export function BuyPowerup({ id, label, enabled, order, price, disabledReason, p
 	}, [panelVisible]);
 
 	useEffect(() => {
-		sizeMotion.spring(new UDim2(0, showTooltip ? FULL_WIDTH : WIDTH, 0, HEIGHT), springs.gentle);
-	}, [showTooltip, WIDTH, FULL_WIDTH, HEIGHT]);
+		if (isTop) {
+			sizeMotion.spring(new UDim2(0, WIDTH, 0, showTooltip ? FULL_HEIGHT : HEIGHT), springs.gentle);
+		} else {
+			sizeMotion.spring(new UDim2(0, showTooltip ? FULL_WIDTH : WIDTH, 0, HEIGHT), springs.gentle);
+		}
+	}, [showTooltip, WIDTH, FULL_WIDTH, HEIGHT, FULL_HEIGHT, isTop]);
 
 	const fullRound = new UDim(1, 0);
 
@@ -187,7 +205,7 @@ export function BuyPowerup({ id, label, enabled, order, price, disabledReason, p
 		<Frame
 			ref={wrapperRef}
 			backgroundTransparency={1}
-			size={new UDim2(0, 0, 0, HEIGHT)}
+			size={new UDim2(0, WIDTH, 0, HEIGHT)}
 			layoutOrder={order}
 			clipsDescendants={false}
 		>
@@ -224,7 +242,8 @@ export function BuyPowerup({ id, label, enabled, order, price, disabledReason, p
 				enabled={enabled}
 				backgroundTransparency={1}
 				size={size}
-				anchorPoint={new Vector2(1, 0)}
+				position={isTop ? new UDim2(0, 0, 1, 0) : new UDim2(1, 0, 0, 0)}
+				anchorPoint={isTop ? new Vector2(0, 1) : new Vector2(1, 0)}
 				onMouseEnter={() => setShowTooltip(true)}
 				onMouseLeave={() => !introLocked && setShowTooltip(false)}
 			>
@@ -301,90 +320,182 @@ export function BuyPowerup({ id, label, enabled, order, price, disabledReason, p
 
 						{/* Content */}
 
-						<HStack clipsDescendants={false} horizontalAlignment={Enum.HorizontalAlignment.Right}>
-							{showTooltip ? (
-								<HStack spacing={rem(1)} size={new UDim2(0, rem(TOOLTIP_WIDTH), 0, HEIGHT)} wraps>
-									<uipadding PaddingLeft={new UDim(0, rem(1))} />
-									<Text
-										text={label}
-										size={new UDim2(1, 0, 0, rem(1))}
-										font={fonts.fredokaOne.regular}
-										textColor={palette.white}
-										textSize={rem(1.5)}
-										textXAlignment="Center"
-										textYAlignment="Center"
-										richText
-									>
-										<uistroke Thickness={rem(0.15)} Color={palette.white}>
-											<uigradient Color={textStrokeGradient} Rotation={90} />
-										</uistroke>
-									</Text>
-									<HStack
-										size={new UDim2(1, 0, 0, rem(1))}
-										backgroundTransparency={1}
-										spacing={rem(0.25)}
-										verticalAlignment={Enum.VerticalAlignment.Center}
+						{isTop ? (
+							<VStack clipsDescendants={false} verticalAlignment={Enum.VerticalAlignment.Bottom}>
+								{showTooltip ? (
+									<VStack
+										spacing={rem(0.5)}
+										size={new UDim2(0, WIDTH, 0, rem(TOOLTIP_HEIGHT))}
 										horizontalAlignment={Enum.HorizontalAlignment.Center}
+										verticalAlignment={Enum.VerticalAlignment.Center}
 									>
-										<Image
-											image={assets.ui.icons.orb}
-											size={new UDim2(0, rem(1), 0, rem(1))}
-											position={new UDim2(0, 0, 0.5, 0)}
-											anchorPoint={new Vector2(0, 0.5)}
-											scaleType="Fit"
-											zIndex={1}
-										/>
+										<uipadding PaddingTop={new UDim(0, rem(1))} />
 										<Text
-											size={new UDim2(0, 0, 1, 0)}
-											automaticSize={Enum.AutomaticSize.X}
+											text={label}
+											size={new UDim2(1, 0, 0, rem(1))}
 											font={fonts.fredokaOne.regular}
-											textColor={enabled ? palette.green : palette.red1}
-											text={tostring(price)}
-											textSize={rem(1)}
+											textColor={palette.white}
+											textSize={rem(1.5)}
 											textXAlignment="Center"
 											textYAlignment="Center"
+											richText
 										>
 											<uistroke Thickness={rem(0.15)} Color={palette.white}>
 												<uigradient Color={textStrokeGradient} Rotation={90} />
 											</uistroke>
 										</Text>
-									</HStack>
-								</HStack>
-							) : undefined}
+										<HStack
+											size={new UDim2(1, 0, 0, rem(1))}
+											backgroundTransparency={1}
+											spacing={rem(0.25)}
+											verticalAlignment={Enum.VerticalAlignment.Center}
+											horizontalAlignment={Enum.HorizontalAlignment.Center}
+										>
+											<Image
+												image={assets.ui.icons.orb}
+												size={new UDim2(0, rem(1), 0, rem(1))}
+												position={new UDim2(0, 0, 0.5, 0)}
+												anchorPoint={new Vector2(0, 0.5)}
+												scaleType="Fit"
+												zIndex={1}
+											/>
+											<Text
+												size={new UDim2(0, 0, 1, 0)}
+												automaticSize={Enum.AutomaticSize.X}
+												font={fonts.fredokaOne.regular}
+												textColor={enabled ? palette.green : palette.red1}
+												text={tostring(price)}
+												textSize={rem(1)}
+												textXAlignment="Center"
+												textYAlignment="Center"
+											>
+												<uistroke Thickness={rem(0.15)} Color={palette.white}>
+													<uigradient Color={textStrokeGradient} Rotation={90} />
+												</uistroke>
+											</Text>
+										</HStack>
+									</VStack>
+								) : undefined}
 
-							{/* Circle with icon */}
-							<Frame size={new UDim2(0, rem(CIRCLE_SIZE), 0, rem(CIRCLE_SIZE))}>
-								<Image
-									image={POWERUP_ICONS[id]}
-									anchorPoint={new Vector2(0.5, 0.5)}
-									size={new UDim2(0, iconSize, 0, iconSize)}
-									position={new UDim2(0.5, 0, 0.5, 0)}
-									backgroundTransparency={1}
-								/>
-
-								{disabledReason !== undefined && (
-									<Text
-										text={disabledReason}
-										size={new UDim2(1, 0, 0, rem(1))}
-										position={new UDim2(0.5, 0, 1, rem(0.25))}
-										anchorPoint={new Vector2(0.5, 0)}
-										font={fonts.fredokaOne.regular}
-										textColor={palette.red1}
-										textSize={rem(0.7)}
-										textXAlignment="Center"
-										textYAlignment="Center"
+								{/* Circle with icon */}
+								<Frame size={new UDim2(0, rem(CIRCLE_SIZE), 0, rem(CIRCLE_SIZE))}>
+									<Image
+										image={POWERUP_ICONS[id]}
+										anchorPoint={new Vector2(0.5, 0.5)}
+										size={new UDim2(0, iconSize, 0, iconSize)}
+										position={new UDim2(0.5, 0, 0.5, 0)}
 										backgroundTransparency={1}
-										zIndex={10}
-									>
-										<uistroke Thickness={rem(0.1)} Color={palette.white}>
-											<uigradient Color={textStrokeGradient} Rotation={90} />
-										</uistroke>
-									</Text>
-								)}
+									/>
 
-								{children}
-							</Frame>
-						</HStack>
+									{disabledReason !== undefined && (
+										<Text
+											text={disabledReason}
+											size={new UDim2(1, 0, 0, rem(1))}
+											position={new UDim2(0.5, 0, 1, rem(0.25))}
+											anchorPoint={new Vector2(0.5, 0)}
+											font={fonts.fredokaOne.regular}
+											textColor={palette.red1}
+											textSize={rem(0.7)}
+											textXAlignment="Center"
+											textYAlignment="Center"
+											backgroundTransparency={1}
+											zIndex={10}
+										>
+											<uistroke Thickness={rem(0.1)} Color={palette.white}>
+												<uigradient Color={textStrokeGradient} Rotation={90} />
+											</uistroke>
+										</Text>
+									)}
+
+									{children}
+								</Frame>
+							</VStack>
+						) : (
+							<HStack clipsDescendants={false} horizontalAlignment={Enum.HorizontalAlignment.Right}>
+								{showTooltip ? (
+									<HStack spacing={rem(1)} size={new UDim2(0, rem(TOOLTIP_WIDTH), 0, HEIGHT)} wraps>
+										<uipadding PaddingLeft={new UDim(0, rem(1))} />
+										<Text
+											text={label}
+											size={new UDim2(1, 0, 0, rem(1))}
+											font={fonts.fredokaOne.regular}
+											textColor={palette.white}
+											textSize={rem(1.5)}
+											textXAlignment="Center"
+											textYAlignment="Center"
+											richText
+										>
+											<uistroke Thickness={rem(0.15)} Color={palette.white}>
+												<uigradient Color={textStrokeGradient} Rotation={90} />
+											</uistroke>
+										</Text>
+										<HStack
+											size={new UDim2(1, 0, 0, rem(1))}
+											backgroundTransparency={1}
+											spacing={rem(0.25)}
+											verticalAlignment={Enum.VerticalAlignment.Center}
+											horizontalAlignment={Enum.HorizontalAlignment.Center}
+										>
+											<Image
+												image={assets.ui.icons.orb}
+												size={new UDim2(0, rem(1), 0, rem(1))}
+												position={new UDim2(0, 0, 0.5, 0)}
+												anchorPoint={new Vector2(0, 0.5)}
+												scaleType="Fit"
+												zIndex={1}
+											/>
+											<Text
+												size={new UDim2(0, 0, 1, 0)}
+												automaticSize={Enum.AutomaticSize.X}
+												font={fonts.fredokaOne.regular}
+												textColor={enabled ? palette.green : palette.red1}
+												text={tostring(price)}
+												textSize={rem(1)}
+												textXAlignment="Center"
+												textYAlignment="Center"
+											>
+												<uistroke Thickness={rem(0.15)} Color={palette.white}>
+													<uigradient Color={textStrokeGradient} Rotation={90} />
+												</uistroke>
+											</Text>
+										</HStack>
+									</HStack>
+								) : undefined}
+
+								{/* Circle with icon */}
+								<Frame size={new UDim2(0, rem(CIRCLE_SIZE), 0, rem(CIRCLE_SIZE))}>
+									<Image
+										image={POWERUP_ICONS[id]}
+										anchorPoint={new Vector2(0.5, 0.5)}
+										size={new UDim2(0, iconSize, 0, iconSize)}
+										position={new UDim2(0.5, 0, 0.5, 0)}
+										backgroundTransparency={1}
+									/>
+
+									{disabledReason !== undefined && (
+										<Text
+											text={disabledReason}
+											size={new UDim2(1, 0, 0, rem(1))}
+											position={new UDim2(0.5, 0, 1, rem(0.25))}
+											anchorPoint={new Vector2(0.5, 0)}
+											font={fonts.fredokaOne.regular}
+											textColor={palette.red1}
+											textSize={rem(0.7)}
+											textXAlignment="Center"
+											textYAlignment="Center"
+											backgroundTransparency={1}
+											zIndex={10}
+										>
+											<uistroke Thickness={rem(0.1)} Color={palette.white}>
+												<uigradient Color={textStrokeGradient} Rotation={90} />
+											</uistroke>
+										</Text>
+									)}
+
+									{children}
+								</Frame>
+							</HStack>
+						)}
 					</Frame>
 				</Transition>
 			</ReactiveButton2>

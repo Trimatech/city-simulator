@@ -63,9 +63,10 @@ interface Props {
 	readonly anchorPoint?: Vector2;
 	readonly position?: UDim2;
 	readonly heightRem?: number;
+	readonly orientation?: "vertical" | "horizontal";
 }
 
-export function OrbsMeter({ position = new UDim2(0, 0, 0, 0) }: Props) {
+export function OrbsMeter({ position = new UDim2(0, 0, 0, 0), orientation = "vertical" }: Props) {
 	const rem = useRem();
 	const orbs = useSelector(selectLocalOrbs) ?? 0;
 
@@ -99,15 +100,18 @@ export function OrbsMeter({ position = new UDim2(0, 0, 0, 0) }: Props) {
 	}, [orbs]);
 
 	const progress = math.clamp(math.max(orbs, 15) / SOLDIER_MAX_ORBS, 0, 1);
+	const isHorizontal = orientation === "horizontal";
 
-	const [fillPosition, fillMotion] = useMotion(progress, (value) => new UDim2(0.5, 0, 1 - value, 0));
+	const [fillPosition, fillMotion] = useMotion(progress, (value) =>
+		isHorizontal ? new UDim2(value - 1, 0, 0.5, 0) : new UDim2(0.5, 0, 1 - value, 0),
+	);
 
 	useEffect(() => {
 		fillMotion.spring(progress, springs.gentle);
 	}, [progress]);
 
 	const width = rem(1.5);
-	const meterSize = new UDim2(0, width, 1, 0);
+	const meterSize = isHorizontal ? new UDim2(1, 0, 0, width) : new UDim2(0, width, 1, 0);
 	const thickness = rem(0.2);
 
 	const fillStrokeGradient = useMemo(() => {
@@ -149,19 +153,19 @@ export function OrbsMeter({ position = new UDim2(0, 0, 0, 0) }: Props) {
 				<canvasgroup
 					key="OrbsFill"
 					Position={fillPosition}
-					Size={new UDim2(1, -thickness * 3, 1, 0)}
-					AnchorPoint={new Vector2(0.5, 0)}
+					Size={isHorizontal ? new UDim2(1, 0, 1, -thickness * 3) : new UDim2(1, -thickness * 3, 1, 0)}
+					AnchorPoint={isHorizontal ? new Vector2(0, 0.5) : new Vector2(0.5, 0)}
 					BackgroundColor3={palette.white}
 					ZIndex={2}
 				>
-					<uigradient Color={fillBgGradient} Rotation={90} />
+					<uigradient Color={fillBgGradient} Rotation={isHorizontal ? 0 : 90} />
 					<uicorner CornerRadius={cornerRadiusFull} />
 					<uistroke
 						Color={Color3.fromHex("#ffffff")}
 						Thickness={rem(0.2)}
 						BorderStrokePosition={Enum.BorderStrokePosition.Outer}
 					>
-						<uigradient Color={fillStrokeGradient} Rotation={-90} />
+						<uigradient Color={fillStrokeGradient} Rotation={isHorizontal ? 180 : -90} />
 					</uistroke>
 				</canvasgroup>
 
@@ -187,7 +191,6 @@ export function OrbsMeter({ position = new UDim2(0, 0, 0, 0) }: Props) {
 			{/* Price markers */}
 			{(Object.entries(POWERUP_PRICES) as Array<[PowerupId, number]>).map(([id, price]) => {
 				const fraction = math.clamp(price / SOLDIER_MAX_ORBS, 0, 1);
-				const y = 1 - fraction;
 				const markerGradient = new ColorSequence([
 					new ColorSequenceKeypoint(0, OUTER_BORDER_COLOR),
 					new ColorSequenceKeypoint(0.5, POWERUP_COLORS[id]),
@@ -198,12 +201,12 @@ export function OrbsMeter({ position = new UDim2(0, 0, 0, 0) }: Props) {
 						key={`price-${price}`}
 						backgroundColor={palette.white}
 						backgroundTransparency={0}
-						size={new UDim2(1, 0, 0, rem(0.2))}
+						size={isHorizontal ? new UDim2(0, rem(0.2), 1, 0) : new UDim2(1, 0, 0, rem(0.2))}
 						anchorPoint={new Vector2(0.5, 0.5)}
-						position={new UDim2(0.5, 0, y, 0)}
+						position={isHorizontal ? new UDim2(fraction, 0, 0.5, 0) : new UDim2(0.5, 0, 1 - fraction, 0)}
 						zIndex={3}
 					>
-						<uigradient Color={markerGradient} Rotation={0} />
+						<uigradient Color={markerGradient} Rotation={isHorizontal ? 90 : 0} />
 					</Frame>
 				);
 			})}
@@ -212,9 +215,9 @@ export function OrbsMeter({ position = new UDim2(0, 0, 0, 0) }: Props) {
 			{wasteBursts.map((burst) => (
 				<Frame
 					key={`waste-burst-${burst.key}`}
-					position={new UDim2(0.5, 0, 0, 0)}
-					size={new UDim2(0, width, 0, 1)}
-					anchorPoint={new Vector2(0.5, 1)}
+					position={isHorizontal ? new UDim2(1, 0, 0.5, 0) : new UDim2(0.5, 0, 0, 0)}
+					size={isHorizontal ? new UDim2(0, 1, 0, width) : new UDim2(0, width, 0, 1)}
+					anchorPoint={isHorizontal ? new Vector2(0, 0.5) : new Vector2(0.5, 1)}
 					backgroundTransparency={1}
 					zIndex={5}
 				>

@@ -14,26 +14,30 @@ interface Props {
 	readonly visible: boolean;
 }
 
-export function PowerupsPanel({ visible }: Props) {
+export function PowerupsPanelHorizontal({ visible }: Props) {
 	const rem = useRem();
-	const height = rem(36);
-	const width = rem(8);
-	const size = new UDim2(0, width, 0, height);
 	const orbs = useSelector(selectLocalOrbs) ?? 0;
 	const localSoldier = useSelector(selectLocalSoldier);
 	const isInsideTerritory = localSoldier?.isInside ?? false;
 
+	const width = rem(28);
+	const height = rem(7);
+	const size = new UDim2(0, width, 0, height);
+
 	return (
-		<HStack name="powerups-panel" size={size} verticalAlignment={Enum.VerticalAlignment.Bottom} spacing={rem(1)}>
-			<VStack
+		<VStack
+			name="powerups-panel-horizontal"
+			size={size}
+			spacing={rem(1)}
+			horizontalAlignment={Enum.HorizontalAlignment.Center}
+		>
+			<HStack
 				name="buy-powerups-stack"
-				size={new UDim2(0, 0, 1, 0)}
+				size={new UDim2(1, 0, 0, rem(5))}
 				spacing={rem(1)}
 				verticalAlignment={Enum.VerticalAlignment.Center}
-				horizontalAlignment={Enum.HorizontalAlignment.Right}
+				horizontalAlignment={Enum.HorizontalAlignment.Center}
 			>
-				<uipadding PaddingTop={new UDim(0, rem(0.5))} />
-
 				<BuyPowerup
 					id="nuclearExplosion"
 					label="Nuclear"
@@ -41,6 +45,7 @@ export function PowerupsPanel({ visible }: Props) {
 					order={1}
 					price={POWERUP_PRICES.nuclearExplosion}
 					panelVisible={visible}
+					expandDirection="top"
 				/>
 
 				<BuyPowerup
@@ -50,6 +55,7 @@ export function PowerupsPanel({ visible }: Props) {
 					order={2}
 					price={POWERUP_PRICES.laserBeam}
 					panelVisible={visible}
+					expandDirection="top"
 				/>
 
 				<BuyPowerup
@@ -59,6 +65,7 @@ export function PowerupsPanel({ visible }: Props) {
 					order={3}
 					price={POWERUP_PRICES.shield}
 					panelVisible={visible}
+					expandDirection="top"
 				>
 					<ShieldTimer />
 				</BuyPowerup>
@@ -71,6 +78,7 @@ export function PowerupsPanel({ visible }: Props) {
 					price={POWERUP_PRICES.tower}
 					disabledReason={!isInsideTerritory ? "Can't place" : undefined}
 					panelVisible={visible}
+					expandDirection="top"
 				/>
 
 				<BuyPowerup
@@ -80,11 +88,12 @@ export function PowerupsPanel({ visible }: Props) {
 					order={5}
 					price={POWERUP_PRICES.turbo}
 					panelVisible={visible}
+					expandDirection="top"
 				>
 					<TurboTimer />
 				</BuyPowerup>
-			</VStack>
-			<OrbsMeter anchorPoint={new Vector2(0, 0)} position={new UDim2(0, 0, 0, 0)} />
-		</HStack>
+			</HStack>
+			<OrbsMeter orientation="horizontal" />
+		</VStack>
 	);
 }
