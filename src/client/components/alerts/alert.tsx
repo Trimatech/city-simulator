@@ -9,7 +9,6 @@ import { springs } from "client/constants/springs";
 import { useMotion } from "client/hooks";
 import { Alert, selectAlertIndex } from "client/store/alert";
 import { useRem } from "client/ui/rem/useRem";
-import { Shadow } from "client/ui/shadow";
 import assets from "shared/assets";
 import { playSound } from "shared/assetsFolder";
 import { palette } from "shared/constants/palette";
@@ -96,14 +95,6 @@ export function Alert({ alert, index }: AlertProps) {
 			size={size}
 			position={position}
 		>
-			<Shadow
-				shadowColor={hasGradient ? palette.white : lerpBinding(transition, alert.color, style.background)}
-				shadowTransparency={lerpBinding(transition, 1, 0.3)}
-				shadowSize={rem(3)}
-			>
-				{hasGradient && <uigradient Color={new ColorSequence(style.background, style.backgroundSecondary)} />}
-			</Shadow>
-
 			<Frame
 				backgroundColor={hasGradient ? palette.white : style.background}
 				backgroundTransparency={lerpBinding(transition, 1, 0.3)}
@@ -122,8 +113,10 @@ export function Alert({ alert, index }: AlertProps) {
 
 			<Outline
 				innerColor={hasGradient ? palette.white : alert.color}
-				innerTransparency={lerpBinding(transition, 1, 0.85)}
-				outerTransparency={lerpBinding(transition, 1, 0.75)}
+				innerThickness={rem(0.2)}
+				innerTransparency={lerpBinding(transition, 1, 0.75)}
+				outerTransparency={lerpBinding(transition, 1, 0.55)}
+				outerThickness={rem(0.2)}
 				cornerRadius={new UDim(0, rem(1))}
 			>
 				{hasGradient && <uigradient Color={new ColorSequence(alert.color, alert.colorSecondary)} />}

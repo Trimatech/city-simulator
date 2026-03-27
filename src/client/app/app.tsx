@@ -70,9 +70,16 @@ export function App() {
 				<OverlayScreens />
 			</screengui>
 
-			<Layer>
+			<screengui
+				key="alerts"
+				ResetOnSpawn={false}
+				IgnoreGuiInset
+				ZIndexBehavior="Sibling"
+				DisplayOrder={10}
+				ScreenInsets={Enum.ScreenInsets.None}
+			>
 				<Alerts />
-			</Layer>
+			</screengui>
 		</ErrorHandler>
 	);
 }
