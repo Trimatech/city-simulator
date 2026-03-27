@@ -96,6 +96,7 @@ export function BuyPowerup({ id, label, enabled, order, price, disabledReason, p
 
 	const [size, sizeMotion] = useMotion(new UDim2(0, WIDTH, 0, HEIGHT));
 	const [scale, scaleMotion] = useMotion(1);
+	const [disabledOverlay, disabledOverlayMotion] = useMotion(enabled ? 1 : 0.75);
 	const [shimmerGradientOffset, shimmerMotion] = useMotionMapped(-150, (v: number) => new Vector2(v, 0));
 
 	// Bounce + shimmer when powerup becomes affordable
@@ -117,13 +118,9 @@ export function BuyPowerup({ id, label, enabled, order, price, disabledReason, p
 		prevEnabled.current = enabled;
 	}, [enabled]);
 
-	// useEffect(() => {
-	// 	transparencyMotion.spring(enabled ? 0 : 0.4, springs.slow);
-	// }, [enabled]);
-
-	// useEffect(() => {
-	// 	bgColorMotion.spring(enabled ? style.backgroundColor : palette.overlay2, springs.slow);
-	// }, [enabled, style.backgroundColor]);
+	useEffect(() => {
+		disabledOverlayMotion.spring(enabled ? 1 : 0.55, springs.slow);
+	}, [enabled]);
 
 	// When panel slides in, delay 1s, stagger tooltips in and out per button
 	useEffect(() => {
@@ -292,6 +289,15 @@ export function BuyPowerup({ id, label, enabled, order, price, disabledReason, p
 								/>
 							</Frame>
 						)}
+
+						{/* Disabled darkening overlay */}
+						<Frame
+							size={new UDim2(1, 0, 1, 0)}
+							backgroundColor={palette.black}
+							backgroundTransparency={disabledOverlay}
+							cornerRadius={fullRound}
+							zIndex={6}
+						/>
 
 						{/* Content */}
 
