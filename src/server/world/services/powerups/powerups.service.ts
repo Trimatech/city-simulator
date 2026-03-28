@@ -3,20 +3,21 @@ import { Workspace } from "@rbxts/services";
 import { setTimeout } from "@rbxts/set-timeout";
 import { tryGrantBadge } from "server/rewards/services/badges";
 import { store } from "server/store";
-import {
-	ensureForceFieldOnPlayerName,
-	onPlayerDeath,
-	removeForceFieldFromPlayerName,
-} from "server/world/world.utils";
+import { updateAreaGridForPolygon } from "server/world/services/soldiers/soldier-grid";
+import { setOwnerTracerShieldMaterial } from "server/world/services/soldiers/wall-part-manager";
+import { ensureForceFieldOnPlayerName, onPlayerDeath, removeForceFieldFromPlayerName } from "server/world/world.utils";
 import { Badge } from "shared/assetsFolder";
-import { SOLDIER_MIN_AREA } from "shared/constants/core";
+import { SOLDIER_MIN_AREA, TRAIL_POLYGON_CONNECTION_THRESHOLD } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
 import type { PowerupId } from "shared/constants/powerups";
 import { POWERUP_DURATIONS, POWERUP_EXPLOSIONS, POWERUP_PRICES } from "shared/constants/powerups";
 import {
 	calculatePolygonOperation,
+	distanceToClosestPoint,
+	isPointInPolygon,
 	pointsToVectors,
 	selectLargestRegionByArea,
+	vector2ToPoint,
 	vectorsToPoints,
 } from "shared/polybool/poly-utils";
 import { pointsToPolygon } from "shared/polybool/polybool";
@@ -25,8 +26,6 @@ import { remotes } from "shared/remotes";
 import { selectSoldierById, selectSoldierOrbs, selectSoldiersById } from "shared/store/soldiers";
 import { selectTowersById } from "shared/store/towers/tower-selectors";
 
-import { updateAreaGridForPolygon } from "server/world/services/soldiers/soldier-grid";
-import { setOwnerTracerShieldMaterial } from "server/world/services/soldiers/wall-part-manager";
 import { placeTower } from "./placeTower";
 
 /** Tracks the turbo generation per soldier so stacked activations extend duration correctly. */
@@ -321,9 +320,25 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-
 						dropTracers: false,
 					});
 
-					// Kill soldier if area becomes too small
-					if (updatedArea < SOLDIER_MIN_AREA) {
-						print(`[DEBUG] Soldier ${soldierId} area too small, killing`);
+					// Kill soldier if area becomes too small or they lost connection to the kept region
+					let playerStillConnected: boolean;
+					if (soldier.isInside) {
+						playerStillConnected = isPointInPolygon(vector2ToPoint(soldier.position), bestRegion);
+					} else {
+						// Player is outside trailing — check if trail start is close to the kept polygon
+						const trailStart = soldier.tracers.size() > 0 ? soldier.tracers[0] : undefined;
+						if (trailStart === undefined) {
+							playerStillConnected = true;
+						} else {
+							playerStillConnected =
+								distanceToClosestPoint(vector2ToPoint(trailStart), bestRegion) <=
+								TRAIL_POLYGON_CONNECTION_THRESHOLD;
+						}
+					}
+					if (updatedArea < SOLDIER_MIN_AREA || !playerStillConnected) {
+						print(
+							`[DEBUG] Soldier ${soldierId} killed: area=${updatedArea}, connected=${playerStillConnected}`,
+						);
 						onPlayerDeath(soldierId as string, "system", killSource);
 					}
 				} else {

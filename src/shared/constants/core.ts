@@ -8,6 +8,7 @@ export const WORLD_BOUNDS = 960;
 export const WORLD_TICK = 1 / 20;
 
 export const SOLDIER_MIN_AREA = 100;
+export const TRAIL_POLYGON_CONNECTION_THRESHOLD = 2;
 
 export const SOLDIER_SPEED = 32;
 export const SOLDIER_BOOST_MULTIPLIER = 1.8;

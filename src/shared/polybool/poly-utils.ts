@@ -594,6 +594,29 @@ export function aabbIntersects(a: BoundingBox, b: BoundingBox): boolean {
 	return true;
 }
 
+export function distanceToClosestPoint(target: Point, points: Point[]): number {
+	let minDist = math.huge;
+	for (const pt of points) {
+		const dx = pt[0] - target[0];
+		const dy = pt[1] - target[1];
+		const dist = math.sqrt(dx * dx + dy * dy);
+		if (dist < minDist) minDist = dist;
+	}
+	return minDist;
+}
+
+// Select the region that contains the given point, falling back to the largest region by area
+export function selectRegionContainingPoint(regions: Array<Array<PointShape>>, point: Point): Point[] | undefined {
+	for (const region of regions) {
+		const pts = region.filter((p) => p.size() === 2) as unknown as Point[];
+		if (pts.size() <= 2) continue;
+		if (isPointInPolygon(point, pts)) {
+			return pts;
+		}
+	}
+	return selectLargestRegionByArea(regions);
+}
+
 // Select the largest region by polygon area from a PolyBool result
 export function selectLargestRegionByArea(regions: Array<Array<PointShape>>): Point[] | undefined {
 	let bestRegion: Point[] | undefined = undefined;
