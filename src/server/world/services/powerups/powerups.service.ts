@@ -3,21 +3,21 @@ import { Workspace } from "@rbxts/services";
 import { setTimeout } from "@rbxts/set-timeout";
 import { tryGrantBadge } from "server/rewards/services/badges";
 import { store } from "server/store";
-import {
-	ensureForceFieldOnPlayerName,
-	getPlayerHumanoidByName,
-	onPlayerDeath,
-	removeForceFieldFromPlayerName,
-} from "server/world/world.utils";
+import { updateAreaGridForPolygon } from "server/world/services/soldiers/soldier-grid";
+import { setOwnerTracerShieldMaterial } from "server/world/services/soldiers/wall-part-manager";
+import { ensureForceFieldOnPlayerName, onPlayerDeath, removeForceFieldFromPlayerName } from "server/world/world.utils";
 import { Badge } from "shared/assetsFolder";
-import { SOLDIER_MIN_AREA, SOLDIER_SPEED } from "shared/constants/core";
+import { SOLDIER_MIN_AREA, TRAIL_POLYGON_CONNECTION_THRESHOLD } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
 import type { PowerupId } from "shared/constants/powerups";
-import { POWERUP_DURATIONS, POWERUP_EXPLOSIONS, POWERUP_PRICES, POWERUP_TURBO_SPEED } from "shared/constants/powerups";
+import { POWERUP_DURATIONS, POWERUP_EXPLOSIONS, POWERUP_PRICES } from "shared/constants/powerups";
 import {
 	calculatePolygonOperation,
+	distanceToClosestPoint,
+	isPointInPolygon,
 	pointsToVectors,
 	selectLargestRegionByArea,
+	vector2ToPoint,
 	vectorsToPoints,
 } from "shared/polybool/poly-utils";
 import { pointsToPolygon } from "shared/polybool/polybool";
@@ -26,7 +26,6 @@ import { remotes } from "shared/remotes";
 import { selectSoldierById, selectSoldierOrbs, selectSoldiersById } from "shared/store/soldiers";
 import { selectTowersById } from "shared/store/towers/tower-selectors";
 
-import { setOwnerTracerShieldMaterial } from "server/world/services/soldiers/wall-part-manager";
 import { placeTower } from "./placeTower";
 
 /** Tracks the turbo generation per soldier so stacked activations extend duration correctly. */
@@ -256,7 +255,7 @@ function createCircularExplosionPolygonFromPart(center: Vector2, radius: number)
 	return points;
 }
 
-function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-beam" | "nuclear") {
+function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-beam" | "nuclear", killerId: string) {
 	const soldiers = store.getState(selectSoldiersById);
 	const damagePolygonObj = pointsToPolygon(vectorsToPoints(damagePolygon));
 
@@ -315,11 +314,32 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-
 
 					store.setSoldierPolygon(soldierId as string, updatedPolygon, updatedArea);
 					store.setSoldierPolygonAreaSize(soldierId as string, updatedArea);
+					updateAreaGridForPolygon({
+						ownerId: soldierId as string,
+						polygon: updatedPolygon,
+						dropTracers: false,
+					});
 
-					// Kill soldier if area becomes too small
-					if (updatedArea < SOLDIER_MIN_AREA) {
-						print(`[DEBUG] Soldier ${soldierId} area too small, killing`);
-						onPlayerDeath(soldierId as string, "system", killSource);
+					// Kill soldier if area becomes too small or they lost connection to the kept region
+					let playerStillConnected: boolean;
+					if (soldier.isInside) {
+						playerStillConnected = isPointInPolygon(vector2ToPoint(soldier.position), bestRegion);
+					} else {
+						// Player is outside trailing — check if trail start is close to the kept polygon
+						const trailStart = soldier.tracers.size() > 0 ? soldier.tracers[0] : undefined;
+						if (trailStart === undefined) {
+							playerStillConnected = true;
+						} else {
+							playerStillConnected =
+								distanceToClosestPoint(vector2ToPoint(trailStart), bestRegion) <=
+								TRAIL_POLYGON_CONNECTION_THRESHOLD;
+						}
+					}
+					if (updatedArea < SOLDIER_MIN_AREA || !playerStillConnected) {
+						print(
+							`[DEBUG] Soldier ${soldierId} killed: area=${updatedArea}, connected=${playerStillConnected}`,
+						);
+						onPlayerDeath(soldierId as string, killerId, killSource);
 					}
 				} else {
 					print(
@@ -327,7 +347,12 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-
 					);
 					store.setSoldierPolygon(soldierId as string, [], 0, true);
 					store.setSoldierPolygonAreaSize(soldierId as string, 0);
-					onPlayerDeath(soldierId as string, "system", killSource);
+					updateAreaGridForPolygon({
+						ownerId: soldierId as string,
+						polygon: [] as Vector2[],
+						dropTracers: false,
+					});
+					onPlayerDeath(soldierId as string, killerId, killSource);
 				}
 			} else {
 				print(
@@ -336,7 +361,12 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-
 				// Fully covered by damage area: clear polygon immediately, then kill
 				store.setSoldierPolygon(soldierId as string, [], 0, true);
 				store.setSoldierPolygonAreaSize(soldierId as string, 0);
-				onPlayerDeath(soldierId as string, "system", killSource);
+				updateAreaGridForPolygon({
+					ownerId: soldierId as string,
+					polygon: [] as Vector2[],
+					dropTracers: false,
+				});
+				onPlayerDeath(soldierId as string, killerId, killSource);
 			}
 		} else {
 			print(`[DEBUG] No intersection found for soldier ${soldierId}, skipping difference operation`);
@@ -388,21 +418,15 @@ export function executePowerupForSoldier(
 				POWERUP_DURATIONS.turbo;
 			store.setSoldierTurboActiveUntil(soldierId, activeUntil);
 
-			const humanoid = getPlayerHumanoidByName(soldierId);
-			if (humanoid) {
-				humanoid.WalkSpeed = POWERUP_TURBO_SPEED;
-				const prevCancel = turboCancelMap.get(soldierId);
-				if (prevCancel) prevCancel();
-				const cancel = setTimeout(() => {
-					if (turboGeneration.get(soldierId) !== gen) return;
-					turboGeneration.delete(soldierId);
-					turboCancelMap.delete(soldierId);
-					store.setSoldierTurboActiveUntil(soldierId, 0);
-					const again = getPlayerHumanoidByName(soldierId);
-					if (again) again.WalkSpeed = SOLDIER_SPEED;
-				}, activeUntil - now);
-				turboCancelMap.set(soldierId, cancel);
-			}
+			const prevCancel = turboCancelMap.get(soldierId);
+			if (prevCancel) prevCancel();
+			const cancel = setTimeout(() => {
+				if (turboGeneration.get(soldierId) !== gen) return;
+				turboGeneration.delete(soldierId);
+				turboCancelMap.delete(soldierId);
+				store.setSoldierTurboActiveUntil(soldierId, 0);
+			}, activeUntil - now);
+			turboCancelMap.set(soldierId, cancel);
 			break;
 		}
 		case "shield": {
@@ -469,7 +493,7 @@ export function executePowerupForSoldier(
 			}
 
 			const damagePolygon = createExplosionPolygonFromPart(bombCenter2D, cfg.length, cfg.width, cframe);
-			cutDamageAreaFromSoldiers(damagePolygon, "laser-beam");
+			cutDamageAreaFromSoldiers(damagePolygon, "laser-beam", soldierId);
 			remotes.client.powerupCarpet.fireAll(cframe, size);
 			break;
 		}
@@ -492,7 +516,7 @@ export function executePowerupForSoldier(
 				}
 			}
 			const damagePolygon = createCircularExplosionPolygonFromPart(center, cfg.radius);
-			cutDamageAreaFromSoldiers(damagePolygon, "nuclear");
+			cutDamageAreaFromSoldiers(damagePolygon, "nuclear", soldierId);
 			const nuclearCFrame = new CFrame(center.X, 0.5, center.Y);
 			const size = new Vector3(5, cfg.radius * 2, cfg.radius * 2);
 			remotes.client.powerupNuclear.fireAll(nuclearCFrame, size);

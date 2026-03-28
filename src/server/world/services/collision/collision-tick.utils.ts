@@ -1,7 +1,8 @@
+import { store } from "server/store";
 import { getSoldier } from "server/world/world.utils";
 import { WORLD_BOUNDS } from "shared/constants/core";
 import { isPointInPolygon, vector2ToPoint, vectorsToPoints } from "shared/polybool/poly-utils";
-import { SOLDIER_RADIUS_BASE, SoldierEntity } from "shared/store/soldiers";
+import { SOLDIER_RADIUS_BASE, SoldierEntity, selectSoldiers } from "shared/store/soldiers";
 
 import { soldierGrid } from "../soldiers";
 
@@ -106,6 +107,29 @@ export function isInsidePolygon(soldier: SoldierEntity) {
 	// Only do expensive point-in-polygon check if inside bounding box
 	const polygon = vectorsToPoints(soldier.polygon as Vector2[]);
 	return isPointInPolygon(vector2ToPoint(soldier.position), polygon);
+}
+
+export function isInsideAnyEnemyPolygon(soldier: SoldierEntity): boolean {
+	const soldiers = store.getState(selectSoldiers);
+	const pos = soldier.position;
+
+	for (const other of soldiers) {
+		if (other.id === soldier.id || other.dead) continue;
+
+		const bounds = other.polygonBounds;
+		if (bounds) {
+			if (pos.X < bounds.min.X || pos.X > bounds.max.X || pos.Y < bounds.min.Y || pos.Y > bounds.max.Y) {
+				continue;
+			}
+		}
+
+		const polygon = vectorsToPoints(other.polygon as Vector2[]);
+		if (isPointInPolygon(vector2ToPoint(pos), polygon)) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 export function isCollidingWithWall(soldier: SoldierEntity) {

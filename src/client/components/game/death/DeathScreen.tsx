@@ -216,54 +216,82 @@ export function DeathScreen({ activeDeadline, persistent, onDismiss }: DeathScre
 						automaticSize={Enum.AutomaticSize.Y}
 						horizontalAlignment={Enum.HorizontalAlignment.Center}
 					>
-						<MainButton
-							fitContent
-							enabled={!isReviving}
-							onClick={() => {
-								setIsReviving(true);
-								remotes.soldier.continue.fire();
-							}}
-						>
-							<ShopButtonTextWithIcon
-								text={isReviving ? "Loading..." : "Revive"}
-								icon={assets.ui.shards_icon_color}
-							/>
-						</MainButton>
+						{crystals > 0 ? (
+							<>
+								<MainButton
+									fitContent
+									enabled={!isReviving}
+									onClick={() => {
+										setIsReviving(true);
+										remotes.soldier.continue.fire();
+									}}
+								>
+									<ShopButtonTextWithIcon
+										text={isReviving ? "Loading..." : "Revive"}
+										icon={assets.ui.shards_icon_color}
+									/>
+								</MainButton>
 
-						<HStack
-							horizontalAlignment={Enum.HorizontalAlignment.Center}
-							automaticSize={Enum.AutomaticSize.XY}
-							layoutOrder={1}
-						>
-							<uiflexitem FlexMode={Enum.UIFlexMode.Shrink} />
-							<Text
-								text="You have "
-								font={fonts.fredokaOne.regular}
-								textColor={palette.white}
-								textSize={rem(1)}
-								automaticSize={Enum.AutomaticSize.XY}
-							/>
-							<Text
-								font={fonts.fredokaOne.regular}
-								text={`${crystals}`}
-								automaticSize={Enum.AutomaticSize.XY}
-								textColor={palette.sapphire}
-								textSize={rem(1.2)}
-							/>
-							<Image
-								image={assets.ui.shards_icon}
-								size={new UDim2(0, rem(1), 0, rem(1.2))}
-								imageColor3={palette.sapphire}
-								scaleType="Crop"
-							/>
-							<Text
-								text="left"
-								font={fonts.fredokaOne.regular}
-								textColor={palette.white}
-								textSize={rem(1)}
-								automaticSize={Enum.AutomaticSize.XY}
-							/>
-						</HStack>
+								<HStack
+									horizontalAlignment={Enum.HorizontalAlignment.Center}
+									automaticSize={Enum.AutomaticSize.XY}
+									layoutOrder={1}
+								>
+									<uiflexitem FlexMode={Enum.UIFlexMode.Shrink} />
+									<Text
+										text="You have "
+										font={fonts.fredokaOne.regular}
+										textColor={palette.white}
+										textSize={rem(1)}
+										automaticSize={Enum.AutomaticSize.XY}
+									/>
+									<Text
+										font={fonts.fredokaOne.regular}
+										text={`${crystals}`}
+										automaticSize={Enum.AutomaticSize.XY}
+										textColor={palette.sapphire}
+										textSize={rem(1.2)}
+									/>
+									<Image
+										image={assets.ui.shards_icon}
+										size={new UDim2(0, rem(1), 0, rem(1.2))}
+										imageColor3={palette.sapphire}
+										scaleType="Crop"
+									/>
+									<Text
+										text="left"
+										font={fonts.fredokaOne.regular}
+										textColor={palette.white}
+										textSize={rem(1)}
+										automaticSize={Enum.AutomaticSize.XY}
+									/>
+								</HStack>
+							</>
+						) : (
+							<>
+								<Text
+									text="No Crystals for Revive"
+									font={fonts.fredokaOne.regular}
+									textColor={palette.white}
+									textSize={rem(2)}
+									automaticSize={Enum.AutomaticSize.XY}
+								>
+									<uistroke Color={palette.black} Transparency={0} Thickness={rem(0.15)} />
+								</Text>
+								<Text
+									text="Earn more from Daily Rewards, the Shop, or by exploring the game world!"
+									font={fonts.mplus.bold}
+									textColor={palette.white}
+									textSize={rem(1)}
+									automaticSize={Enum.AutomaticSize.XY}
+									textXAlignment="Center"
+									textWrapped={true}
+									size={new UDim2(1, 0, 0, 0)}
+									layoutOrder={1}
+									textTransparency={0.2}
+								/>
+							</>
+						)}
 					</VStack>
 				</VStack>
 			</Frame>

@@ -4,12 +4,14 @@ import { onPlayerDeath } from "server/world/world.utils";
 import { selectSoldierRanking, selectSoldiers, selectSoldiersById } from "shared/store/soldiers";
 
 import { soldierIsInsideChanged } from "../soldiers/soldier-events";
+import { applySoldierTerritorySpeed } from "../soldiers/soldiers.utils";
 import { getLastIsInsideCheckPosition, invalidateIsInsideCache, setLastIsInsideCheckPosition } from "./collision-cache";
 import {
 	isCollidingWithEnemyTracers,
 	isCollidingWithOwnTracers,
 	isCollidingWithSoldier,
 	isCollidingWithWall,
+	isInsideAnyEnemyPolygon,
 	isInsidePolygon,
 } from "./collision-tick.utils";
 
@@ -59,6 +61,9 @@ export function onCollisionTick() {
 				store.setSoldierIsInside(soldier.id, isInside);
 				soldierIsInsideChanged.Fire(soldier.id, isInside);
 			}
+
+			const inEnemyTerritory = !isInside && isInsideAnyEnemyPolygon(soldier);
+			applySoldierTerritorySpeed(soldier.id, isInside, inEnemyTerritory);
 		}
 
 		debug.profileend();
