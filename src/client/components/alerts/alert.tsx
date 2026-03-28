@@ -97,7 +97,7 @@ export function Alert({ alert, index }: AlertProps) {
 		>
 			<Frame
 				backgroundColor={hasGradient ? palette.white : style.background}
-				backgroundTransparency={lerpBinding(transition, 1, 0.3)}
+				backgroundTransparency={lerpBinding(transition, 1, 0.1)}
 				cornerRadius={new UDim(0, rem(1))}
 				size={new UDim2(1, 0, 1, 0)}
 			>
