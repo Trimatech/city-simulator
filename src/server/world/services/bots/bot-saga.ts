@@ -8,16 +8,18 @@ import {
 } from "server/world/world.utils";
 import { DEATH_CHOICE_TIMEOUT_SEC, SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
 import { getRandomBotSkin } from "shared/constants/skins";
-import { selectAliveSoldiersById, selectSoldiersById } from "shared/store/soldiers";
+import { selectAliveSoldiersById, selectSoldierById, selectSoldiersById } from "shared/store/soldiers";
 import { createScheduler } from "shared/utils/scheduler";
 
 import { getRandomBotName } from "../bots/bot-names";
 import { applyInitialPolygonClaim } from "../soldiers/soldier-claims";
 import { soldierIsInsideChanged } from "../soldiers/soldier-events";
 import { registerSoldierInput } from "../soldiers/soldier-tick";
-import { setSoldierSpeed } from "../soldiers/soldiers.utils";
+import { isInsideAnyEnemyPolygon } from "../collision/collision-tick.utils";
+import { getEffectiveSpeed, setSoldierSpeed } from "../soldiers/soldiers.utils";
+import { evaluateStrategy, BotStrategy } from "./bot-brain";
+import { closestPointOnPolygonEdge, getPolygonCentroid } from "./bot-cuts";
 import { botStopped } from "./bot-events";
-import { buildBotMovementPath } from "./buildBotMovementPath";
 
 const MAX_BOTS_PER_PLAYER = 2;
 const BOT_RESPAWN_DELAY = 2; // seconds to wait before replacing a dead bot
@@ -33,6 +35,7 @@ interface BotController {
 	speed: number;
 	wasInside: boolean;
 	lastDirection: Vector2;
+	strategy: BotStrategy;
 }
 
 const botControllers = new Map<string, BotController>();
@@ -136,8 +139,32 @@ async function spawnBot(botId: string, forceTargetPlayerId?: string) {
 		speed: SOLDIER_SPEED,
 		wasInside: true,
 		lastDirection: new Vector2(0, 1),
+		strategy: "circularCut",
 	});
 	botStopped.Fire(botId);
+}
+
+/**
+ * If the bot is outside its polygon and the polygon edge has grown closer than
+ * the next waypoint, reroute the bot to head home early. Prevents territory spikes
+ * when the polygon expands toward the bot mid-path.
+ */
+function tryMidPathShortcut(bot: BotController, soldier: { polygon: ReadonlyArray<Vector2> }) {
+	const polygon = soldier.polygon as Vector2[];
+	const nextTarget = bot.waypoints[bot.waypointIndex];
+	const distToNext = nextTarget.sub(bot.position).Magnitude;
+	const { point: nearestEdge } = closestPointOnPolygonEdge(polygon, bot.position);
+	const distToPolygon = nearestEdge.sub(bot.position).Magnitude;
+
+	if (distToPolygon > 15 && distToPolygon < distToNext * 0.6) {
+		const centroid = getPolygonCentroid(polygon);
+		const inward = centroid.sub(nearestEdge);
+		const inwardLen = inward.Magnitude;
+		const insidePoint = inwardLen > 1 ? nearestEdge.add(inward.div(inwardLen).mul(8)) : nearestEdge;
+
+		bot.waypoints = [bot.position, nearestEdge, insidePoint];
+		bot.waypointIndex = 1;
+	}
 }
 
 function advanceBot(bot: BotController) {
@@ -146,17 +173,25 @@ function advanceBot(bot: BotController) {
 		return;
 	}
 
+	const soldier = store.getState(selectSoldierById(bot.id));
+	if (soldier) {
+		const inEnemyTerritory = !soldier.isInside && isInsideAnyEnemyPolygon(soldier);
+		bot.speed = getEffectiveSpeed(bot.id, soldier.isInside, inEnemyTerritory);
+	}
+
+	if (soldier && !soldier.isInside && soldier.polygon.size() >= 3) {
+		tryMidPathShortcut(bot, soldier);
+	}
+
 	const target = bot.waypoints[bot.waypointIndex];
 	const delta = target.sub(bot.position);
 	const distance = delta.Magnitude;
 	const step = bot.speed * WORLD_TICK;
 
 	if (distance <= step) {
-		// arrive at waypoint
 		bot.position = target;
 		bot.waypointIndex = (bot.waypointIndex + 1) % bot.waypoints.size();
 
-		// if we completed the rectangle, signal stop to plan new path next tick
 		if (bot.waypointIndex === 0) {
 			bot.waypoints = [];
 			botStopped.Fire(bot.id);
@@ -169,10 +204,7 @@ function advanceBot(bot: BotController) {
 		}
 	}
 
-	// drive soldier movement + model
 	registerSoldierInput(bot.id, bot.position);
-
-	// Client handles model movement, rotation, and animation for bots via tweens
 }
 
 function cleanupBot(botId: string) {
@@ -277,24 +309,26 @@ export function setBotFaceToward(botId: string, targetPosition: Vector2) {
 
 export async function initBotService() {
 	// React to inside-state changes
+	// When bot re-enters its polygon, do NOT stop immediately — let it continue
+	// along its current path so it penetrates deeper inside. This ensures the
+	// tracer-based area claim is committed before the bot starts a new outward path.
 	soldierIsInsideChanged.Connect((id, isInside) => {
 		const controller = botControllers.get(id);
 		if (!controller) return;
-		if (isInside && controller.waypoints.size() > 0) {
-			controller.waypoints = [];
-			controller.waypointIndex = 0;
-			botStopped.Fire(id);
-		}
 		controller.wasInside = isInside;
+		// No immediate waypoint clearing — let advanceBot finish the current path naturally.
+		// The claim triggers via selectIsInsideBySoldierById observer in soldiers-saga.
 	});
 
 	botStopped.Connect((id) => {
 		if (botPausedIds.has(id)) return;
 		const bot = botControllers.get(id);
 		if (bot && bot.waypoints.size() === 0) {
-			const waypoints = buildBotMovementPath(bot.id, bot.position);
-			bot.waypoints = waypoints;
-			bot.waypointIndex = 1;
+			const result = evaluateStrategy(bot.id, bot.position);
+			bot.strategy = result.strategy;
+			bot.waypoints = result.waypoints;
+			bot.waypointIndex = result.waypoints.size() > 1 ? 1 : 0;
+			print(`[Bot ${bot.id}] strategy: ${result.strategy} (${result.waypoints.size()} waypoints)`);
 		}
 	});
 
@@ -306,17 +340,6 @@ export async function initBotService() {
 			const aliveBotIds = getAliveBotIds();
 			const aliveBots = aliveBotIds.size();
 			const aliveNonBots = getAliveNonBotCount();
-
-			// No humans alive -> remove all bots (conserve resources)
-			// if (aliveNonBots === 0) {
-			// 	if (aliveBots > 0) {
-			// 		for (const id of aliveBotIds) {
-			// 			print(`Killing bot ${id} because no players are alive`);
-			// 			killSoldier(id);
-			// 		}
-			// 	}
-			// 	return;
-			// }
 
 			// Target bots = MAX_BOTS_PER_PLAYER * number of real players
 			const targetBots = aliveNonBots * MAX_BOTS_PER_PLAYER;
@@ -333,15 +356,6 @@ export async function initBotService() {
 				return;
 			}
 
-			// if (aliveBots > targetBots) {
-			// 	const extras = aliveBots - targetBots;
-			// 	const start = aliveBotIds.size() - extras;
-			// 	const toKill = aliveBotIds.move(start, aliveBotIds.size() - 1, 0, [] as string[]);
-			// 	for (const id of toKill) {
-			// 		print(`Killing bot ${id} because there are too many bots`);
-			// 		killSoldier(id);
-			// 	}
-			// }
 		},
 	);
 
