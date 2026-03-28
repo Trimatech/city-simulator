@@ -10,7 +10,7 @@ import {
 	removeForceFieldFromPlayerName,
 } from "server/world/world.utils";
 import { Badge } from "shared/assetsFolder";
-import { SOLDIER_MIN_AREA, SOLDIER_SPEED } from "shared/constants/core";
+import { SOLDIER_MIN_AREA } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
 import type { PowerupId } from "shared/constants/powerups";
 import { POWERUP_DURATIONS, POWERUP_EXPLOSIONS, POWERUP_PRICES, POWERUP_TURBO_SPEED } from "shared/constants/powerups";
@@ -26,6 +26,7 @@ import { remotes } from "shared/remotes";
 import { selectSoldierById, selectSoldierOrbs, selectSoldiersById } from "shared/store/soldiers";
 import { selectTowersById } from "shared/store/towers/tower-selectors";
 
+import { updateAreaGridForPolygon } from "server/world/services/soldiers/soldier-grid";
 import { setOwnerTracerShieldMaterial } from "server/world/services/soldiers/wall-part-manager";
 import { placeTower } from "./placeTower";
 
@@ -315,6 +316,11 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-
 
 					store.setSoldierPolygon(soldierId as string, updatedPolygon, updatedArea);
 					store.setSoldierPolygonAreaSize(soldierId as string, updatedArea);
+					updateAreaGridForPolygon({
+						ownerId: soldierId as string,
+						polygon: updatedPolygon,
+						dropTracers: false,
+					});
 
 					// Kill soldier if area becomes too small
 					if (updatedArea < SOLDIER_MIN_AREA) {
@@ -327,6 +333,11 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-
 					);
 					store.setSoldierPolygon(soldierId as string, [], 0, true);
 					store.setSoldierPolygonAreaSize(soldierId as string, 0);
+					updateAreaGridForPolygon({
+						ownerId: soldierId as string,
+						polygon: [] as Vector2[],
+						dropTracers: false,
+					});
 					onPlayerDeath(soldierId as string, "system", killSource);
 				}
 			} else {
@@ -336,6 +347,11 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-
 				// Fully covered by damage area: clear polygon immediately, then kill
 				store.setSoldierPolygon(soldierId as string, [], 0, true);
 				store.setSoldierPolygonAreaSize(soldierId as string, 0);
+				updateAreaGridForPolygon({
+					ownerId: soldierId as string,
+					polygon: [] as Vector2[],
+					dropTracers: false,
+				});
 				onPlayerDeath(soldierId as string, "system", killSource);
 			}
 		} else {
