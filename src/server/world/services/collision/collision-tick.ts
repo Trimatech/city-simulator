@@ -1,6 +1,6 @@
 import { Workspace } from "@rbxts/services";
 import { store } from "server/store";
-import { killSoldier, onPlayerDeath } from "server/world/world.utils";
+import { onPlayerDeath } from "server/world/world.utils";
 import { selectSoldierRanking, selectSoldiers, selectSoldiersById } from "shared/store/soldiers";
 
 import { getLastIsInsideCheckPosition, setLastIsInsideCheckPosition, invalidateIsInsideCache } from "./collision-cache";
@@ -31,8 +31,7 @@ export function onCollisionTick() {
 		// This is to prevent hackers claiming areas outside of the map
 		if (isCollidingWithWall(soldier)) {
 			print(`Collided with wall, kill soldier ${soldier.id}`);
-			killSoldier(soldier.id);
-			store.playerKilledSoldier(soldier.id, soldier.id, "wall");
+			onPlayerDeath(soldier.id, soldier.id, "wall");
 			continue;
 		}
 
@@ -77,15 +76,13 @@ export function onCollisionTick() {
 					continue;
 				}
 				print(`Collided with enemy tracer while owner shielded, kill collider ${soldier.id}`);
-				onPlayerDeath(soldier.id);
-				store.playerKilledSoldier(enemyId, soldier.id, "shield-reflect");
+				onPlayerDeath(soldier.id, enemyId, "shield-reflect");
 				store.incrementSoldierEliminations(enemyId);
 				// Shield blocked a death for the tracer owner
 				store.setMilestoneShieldBlockedDeath(enemyId);
 			} else {
 				print(`Collided with enemy tracer, kill owner ${enemyId}`);
-				onPlayerDeath(enemyId);
-				store.playerKilledSoldier(soldier.id, enemyId, "tracer");
+				onPlayerDeath(enemyId, soldier.id, "tracer");
 				store.incrementSoldierEliminations(soldier.id);
 				// Check if the killed player was rank 1 (Giant Slayer)
 				const enemyRank = store.getState(selectSoldierRanking(enemyId));
@@ -101,8 +98,7 @@ export function onCollisionTick() {
 
 		if (!soldier.isInside && isCollidingWithOwnTracers(soldier)) {
 			print(`Collided with own tracer, kill soldier ${soldier.id}`);
-			onPlayerDeath(soldier.id);
-			store.playerKilledSoldier(soldier.id, soldier.id, "self-tracer");
+			onPlayerDeath(soldier.id, soldier.id, "self-tracer");
 			continue;
 		}
 		debug.profileend();
@@ -117,8 +113,7 @@ export function onCollisionTick() {
 				continue;
 			}
 			print(`Collided with enemy, kill soldier ${enemy.id}`);
-			onPlayerDeath(enemy.id);
-			store.playerKilledSoldier(soldier.id, enemy.id, "head-on");
+			onPlayerDeath(enemy.id, soldier.id, "head-on");
 			store.incrementSoldierEliminations(soldier.id);
 			// Head-on collision badge
 			store.setMilestoneHeadOnVictory(soldier.id);

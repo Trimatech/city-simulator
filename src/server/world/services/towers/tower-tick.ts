@@ -1,7 +1,7 @@
 import Object from "@rbxts/object-utils";
 import { Workspace } from "@rbxts/services";
 import { store } from "server/store";
-import { killSoldier } from "server/world/world.utils";
+import { onPlayerDeath } from "server/world/world.utils";
 import { isPointInPolygon, vector2ToPoint, vectorsToPoints } from "shared/polybool/poly-utils";
 import { selectSoldiersById } from "shared/store/soldiers";
 import { selectTowersById } from "shared/store/towers/tower-selectors";
@@ -62,8 +62,7 @@ export function onTowerTick(dt: number) {
 
 		const updated = store.getState(selectSoldiersById)[nearestId];
 		if (updated && updated.health <= 0 && !updated.dead) {
-			killSoldier(nearestId);
-			store.playerKilledSoldier(tower.ownerId, nearestId, "tower");
+			onPlayerDeath(nearestId, tower.ownerId, "tower");
 		}
 	}
 }

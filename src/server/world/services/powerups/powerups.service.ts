@@ -6,7 +6,7 @@ import { store } from "server/store";
 import {
 	ensureForceFieldOnPlayerName,
 	getPlayerHumanoidByName,
-	killSoldier,
+	onPlayerDeath,
 	removeForceFieldFromPlayerName,
 } from "server/world/world.utils";
 import { Badge } from "shared/assetsFolder";
@@ -318,8 +318,7 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-
 					// Kill soldier if area becomes too small
 					if (updatedArea < SOLDIER_MIN_AREA) {
 						print(`[DEBUG] Soldier ${soldierId} area too small, killing`);
-						killSoldier(soldierId as string);
-						store.playerKilledSoldier("system", soldierId as string, killSource);
+						onPlayerDeath(soldierId as string, "system", killSource);
 					}
 				} else {
 					print(
@@ -327,8 +326,7 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-
 					);
 					store.setSoldierPolygon(soldierId as string, [], 0, true);
 					store.setSoldierPolygonAreaSize(soldierId as string, 0);
-					killSoldier(soldierId as string);
-					store.playerKilledSoldier("system", soldierId as string, killSource);
+					onPlayerDeath(soldierId as string, "system", killSource);
 				}
 			} else {
 				print(
@@ -337,8 +335,7 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-
 				// Fully covered by damage area: clear polygon immediately, then kill
 				store.setSoldierPolygon(soldierId as string, [], 0, true);
 				store.setSoldierPolygonAreaSize(soldierId as string, 0);
-				killSoldier(soldierId as string);
-				store.playerKilledSoldier("system", soldierId as string, killSource);
+				onPlayerDeath(soldierId as string, "system", killSource);
 			}
 		} else {
 			print(`[DEBUG] No intersection found for soldier ${soldierId}, skipping difference operation`);
@@ -452,8 +449,7 @@ export function executePowerupForSoldier(
 				if (s.shieldActiveUntil > Workspace.GetServerTimeNow()) continue;
 				if (isPointInRectangleWithCFrame(s.position, cframe, size)) {
 					laserHitEnemy = true;
-					killSoldier(s.id);
-					store.playerKilledSoldier(soldierId, s.id, "laser-beam");
+					onPlayerDeath(s.id, soldierId, "laser-beam");
 				}
 			}
 			if (laserHitEnemy) {
@@ -481,8 +477,7 @@ export function executePowerupForSoldier(
 				if (!s || s.dead || s.id === soldierId) continue;
 				if (s.shieldActiveUntil > Workspace.GetServerTimeNow()) continue;
 				if (magnitude2D(s.position, center) <= cfg.radius) {
-					killSoldier(s.id);
-					store.playerKilledSoldier(soldierId, s.id, "nuclear");
+					onPlayerDeath(s.id, soldierId, "nuclear");
 				}
 			}
 			const towers = store.getState(selectTowersById);

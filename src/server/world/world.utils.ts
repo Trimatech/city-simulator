@@ -16,6 +16,7 @@ import { calculatePolygonOperation, isPointInPolygon, vector2ToPoint } from "sha
 import { pointsToPolygon } from "shared/polybool/polybool";
 import { createPolygonAroundPosition, getPolygonCentroid } from "shared/polygon-extra.utils";
 import { selectAliveSoldiersById } from "shared/store/soldiers";
+import { KillSource } from "shared/store/milestones/milestone-utils";
 import { RAGDOLL_DURATION_SEC } from "shared/utils/ragdoll";
 
 import { getBotHumanoid } from "./services/bots/bot-registry";
@@ -110,7 +111,7 @@ export function cancelDeathChoiceTimer(soldierId: string) {
 	}
 }
 
-export function onPlayerDeath(soldierId: string) {
+export function onPlayerDeath(soldierId: string, killerId?: string, killSource?: KillSource) {
 	const existing = getSoldier(soldierId);
 	if (!existing || existing.dead) {
 		warn(`[Death] onPlayerDeath(${soldierId}) skipped: exists=${existing !== undefined}, dead=${existing?.dead}`);
@@ -119,6 +120,10 @@ export function onPlayerDeath(soldierId: string) {
 
 	warn(`[Death] onPlayerDeath(${soldierId}) — setting dead=true`);
 	store.setSoldierIsDead(soldierId);
+
+	if (killerId !== undefined) {
+		store.playerKilledSoldier(killerId, soldierId, killSource);
+	}
 
 	const player = Players.FindFirstChild(soldierId);
 	if (player?.IsA("Player") && player.Character) {
