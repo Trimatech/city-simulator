@@ -63,6 +63,7 @@ export function onTowerTick(dt: number) {
 		const updated = store.getState(selectSoldiersById)[nearestId];
 		if (updated && updated.health <= 0 && !updated.dead) {
 			killSoldier(nearestId);
+			store.playerKilledSoldier(tower.ownerId, nearestId, "tower");
 		}
 	}
 }

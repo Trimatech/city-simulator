@@ -1,7 +1,7 @@
 import { WORLD_BOUNDS } from "shared/constants/core";
 import { reverseArray } from "shared/polybool/poly-utils";
 
-export type KillSource = "tracer" | "head-on" | "trailing-wall-cut" | "shield-reflect" | "laser-beam" | "nuclear" | "self-tracer" | "wall" | "system";
+export type KillSource = "tracer" | "head-on" | "trailing-wall-cut" | "shield-reflect" | "laser-beam" | "nuclear" | "self-tracer" | "wall" | "system" | "tower";
 
 export const KILL_SOURCE_LABELS: Record<KillSource, string> = {
 	"tracer": "trail",
@@ -12,6 +12,7 @@ export const KILL_SOURCE_LABELS: Record<KillSource, string> = {
 	"nuclear": "nuclear explosion",
 	"self-tracer": "own trail",
 	"wall": "wall collision",
+	"tower": "tower",
 	"system": "explosion",
 };
 

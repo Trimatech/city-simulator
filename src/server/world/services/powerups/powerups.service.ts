@@ -453,6 +453,7 @@ export function executePowerupForSoldier(
 				if (isPointInRectangleWithCFrame(s.position, cframe, size)) {
 					laserHitEnemy = true;
 					killSoldier(s.id);
+					store.playerKilledSoldier(soldierId, s.id, "laser-beam");
 				}
 			}
 			if (laserHitEnemy) {
@@ -481,6 +482,7 @@ export function executePowerupForSoldier(
 				if (s.shieldActiveUntil > Workspace.GetServerTimeNow()) continue;
 				if (magnitude2D(s.position, center) <= cfg.radius) {
 					killSoldier(s.id);
+					store.playerKilledSoldier(soldierId, s.id, "nuclear");
 				}
 			}
 			const towers = store.getState(selectTowersById);
