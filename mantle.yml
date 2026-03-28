@@ -194,11 +194,11 @@ target:
                 enabled: true
 
             # --- Survival ---
-            # survival-second-chance:
-            #     name: 💖 Second Chance
-            #     description: Back from the brink! Revive for the first time.
-            #     icon: assets/badges/survival/second-chance.png
-            #     enabled: true
+            survival-second-chance:
+                name: 💖 Second Chance
+                description: Back from the brink! Revive for the first time.
+                icon: assets/badges/survival/second-chance.png
+                enabled: true
             # survival-cats-nine-lives:
             #     name: 🐱 Cat's Nine Lives
             #     description: You just won't stay down! Revive 9 times in one session.
@@ -258,16 +258,16 @@ target:
                 description: Demolition expert! Destroy an enemy tower with a powerup.
                 icon: assets/badges/special-rare/tower-destroyer.png
                 enabled: true
-            # special-claimed:
-            #     name: 🤠 Claimed
-            #     description: Bounty collected! Earn your first kill bounty.
-            #     icon: assets/badges/special-rare/claimed.png
-            #     enabled: true
-            # special-bot-buster:
-            #     name: 🤖 Bot Buster
-            #     description: Exterminator! Eliminate 10 bots in a single life.
-            #     icon: assets/badges/special-rare/bot-buster.png
-            #     enabled: true
+            special-claimed:
+                name: 🤠 Claimed
+                description: Bounty collected! Earn your first kill bounty.
+                icon: assets/badges/special-rare/claimed.png
+                enabled: true
+            special-bot-buster:
+                name: 🤖 Bot Buster
+                description: Exterminator! Eliminate 10 bots in a single life.
+                icon: assets/badges/special-rare/bot-buster.png
+                enabled: true
         products:
             money-100:
                 price: 10
