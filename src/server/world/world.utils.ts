@@ -150,7 +150,9 @@ export function onPlayerDeath(soldierId: string) {
 	clearOwnerTracersFromGrid(soldierId);
 
 	const deadline = Workspace.GetServerTimeNow() + DEATH_CHOICE_TIMEOUT_SEC;
-	warn(`[Death] onPlayerDeath(${soldierId}) — setting deathChoiceDeadline=${deadline} (serverTime=${Workspace.GetServerTimeNow()})`);
+	warn(
+		`[Death] onPlayerDeath(${soldierId}) — setting deathChoiceDeadline=${deadline} (serverTime=${Workspace.GetServerTimeNow()})`,
+	);
 	store.setSoldierDeathChoiceDeadline(soldierId, deadline);
 
 	// Verify the state was actually set
@@ -160,7 +162,9 @@ export function onPlayerDeath(soldierId: string) {
 	const timer = task.delay(DEATH_CHOICE_TIMEOUT_SEC, () => {
 		deathChoiceTimers.delete(soldierId);
 		const soldier = getSoldier(soldierId);
-		warn(`[Death] deathChoiceTimer expired for ${soldierId} — exists=${soldier !== undefined}, dead=${soldier?.dead}`);
+		warn(
+			`[Death] deathChoiceTimer expired for ${soldierId} — exists=${soldier !== undefined}, dead=${soldier?.dead}`,
+		);
 		if (soldier?.dead) {
 			killSoldier(soldierId);
 		}
