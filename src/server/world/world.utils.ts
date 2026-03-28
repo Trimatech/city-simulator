@@ -128,6 +128,8 @@ export function onPlayerDeath(soldierId: string) {
 			ragdoll.AddRandomVelocity(50);
 		}
 		task.delay(RAGDOLL_DURATION_SEC, () => {
+			ragdoll?.Destroy();
+			task.wait(0.1);
 			if (character.Parent) {
 				character.Destroy();
 			}

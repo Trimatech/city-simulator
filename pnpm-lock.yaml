@@ -36,8 +36,8 @@ importers:
         specifier: 1.0.0-ts.0
         version: 1.0.0-ts.0
       '@rbxts/falldown':
-        specifier: ^1.0.3
-        version: 1.0.3
+        specifier: ^1.2.0
+        version: 1.2.0
       '@rbxts/flipper':
         specifier: ^2.0.1
         version: 2.0.1
@@ -279,8 +279,8 @@ packages:
   '@rbxts/compiler-types@3.0.0-types.0':
     resolution: {integrity: sha512-VGOHJPoL7+56NTatMGqQj3K7xWuzEV+aP4QD5vZiHu+bcff3kiTmtoadaF6NkJrmwfFAvbsd4Dg764ZjWNceag==}
 
-  '@rbxts/falldown@1.0.3':
-    resolution: {integrity: sha512-bzD4YfTUFjIJp4FYLYxQDCiz0eM4jq6PU+ps4vuWc6mhG7J7GEjS+WPUmh3LSaHs8/7V++y7J0t5s4mv8zEQgg==}
+  '@rbxts/falldown@1.2.0':
+    resolution: {integrity: sha512-a8pKg6hAApW5aazAV3h+GH9UPnhM6/KBiPnxHeQbLHQhdBBJDAXptdN7Sj9KIrx16Nh0PYrJXfjKjMb/CoB5Gg==}
 
   '@rbxts/flipper@2.0.1':
     resolution: {integrity: sha512-kxb5AZizP05XSmo3waS/QkcfNMD5b6HX4gGwyHOyBow260R5MIT4L/ZUPLvleXXyb9b67X4NVmHoac1tPXOLNA==}
@@ -1255,7 +1255,7 @@ snapshots:
 
   '@rbxts/compiler-types@3.0.0-types.0': {}
 
-  '@rbxts/falldown@1.0.3':
+  '@rbxts/falldown@1.2.0':
     dependencies:
       '@rbxts/beacon': 2.1.1
       '@rbxts/services': 1.6.0
