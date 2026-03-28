@@ -1,15 +1,13 @@
-import React, { useEffect, useRef, useState } from "@rbxts/react";
+import React, { useEffect, useState } from "@rbxts/react";
 import { useSelector, useSelectorCreator } from "@rbxts/react-reflex";
 import { RunService } from "@rbxts/services";
 import { USER_NAME } from "shared/constants/core";
-import { selectPlayerLifetimeGamesPlayed, selectPlayerLifetimeOrbsSpent } from "shared/store/saves/save-selectors";
-import { selectLocalPolygonAreaSize, selectLocalSoldier } from "shared/store/soldiers";
+import { selectPlayerLifetimeArea, selectPlayerLifetimeOrbsSpent } from "shared/store/saves/save-selectors";
+import { selectLocalSoldier } from "shared/store/soldiers";
 
 import { TutorialHint } from "./TutorialHint";
 
 const SHOW_DELAY_SECONDS = 2;
-const ORBS_HINT_DELAY_SECONDS = 3;
-const MAX_GAMES_FOR_HINTS = 3;
 
 const HINT_AREA =
 	"Welcome to Zone Wars! Here's how to expand your territory:\n\n• Go <b>outside</b> your zone.\n• A <b>wall</b> trails behind you as you move.\n• <b>Loop back</b> to claim the enclosed land.\n• <font color='#ffea00'>Danger:</font> enemies can hit your <b>trail wall</b> before you return";
@@ -19,91 +17,63 @@ const HINT_ORBS =
 type HintId = "area" | "orbs";
 
 export function TutorialHints() {
-	const gamesPlayed = useSelectorCreator(selectPlayerLifetimeGamesPlayed, USER_NAME);
+	const lifetimeArea = useSelectorCreator(selectPlayerLifetimeArea, USER_NAME);
 	const orbsSpent = useSelectorCreator(selectPlayerLifetimeOrbsSpent, USER_NAME);
 	const soldier = useSelector(selectLocalSoldier);
 
-	const areaSize = useSelector(selectLocalPolygonAreaSize);
-
-	const dismissedRef = useRef<Record<HintId, boolean>>({ area: false, orbs: false });
-	const initialAreaRef = useRef<number | undefined>(undefined);
 	const [activeHint, setActiveHint] = useState<HintId | undefined>(undefined);
+	const [dismissed, setDismissed] = useState(false);
 
-	const isNewPlayer = gamesPlayed < MAX_GAMES_FOR_HINTS;
 	const isAlive = soldier !== undefined && !soldier.dead;
-	const hasOrbs = (soldier?.orbs ?? 0) > 0;
-	const hasSpentOrbs = orbsSpent > 0;
+	const needsAreaHint = lifetimeArea === 0;
+	const needsOrbsHint = orbsSpent === 0;
 
-	// Capture the initial area size when the soldier spawns
+	// Show the appropriate hint after a delay when spawned
 	useEffect(() => {
-		if (isAlive && areaSize !== undefined && initialAreaRef.current === undefined) {
-			initialAreaRef.current = areaSize;
-		}
-		if (!isAlive) {
-			initialAreaRef.current = undefined;
-		}
-	}, [isAlive, areaSize]);
+		if (!isAlive || dismissed) return;
 
-	const hasClaimedLand =
-		areaSize !== undefined && initialAreaRef.current !== undefined && areaSize > initialAreaRef.current;
-
-	// Tip 1: Show area claiming hint after a delay when spawned
-	useEffect(() => {
-		if (!isNewPlayer || !isAlive || dismissedRef.current.area) return;
+		const hint: HintId | undefined = needsAreaHint ? "area" : needsOrbsHint ? "orbs" : undefined;
+		if (hint === undefined) return;
 
 		const startTime = os.clock();
 		const connection = RunService.Heartbeat.Connect(() => {
 			if (os.clock() - startTime >= SHOW_DELAY_SECONDS) {
-				setActiveHint("area");
+				setActiveHint(hint);
 				connection.Disconnect();
 			}
 		});
 
 		return () => connection.Disconnect();
-	}, [isNewPlayer, isAlive]);
+	}, [isAlive, needsAreaHint, needsOrbsHint, dismissed]);
 
-	// Auto-dismiss area hint when player claims new land
+	// Auto-dismiss area hint when player claims land
 	useEffect(() => {
-		if (activeHint === "area" && hasClaimedLand) {
-			dismissedRef.current.area = true;
+		if (activeHint === "area" && !needsAreaHint) {
 			setActiveHint(undefined);
+			setDismissed(false); // allow orbs hint to show next
 		}
-	}, [activeHint, hasClaimedLand]);
-
-	// Tip 2: Show orbs hint after player has claimed land and has orbs
-	useEffect(() => {
-		if (!isNewPlayer || !isAlive || dismissedRef.current.orbs || !hasClaimedLand || !hasOrbs || hasSpentOrbs)
-			return;
-
-		const startTime = os.clock();
-		const connection = RunService.Heartbeat.Connect(() => {
-			if (os.clock() - startTime >= ORBS_HINT_DELAY_SECONDS) {
-				setActiveHint("orbs");
-				connection.Disconnect();
-			}
-		});
-
-		return () => connection.Disconnect();
-	}, [isNewPlayer, isAlive, hasOrbs, hasSpentOrbs, hasClaimedLand]);
+	}, [activeHint, needsAreaHint]);
 
 	// Auto-dismiss orbs hint when player spends orbs
 	useEffect(() => {
-		if (activeHint === "orbs" && hasSpentOrbs) {
-			dismissedRef.current.orbs = true;
+		if (activeHint === "orbs" && !needsOrbsHint) {
 			setActiveHint(undefined);
 		}
-	}, [activeHint, hasSpentOrbs]);
+	}, [activeHint, needsOrbsHint]);
 
 	// Hide hints when player dies
 	useEffect(() => {
-		if (!isAlive) setActiveHint(undefined);
+		if (!isAlive) {
+			setActiveHint(undefined);
+			setDismissed(false);
+		}
 	}, [isAlive]);
 
 	const hintText = activeHint === "area" ? HINT_AREA : activeHint === "orbs" ? HINT_ORBS : undefined;
 
 	const dismiss = () => {
 		if (activeHint !== undefined) {
-			dismissedRef.current[activeHint] = true;
+			setDismissed(true);
 			setActiveHint(undefined);
 		}
 	};

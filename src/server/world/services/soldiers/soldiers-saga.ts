@@ -112,7 +112,9 @@ export async function initSoldierService() {
 		const deadline = soldier.deathChoiceDeadline;
 		const now = Workspace.GetServerTimeNow();
 		if (deadline === undefined || now > deadline) {
-			warn(`[Revive] REJECTED: deadline=${deadline}, serverTime=${now}, expired=${deadline !== undefined && now > deadline}`);
+			warn(
+				`[Revive] REJECTED: deadline=${deadline}, serverTime=${now}, expired=${deadline !== undefined && now > deadline}`,
+			);
 			return;
 		}
 
@@ -156,7 +158,7 @@ export async function initSoldierService() {
 
 	store.observe(selectIsInsideBySoldierById, identifySoldier, ({ id, polygon, tracers, isInside }) => {
 		debug.profilebegin("SOLDIER_IS_INSIDE");
-		print(`Soldier ${id} is ${isInside ? "inside" : "outside"}--------------------`);
+		//print(`Soldier ${id} is ${isInside ? "inside" : "outside"}--------------------`);
 
 		// Early exit: Check minimum tracer requirement
 		if (tracers.size() < 2) {
@@ -202,7 +204,7 @@ export async function initSoldierService() {
 			debug.profileend();
 		}
 		return () => {
-			print(`Soldier ${id} is no longer inside--------------------`);
+			//print(`Soldier ${id} is no longer inside--------------------`);
 			// Clean up debounce entry when soldier is no longer inside
 			lastAreaClaimTime.delete(id);
 		};

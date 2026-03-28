@@ -2,6 +2,7 @@ import React from "@rbxts/react";
 import { ReactiveButton2 } from "@rbxts-ui/components";
 import { Frame, Image, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
+import { NotificationDot } from "client/ui/NotificationDot";
 import { useRem } from "client/ui/rem/useRem";
 import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
@@ -61,6 +62,7 @@ interface ShopItemButtonProps extends React.PropsWithChildren {
 	readonly position?: UDim2;
 	readonly anchorPoint?: Vector2;
 	readonly layoutOrder?: number;
+	readonly showNotificationDot?: boolean;
 }
 
 export function MainButton({
@@ -75,6 +77,7 @@ export function MainButton({
 	position,
 	anchorPoint,
 	layoutOrder,
+	showNotificationDot = false,
 }: ShopItemButtonProps) {
 	const rem = useRem();
 
@@ -99,6 +102,8 @@ export function MainButton({
 			layoutOrder={layoutOrder}
 			zIndex={100}
 		>
+			{showNotificationDot && <NotificationDot position={new UDim2(1, rem(-0.5), 0, rem(0.5))} />}
+
 			{/* Outer background with dark border */}
 			<Frame
 				name="ShopItemButton"

@@ -1,5 +1,5 @@
 import { store } from "server/store";
-import { getCandy, killSoldier } from "server/world/world.utils";
+import { getCandy, onPlayerDeath } from "server/world/world.utils";
 import { SOLDIER_MIN_AREA } from "shared/constants/core";
 import {
 	aabbIntersects,
@@ -55,8 +55,7 @@ export function cutOthersByNewArea(ownerId: string, newCutPolygon: Polygon) {
 				const isStillInside =
 					!soldier.isInside || isPointInPolygon(vector2ToPoint(soldier.position), bestRegion);
 				if (updatedArea < SOLDIER_MIN_AREA || !isStillInside) {
-					killSoldier(otherId);
-					store.playerKilledSoldier(ownerId, otherId);
+					onPlayerDeath(otherId, ownerId, "trailing-wall-cut");
 					store.incrementSoldierEliminations(ownerId);
 				}
 			}
@@ -65,8 +64,7 @@ export function cutOthersByNewArea(ownerId: string, newCutPolygon: Polygon) {
 			invalidateIsInsideCache(otherId);
 			store.setSoldierPolygon(otherId, [], 0, true);
 			store.setSoldierPolygonAreaSize(otherId, 0);
-			killSoldier(otherId);
-			store.playerKilledSoldier(ownerId, otherId);
+			onPlayerDeath(otherId, ownerId, "trailing-wall-cut");
 			store.incrementSoldierEliminations(ownerId);
 		}
 	}

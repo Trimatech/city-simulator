@@ -45,7 +45,7 @@
 		"@rbxts-ui/utils": "2.3.1",
 		"@rbxts/beacon": "^2.1.1",
 		"@rbxts/bitbuffer2": "1.0.0-ts.0",
-		"@rbxts/falldown": "^1.0.3",
+		"@rbxts/falldown": "^1.2.0",
 		"@rbxts/flipper": "^2.0.1",
 		"@rbxts/lapis": "^0.3.6",
 		"@rbxts/object-utils": "^1.0.4",

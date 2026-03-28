@@ -16,10 +16,12 @@ import { calculatePolygonOperation, isPointInPolygon, vector2ToPoint } from "sha
 import { pointsToPolygon } from "shared/polybool/polybool";
 import { createPolygonAroundPosition, getPolygonCentroid } from "shared/polygon-extra.utils";
 import { selectAliveSoldiersById } from "shared/store/soldiers";
+import { KillSource } from "shared/store/milestones/milestone-utils";
 import { RAGDOLL_DURATION_SEC } from "shared/utils/ragdoll";
 
 import { getBotHumanoid } from "./services/bots/bot-registry";
 import { getCandy as getCandyLocal } from "./services/candy/candy-store";
+import { handleElimination } from "server/rewards/services/social-feed";
 
 const MIN_SPAWN_SPACING = 35;
 const SAFE_SPAWN_ATTEMPTS = 40;
@@ -110,7 +112,7 @@ export function cancelDeathChoiceTimer(soldierId: string) {
 	}
 }
 
-export function onPlayerDeath(soldierId: string) {
+export function onPlayerDeath(soldierId: string, killerId?: string, killSource?: KillSource) {
 	const existing = getSoldier(soldierId);
 	if (!existing || existing.dead) {
 		warn(`[Death] onPlayerDeath(${soldierId}) skipped: exists=${existing !== undefined}, dead=${existing?.dead}`);
@@ -120,6 +122,14 @@ export function onPlayerDeath(soldierId: string) {
 	warn(`[Death] onPlayerDeath(${soldierId}) — setting dead=true`);
 	store.setSoldierIsDead(soldierId);
 
+	if (killerId !== undefined) {
+		warn(`[Death] onPlayerDeath(${soldierId}) — calling playerKilledSoldier(killer=${killerId}, victim=${soldierId}, source=${killSource})`);
+		store.playerKilledSoldier(killerId, soldierId, killSource);
+		handleElimination(killerId, soldierId, killSource);
+	} else {
+		warn(`[Death] onPlayerDeath(${soldierId}) — no killerId provided, skipping playerKilledSoldier`);
+	}
+
 	const player = Players.FindFirstChild(soldierId);
 	if (player?.IsA("Player") && player.Character) {
 		const character = player.Character;
@@ -128,6 +138,8 @@ export function onPlayerDeath(soldierId: string) {
 			ragdoll.AddRandomVelocity(50);
 		}
 		task.delay(RAGDOLL_DURATION_SEC, () => {
+			ragdoll?.Destroy(Falldown.ExitMode.Immediate);
+			task.wait(0.1);
 			if (character.Parent) {
 				character.Destroy();
 			}
@@ -148,7 +160,9 @@ export function onPlayerDeath(soldierId: string) {
 	clearOwnerTracersFromGrid(soldierId);
 
 	const deadline = Workspace.GetServerTimeNow() + DEATH_CHOICE_TIMEOUT_SEC;
-	warn(`[Death] onPlayerDeath(${soldierId}) — setting deathChoiceDeadline=${deadline} (serverTime=${Workspace.GetServerTimeNow()})`);
+	warn(
+		`[Death] onPlayerDeath(${soldierId}) — setting deathChoiceDeadline=${deadline} (serverTime=${Workspace.GetServerTimeNow()})`,
+	);
 	store.setSoldierDeathChoiceDeadline(soldierId, deadline);
 
 	// Verify the state was actually set
@@ -158,7 +172,9 @@ export function onPlayerDeath(soldierId: string) {
 	const timer = task.delay(DEATH_CHOICE_TIMEOUT_SEC, () => {
 		deathChoiceTimers.delete(soldierId);
 		const soldier = getSoldier(soldierId);
-		warn(`[Death] deathChoiceTimer expired for ${soldierId} — exists=${soldier !== undefined}, dead=${soldier?.dead}`);
+		warn(
+			`[Death] deathChoiceTimer expired for ${soldierId} — exists=${soldier !== undefined}, dead=${soldier?.dead}`,
+		);
 		if (soldier?.dead) {
 			killSoldier(soldierId);
 		}

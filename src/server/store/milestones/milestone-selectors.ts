@@ -8,6 +8,7 @@ export {
 	selectMilestoneGiantSlain,
 	selectMilestoneHeadOnVictory,
 	selectMilestoneLastKilled,
+	selectMilestoneLastKillSource,
 	selectMilestoneOrbsSpent,
 	selectMilestonePowerupsUsed,
 	selectMilestoneRank1Count,

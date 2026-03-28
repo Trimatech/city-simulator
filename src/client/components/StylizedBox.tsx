@@ -35,6 +35,7 @@ export function StylizedBox({
 	const innerBorderGradient = new ColorSequence(theme.innerBorderFrom, theme.innerBorderTo);
 	const borderPad = new UDim(0, rem(0.3));
 	const whitePad = new UDim(0, rem(0.3));
+	const innerSize = automaticSize ? new UDim2(1, 0, 0, 0) : new UDim2(1, 0, 1, 0);
 
 	useEffect(() => {
 		if (parentRef.current && patternRef.current) {
@@ -69,7 +70,7 @@ export function StylizedBox({
 				<Frame
 					backgroundColor={theme.whiteBorderColor}
 					cornerRadius={whiteRadius}
-					size={new UDim2(1, 0, 0, 0)}
+					size={innerSize}
 					backgroundTransparency={0}
 					automaticSize={automaticSize}
 				>
@@ -82,7 +83,7 @@ export function StylizedBox({
 
 					{/* Layer 3: Inner gradient area */}
 					<Frame
-						size={new UDim2(1, 0, 0, 0)}
+						size={innerSize}
 						name="StylizedBoxInner"
 						automaticSize={automaticSize}
 						cornerRadius={innerRadius}
@@ -105,7 +106,7 @@ export function StylizedBox({
 						>
 							<uicorner CornerRadius={innerRadius} />
 						</imagelabel>
-						<Frame ref={parentRef} size={new UDim2(1, 0, 0, 0)} automaticSize={automaticSize}>
+						<Frame ref={parentRef} size={innerSize} automaticSize={automaticSize}>
 							{children}
 						</Frame>
 					</Frame>

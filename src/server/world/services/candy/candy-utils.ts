@@ -108,7 +108,7 @@ export function removeCandy(id: string, eatenAt?: Vector2) {
 		return;
 	}
 
-	print(`[DEBUG] Removing candy ID: ${candy.id}, Position: (${candy.position.X}, ${candy.position.Y})`);
+	//	print(`[DEBUG] Removing candy ID: ${candy.id}, Position: (${candy.position.X}, ${candy.position.Y})`);
 
 	setCandyEatenAtLocal(id, eatenAt ?? candy.position);
 	candyGrid.remove(candy.position);
@@ -127,7 +127,7 @@ export function removeCandy(id: string, eatenAt?: Vector2) {
 		removeCandyLocal(id);
 		// Remove the server-side Part
 		removeCandyPart(id);
-		print(`[DEBUG] Candy ${id} fully removed after timeout`);
+		//print(`[DEBUG] Candy ${id} fully removed after timeout`);
 	}, TIMEOUT_DELAY);
 }
 
@@ -147,7 +147,7 @@ export function eatCandy(candyId: string, soldierId: string) {
 	const soldier = getSoldier(soldierId);
 
 	if (soldier && candy && !candy.eatenAt) {
-		print(`Candy eaten with id ${candy.id}`);
+		//	print(`Candy eaten with id ${candy.id}`);
 		removeCandy(candy.id, soldier.position);
 		fireOrbsWastedIfNeeded(soldier.id, candy.size);
 		store.incrementSoldierOrbs(soldier.id, candy.size);

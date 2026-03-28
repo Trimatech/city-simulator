@@ -6,7 +6,7 @@ import { store } from "server/store";
 import {
 	ensureForceFieldOnPlayerName,
 	getPlayerHumanoidByName,
-	killSoldier,
+	onPlayerDeath,
 	removeForceFieldFromPlayerName,
 } from "server/world/world.utils";
 import { Badge } from "shared/assetsFolder";
@@ -25,6 +25,8 @@ import { calculatePolygonArea } from "shared/polygon-extra.utils";
 import { remotes } from "shared/remotes";
 import { selectSoldierById, selectSoldierOrbs, selectSoldiersById } from "shared/store/soldiers";
 import { selectTowersById } from "shared/store/towers/tower-selectors";
+
+import { setOwnerTracerShieldMaterial } from "server/world/services/soldiers/wall-part-manager";
 import { placeTower } from "./placeTower";
 
 /** Tracks the turbo generation per soldier so stacked activations extend duration correctly. */
@@ -254,7 +256,7 @@ function createCircularExplosionPolygonFromPart(center: Vector2, radius: number)
 	return points;
 }
 
-function cutDamageAreaFromSoldiers(damagePolygon: Vector2[]) {
+function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-beam" | "nuclear") {
 	const soldiers = store.getState(selectSoldiersById);
 	const damagePolygonObj = pointsToPolygon(vectorsToPoints(damagePolygon));
 
@@ -267,6 +269,7 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[]) {
 
 	for (const [soldierId, soldier] of Object.entries(soldiers)) {
 		if (!soldier || soldier.dead) continue;
+		if (soldier.shieldActiveUntil > Workspace.GetServerTimeNow()) continue;
 
 		print(`[DEBUG] Processing soldier ${soldierId} with polygon of ${soldier.polygon.size()} points`);
 		print(
@@ -316,8 +319,7 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[]) {
 					// Kill soldier if area becomes too small
 					if (updatedArea < SOLDIER_MIN_AREA) {
 						print(`[DEBUG] Soldier ${soldierId} area too small, killing`);
-						killSoldier(soldierId as string);
-						store.playerKilledSoldier("system", soldierId as string);
+						onPlayerDeath(soldierId as string, "system", killSource);
 					}
 				} else {
 					print(
@@ -325,8 +327,7 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[]) {
 					);
 					store.setSoldierPolygon(soldierId as string, [], 0, true);
 					store.setSoldierPolygonAreaSize(soldierId as string, 0);
-					killSoldier(soldierId as string);
-					store.playerKilledSoldier("system", soldierId as string);
+					onPlayerDeath(soldierId as string, "system", killSource);
 				}
 			} else {
 				print(
@@ -335,8 +336,7 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[]) {
 				// Fully covered by damage area: clear polygon immediately, then kill
 				store.setSoldierPolygon(soldierId as string, [], 0, true);
 				store.setSoldierPolygonAreaSize(soldierId as string, 0);
-				killSoldier(soldierId as string);
-				store.playerKilledSoldier("system", soldierId as string);
+				onPlayerDeath(soldierId as string, "system", killSource);
 			}
 		} else {
 			print(`[DEBUG] No intersection found for soldier ${soldierId}, skipping difference operation`);
@@ -412,12 +412,14 @@ export function executePowerupForSoldier(
 				POWERUP_DURATIONS.shield;
 			store.setSoldierShieldActiveUntil(soldierId, activeUntil);
 			ensureForceFieldOnPlayerName(soldierId, true);
+			setOwnerTracerShieldMaterial(soldierId, true);
 			const prevCancel = shieldCancelMap.get(soldierId);
 			if (prevCancel) prevCancel();
 			const cancel = setTimeout(() => {
 				shieldCancelMap.delete(soldierId);
 				store.setSoldierShieldActiveUntil(soldierId, 0);
 				removeForceFieldFromPlayerName(soldierId);
+				setOwnerTracerShieldMaterial(soldierId, false);
 			}, activeUntil - now);
 			shieldCancelMap.set(soldierId, cancel);
 			break;
@@ -447,15 +449,10 @@ export function executePowerupForSoldier(
 			const soldiers = store.getState(selectSoldiersById);
 			for (const [, s] of Object.entries(soldiers)) {
 				if (!s || s.dead || s.id === soldierId) continue;
+				if (s.shieldActiveUntil > Workspace.GetServerTimeNow()) continue;
 				if (isPointInRectangleWithCFrame(s.position, cframe, size)) {
 					laserHitEnemy = true;
-					const h = getPlayerHumanoidByName(s.id);
-					if (h) {
-						pushHumanoidAway(h, new Vector3(bombCenter2D.X, 0, bombCenter2D.Y), 80);
-					}
-					const h2 = getPlayerHumanoidByName(s.id);
-					if (h2) h2.TakeDamage(cfg.damage);
-					store.setMilestoneLastDamageAt(s.id, Workspace.GetServerTimeNow());
+					onPlayerDeath(s.id, soldierId, "laser-beam");
 				}
 			}
 			if (laserHitEnemy) {
@@ -472,7 +469,7 @@ export function executePowerupForSoldier(
 			}
 
 			const damagePolygon = createExplosionPolygonFromPart(bombCenter2D, cfg.length, cfg.width, cframe);
-			cutDamageAreaFromSoldiers(damagePolygon);
+			cutDamageAreaFromSoldiers(damagePolygon, "laser-beam");
 			remotes.client.powerupCarpet.fireAll(cframe, size);
 			break;
 		}
@@ -481,8 +478,9 @@ export function executePowerupForSoldier(
 			const soldiers = store.getState(selectSoldiersById);
 			for (const [, s] of Object.entries(soldiers)) {
 				if (!s || s.dead || s.id === soldierId) continue;
+				if (s.shieldActiveUntil > Workspace.GetServerTimeNow()) continue;
 				if (magnitude2D(s.position, center) <= cfg.radius) {
-					killSoldier(s.id);
+					onPlayerDeath(s.id, soldierId, "nuclear");
 				}
 			}
 			const towers = store.getState(selectTowersById);
@@ -494,7 +492,7 @@ export function executePowerupForSoldier(
 				}
 			}
 			const damagePolygon = createCircularExplosionPolygonFromPart(center, cfg.radius);
-			cutDamageAreaFromSoldiers(damagePolygon);
+			cutDamageAreaFromSoldiers(damagePolygon, "nuclear");
 			const nuclearCFrame = new CFrame(center.X, 0.5, center.Y);
 			const size = new Vector3(5, cfg.radius * 2, cfg.radius * 2);
 			remotes.client.powerupNuclear.fireAll(nuclearCFrame, size);
