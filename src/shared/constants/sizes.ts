@@ -33,3 +33,6 @@ export const cornerRadiusFull = new UDim(1, 0);
 
 export const scrollbarThickness = 2;
 export const scrollbarThickness2 = 20;
+
+export const outerPaddingRem = 3;
+export const outerPaddingRemMobile = 1;

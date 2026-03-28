@@ -1,4 +1,5 @@
 import React from "@rbxts/react";
+import { HStack } from "@rbxts-ui/layout";
 import { ROBLOX_TOOLBAR_HEIGHT, ROBLOX_TOOLBAR_WIDTH } from "client/constants/roblox.constants";
 
 const BUTTON_SIZE = 32;
@@ -7,11 +8,7 @@ const BUTTON_COLOR = Color3.fromRGB(255, 255, 255);
 
 function FakeRobloxButtons() {
 	return (
-		<frame
-			key="roblox-buttons"
-			Size={new UDim2(0, ROBLOX_TOOLBAR_WIDTH, 1, 0)}
-			BackgroundTransparency={1}
-		>
+		<frame key="roblox-buttons" Size={new UDim2(0, ROBLOX_TOOLBAR_WIDTH, 1, 0)} BackgroundTransparency={1}>
 			<uilistlayout
 				FillDirection="Horizontal"
 				VerticalAlignment="Center"
@@ -91,16 +88,14 @@ export function FakeTopbar({ header, toolbarColor, children }: FakeTopbarProps) 
 		<frame Size={new UDim2(1, 0, 1, 0)} BackgroundTransparency={1}>
 			<uilistlayout FillDirection="Vertical" SortOrder="LayoutOrder" />
 
-			<frame
-				key="toolbar"
-				LayoutOrder={0}
-				Size={new UDim2(1, 0, 0, ROBLOX_TOOLBAR_HEIGHT)}
-				BackgroundColor3={toolbarColor ?? Color3.fromRGB(0, 0, 0)}
-				BackgroundTransparency={toolbarColor ? 0 : 0.5}
+			<HStack
+				size={new UDim2(1, 0, 0, ROBLOX_TOOLBAR_HEIGHT)}
+				backgroundColor={toolbarColor ?? Color3.fromRGB(0, 0, 0)}
+				backgroundTransparency={toolbarColor ? 0 : 0.5}
 			>
 				<FakeRobloxButtons />
 				{header}
-			</frame>
+			</HStack>
 
 			<frame
 				key="content"

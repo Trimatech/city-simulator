@@ -43,34 +43,8 @@ export function MilestoneWidget() {
 		prevProgressRef.current = progress;
 	}, [progress]);
 
-	if (fixed.size() === 0 && rotating === undefined) {
-		return (
-			<Frame
-				position={new UDim2(0, 0, 0.5, 0)}
-				size={new UDim2(0, rem(22), 0, rem(3))}
-				backgroundColor={palette.crust}
-				backgroundTransparency={0.25}
-			>
-				<uicorner CornerRadius={new UDim(0, rem(0.8))} />
-				<Text
-					font={fonts.fredokaOne.regular}
-					text="All milestones complete!"
-					textColor={palette.yellow}
-					textSize={rem(1.1)}
-					size={new UDim2(1, 0, 1, 0)}
-					backgroundTransparency={1}
-				/>
-			</Frame>
-		);
-	}
-
 	return (
-		<VStack
-			size={new UDim2(0, rem(26), 0, 0)}
-			spacing={rem(1)}
-			automaticSize={Enum.AutomaticSize.Y}
-			padding={rem(3)}
-		>
+		<VStack size={new UDim2(0, rem(26), 0, 0)} spacing={rem(1)} automaticSize={Enum.AutomaticSize.Y}>
 			{fixed.map((data) => (
 				<MilestoneItem
 					key={data.category.id}
@@ -84,6 +58,18 @@ export function MilestoneWidget() {
 					data={rotating}
 					celebrating={celebratingCategories.has(rotating.category.id)}
 				/>
+			)}
+			{fixed.size() === 0 && rotating === undefined && (
+				<Frame size={UDim2.fromScale(1, 1)} backgroundTransparency={1}>
+					<Text
+						font={fonts.fredokaOne.regular}
+						text="No milestones"
+						textColor={palette.yellow}
+						textSize={rem(1.1)}
+						size={new UDim2(1, 0, 1, 0)}
+						backgroundTransparency={1}
+					/>
+				</Frame>
 			)}
 		</VStack>
 	);

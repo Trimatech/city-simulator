@@ -70,7 +70,9 @@ export function HealthView() {
 	}, [health]);
 
 	return (
-		<HStack name="HealthView" size={new UDim2(0, rem(35), 0, ROBLOX_TOOLBAR_HEIGHT)} spacing={rem(0.5)}>
+		<HStack name="HealthView" size={new UDim2(1, 0, 0, ROBLOX_TOOLBAR_HEIGHT)} spacing={rem(0.5)}>
+			<uiflexitem FlexMode={Enum.UIFlexMode.Fill} />
+			<uisizeconstraint MinSize={new Vector2(rem(10), 0)} MaxSize={new Vector2(rem(35), math.huge)} />
 			<frame BackgroundTransparency={1} Size={new UDim2(0, iconSize, 0, iconSize)} ClipsDescendants={false}>
 				<imagelabel
 					Image={assets.ui.heart}

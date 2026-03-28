@@ -13,6 +13,7 @@ import { defaultPlayerSave } from "shared/store/saves";
 const FAKE_BOT_IDS = ["story-bot-1", "story-bot-2"];
 
 const controls = {
+	horizontal: Boolean(false),
 	showSoldierData: Boolean(true),
 	showBalance: Boolean(true),
 	eliminations: Number(42, 0, 9999, 1),
@@ -22,6 +23,7 @@ const controls = {
 };
 
 interface StoryProps {
+	horizontal: boolean;
 	showSoldierData: boolean;
 	showBalance: boolean;
 	eliminations: number;
@@ -30,7 +32,15 @@ interface StoryProps {
 	balance: number;
 }
 
-function StatsStoryContent({ showSoldierData, showBalance, eliminations, orbs, area, balance }: StoryProps) {
+function StatsStoryContent({
+	horizontal,
+	showSoldierData,
+	showBalance,
+	eliminations,
+	orbs,
+	area,
+	balance,
+}: StoryProps) {
 	useEffect(() => {
 		for (const id of FAKE_BOT_IDS) {
 			store.addSoldier(id, { name: id, position: Vector2.zero });
@@ -62,7 +72,9 @@ function StatsStoryContent({ showSoldierData, showBalance, eliminations, orbs, a
 
 	return (
 		<RootProvider>
-			<Stats />
+			<frame BackgroundTransparency={1} Size={new UDim2(1, 0, 1, 0)} Position={new UDim2(0.5, 0, 0.5, 0)}>
+				<Stats direction={horizontal ? "horizontal" : "vertical"} />
+			</frame>
 		</RootProvider>
 	);
 }
@@ -72,9 +84,10 @@ const story = {
 	reactRoblox: ReactRoblox,
 	controls,
 	story: (props: InferFusionProps<typeof controls>) => {
-		const { showSoldierData, showBalance, eliminations, orbs, area, balance } = props.controls;
+		const { horizontal, showSoldierData, showBalance, eliminations, orbs, area, balance } = props.controls;
 		return (
 			<StatsStoryContent
+				horizontal={horizontal as boolean}
 				showSoldierData={showSoldierData as boolean}
 				showBalance={showBalance as boolean}
 				eliminations={eliminations as number}

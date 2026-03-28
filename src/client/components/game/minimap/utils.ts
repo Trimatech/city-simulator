@@ -4,7 +4,7 @@ import { Players } from "@rbxts/services";
 import { useRem } from "client/ui/rem/useRem";
 import { USER_ID, WORLD_BOUNDS } from "shared/constants/core";
 
-export const MINIMUM_MINIMAP_REM = 10;
+export const MINIMUM_MINIMAP_REM = 8;
 
 export function useMinimapRem() {
 	return useRem({ minimum: MINIMUM_MINIMAP_REM });

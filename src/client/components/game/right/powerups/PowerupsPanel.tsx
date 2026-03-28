@@ -24,7 +24,13 @@ export function PowerupsPanel({ visible }: Props) {
 	const isInsideTerritory = localSoldier?.isInside ?? false;
 
 	return (
-		<HStack name="powerups-panel" size={size} verticalAlignment={Enum.VerticalAlignment.Bottom} spacing={rem(1)}>
+		<HStack
+			name="powerups-panel"
+			size={size}
+			verticalAlignment={Enum.VerticalAlignment.Bottom}
+			horizontalAlignment={Enum.HorizontalAlignment.Right}
+			spacing={rem(1)}
+		>
 			<VStack
 				name="buy-powerups-stack"
 				size={new UDim2(0, 0, 1, 0)}

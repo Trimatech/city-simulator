@@ -1,13 +1,14 @@
 import React, { useRef } from "@rbxts/react";
 import { useSelector, useSelectorCreator } from "@rbxts/react-reflex";
-import { Group } from "@rbxts-ui/primitives";
+import { createPortal } from "@rbxts/react-roblox";
+import { Frame } from "@rbxts-ui/primitives";
 import { useDefined } from "client/hooks";
+import { usePortal } from "client/providers/PortalProvider";
 import { FlyToComponents } from "client/ui/FlyTo/FlyToComponents";
 import { useRem } from "client/ui/rem/useRem";
 import { formatInteger } from "client/utils/format-integer";
 import assets from "shared/assets";
 import { USER_NAME } from "shared/constants/core";
-import { ROOT_PADDING } from "shared/constants/theme";
 import { selectPlayerBalance, selectPlayerCrystals } from "shared/store/saves";
 import {
 	selectLocalEliminations,
@@ -18,8 +19,13 @@ import {
 
 import { StatsCard } from "./StatsCard";
 
-export function Stats() {
+interface StatsProps {
+	readonly direction?: "vertical" | "horizontal";
+}
+
+export function Stats({ direction = "vertical" }: StatsProps) {
 	const rem = useRem();
+	const { portalRef } = usePortal();
 
 	const eliminationsRef = useRef<ImageLabel>();
 	const orbsRef = useRef<ImageLabel>();
@@ -42,15 +48,11 @@ export function Stats() {
 
 	return (
 		<>
-			<Group name="Stats">
-				<uipadding
-					PaddingBottom={new UDim(0, rem(ROOT_PADDING))}
-					PaddingLeft={new UDim(0, rem(ROOT_PADDING))}
-				/>
+			<Frame name="Stats" automaticSize={Enum.AutomaticSize.XY} size={UDim2.fromScale(0, 0)}>
 				<uilistlayout
-					FillDirection="Vertical"
+					FillDirection={direction === "horizontal" ? "Horizontal" : "Vertical"}
 					HorizontalAlignment="Left"
-					VerticalAlignment="Bottom"
+					VerticalAlignment={direction === "horizontal" ? "Center" : "Bottom"}
 					Padding={new UDim(0, rem(1))}
 					SortOrder="LayoutOrder"
 				/>
@@ -106,44 +108,50 @@ export function Stats() {
 					enabled={currentArea !== undefined}
 					order={5}
 				/>
-			</Group>
+			</Frame>
 
-			<FlyToComponents
-				amount={currentEliminations ?? 0}
-				statsImageRef={eliminationsRef}
-				image={assets.ui.icons.kills}
-				sound={assets.sounds.thump_sound}
-				startFromCharacter={true}
-				imageTransparency={0.1}
-				startScale={5}
-			/>
-			<FlyToComponents
-				amount={currentOrbs ?? 0}
-				statsImageRef={orbsRef}
-				image={assets.ui.icons.orb}
-				sound={assets.sounds.bong_001}
-				startFromCharacter={true}
-				imageTransparency={0.3}
-				startScale={1}
-			/>
-			<FlyToComponents
-				amount={currentBalance ?? 0}
-				statsImageRef={balanceRef}
-				image={assets.ui.shop.Cash}
-				sound={assets.sounds.alert_money}
-				startFromCharacter={true}
-				imageTransparency={0.3}
-				startScale={1}
-			/>
-			<FlyToComponents
-				amount={currentCrystals ?? 0}
-				statsImageRef={crystalsRef}
-				image={assets.ui.shards_icon_color}
-				sound={assets.sounds.alert_neutral}
-				startFromCharacter={true}
-				imageTransparency={0.3}
-				startScale={1}
-			/>
+			{portalRef.current &&
+				createPortal(
+					<>
+						<FlyToComponents
+							amount={currentEliminations ?? 0}
+							statsImageRef={eliminationsRef}
+							image={assets.ui.icons.kills}
+							sound={assets.sounds.thump_sound}
+							startFromCharacter={true}
+							imageTransparency={0.1}
+							startScale={5}
+						/>
+						<FlyToComponents
+							amount={currentOrbs ?? 0}
+							statsImageRef={orbsRef}
+							image={assets.ui.icons.orb}
+							sound={assets.sounds.bong_001}
+							startFromCharacter={true}
+							imageTransparency={0.3}
+							startScale={1}
+						/>
+						<FlyToComponents
+							amount={currentBalance ?? 0}
+							statsImageRef={balanceRef}
+							image={assets.ui.shop.Cash}
+							sound={assets.sounds.alert_money}
+							startFromCharacter={true}
+							imageTransparency={0.3}
+							startScale={1}
+						/>
+						<FlyToComponents
+							amount={currentCrystals ?? 0}
+							statsImageRef={crystalsRef}
+							image={assets.ui.shards_icon_color}
+							sound={assets.sounds.alert_neutral}
+							startFromCharacter={true}
+							imageTransparency={0.3}
+							startScale={1}
+						/>
+					</>,
+					portalRef.current,
+				)}
 		</>
 	);
 }

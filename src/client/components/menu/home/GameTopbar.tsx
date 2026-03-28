@@ -1,10 +1,12 @@
 import React from "@rbxts/react";
 import { HStack } from "@rbxts-ui/layout";
 import { HealthView } from "client/components/game/health/HealthView";
+import { Stats } from "client/components/stats/Stats";
 import { ROBLOX_TOOLBAR_HEIGHT } from "client/constants/roblox.constants";
+import { useIsMobile } from "client/hooks";
 import { store } from "client/store";
 import { MenuWindow } from "client/store/screen";
-import { MainButton, ShopButtonTextWithIcon } from "client/ui/MainButton";
+import { MainButton, ShopButtonIcon, ShopButtonTextWithIcon } from "client/ui/MainButton";
 import { useRem } from "client/ui/rem/useRem";
 import { SlideIn } from "client/ui/slide-in";
 import assets from "shared/assets";
@@ -15,9 +17,11 @@ interface GameTopbarProps {
 
 export function GameTopbar({ visible }: GameTopbarProps) {
 	const rem = useRem();
+	const isMobile = useIsMobile();
 
 	return (
 		<SlideIn visible={visible} direction="top">
+			<uiflexitem FlexMode={Enum.UIFlexMode.Fill} />
 			<HStack
 				verticalAlignment={Enum.VerticalAlignment.Center}
 				spacing={rem(1)}
@@ -26,11 +30,17 @@ export function GameTopbar({ visible }: GameTopbarProps) {
 			>
 				<MainButton
 					onClick={() => store.setOpenMenuWindow(MenuWindow.Progress)}
-					size={new UDim2(0, rem(13), 0, rem(4))}
-					fitContent
+					size={isMobile ? new UDim2(0, rem(4), 0, rem(4)) : new UDim2(0, rem(13), 0, rem(4))}
+					fitContent={!isMobile}
 				>
-					<ShopButtonTextWithIcon text="Progress" icon={assets.ui.icons.rank} />
+					{isMobile ? (
+						<ShopButtonIcon icon={assets.ui.icons.rank} />
+					) : (
+						<ShopButtonTextWithIcon text="Progress" icon={assets.ui.icons.rank} />
+					)}
 				</MainButton>
+				{isMobile && <Stats direction="horizontal" />}
+
 				<HealthView />
 			</HStack>
 		</SlideIn>
