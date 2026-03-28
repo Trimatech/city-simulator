@@ -54,6 +54,7 @@ export function onTowerTick(dt: number) {
 
 		const target = soldiers[nearestId];
 		if (!target || target.dead) continue;
+		if (target.shieldActiveUntil > Workspace.GetServerTimeNow()) continue;
 
 		const damage = tower.damage * dt;
 		store.decrementSoldierHealth(nearestId, damage);

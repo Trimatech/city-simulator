@@ -56,7 +56,7 @@ export function cutOthersByNewArea(ownerId: string, newCutPolygon: Polygon) {
 					!soldier.isInside || isPointInPolygon(vector2ToPoint(soldier.position), bestRegion);
 				if (updatedArea < SOLDIER_MIN_AREA || !isStillInside) {
 					killSoldier(otherId);
-					store.playerKilledSoldier(ownerId, otherId);
+					store.playerKilledSoldier(ownerId, otherId, "trailing-wall-cut");
 					store.incrementSoldierEliminations(ownerId);
 				}
 			}
@@ -66,7 +66,7 @@ export function cutOthersByNewArea(ownerId: string, newCutPolygon: Polygon) {
 			store.setSoldierPolygon(otherId, [], 0, true);
 			store.setSoldierPolygonAreaSize(otherId, 0);
 			killSoldier(otherId);
-			store.playerKilledSoldier(ownerId, otherId);
+			store.playerKilledSoldier(ownerId, otherId, "trailing-wall-cut");
 			store.incrementSoldierEliminations(ownerId);
 		}
 	}

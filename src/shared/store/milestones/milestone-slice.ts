@@ -1,7 +1,7 @@
 import { createProducer } from "@rbxts/reflex";
 import { mapProperty } from "shared/utils/object-utils";
 
-import { ScoreMilestone } from "./milestone-utils";
+import { KillSource, ScoreMilestone } from "./milestone-utils";
 import { getMilestoneArea, MilestoneState, SCORE_MILESTONES_REVERSE } from "./milestone-utils";
 import { MilestoneEntity } from "./milestone-utils";
 
@@ -86,16 +86,20 @@ export const milestoneSlice = createProducer(initialState, {
 		});
 	},
 
-	playerKilledSoldier: (state, playerId: string, lastKilled: string) => {
-		return mapProperty(state, playerId, (milestone) => {
-			const isBot = string.sub(lastKilled, 1, 4) === "BOT_";
-			return {
+	playerKilledSoldier: (state, playerId: string, lastKilled: string, killSource?: KillSource) => {
+		const milestone = state[playerId] ?? defaultEntity;
+		const isSelfKill = playerId === lastKilled;
+		const isBot = string.sub(lastKilled, 1, 4) === "BOT_";
+		return {
+			...state,
+			[playerId]: {
 				...milestone,
 				lastKilled,
-				eliminationCount: milestone.eliminationCount + 1,
-				botKillCount: isBot ? milestone.botKillCount + 1 : milestone.botKillCount,
-			};
-		});
+				lastKillSource: killSource,
+				eliminationCount: isSelfKill ? milestone.eliminationCount : milestone.eliminationCount + 1,
+				botKillCount: isBot && !isSelfKill ? milestone.botKillCount + 1 : milestone.botKillCount,
+			},
+		};
 	},
 
 	setMilestoneHeadOnVictory: (state, playerId: string) => {

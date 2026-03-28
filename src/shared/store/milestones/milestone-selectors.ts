@@ -34,6 +34,12 @@ export const selectMilestoneLastKilled = (playerId: string) => {
 	};
 };
 
+export const selectMilestoneLastKillSource = (playerId: string) => {
+	return (state: SharedState) => {
+		return state.milestones[playerId]?.lastKillSource;
+	};
+};
+
 export const selectMilestoneEliminationCount = (playerId: string) => {
 	return (state: SharedState) => {
 		return state.milestones[playerId]?.eliminationCount;

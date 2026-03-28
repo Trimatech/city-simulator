@@ -81,7 +81,7 @@ function observeMilestone(id: string) {
 	const unsubscribeKill = store.observeWhile(selectMilestoneLastKilled(id), (enemyId) => {
 		const enemy = getSoldier(enemyId);
 
-		if (enemy && shouldGrantReward()) {
+		if (enemy && enemyId !== id && shouldGrantReward()) {
 			const bounty = math.min(math.ceil(enemy.polygonAreaSize / 3), KILL_BOUNTY_CAP);
 			grantMoneyReward(id, bounty, `eliminating <font color="#fff">${enemy.name}</font>`, true);
 

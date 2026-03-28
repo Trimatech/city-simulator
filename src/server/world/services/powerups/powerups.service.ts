@@ -25,6 +25,7 @@ import { calculatePolygonArea } from "shared/polygon-extra.utils";
 import { remotes } from "shared/remotes";
 import { selectSoldierById, selectSoldierOrbs, selectSoldiersById } from "shared/store/soldiers";
 import { selectTowersById } from "shared/store/towers/tower-selectors";
+
 import { placeTower } from "./placeTower";
 
 /** Tracks the turbo generation per soldier so stacked activations extend duration correctly. */
@@ -254,7 +255,7 @@ function createCircularExplosionPolygonFromPart(center: Vector2, radius: number)
 	return points;
 }
 
-function cutDamageAreaFromSoldiers(damagePolygon: Vector2[]) {
+function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-beam" | "nuclear") {
 	const soldiers = store.getState(selectSoldiersById);
 	const damagePolygonObj = pointsToPolygon(vectorsToPoints(damagePolygon));
 
@@ -267,6 +268,7 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[]) {
 
 	for (const [soldierId, soldier] of Object.entries(soldiers)) {
 		if (!soldier || soldier.dead) continue;
+		if (soldier.shieldActiveUntil > Workspace.GetServerTimeNow()) continue;
 
 		print(`[DEBUG] Processing soldier ${soldierId} with polygon of ${soldier.polygon.size()} points`);
 		print(
@@ -317,7 +319,7 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[]) {
 					if (updatedArea < SOLDIER_MIN_AREA) {
 						print(`[DEBUG] Soldier ${soldierId} area too small, killing`);
 						killSoldier(soldierId as string);
-						store.playerKilledSoldier("system", soldierId as string);
+						store.playerKilledSoldier("system", soldierId as string, killSource);
 					}
 				} else {
 					print(
@@ -326,7 +328,7 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[]) {
 					store.setSoldierPolygon(soldierId as string, [], 0, true);
 					store.setSoldierPolygonAreaSize(soldierId as string, 0);
 					killSoldier(soldierId as string);
-					store.playerKilledSoldier("system", soldierId as string);
+					store.playerKilledSoldier("system", soldierId as string, killSource);
 				}
 			} else {
 				print(
@@ -336,7 +338,7 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[]) {
 				store.setSoldierPolygon(soldierId as string, [], 0, true);
 				store.setSoldierPolygonAreaSize(soldierId as string, 0);
 				killSoldier(soldierId as string);
-				store.playerKilledSoldier("system", soldierId as string);
+				store.playerKilledSoldier("system", soldierId as string, killSource);
 			}
 		} else {
 			print(`[DEBUG] No intersection found for soldier ${soldierId}, skipping difference operation`);
@@ -447,6 +449,7 @@ export function executePowerupForSoldier(
 			const soldiers = store.getState(selectSoldiersById);
 			for (const [, s] of Object.entries(soldiers)) {
 				if (!s || s.dead || s.id === soldierId) continue;
+				if (s.shieldActiveUntil > Workspace.GetServerTimeNow()) continue;
 				if (isPointInRectangleWithCFrame(s.position, cframe, size)) {
 					laserHitEnemy = true;
 					killSoldier(s.id);
@@ -466,7 +469,7 @@ export function executePowerupForSoldier(
 			}
 
 			const damagePolygon = createExplosionPolygonFromPart(bombCenter2D, cfg.length, cfg.width, cframe);
-			cutDamageAreaFromSoldiers(damagePolygon);
+			cutDamageAreaFromSoldiers(damagePolygon, "laser-beam");
 			remotes.client.powerupCarpet.fireAll(cframe, size);
 			break;
 		}
@@ -475,6 +478,7 @@ export function executePowerupForSoldier(
 			const soldiers = store.getState(selectSoldiersById);
 			for (const [, s] of Object.entries(soldiers)) {
 				if (!s || s.dead || s.id === soldierId) continue;
+				if (s.shieldActiveUntil > Workspace.GetServerTimeNow()) continue;
 				if (magnitude2D(s.position, center) <= cfg.radius) {
 					killSoldier(s.id);
 				}
@@ -488,7 +492,7 @@ export function executePowerupForSoldier(
 				}
 			}
 			const damagePolygon = createCircularExplosionPolygonFromPart(center, cfg.radius);
-			cutDamageAreaFromSoldiers(damagePolygon);
+			cutDamageAreaFromSoldiers(damagePolygon, "nuclear");
 			const nuclearCFrame = new CFrame(center.X, 0.5, center.Y);
 			const size = new Vector3(5, cfg.radius * 2, cfg.radius * 2);
 			remotes.client.powerupNuclear.fireAll(nuclearCFrame, size);

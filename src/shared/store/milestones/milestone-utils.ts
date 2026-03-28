@@ -1,6 +1,20 @@
 import { WORLD_BOUNDS } from "shared/constants/core";
 import { reverseArray } from "shared/polybool/poly-utils";
 
+export type KillSource = "tracer" | "head-on" | "trailing-wall-cut" | "shield-reflect" | "laser-beam" | "nuclear" | "self-tracer" | "wall" | "system";
+
+export const KILL_SOURCE_LABELS: Record<KillSource, string> = {
+	"tracer": "trail",
+	"head-on": "head-on collision",
+	"trailing-wall-cut": "trailing wall cut",
+	"shield-reflect": "shield reflect",
+	"laser-beam": "laser beam",
+	"nuclear": "nuclear explosion",
+	"self-tracer": "own trail",
+	"wall": "wall collision",
+	"system": "explosion",
+};
+
 export type MilestoneState = {
 	readonly [K in string]?: MilestoneEntity;
 };
@@ -9,6 +23,7 @@ export interface MilestoneEntity {
 	readonly topArea?: ScoreMilestone;
 	readonly topRank: number;
 	readonly lastKilled?: string;
+	readonly lastKillSource?: KillSource;
 
 	// Badge tracking (per-life, reset on death)
 	readonly eliminationCount: number;
