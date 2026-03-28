@@ -6,6 +6,7 @@ import {
 	getPolygonCenterInside,
 	getSpawnPointNearAnyPlayer,
 	killSoldier,
+	onPlayerDeath,
 	playerIsSpawned,
 } from "server/world/world.utils";
 import { REVIVE_CRYSTAL_COST, SOLDIER_SPEED, WORLD_TICK } from "shared/constants/core";
@@ -151,7 +152,7 @@ export async function initSoldierService() {
 
 	Players.PlayerRemoving.Connect((player) => {
 		deleteSoldierInput(player.Name);
-		killSoldier(player.Name);
+		onPlayerDeath(player.Name, player.Name, "leaving-server");
 	});
 
 	// TODO: should only check if spawned

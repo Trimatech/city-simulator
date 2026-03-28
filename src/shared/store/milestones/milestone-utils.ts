@@ -10,7 +10,8 @@ export type KillSource =
 	| "nuclear"
 	| "self-tracer"
 	| "wall"
-	| "tower";
+	| "tower"
+	| "leaving-server";
 
 export const KILL_SOURCE_LABELS: Record<KillSource, string> = {
 	tracer: "trail slice",
@@ -22,6 +23,7 @@ export const KILL_SOURCE_LABELS: Record<KillSource, string> = {
 	"self-tracer": "own trail",
 	wall: "wall collision",
 	tower: "tower",
+	"leaving-server": "leaving server",
 };
 
 export type MilestoneState = {

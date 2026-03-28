@@ -112,7 +112,7 @@ export function cancelDeathChoiceTimer(soldierId: string) {
 	}
 }
 
-export function onPlayerDeath(soldierId: string, killerId?: string, killSource?: KillSource) {
+export function onPlayerDeath(soldierId: string, killerId: string, killSource: KillSource) {
 	const existing = getSoldier(soldierId);
 	if (!existing || existing.dead) {
 		warn(`[Death] onPlayerDeath(${soldierId}) skipped: exists=${existing !== undefined}, dead=${existing?.dead}`);
@@ -122,15 +122,11 @@ export function onPlayerDeath(soldierId: string, killerId?: string, killSource?:
 	warn(`[Death] onPlayerDeath(${soldierId}) — setting dead=true`);
 	store.setSoldierIsDead(soldierId);
 
-	if (killerId !== undefined) {
-		warn(
-			`[Death] onPlayerDeath(${soldierId}) — calling playerKilledSoldier(killer=${killerId}, victim=${soldierId}, source=${killSource})`,
-		);
-		store.playerKilledSoldier(killerId, soldierId, killSource);
-		handleElimination(killerId, soldierId, killSource);
-	} else {
-		warn(`[Death] onPlayerDeath(${soldierId}) — no killerId provided, skipping playerKilledSoldier`);
-	}
+	warn(
+		`[Death] onPlayerDeath(${soldierId}) — calling playerKilledSoldier(killer=${killerId}, victim=${soldierId}, source=${killSource})`,
+	);
+	store.playerKilledSoldier(killerId, soldierId, killSource);
+	handleElimination(killerId, soldierId, killSource);
 
 	const player = Players.FindFirstChild(soldierId);
 	if (player?.IsA("Player") && player.Character) {
