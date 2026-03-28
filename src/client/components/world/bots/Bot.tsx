@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import { RunService, TweenService } from "@rbxts/services";
+import { RunService, TweenService, Workspace } from "@rbxts/services";
 import { WORLD_TICK } from "shared/constants/core";
 import { selectSoldierById, selectSoldierPosition } from "shared/store/soldiers";
 import { RAGDOLL_DURATION_SEC } from "shared/utils/ragdoll";
@@ -165,6 +165,25 @@ export function Bot({ id }: BotProps) {
 
 		lastPosRef.current = position;
 	}, [position]);
+
+	// Toggle ForceField on bot character when shield is active
+	useEffect(() => {
+		const m = modelRef.current;
+		if (!m) return;
+
+		const hasShield = soldier !== undefined && soldier.shieldActiveUntil > Workspace.GetServerTimeNow();
+
+		if (hasShield) {
+			if (!m.FindFirstChildOfClass("ForceField")) {
+				const ff = new Instance("ForceField");
+				ff.Visible = true;
+				ff.Parent = m;
+			}
+		} else {
+			const ff = m.FindFirstChildOfClass("ForceField");
+			if (ff) ff.Destroy();
+		}
+	}, [soldier?.shieldActiveUntil, model]);
 
 	return <SoldierGlow id={id} model={model} />;
 }
