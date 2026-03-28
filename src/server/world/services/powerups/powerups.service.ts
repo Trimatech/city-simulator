@@ -449,13 +449,7 @@ export function executePowerupForSoldier(
 				if (!s || s.dead || s.id === soldierId) continue;
 				if (isPointInRectangleWithCFrame(s.position, cframe, size)) {
 					laserHitEnemy = true;
-					const h = getPlayerHumanoidByName(s.id);
-					if (h) {
-						pushHumanoidAway(h, new Vector3(bombCenter2D.X, 0, bombCenter2D.Y), 80);
-					}
-					const h2 = getPlayerHumanoidByName(s.id);
-					if (h2) h2.TakeDamage(cfg.damage);
-					store.setMilestoneLastDamageAt(s.id, Workspace.GetServerTimeNow());
+					killSoldier(s.id);
 				}
 			}
 			if (laserHitEnemy) {
