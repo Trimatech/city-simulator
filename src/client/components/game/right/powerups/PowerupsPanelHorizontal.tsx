@@ -43,7 +43,7 @@ export function PowerupsPanelHorizontal({ visible }: Props) {
 					id="nuclearExplosion"
 					label="Nuclear"
 					enabled={orbs >= POWERUP_PRICES.nuclearExplosion}
-					order={1}
+					order={5}
 					price={POWERUP_PRICES.nuclearExplosion}
 					panelVisible={visible}
 					expandDirection="top"
@@ -53,7 +53,7 @@ export function PowerupsPanelHorizontal({ visible }: Props) {
 					id="laserBeam"
 					label="Laser"
 					enabled={orbs >= POWERUP_PRICES.laserBeam}
-					order={2}
+					order={4}
 					price={POWERUP_PRICES.laserBeam}
 					panelVisible={visible}
 					expandDirection="top"
@@ -75,7 +75,7 @@ export function PowerupsPanelHorizontal({ visible }: Props) {
 					id="tower"
 					label="Tower"
 					enabled={orbs >= POWERUP_PRICES.tower && isInsideTerritory}
-					order={4}
+					order={2}
 					price={POWERUP_PRICES.tower}
 					disabledReason={!isInsideTerritory ? "Can't place" : undefined}
 					panelVisible={visible}
@@ -86,7 +86,7 @@ export function PowerupsPanelHorizontal({ visible }: Props) {
 					id="turbo"
 					label="Turbo"
 					enabled={orbs >= POWERUP_PRICES.turbo}
-					order={5}
+					order={1}
 					price={POWERUP_PRICES.turbo}
 					panelVisible={visible}
 					expandDirection="top"
