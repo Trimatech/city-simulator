@@ -73,6 +73,7 @@ const otherColors = {
 	subtitleStrokeFrom: Color3.fromHex("#005794"),
 	subtitleStrokeTo: Color3.fromHex("#000000"),
 	red1: Color3.fromRGB(244, 0, 27),
+	red2: Color3.fromRGB(255, 51, 51),
 	textStrokeFrom: Color3.fromRGB(10, 60, 130),
 	textStrokeTo: Color3.fromRGB(5, 40, 100),
 	claimYellow: Color3.fromHex("#F9CB4E"),
