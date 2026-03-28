@@ -5,7 +5,6 @@ import { tryGrantBadge } from "server/rewards/services/badges";
 import { store } from "server/store";
 import {
 	ensureForceFieldOnPlayerName,
-	getPlayerHumanoidByName,
 	onPlayerDeath,
 	removeForceFieldFromPlayerName,
 } from "server/world/world.utils";
@@ -13,7 +12,7 @@ import { Badge } from "shared/assetsFolder";
 import { SOLDIER_MIN_AREA } from "shared/constants/core";
 import { palette } from "shared/constants/palette";
 import type { PowerupId } from "shared/constants/powerups";
-import { POWERUP_DURATIONS, POWERUP_EXPLOSIONS, POWERUP_PRICES, POWERUP_TURBO_SPEED } from "shared/constants/powerups";
+import { POWERUP_DURATIONS, POWERUP_EXPLOSIONS, POWERUP_PRICES } from "shared/constants/powerups";
 import {
 	calculatePolygonOperation,
 	pointsToVectors,
@@ -404,21 +403,15 @@ export function executePowerupForSoldier(
 				POWERUP_DURATIONS.turbo;
 			store.setSoldierTurboActiveUntil(soldierId, activeUntil);
 
-			const humanoid = getPlayerHumanoidByName(soldierId);
-			if (humanoid) {
-				humanoid.WalkSpeed = POWERUP_TURBO_SPEED;
-				const prevCancel = turboCancelMap.get(soldierId);
-				if (prevCancel) prevCancel();
-				const cancel = setTimeout(() => {
-					if (turboGeneration.get(soldierId) !== gen) return;
-					turboGeneration.delete(soldierId);
-					turboCancelMap.delete(soldierId);
-					store.setSoldierTurboActiveUntil(soldierId, 0);
-					const again = getPlayerHumanoidByName(soldierId);
-					if (again) again.WalkSpeed = SOLDIER_SPEED;
-				}, activeUntil - now);
-				turboCancelMap.set(soldierId, cancel);
-			}
+			const prevCancel = turboCancelMap.get(soldierId);
+			if (prevCancel) prevCancel();
+			const cancel = setTimeout(() => {
+				if (turboGeneration.get(soldierId) !== gen) return;
+				turboGeneration.delete(soldierId);
+				turboCancelMap.delete(soldierId);
+				store.setSoldierTurboActiveUntil(soldierId, 0);
+			}, activeUntil - now);
+			turboCancelMap.set(soldierId, cancel);
 			break;
 		}
 		case "shield": {

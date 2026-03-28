@@ -26,7 +26,7 @@ import { createScheduler } from "shared/utils/scheduler";
 import { applyInitialPolygonClaim, processNewAreaClaim } from "./soldier-claims";
 import { clearOwnerTracersFromGrid } from "./soldier-grid";
 import { deleteSoldierInput, onSoldierTick, registerSoldierInput } from "./soldier-tick";
-import { setSoldierSpeed } from "./soldiers.utils";
+import { applySoldierTerritorySpeed, setSoldierSpeed } from "./soldiers.utils";
 
 // Debounce map to prevent rapid-fire area claims
 const lastAreaClaimTime = new Map<string, number>();
@@ -211,13 +211,12 @@ export async function initSoldierService() {
 	});
 
 	store.observe(selectAliveSoldiersById, identifySoldier, ({ id }) => {
-		print(`Soldier ${id} is alive in saga, setting speed to ${SOLDIER_SPEED}`);
-		setSoldierSpeed(id, SOLDIER_SPEED);
+		// Spawn inside own territory → 2x speed
+		applySoldierTerritorySpeed(id, true, false);
 
-		// when the soldier dies, create candy on the soldier's tracers
+		// when the soldier dies, reset speed
 		return () => {
 			setSoldierSpeed(id, SOLDIER_SPEED);
-			// HERE WE DIE AND DROP STUFF
 			print(`Soldier ${id} died in saga`);
 		};
 	});

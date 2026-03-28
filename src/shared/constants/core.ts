@@ -8,8 +8,20 @@ export const WORLD_BOUNDS = 960;
 export const WORLD_TICK = 1 / 20;
 
 export const SOLDIER_MIN_AREA = 100;
+
 export const SOLDIER_SPEED = 32;
-export const SOLDIER_BOOST_SPEED = SOLDIER_SPEED * 2;
+export const SOLDIER_BOOST_MULTIPLIER = 1.8;
+export const SOLDIER_OWN_TERRITORY_MULTIPLIER = 1.5;
+export const SOLDIER_ENEMY_TERRITORY_MULTIPLIER = 0.7;
+/**
+ * Neutral: 32
+ * Own territory: 32 × 1.5 = 48
+ * Enemy territory: 32 × 0.7 = 22.4
+ * Neutral + turbo: 32 × 1.8 = 57.6
+ * Own territory + turbo: 32 × 1.5 × 1.8 = 86.4
+ * Enemy territory + turbo: 32 × 0.7 × 1.8 = 40.3
+ */
+
 export const SOLDIER_MAX_ORBS = 400;
 
 export const REMOTE_TICK = 1 / 20; // Roblox limits
