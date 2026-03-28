@@ -255,7 +255,7 @@ function createCircularExplosionPolygonFromPart(center: Vector2, radius: number)
 	return points;
 }
 
-function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-beam" | "nuclear") {
+function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-beam" | "nuclear", killerId: string) {
 	const soldiers = store.getState(selectSoldiersById);
 	const damagePolygonObj = pointsToPolygon(vectorsToPoints(damagePolygon));
 
@@ -339,7 +339,7 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-
 						print(
 							`[DEBUG] Soldier ${soldierId} killed: area=${updatedArea}, connected=${playerStillConnected}`,
 						);
-						onPlayerDeath(soldierId as string, "system", killSource);
+						onPlayerDeath(soldierId as string, killerId, killSource);
 					}
 				} else {
 					print(
@@ -352,7 +352,7 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-
 						polygon: [] as Vector2[],
 						dropTracers: false,
 					});
-					onPlayerDeath(soldierId as string, "system", killSource);
+					onPlayerDeath(soldierId as string, killerId, killSource);
 				}
 			} else {
 				print(
@@ -366,7 +366,7 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-
 					polygon: [] as Vector2[],
 					dropTracers: false,
 				});
-				onPlayerDeath(soldierId as string, "system", killSource);
+				onPlayerDeath(soldierId as string, killerId, killSource);
 			}
 		} else {
 			print(`[DEBUG] No intersection found for soldier ${soldierId}, skipping difference operation`);
@@ -493,7 +493,7 @@ export function executePowerupForSoldier(
 			}
 
 			const damagePolygon = createExplosionPolygonFromPart(bombCenter2D, cfg.length, cfg.width, cframe);
-			cutDamageAreaFromSoldiers(damagePolygon, "laser-beam");
+			cutDamageAreaFromSoldiers(damagePolygon, "laser-beam", soldierId);
 			remotes.client.powerupCarpet.fireAll(cframe, size);
 			break;
 		}
@@ -516,7 +516,7 @@ export function executePowerupForSoldier(
 				}
 			}
 			const damagePolygon = createCircularExplosionPolygonFromPart(center, cfg.radius);
-			cutDamageAreaFromSoldiers(damagePolygon, "nuclear");
+			cutDamageAreaFromSoldiers(damagePolygon, "nuclear", soldierId);
 			const nuclearCFrame = new CFrame(center.X, 0.5, center.Y);
 			const size = new Vector3(5, cfg.radius * 2, cfg.radius * 2);
 			remotes.client.powerupNuclear.fireAll(nuclearCFrame, size);
