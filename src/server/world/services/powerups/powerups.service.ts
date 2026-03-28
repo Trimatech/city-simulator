@@ -26,6 +26,7 @@ import { remotes } from "shared/remotes";
 import { selectSoldierById, selectSoldierOrbs, selectSoldiersById } from "shared/store/soldiers";
 import { selectTowersById } from "shared/store/towers/tower-selectors";
 
+import { setOwnerTracerShieldMaterial } from "server/world/services/soldiers/wall-part-manager";
 import { placeTower } from "./placeTower";
 
 /** Tracks the turbo generation per soldier so stacked activations extend duration correctly. */
@@ -411,12 +412,14 @@ export function executePowerupForSoldier(
 				POWERUP_DURATIONS.shield;
 			store.setSoldierShieldActiveUntil(soldierId, activeUntil);
 			ensureForceFieldOnPlayerName(soldierId, true);
+			setOwnerTracerShieldMaterial(soldierId, true);
 			const prevCancel = shieldCancelMap.get(soldierId);
 			if (prevCancel) prevCancel();
 			const cancel = setTimeout(() => {
 				shieldCancelMap.delete(soldierId);
 				store.setSoldierShieldActiveUntil(soldierId, 0);
 				removeForceFieldFromPlayerName(soldierId);
+				setOwnerTracerShieldMaterial(soldierId, false);
 			}, activeUntil - now);
 			shieldCancelMap.set(soldierId, cancel);
 			break;

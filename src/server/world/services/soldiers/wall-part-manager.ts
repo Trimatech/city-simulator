@@ -16,7 +16,7 @@ import {
 import { getWallSkin } from "shared/constants/skins";
 import { selectGridResolution } from "shared/store/grid/grid-selectors";
 import type { GridCellsByEdgeId, GridLine } from "shared/store/grid/grid-types";
-import { selectSoldiersById, selectSoldierZIndex } from "shared/store/soldiers";
+import { selectSoldierById, selectSoldiersById, selectSoldierZIndex } from "shared/store/soldiers";
 import { quantizeVector2 } from "shared/utils/edge-id";
 import { getQuantizationStep } from "shared/utils/grid-lines.utils";
 
@@ -283,6 +283,14 @@ function createWallPart(cellKey: string, edgeId: string, line: GridLine): BasePa
 	part.SetAttribute(WALL_ATTR_TARGET_Y, targetY);
 	part.SetAttribute(WALL_ATTR_SKIN_ID, skinId);
 
+	// Apply ForceField material if owner has an active shield and this is a tracer
+	if (line.kind === "tracer") {
+		const soldier = store.getState(selectSoldierById(line.ownerId));
+		if (soldier && soldier.shieldActiveUntil > Workspace.GetServerTimeNow()) {
+			part.Material = Enum.Material.ForceField;
+		}
+	}
+
 	part.Parent = ensureWallsFolder();
 	CollectionService.AddTag(part, WALL_TAG);
 
@@ -371,6 +379,24 @@ export function clearOwnerWallParts(ownerId: string): void {
 
 	for (const key of toRemove) {
 		destroyWallPart(key);
+	}
+}
+
+/**
+ * Toggles ForceField material on all tracer wall parts for a given owner.
+ * When `active` is true, sets material to ForceField.
+ * When false, reverts to the skin's original material (SmoothPlastic for tint skins).
+ */
+export function setOwnerTracerShieldMaterial(ownerId: string, active: boolean): void {
+	for (const [, part] of wallParts) {
+		if (part.GetAttribute(WALL_ATTR_OWNER_ID) !== ownerId) continue;
+		if (part.GetAttribute(WALL_ATTR_KIND) !== "tracer") continue;
+
+		if (active) {
+			part.Material = Enum.Material.ForceField;
+		} else {
+			part.Material = Enum.Material.SmoothPlastic;
+		}
 	}
 }
 
