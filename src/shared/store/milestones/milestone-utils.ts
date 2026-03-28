@@ -4,7 +4,7 @@ import { reverseArray } from "shared/polybool/poly-utils";
 export type KillSource = "tracer" | "head-on" | "trailing-wall-cut" | "shield-reflect" | "laser-beam" | "nuclear" | "self-tracer" | "wall" | "system" | "tower";
 
 export const KILL_SOURCE_LABELS: Record<KillSource, string> = {
-	"tracer": "trail",
+	"tracer": "trail slice",
 	"head-on": "head-on collision",
 	"trailing-wall-cut": "trailing wall cut",
 	"shield-reflect": "shield reflect",
