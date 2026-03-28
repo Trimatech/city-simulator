@@ -1,6 +1,7 @@
 import React from "@rbxts/react";
 import { HStack, VStack } from "@rbxts-ui/layout";
 import { Group } from "@rbxts-ui/primitives";
+import { RemProvider } from "client/ui/rem/RemProvider";
 import { useRem } from "client/ui/rem/useRem";
 import { SlideIn } from "client/ui/slide-in";
 import { outerPaddingRemMobile } from "shared/constants/sizes";
@@ -10,6 +11,8 @@ import { MilestoneWidget } from "./milestones/MilestoneWidget";
 import { MinimapArea } from "./minimap/MinimapArea";
 import { PowerupsPanelHorizontal } from "./right/powerups/PowerupsPanelHorizontal";
 import { TutorialHints } from "./TutorialHints";
+
+const MINIMUM_POWERUPS_PANEL_REM = 10;
 
 interface GameUIMobileProps {
 	visible: boolean;
@@ -49,7 +52,9 @@ export function GameUIMobile({ visible }: GameUIMobileProps) {
 					verticalAlignment={Enum.VerticalAlignment.Bottom}
 					padding={rem(outerPaddingRemMobile)}
 				>
-					<PowerupsPanelHorizontal visible={visible} />
+					<RemProvider minimumRem={MINIMUM_POWERUPS_PANEL_REM}>
+						<PowerupsPanelHorizontal visible={visible} />
+					</RemProvider>
 				</HStack>
 			</SlideIn>
 

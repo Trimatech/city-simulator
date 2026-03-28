@@ -30,6 +30,7 @@ export function PowerupsPanelHorizontal({ visible }: Props) {
 			size={size}
 			spacing={rem(1)}
 			horizontalAlignment={Enum.HorizontalAlignment.Center}
+			automaticSize={Enum.AutomaticSize.Y}
 		>
 			<HStack
 				name="buy-powerups-stack"
