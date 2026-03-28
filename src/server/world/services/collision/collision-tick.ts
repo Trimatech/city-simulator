@@ -3,8 +3,8 @@ import { store } from "server/store";
 import { onPlayerDeath } from "server/world/world.utils";
 import { selectSoldierRanking, selectSoldiers, selectSoldiersById } from "shared/store/soldiers";
 
-import { getLastIsInsideCheckPosition, setLastIsInsideCheckPosition, invalidateIsInsideCache } from "./collision-cache";
 import { soldierIsInsideChanged } from "../soldiers/soldier-events";
+import { getLastIsInsideCheckPosition, invalidateIsInsideCache, setLastIsInsideCheckPosition } from "./collision-cache";
 import {
 	isCollidingWithEnemyTracers,
 	isCollidingWithOwnTracers,

@@ -1,12 +1,6 @@
 import { Players } from "@rbxts/services";
 import { store } from "server/store";
-import {
-	identifyMilestone,
-	selectMilestoneEliminationCount,
-	selectMilestoneLastKilled,
-	selectMilestoneLastKillSource,
-	selectMilestones,
-} from "server/store/milestones";
+import { selectMilestoneEliminationCount } from "server/store/milestones";
 import assets from "shared/assets";
 import { palette } from "shared/constants/palette";
 import { remotes } from "shared/remotes";
@@ -78,8 +72,8 @@ function getKillSourceSuffix(killSource?: KillSource): string {
 	return label ? ` with <font color="#ccc">${label}</font>` : "";
 }
 
-function handleElimination(killerId: string, victimId: string) {
-	const killSource = store.getState(selectMilestoneLastKillSource(killerId));
+export function handleElimination(killerId: string, victimId: string, killSource?: KillSource) {
+	warn(`[SocialFeed] handleElimination called: killer=${killerId}, victim=${victimId}, source=${killSource}`);
 	const sourceSuffix = getKillSourceSuffix(killSource);
 
 	if (killerId === "system") {
@@ -190,20 +184,6 @@ function handleElimination(killerId: string, victimId: string) {
 	lastKillerByVictim.set(victimId, killerId);
 }
 
-function observeMilestone(playerId: string) {
-	const unsubscribeKill = store.subscribe(selectMilestoneLastKilled(playerId), (victimId) => {
-		if (victimId !== undefined) {
-			handleElimination(playerId, victimId);
-		}
-	});
-
-	return () => {
-		unsubscribeKill();
-	};
-}
-
 export function initSocialFeedService() {
-	store.observe(selectMilestones, identifyMilestone, (_, id) => {
-		return observeMilestone(id);
-	});
+	warn("[SocialFeed] initSocialFeedService started");
 }

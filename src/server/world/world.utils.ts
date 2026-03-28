@@ -21,6 +21,7 @@ import { RAGDOLL_DURATION_SEC } from "shared/utils/ragdoll";
 
 import { getBotHumanoid } from "./services/bots/bot-registry";
 import { getCandy as getCandyLocal } from "./services/candy/candy-store";
+import { handleElimination } from "server/rewards/services/social-feed";
 
 const MIN_SPAWN_SPACING = 35;
 const SAFE_SPAWN_ATTEMPTS = 40;
@@ -122,7 +123,11 @@ export function onPlayerDeath(soldierId: string, killerId?: string, killSource?:
 	store.setSoldierIsDead(soldierId);
 
 	if (killerId !== undefined) {
+		warn(`[Death] onPlayerDeath(${soldierId}) — calling playerKilledSoldier(killer=${killerId}, victim=${soldierId}, source=${killSource})`);
 		store.playerKilledSoldier(killerId, soldierId, killSource);
+		handleElimination(killerId, soldierId, killSource);
+	} else {
+		warn(`[Death] onPlayerDeath(${soldierId}) — no killerId provided, skipping playerKilledSoldier`);
 	}
 
 	const player = Players.FindFirstChild(soldierId);
