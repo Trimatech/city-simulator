@@ -87,7 +87,7 @@ export function placeTower(player: Player, options?: PlaceTowerOptions) {
 		position: serverPosition,
 		ownerId: player.Name,
 		damage: 15,
-		shootRange: 50,
+		shootRange: 100,
 		lastAttackTime: 0,
 		lastAttackPlayerName: undefined,
 		currentTargetId: undefined,
