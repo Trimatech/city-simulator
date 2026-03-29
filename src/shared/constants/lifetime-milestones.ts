@@ -31,6 +31,9 @@ function tier(name: string, threshold: number, cash: number, crystals = 0, orbs 
 	return { name, threshold, cashReward: cash, crystalReward: crystals, orbReward: orbs, badge };
 }
 
+export const MAP_AREA = math.pi * WORLD_BOUNDS * WORLD_BOUNDS;
+export const WIN_AREA = math.floor(MAP_AREA * 0.9);
+
 export const MILESTONE_CATEGORIES: readonly MilestoneCategoryDef[] = [
 	{
 		id: "kills",
@@ -68,7 +71,7 @@ export const MILESTONE_CATEGORIES: readonly MilestoneCategoryDef[] = [
 			tier("Landowner", 250_000, 500, 0, 50, Badge.LANDLORD),
 			tier("Conqueror", 500_000, 900, 1, 0, Badge.CONQUEROR),
 			tier("Baron", 1_000_000, 1_500, 0, 0, Badge.EMPIRE),
-			tier("World Dominator", 2_500_000, 2_000, 0, 0, Badge.WORLD_DOMINATOR),
+			tier("World Dominator", WIN_AREA, 2_000, 0, 0, Badge.WORLD_DOMINATOR),
 			tier("Duke", 5_000_000, 3_000, 2),
 			tier("Sovereign", 15_000_000, 5_000),
 			tier("Emperor", 50_000_000, 10_000, 0, 100),
@@ -234,7 +237,6 @@ export const DEFAULT_MILESTONE_PROGRESS: MilestoneProgress = {
 };
 
 // Passive orb income from territory ownership
-export const MAP_AREA = math.pi * WORLD_BOUNDS * WORLD_BOUNDS;
 export const PASSIVE_ORB_INTERVAL = 60; // seconds
 export const PASSIVE_ORB_CAP = 35; // max orbs per tick
 
