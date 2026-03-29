@@ -3,7 +3,7 @@ import { useSelector } from "@rbxts/react-reflex";
 import { formatInteger } from "client/utils/format-integer";
 import { USER_NAME } from "shared/constants/core";
 
-import { BADGE_TARGETS, BadgeTarget } from "../constants";
+import { GAME_BADGE_TARGETS, LIFETIME_BADGE_TARGETS, BadgeTarget } from "../constants";
 import { ProgressCardItem } from "./ProgressCardItem";
 import { SectionHeader } from "./SectionHeader";
 
@@ -29,8 +29,13 @@ function BadgeTargetItem({ badge }: { readonly badge: BadgeTarget }) {
 export function BadgeTargets() {
 	return (
 		<>
-			<SectionHeader text="Badges" />
-			{BADGE_TARGETS.map((badge) => (
+			<SectionHeader text="Lifetime Badges" />
+			{LIFETIME_BADGE_TARGETS.map((badge) => (
+				<BadgeTargetItem key={badge.key} badge={badge} />
+			))}
+
+			<SectionHeader text="Game Badges" />
+			{GAME_BADGE_TARGETS.map((badge) => (
 				<BadgeTargetItem key={badge.key} badge={badge} />
 			))}
 		</>

@@ -19,6 +19,7 @@ import {
 	selectMilestoneTowerDestroyed,
 } from "server/store/milestones";
 import { Badge } from "shared/assetsFolder";
+import { WIN_AREA } from "shared/constants/lifetime-milestones";
 import { selectSoldierById, selectSoldierRanking } from "shared/store/soldiers";
 import { getPlayerByName } from "shared/utils/player-utils";
 
@@ -31,7 +32,7 @@ const AREA_BADGES: { threshold: number; badge: Badge }[] = [
 	{ threshold: 250_000, badge: Badge.LANDLORD },
 	{ threshold: 500_000, badge: Badge.CONQUEROR },
 	{ threshold: 1_000_000, badge: Badge.EMPIRE },
-	{ threshold: 2_500_000, badge: Badge.WORLD_DOMINATOR },
+	{ threshold: WIN_AREA, badge: Badge.WORLD_DOMINATOR },
 ];
 
 // --- Ranking ---
