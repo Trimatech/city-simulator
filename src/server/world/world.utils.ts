@@ -22,6 +22,7 @@ import { RAGDOLL_DURATION_SEC } from "shared/utils/ragdoll";
 
 import { getBotHumanoid } from "./services/bots/bot-registry";
 import { getCandy as getCandyLocal } from "./services/candy/candy-store";
+import { getEdgeSpawnPosition, getRandomEmptyCellPosition } from "./services/soldiers/occupied-cells";
 
 const MIN_SPAWN_SPACING = 35;
 const SAFE_SPAWN_ATTEMPTS = 40;
@@ -299,9 +300,17 @@ function intersectsAnySoldierPolygon(point: Vector2): boolean {
 }
 
 /**
- * Returns a safe point for bots that is also outside all other soldiers' polygons
+ * Returns a safe point for bots that is also outside all other soldiers' polygons.
+ * Uses grid-based empty cell lookup first for efficiency, then falls back to
+ * random sampling, and finally to territory edge spawning.
  */
 export function getSafePointOutsideSoldierPolygons(maxTries = 25) {
+	// Fast path: pick from grid-based empty cells (computed on-demand, prefers near players)
+	const emptyPos = getRandomEmptyCellPosition();
+	if (emptyPos && !intersectsAnySoldierPolygon(emptyPos)) {
+		return emptyPos;
+	}
+
 	for (const _ of $range(1, maxTries)) {
 		const candidate = getSafePointInWorld();
 		if (!isInsideAnySoldierPolygon(candidate) && !intersectsAnySoldierPolygon(candidate)) {
@@ -317,7 +326,10 @@ export function getSafePointOutsideSoldierPolygons(maxTries = 25) {
 		}
 	}
 
-	// As a last resort, return any random point in world
+	// Last resort: spawn at the edge of a soldier's territory
+	const edgePos = getEdgeSpawnPosition();
+	if (edgePos) return edgePos;
+
 	return getRandomPointInWorld(RANDOM_POINT_MARGIN);
 }
 
@@ -394,7 +406,14 @@ export function getSpawnPointNearPlayer(soldierId: string, maxTries = 25): Vecto
 		}
 	}
 
-	return undefined;
+	// Fallback: use grid-based empty cell lookup
+	const emptyPos = getRandomEmptyCellPosition();
+	if (emptyPos && !intersectsAnySoldierPolygon(emptyPos)) {
+		return emptyPos;
+	}
+
+	// Last resort: spawn at territory edge
+	return getEdgeSpawnPosition();
 }
 
 /**
@@ -416,7 +435,13 @@ function getSpawnPointNearPosition(center: Vector2, maxTries = 25): Vector2 | un
 		}
 	}
 
-	return undefined;
+	// Fallback: use grid-based empty cell lookup
+	const emptyPos = getRandomEmptyCellPosition();
+	if (emptyPos && !intersectsAnySoldierPolygon(emptyPos)) {
+		return emptyPos;
+	}
+
+	return getEdgeSpawnPosition();
 }
 
 /**
@@ -499,6 +524,12 @@ export function getSpawnPointNearAnyPlayer(maxTries = 25): Vector2 {
 				return candidate;
 			}
 		}
+	}
+
+	// Fast fallback: try grid-based empty cell
+	const emptyPos = getRandomEmptyCellPosition();
+	if (emptyPos && !intersectsAnySoldierPolygon(emptyPos)) {
+		return emptyPos;
 	}
 
 	// Fallback if no valid spot found near players/bots
