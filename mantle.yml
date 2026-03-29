@@ -29,7 +29,7 @@ environments:
                           🔥  Take a look at upcoming features before they're shipped to production.
                           🤝  Send your feedback to the group wall or the linked socials!
 
-                      maxPlayerCount: 50
+                      maxPlayerCount: 7
     - label: prod
       branches: [main]
       targetAccess: public
@@ -68,7 +68,7 @@ target:
                         Please like ❤️ and favorite ⭐️ if you enjoyed Zone Wars!
                         Follow 🔔 to be notified of new updates!
 
-                    maxPlayerCount: 25
+                    maxPlayerCount: 7
         badges:
             # --- Territory Milestones ---
             territory-settler:
