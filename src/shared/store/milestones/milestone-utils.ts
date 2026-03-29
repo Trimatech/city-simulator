@@ -12,7 +12,8 @@ export type KillSource =
 	| "wall"
 	| "tower"
 	| "leaving-server"
-	| "world-domination";
+	| "world-domination"
+	| "area-grow";
 
 export const KILL_SOURCE_LABELS: Record<KillSource, string> = {
 	tracer: "trail slice",
@@ -26,6 +27,7 @@ export const KILL_SOURCE_LABELS: Record<KillSource, string> = {
 	tower: "tower",
 	"leaving-server": "leaving server",
 	"world-domination": "world domination",
+	"area-grow": "area grow",
 };
 
 export type MilestoneState = {

@@ -57,4 +57,8 @@ export const remotes = createRemotes({
 		notify: remote<Client, [streakDay: number, crystalAmount: number]>(),
 		claim: remote<Server>(),
 	}),
+
+	admin: namespace({
+		executeCommand: remote<Server, [command: string, args: string, target: string]>(t.string, t.string, t.string),
+	}),
 });

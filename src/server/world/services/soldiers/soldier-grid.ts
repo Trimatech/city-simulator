@@ -147,6 +147,7 @@ export function updateAreaGridForPolygon({
 			syncCellWallParts(cellKey, merged);
 		}
 	});
+
 }
 
 // Remove all grid lines (area and tracer) belonging to an owner across all cells
