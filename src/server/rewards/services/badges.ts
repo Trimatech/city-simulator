@@ -12,7 +12,6 @@ import {
 	selectMilestoneOrbsSpent,
 	selectMilestonePowerupsUsed,
 	selectMilestoneRank1Count,
-	selectMilestoneRank1Since,
 	selectMilestoneRanking,
 	selectMilestoneReviveCount,
 	selectMilestones,

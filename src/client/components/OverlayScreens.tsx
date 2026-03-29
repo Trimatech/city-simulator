@@ -27,9 +27,7 @@ export function OverlayScreens() {
 				Active={true}
 			/>
 
-			{openMenuWindow === MenuWindow.Shop && (
-				<ShopWindow onClose={() => store.setOpenMenuWindow(undefined)} />
-			)}
+			{openMenuWindow === MenuWindow.Shop && <ShopWindow onClose={() => store.setOpenMenuWindow(undefined)} />}
 
 			{openMenuWindow === MenuWindow.DailyReward && (
 				<DailyRewardScreen onDismiss={() => store.setOpenMenuWindow(undefined)} />

@@ -1,6 +1,7 @@
 import { store } from "server/store";
-import { selectAliveSoldiersById, selectSoldierById, SoldierEntity } from "shared/store/soldiers";
 import { isPointInPolygon, vector2ToPoint, vectorsToPoints } from "shared/polybool/poly-utils";
+import { selectAliveSoldiersById, selectSoldierById, SoldierEntity } from "shared/store/soldiers";
+
 import { closestPointOnPolygonEdge, getPolygonCentroid } from "./bot-cuts";
 
 interface NearestEnemyResult {
@@ -85,7 +86,10 @@ export function getClosestPointOnOwnPolygon(botId: string): Vector2 | undefined 
 }
 
 /** Finds the closest point on any enemy polygon edge to the bot, with a fast bounds check to skip distant enemies. */
-export function getNearestEnemyPolygonEdgePoint(botId: string, botPosition: Vector2): { point: Vector2; enemyId: string } | undefined {
+export function getNearestEnemyPolygonEdgePoint(
+	botId: string,
+	botPosition: Vector2,
+): { point: Vector2; enemyId: string } | undefined {
 	const aliveById = store.getState(selectAliveSoldiersById);
 	let bestPoint: Vector2 | undefined;
 	let bestDist = math.huge;
@@ -126,7 +130,12 @@ export function getNearestEnemyPolygonEdgePoint(botId: string, botPosition: Vect
  * Scores a candidate movement direction by sampling a point `sampleDistance` studs away.
  * Higher score = better direction (farther from enemies, not inside enemy territory).
  */
-export function scoreDirection(botId: string, botPosition: Vector2, direction: Vector2, sampleDistance: number): number {
+export function scoreDirection(
+	botId: string,
+	botPosition: Vector2,
+	direction: Vector2,
+	sampleDistance: number,
+): number {
 	const aliveById = store.getState(selectAliveSoldiersById);
 	const targetPoint = botPosition.add(direction.mul(sampleDistance));
 	let score = 0;

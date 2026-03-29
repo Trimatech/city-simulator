@@ -19,7 +19,7 @@ export interface ExplosionConfig {
 }
 
 export const POWERUP_EXPLOSIONS: ExplosionConfig = {
-	laserBeam: { length: 100, width: 10, damage: 1000 },
+	laserBeam: { length: 200, width: 10, damage: 1000 },
 	nuclearExplosion: { radius: 80, damage: 1000 },
 };
 

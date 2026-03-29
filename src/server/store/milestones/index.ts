@@ -1,3 +1,4 @@
+export type { MilestoneEntity, MilestoneState, ScoreMilestone } from "shared/store/milestones";
 export {
 	identifyMilestone,
 	milestoneSlice,
@@ -20,4 +21,3 @@ export {
 	selectMilestoneShieldBlockedDeath,
 	selectMilestoneTowerDestroyed,
 } from "shared/store/milestones";
-export type { MilestoneEntity, MilestoneState, ScoreMilestone } from "shared/store/milestones";

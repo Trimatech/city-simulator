@@ -6,14 +6,27 @@ export const enum MenuWindow {
 	Progress = "progress",
 }
 
+export interface WinData {
+	readonly winnerId: string;
+	readonly winnerName: string;
+	readonly winnerUserId: number;
+	readonly areaPercent: number;
+	readonly eliminations: number;
+	readonly moneyEarned: number;
+	readonly crystalsEarned: number;
+	readonly deadline: number;
+}
+
 export interface ScreenState {
 	readonly cachedDeadline: number | undefined;
 	readonly openMenuWindow: MenuWindow | undefined;
+	readonly winData: WinData | undefined;
 }
 
 const initialState: ScreenState = {
 	cachedDeadline: undefined,
 	openMenuWindow: undefined,
+	winData: undefined,
 };
 
 export const screenSlice = createProducer(initialState, {
@@ -25,5 +38,10 @@ export const screenSlice = createProducer(initialState, {
 	setOpenMenuWindow: (state, openMenuWindow: MenuWindow | undefined) => ({
 		...state,
 		openMenuWindow,
+	}),
+
+	setWinData: (state, winData: WinData | undefined) => ({
+		...state,
+		winData,
 	}),
 });

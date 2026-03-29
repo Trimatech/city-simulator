@@ -3,8 +3,8 @@ import "client/app/react-config";
 import React from "@rbxts/react";
 import ReactRoblox from "@rbxts/react-roblox";
 import { Choose, InferFusionProps, Number } from "@rbxts/ui-labs";
-import { NotificationDot } from "client/ui/NotificationDot";
 import { RootProvider } from "client/providers/root-provider";
+import { NotificationDot } from "client/ui/NotificationDot";
 
 const controls = {
 	visible: Choose(["true", "false"]),
@@ -28,11 +28,7 @@ const story = {
 					Position={new UDim2(0.5, 0, 0.5, 0)}
 					AnchorPoint={new Vector2(0.5, 0.5)}
 				>
-					<NotificationDot
-						visible={visible}
-						size={size}
-						position={new UDim2(1, -10, 0, 10)}
-					/>
+					<NotificationDot visible={visible} size={size} position={new UDim2(1, -10, 0, 10)} />
 				</frame>
 			</RootProvider>
 		);

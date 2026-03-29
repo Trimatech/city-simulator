@@ -28,7 +28,7 @@ interface StoryContentProps {
 function StoryContent(props: StoryContentProps) {
 	const rem = useRem();
 	const [killTier, setKillTier] = useState(2);
-	const [gamesTier, setGamesTier] = useState(2);
+	const [gamesTier, _setGamesTier] = useState(2);
 	const initialized = useRef(false);
 
 	const updateSave = useCallback(

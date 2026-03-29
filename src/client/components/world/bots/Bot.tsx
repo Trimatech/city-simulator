@@ -4,8 +4,8 @@ import { RunService, TweenService, Workspace } from "@rbxts/services";
 import { WORLD_TICK } from "shared/constants/core";
 import { selectSoldierById, selectSoldierPosition } from "shared/store/soldiers";
 import { RAGDOLL_DURATION_SEC } from "shared/utils/ragdoll";
-import { NAME_DISPLAY_DISTANCE } from "../glow/label-constants";
 
+import { NAME_DISPLAY_DISTANCE } from "../glow/label-constants";
 import { SoldierGlow } from "../glow/SoldierGlow";
 import { computeDesiredLookDirection, getCharacterHalfSize, initializeBotModel, sampleGroundYAt } from "./Bot.utils";
 

@@ -4,16 +4,12 @@ import { INITIAL_POLYGON_DIAMETER } from "shared/constants/core";
 import { POWERUP_PRICES } from "shared/constants/powerups";
 import { selectSoldierById } from "shared/store/soldiers";
 
-import {
-	getEnemiesInRadius,
-	getEnemyWithExposedTrail,
-	getNearestEnemyPolygonEdgePoint,
-} from "./bot-awareness";
+import { executePowerupForSoldier } from "../powerups/powerups.service";
+import { getEnemiesInRadius, getEnemyWithExposedTrail, getNearestEnemyPolygonEdgePoint } from "./bot-awareness";
 import { buildBlobCut, buildRectCut } from "./bot-cuts";
 import { buildRaidPath, buildTrailHuntPath } from "./strategies/attack-strategy";
 import { buildDiscoverPath } from "./strategies/discover-strategy";
 import { buildRetreatPath } from "./strategies/retreat-strategy";
-import { executePowerupForSoldier } from "../powerups/powerups.service";
 
 export type BotStrategy = "circularCut" | "discover" | "attack" | "retreat";
 

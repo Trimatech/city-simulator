@@ -157,7 +157,7 @@ export async function initSoldierService() {
 
 	// TODO: should only check if spawned
 
-	store.observe(selectIsInsideBySoldierById, identifySoldier, ({ id, polygon, tracers, isInside }) => {
+	store.observe(selectIsInsideBySoldierById, identifySoldier, ({ id, polygon, tracers, isInside: _isInside }) => {
 		debug.profilebegin("SOLDIER_IS_INSIDE");
 		//print(`Soldier ${id} is ${isInside ? "inside" : "outside"}--------------------`);
 

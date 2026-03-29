@@ -17,7 +17,7 @@ export function SkinThumbnail({ skin, active: _active, transparency: _transparen
 	useEffect(() => {
 		// cancel previous load
 		loadIdRef.current += 1;
-		const myLoadId = loadIdRef.current;
+		const _myLoadId = loadIdRef.current;
 
 		// cleanup previously created transient part
 		if (createdPartRef.current && createdPartRef.current.Parent === undefined) {

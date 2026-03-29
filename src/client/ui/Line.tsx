@@ -1,5 +1,5 @@
-import { Frame } from "@rbxts-ui/primitives";
 import React from "@rbxts/react";
+import { Frame } from "@rbxts-ui/primitives";
 
 export interface LineProps {
 	// Pixel coordinates for start point

@@ -1,6 +1,6 @@
 import Object from "@rbxts/object-utils";
 import { store } from "server/store";
-import { killSoldier } from "server/world";
+import { killSoldier, onPlayerDeath } from "server/world";
 import {
 	pauseBot,
 	setBotFaceToward,
@@ -12,6 +12,7 @@ import { executePowerupForSoldier } from "server/world/services/powerups/powerup
 import { updateAreaGridForPolygon } from "server/world/services/soldiers/soldier-grid";
 import { palette } from "shared/constants/palette";
 import type { PowerupId } from "shared/constants/powerups";
+import { isPointInPolygon, vector2ToPoint } from "shared/polybool/poly-utils";
 import {
 	calculatePolygonArea,
 	createPolygonAroundPosition,
@@ -24,6 +25,18 @@ import { selectSoldierById, selectSoldiers, selectSoldiersById } from "shared/st
 
 import { createCommand } from "./create-command";
 import { runScenarioCrowd, runScenarioNarrow, runScenarioTower } from "./scenarios";
+
+function killSoldiersInsidePolygon(ownerId: string, polygon: Vector2[]) {
+	const soldiers = store.getState(selectSoldiers);
+	const polygonPoints = polygon.map(vector2ToPoint) as unknown as [number, number][];
+	for (const soldier of soldiers) {
+		if (soldier.dead || soldier.id === ownerId) continue;
+		const testPoint = vector2ToPoint(soldier.position);
+		if (isPointInPolygon(testPoint, polygonPoints)) {
+			onPlayerDeath(soldier.id, ownerId, "area-grow");
+		}
+	}
+}
 
 const COMMAND_LIST: { cmd: string; desc: string }[] = [
 	{ cmd: "/help, /commands", desc: "List all commands" },
@@ -165,6 +178,7 @@ createCommand("/areagrow", (player, argument) => {
 	store.setSoldierPolygon(player.Name, newPolygon, newArea, true);
 	store.setSoldierPolygonAreaSize(player.Name, newArea);
 	updateAreaGridForPolygon({ ownerId: player.Name, polygon: newPolygon });
+	killSoldiersInsidePolygon(player.Name, newPolygon);
 });
 
 createCommand("/areashape", (player, argument) => {
@@ -216,6 +230,7 @@ createCommand("/botgrow", (player, argument) => {
 	store.setSoldierPolygon(botId, newPolygon, newArea, true);
 	store.setSoldierPolygonAreaSize(botId, newArea);
 	updateAreaGridForPolygon({ ownerId: botId, polygon: newPolygon });
+	killSoldiersInsidePolygon(botId, newPolygon);
 });
 
 createCommand("/botarea", (player, argument) => {

@@ -2,7 +2,7 @@ import { store } from "server/store";
 import { getSoldier } from "server/world/world.utils";
 import { WORLD_BOUNDS } from "shared/constants/core";
 import { isPointInPolygon, vector2ToPoint, vectorsToPoints } from "shared/polybool/poly-utils";
-import { SOLDIER_RADIUS_BASE, SoldierEntity, selectSoldiers } from "shared/store/soldiers";
+import { selectSoldiers, SOLDIER_RADIUS_BASE, SoldierEntity } from "shared/store/soldiers";
 
 import { soldierGrid } from "../soldiers";
 

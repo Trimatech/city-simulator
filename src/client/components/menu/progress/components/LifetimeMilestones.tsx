@@ -43,7 +43,7 @@ export function LifetimeMilestones() {
 		gamesPlayed: gamesPlayed ?? 0,
 	};
 
-	const allComplete = progress ? allMilestonesComplete(progress) : false;
+	const _allComplete = progress ? allMilestonesComplete(progress) : false;
 
 	return (
 		<>

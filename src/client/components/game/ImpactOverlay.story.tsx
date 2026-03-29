@@ -1,34 +1,34 @@
-import "client/app/react-config"
+import "client/app/react-config";
 
-import React from "@rbxts/react"
-import ReactRoblox from "@rbxts/react-roblox"
-import { RootProvider } from "client/providers/root-provider"
-import { MainButton, ShopButtonText } from "client/ui/MainButton"
-import { palette } from "shared/constants/palette"
+import React from "@rbxts/react";
+import ReactRoblox from "@rbxts/react-roblox";
+import { RootProvider } from "client/providers/root-provider";
+import { MainButton, ShopButtonText } from "client/ui/MainButton";
+import { palette } from "shared/constants/palette";
 
-import { ImpactOverlay, ImpactOverlayTrigger } from "./ImpactOverlay"
+import { ImpactOverlay, ImpactOverlayTrigger } from "./ImpactOverlay";
 
 const TRIGGER_BUTTONS: ReadonlyArray<{
-	readonly kind: ImpactOverlayTrigger
-	readonly label: string
+	readonly kind: ImpactOverlayTrigger;
+	readonly label: string;
 }> = [
 	{ kind: "death", label: "Trigger Death" },
 	{ kind: "carpet", label: "Trigger Carpet" },
 	{ kind: "nuclear", label: "Trigger Nuclear" },
-]
+];
 
 function ImpactOverlayStoryContent() {
 	const [previewTrigger, setPreviewTrigger] = React.useState<{
-		readonly id: number
-		readonly kind: ImpactOverlayTrigger
-	}>()
+		readonly id: number;
+		readonly kind: ImpactOverlayTrigger;
+	}>();
 
 	const triggerImpact = (kind: ImpactOverlayTrigger) => {
 		setPreviewTrigger((current) => ({
 			id: (current?.id ?? 0) + 1,
 			kind,
-		}))
-	}
+		}));
+	};
 
 	return (
 		<RootProvider>
@@ -96,13 +96,13 @@ function ImpactOverlayStoryContent() {
 				<ImpactOverlay previewTrigger={previewTrigger} />
 			</frame>
 		</RootProvider>
-	)
+	);
 }
 
 const story = {
 	react: React,
 	reactRoblox: ReactRoblox,
 	story: () => <ImpactOverlayStoryContent />,
-}
+};
 
-export = story
+export = story;

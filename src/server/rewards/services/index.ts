@@ -5,6 +5,7 @@ import { initLifetimeMilestoneService } from "./lifetime-milestones";
 import { initMilestoneService } from "./milestones-saga";
 import { initRewardService } from "./rewards";
 import { initSocialFeedService } from "./social-feed";
+import { initWinConditionService } from "./win-condition";
 
 export const initRewardServices = runOnce(async () => {
 	initBadgeService();
@@ -12,4 +13,5 @@ export const initRewardServices = runOnce(async () => {
 	initRewardService();
 	initLifetimeMilestoneService();
 	initSocialFeedService();
+	initWinConditionService();
 });

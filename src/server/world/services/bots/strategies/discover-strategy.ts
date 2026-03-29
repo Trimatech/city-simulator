@@ -1,4 +1,5 @@
 import { WORLD_BOUNDS } from "shared/constants/core";
+
 import { scoreDirection } from "../bot-awareness";
 import { buildBlobCut, buildRectCut } from "../bot-cuts";
 
@@ -23,10 +24,7 @@ export function buildDiscoverPath(botId: string, botPosition: Vector2): Vector2[
 		const dir = new Vector2(math.cos(angle), math.sin(angle));
 		const candidateTarget = botPosition.add(dir.mul(SAMPLE_DISTANCE));
 
-		if (
-			math.abs(candidateTarget.X) > WORLD_BOUNDS - 20 ||
-			math.abs(candidateTarget.Y) > WORLD_BOUNDS - 20
-		) {
+		if (math.abs(candidateTarget.X) > WORLD_BOUNDS - 20 || math.abs(candidateTarget.Y) > WORLD_BOUNDS - 20) {
 			continue;
 		}
 
@@ -38,7 +36,10 @@ export function buildDiscoverPath(botId: string, botPosition: Vector2): Vector2[
 	// Sort by score descending, then pick randomly from top 3
 	candidates.sort((a, b) => a.score > b.score);
 	const pickIndex = math.min(math.floor(random.NextNumber() * 3), candidates.size() - 1);
-	const bestDirection = candidates.size() > 0 ? candidates[pickIndex].dir : new Vector2(random.NextNumber() - 0.5, random.NextNumber() - 0.5).Unit;
+	const bestDirection =
+		candidates.size() > 0
+			? candidates[pickIndex].dir
+			: new Vector2(random.NextNumber() - 0.5, random.NextNumber() - 0.5).Unit;
 
 	if (random.NextNumber() > 0.5) {
 		return buildRectCut(botId, botPosition, { direction: bestDirection });

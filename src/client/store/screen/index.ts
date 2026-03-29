@@ -1,2 +1,3 @@
-export { screenSlice, MenuWindow } from "./screen-slice";
-export { selectCachedDeadline, selectOpenMenuWindow } from "./screen-selectors";
+export { selectCachedDeadline, selectOpenMenuWindow, selectWinData } from "./screen-selectors";
+export type { WinData } from "./screen-slice";
+export { MenuWindow, screenSlice } from "./screen-slice";

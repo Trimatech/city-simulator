@@ -20,9 +20,7 @@ interface Appearance {
 	transparency: number;
 }
 
-type ResolvedWallSkin =
-	| { type: "tint"; appearance: Appearance }
-	| { type: "part"; modelName: WallSkinModelName };
+type ResolvedWallSkin = { type: "tint"; appearance: Appearance } | { type: "part"; modelName: WallSkinModelName };
 
 function resolveWallSkin({
 	skinId,

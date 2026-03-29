@@ -10,12 +10,12 @@ import { GameTopbar } from "./menu/home/GameTopbar";
 import { HomeTopbar } from "./menu/home/HomeTopbar";
 
 export function TopbarScreens() {
-	const rem = useRem();
+	const _rem = useRem();
 	const spawned = useSelector(selectHasLocalSoldier);
 	const soldier = useSelector(selectLocalSoldier);
 	const cachedDeadline = useSelector(selectCachedDeadline);
 	const inGame = useSelector(selectWorldSubject) !== undefined;
-	const [transition, transitionMotion] = useMotion(0);
+	const [_transition, transitionMotion] = useMotion(0);
 
 	useEffect(() => {
 		transitionMotion.spring(inGame ? 1 : 0);
