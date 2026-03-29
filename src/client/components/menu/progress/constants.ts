@@ -95,7 +95,7 @@ const lifetime = (category: "kills" | "area"): BadgeProgressSelector => {
 	return (id) => (state) => selectPlayerLifetimeStat(id, category)(state) ?? 0;
 };
 
-export const BADGE_TARGETS: readonly BadgeTarget[] = [
+export const LIFETIME_BADGE_TARGETS: readonly BadgeTarget[] = [
 	// Territory (lifetime)
 	{
 		title: "Settler",
@@ -171,7 +171,9 @@ export const BADGE_TARGETS: readonly BadgeTarget[] = [
 		target: 100,
 		select: lifetime("kills"),
 	},
+];
 
+export const GAME_BADGE_TARGETS: readonly BadgeTarget[] = [
 	// Ranking
 	{
 		title: "Podium",
