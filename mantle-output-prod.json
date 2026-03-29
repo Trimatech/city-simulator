@@ -104,9 +104,34 @@
       "assetId": 83125456065261
     }
   },
+  "badgeIcon_ranking-repeat-champion": {
+    "badgeIcon": {
+      "assetId": 86570797873712
+    }
+  },
+  "badgeIcon_ranking-runner-up": {
+    "badgeIcon": {
+      "assetId": 99237172346579
+    }
+  },
+  "badgeIcon_special-bot-buster": {
+    "badgeIcon": {
+      "assetId": 121203803629449
+    }
+  },
+  "badgeIcon_special-claimed": {
+    "badgeIcon": {
+      "assetId": 124787358196637
+    }
+  },
   "badgeIcon_special-tower-destroyer": {
     "badgeIcon": {
       "assetId": 94221937151792
+    }
+  },
+  "badgeIcon_survival-second-chance": {
+    "badgeIcon": {
+      "assetId": 112663363896095
     }
   },
   "badgeIcon_territory-conqueror": {
@@ -260,10 +285,40 @@
       "initialIconAssetId": 83125456065261
     }
   },
+  "badge_ranking-repeat-champion": {
+    "badge": {
+      "assetId": 1948810824383563,
+      "initialIconAssetId": 86570797873712
+    }
+  },
+  "badge_ranking-runner-up": {
+    "badge": {
+      "assetId": 1439818147414258,
+      "initialIconAssetId": 99237172346579
+    }
+  },
+  "badge_special-bot-buster": {
+    "badge": {
+      "assetId": 2193997879826106,
+      "initialIconAssetId": 121203803629449
+    }
+  },
+  "badge_special-claimed": {
+    "badge": {
+      "assetId": 1677039583908461,
+      "initialIconAssetId": 124787358196637
+    }
+  },
   "badge_special-tower-destroyer": {
     "badge": {
       "assetId": 1832234955999535,
       "initialIconAssetId": 94221937151792
+    }
+  },
+  "badge_survival-second-chance": {
+    "badge": {
+      "assetId": 3614966666683056,
+      "initialIconAssetId": 112663363896095
     }
   },
   "badge_territory-conqueror": {
@@ -318,7 +373,7 @@
   "placeConfiguration_start": "placeConfiguration",
   "placeFile_start": {
     "placeFile": {
-      "version": 29
+      "version": 37
     }
   },
   "place_start": {
@@ -456,6 +511,11 @@
     "product": {
       "assetId": 3411267111,
       "productId": 70576089
+    }
+  },
+  "socialLink_discord.gg": {
+    "socialLink": {
+      "assetId": 34811624
     }
   },
   "socialLink_www.roblox.com": {

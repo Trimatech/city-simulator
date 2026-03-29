@@ -1,4 +1,59 @@
 {
+  "badgeIcon_economy-big-spender": {
+    "badgeIcon": {
+      "assetId": 108998129670804
+    }
+  },
+  "badgeIcon_economy-dedicated": {
+    "badgeIcon": {
+      "assetId": 114598391385780
+    }
+  },
+  "badgeIcon_economy-fashionista": {
+    "badgeIcon": {
+      "assetId": 99928442035068
+    }
+  },
+  "badgeIcon_economy-high-roller": {
+    "badgeIcon": {
+      "assetId": 130494959408442
+    }
+  },
+  "badgeIcon_economy-wealthy": {
+    "badgeIcon": {
+      "assetId": 100651112347315
+    }
+  },
+  "badgeIcon_economy-welcome": {
+    "badgeIcon": {
+      "assetId": 80075816858669
+    }
+  },
+  "badgeIcon_elim-bounty-hunter": {
+    "badgeIcon": {
+      "assetId": 132729389294722
+    }
+  },
+  "badgeIcon_elim-executioner": {
+    "badgeIcon": {
+      "assetId": 94979361660273
+    }
+  },
+  "badgeIcon_elim-first-blood": {
+    "badgeIcon": {
+      "assetId": 133561256034937
+    }
+  },
+  "badgeIcon_elim-giant-slayer": {
+    "badgeIcon": {
+      "assetId": 98213185784187
+    }
+  },
+  "badgeIcon_elim-head-on-victor": {
+    "badgeIcon": {
+      "assetId": 132264406283702
+    }
+  },
   "badgeIcon_elim-killing-spree": {
     "badgeIcon": {
       "assetId": 119516090693320
@@ -59,9 +114,24 @@
       "assetId": 73108457918548
     }
   },
+  "badgeIcon_special-bot-buster": {
+    "badgeIcon": {
+      "assetId": 140073750706907
+    }
+  },
+  "badgeIcon_special-claimed": {
+    "badgeIcon": {
+      "assetId": 119795146137162
+    }
+  },
   "badgeIcon_special-tower-destroyer": {
     "badgeIcon": {
       "assetId": 92537776165975
+    }
+  },
+  "badgeIcon_survival-second-chance": {
+    "badgeIcon": {
+      "assetId": 138798169298852
     }
   },
   "badgeIcon_territory-conqueror": {
@@ -87,6 +157,72 @@
   "badgeIcon_territory-world-dominator": {
     "badgeIcon": {
       "assetId": 92881399684855
+    }
+  },
+  "badge_economy-big-spender": {
+    "badge": {
+      "assetId": 1964637299383323,
+      "initialIconAssetId": 108998129670804
+    }
+  },
+  "badge_economy-dedicated": {
+    "badge": {
+      "assetId": 3660255147429063,
+      "initialIconAssetId": 114598391385780
+    }
+  },
+  "badge_economy-fashionista": {
+    "badge": {
+      "assetId": 3367470714879765,
+      "initialIconAssetId": 99928442035068
+    }
+  },
+  "badge_economy-high-roller": {
+    "badge": {
+      "assetId": 3829357338571363,
+      "initialIconAssetId": 130494959408442
+    }
+  },
+  "badge_economy-wealthy": {
+    "badge": {
+      "assetId": 1899320392039730,
+      "initialIconAssetId": 100651112347315
+    }
+  },
+  "badge_economy-welcome": {
+    "badge": {
+      "assetId": 3954445957078057,
+      "initialIconAssetId": 80075816858669
+    }
+  },
+  "badge_elim-bounty-hunter": {
+    "badge": {
+      "assetId": 1284449667014306,
+      "initialIconAssetId": 132729389294722
+    }
+  },
+  "badge_elim-executioner": {
+    "badge": {
+      "assetId": 2203623411137918,
+      "initialIconAssetId": 94979361660273
+    }
+  },
+  "badge_elim-first-blood": {
+    "badge": {
+      "assetId": 4421941666397840,
+      "initialIconAssetId": 133561256034937
+    }
+  },
+  "badge_elim-giant-slayer": {
+    "badge": {
+      "assetId": 816920551277897,
+      "initialIconAssetId": 98213185784187
+    }
+  },
+  "badge_elim-head-on-victor": {
+    "badge": {
+      "assetId": 1420447418616915,
+      "initialIconAssetId": 132264406283702
     }
   },
   "badge_elim-killing-spree": {
@@ -161,10 +297,28 @@
       "initialIconAssetId": 73108457918548
     }
   },
+  "badge_special-bot-buster": {
+    "badge": {
+      "assetId": 3560082521146559,
+      "initialIconAssetId": 140073750706907
+    }
+  },
+  "badge_special-claimed": {
+    "badge": {
+      "assetId": 4483388482134960,
+      "initialIconAssetId": 119795146137162
+    }
+  },
   "badge_special-tower-destroyer": {
     "badge": {
       "assetId": 2421798362030110,
       "initialIconAssetId": 92537776165975
+    }
+  },
+  "badge_survival-second-chance": {
+    "badge": {
+      "assetId": 4348592582944371,
+      "initialIconAssetId": 138798169298852
     }
   },
   "badge_territory-conqueror": {
@@ -217,6 +371,11 @@
     }
   },
   "placeConfiguration_start": "placeConfiguration",
+  "placeFile_start": {
+    "placeFile": {
+      "version": 114
+    }
+  },
   "place_start": {
     "place": {
       "assetId": 113742151297742

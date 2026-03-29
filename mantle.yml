@@ -93,7 +93,7 @@ target:
                 enabled: true
             territory-world-dominator:
                 name: 🌍 World Dominator
-                description: The entire world bows to you! Reach 2,500,000 studs² of territory.
+                description: Claim 90% of the map area to achieve total domination!
                 icon: assets/badges/territory-milestones/world-dominator.png
                 enabled: true
 
