@@ -5,11 +5,11 @@ import { SlideIn } from "client/ui/slide-in";
 import { outerPaddingRem } from "shared/constants/sizes";
 
 import { Stats } from "../stats/Stats";
-import { Compass } from "./compass";
 import { MilestoneWidget } from "./milestones/MilestoneWidget";
 import { MinimapArea } from "./minimap/MinimapArea";
 import { PowerupsPanel } from "./right/powerups/PowerupsPanel";
 import { TutorialHints } from "./TutorialHints";
+import { WinnerDirection } from "./WinnerDirection/WinnerDirection";
 
 interface GameUIDesktopProps {
 	visible: boolean;
@@ -39,7 +39,7 @@ export function GameUIDesktop({ visible }: GameUIDesktopProps) {
 					<MinimapArea />
 				</VStack>
 			</SlideIn>
-			<Compass />
+			<WinnerDirection />
 			<TutorialHints />
 		</>
 	);

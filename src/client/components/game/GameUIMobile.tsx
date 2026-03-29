@@ -6,11 +6,11 @@ import { useRem } from "client/ui/rem/useRem";
 import { SlideIn } from "client/ui/slide-in";
 import { outerPaddingRemMobile } from "shared/constants/sizes";
 
-import { Compass } from "./compass";
 import { MilestoneWidget } from "./milestones/MilestoneWidget";
 import { MinimapArea } from "./minimap/MinimapArea";
 import { PowerupsPanelHorizontal } from "./right/powerups/PowerupsPanelHorizontal";
 import { TutorialHints } from "./TutorialHints";
+import { WinnerDirection } from "./WinnerDirection/WinnerDirection";
 
 const MINIMUM_POWERUPS_PANEL_REM = 10;
 
@@ -58,7 +58,7 @@ export function GameUIMobile({ visible }: GameUIMobileProps) {
 				</HStack>
 			</SlideIn>
 
-			<Compass />
+			<WinnerDirection />
 			<TutorialHints />
 		</>
 	);

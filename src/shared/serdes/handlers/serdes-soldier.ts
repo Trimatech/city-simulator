@@ -24,7 +24,7 @@ export function serializeSoldiers(state: SoldiersState): string {
 		buffer.WriteBool(soldier.dead);
 		buffer.WriteUInt(16, soldier.eliminations);
 		buffer.WriteBool(soldier.isInside);
-		//	buffer.WriteFloat32(soldier.polygonAreaSize);
+		buffer.WriteFloat32(soldier.polygonAreaSize);
 		buffer.WriteFloat32(soldier.shieldActiveUntil);
 		buffer.WriteFloat32(soldier.turboActiveUntil);
 		buffer.WriteUInt(16, soldier.health);
@@ -61,6 +61,7 @@ export function deserializeSoldiers(data: string): SoldiersState {
 		const dead = buffer.ReadBool();
 		const eliminations = buffer.ReadUInt(16);
 		const isInside = buffer.ReadBool();
+		const polygonAreaSize = buffer.ReadFloat32();
 		const shieldActiveUntil = buffer.ReadFloat32();
 		const turboActiveUntil = buffer.ReadFloat32();
 		const health = buffer.ReadUInt(16);
@@ -84,7 +85,7 @@ export function deserializeSoldiers(data: string): SoldiersState {
 			dead,
 			eliminations,
 			isInside,
-			polygonAreaSize: 0,
+			polygonAreaSize,
 			polygonBounds: defaultPolygonBounds,
 			shieldActiveUntil,
 			turboActiveUntil,
