@@ -1,9 +1,11 @@
 import { Badge } from "shared/assetsFolder";
-import { MilestoneCategory } from "shared/constants/lifetime-milestones";
+import { MilestoneCategory, WIN_AREA } from "shared/constants/lifetime-milestones";
 import { palette } from "shared/constants/palette";
 import { SharedState } from "shared/store";
 import { MilestoneEntity } from "shared/store/milestones";
+import { selectPlayerLifetimeStat } from "shared/store/saves";
 import { RANDOM_SKIN } from "shared/store/saves/save-types";
+import { selectSoldierArea } from "shared/store/soldiers";
 
 type BadgeProgressSelector = (id: string) => (state: SharedState) => number;
 
@@ -89,7 +91,87 @@ const msHasKill: BadgeProgressSelector = (id) => (state) => {
 	return (state.milestones[id]?.eliminationCount ?? 0) > 0 ? 1 : 0;
 };
 
+const lifetime = (category: "kills" | "area"): BadgeProgressSelector => {
+	return (id) => (state) => selectPlayerLifetimeStat(id, category)(state) ?? 0;
+};
+
 export const BADGE_TARGETS: readonly BadgeTarget[] = [
+	// Territory (lifetime)
+	{
+		title: "Settler",
+		detail: "Claim 100,000 studs² total",
+		badge: Badge.SETTLER,
+		key: "settler",
+		accent: palette.green,
+		target: 100_000,
+		select: lifetime("area"),
+	},
+	{
+		title: "Landowner",
+		detail: "Claim 250,000 studs² total",
+		badge: Badge.LANDLORD,
+		key: "landlord",
+		accent: palette.green,
+		target: 250_000,
+		select: lifetime("area"),
+	},
+	{
+		title: "Conqueror",
+		detail: "Claim 500,000 studs² total",
+		badge: Badge.CONQUEROR,
+		key: "conqueror",
+		accent: palette.green,
+		target: 500_000,
+		select: lifetime("area"),
+	},
+	{
+		title: "Empire",
+		detail: "Claim 1,000,000 studs² total",
+		badge: Badge.EMPIRE,
+		key: "empire",
+		accent: palette.green,
+		target: 1_000_000,
+		select: lifetime("area"),
+	},
+
+	// Eliminations (lifetime)
+	{
+		title: "First Blood",
+		detail: "Eliminate 1 player total",
+		badge: Badge.FIRST_BLOOD,
+		key: "first-blood",
+		accent: palette.red,
+		target: 1,
+		select: lifetime("kills"),
+	},
+	{
+		title: "Bounty Hunter",
+		detail: "Eliminate 10 players total",
+		badge: Badge.BOUNTY_HUNTER,
+		key: "bounty-hunter",
+		accent: palette.red,
+		target: 10,
+		select: lifetime("kills"),
+	},
+	{
+		title: "Executioner",
+		detail: "Eliminate 50 players total",
+		badge: Badge.EXECUTIONER,
+		key: "executioner",
+		accent: palette.red,
+		target: 50,
+		select: lifetime("kills"),
+	},
+	{
+		title: "Massacre",
+		detail: "Eliminate 100 players total",
+		badge: Badge.MASSACRE,
+		key: "massacre",
+		accent: palette.red,
+		target: 100,
+		select: lifetime("kills"),
+	},
+
 	// Ranking
 	{
 		title: "Podium",
@@ -108,6 +190,15 @@ export const BADGE_TARGETS: readonly BadgeTarget[] = [
 		accent: palette.yellow,
 		target: 1,
 		select: msRankReached(2),
+	},
+	{
+		title: "Champion",
+		detail: "Reach rank 1 on the server",
+		badge: Badge.CHAMPION,
+		key: "champion",
+		accent: palette.yellow,
+		target: 1,
+		select: msRankReached(1),
 	},
 	{
 		title: "Repeat Champion",
@@ -334,6 +425,28 @@ export const BADGE_TARGETS: readonly BadgeTarget[] = [
 		accent: palette.teal,
 		target: 10,
 		select: ms("botKillCount"),
+	},
+
+	// Welcome
+	{
+		title: "Welcome",
+		detail: "Play your first game",
+		badge: Badge.WELCOME,
+		key: "welcome",
+		accent: palette.teal,
+		target: 1,
+		select: (id) => (state) => (state.saves[id] ? 1 : 0),
+	},
+
+	// Territory
+	{
+		title: "World Dominator",
+		detail: "Claim 90% of the map area",
+		badge: Badge.WORLD_DOMINATOR,
+		key: "world-dominator",
+		accent: palette.green,
+		target: WIN_AREA,
+		select: (id) => (state) => selectSoldierArea(id)(state) ?? 0,
 	},
 ];
 
