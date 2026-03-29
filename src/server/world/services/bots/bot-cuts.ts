@@ -193,14 +193,14 @@ export function buildBlobCut(botId: string, fromPoint: Vector2, options: CutOpti
 	const outward = computeOutwardNormal(edgeUnit, nearEdge, centroid);
 
 	// Cut direction: use provided direction or default outward
-	const cutDir = options.direction ?? outward;
+	const _cutDir = options.direction ?? outward;
 
 	// Randomly pick which side of the edge to place exit/entry (clockwise or counter-clockwise)
 	const sideSign = random.NextNumber() > 0.5 ? 1 : -1;
 
 	// Span and depth
-	const span = options.span ?? (24 + random.NextNumber() * 16); // 24-40 studs
-	const depth = options.depth ?? (span * (0.4 + random.NextNumber() * 0.15)); // 40-55% of span
+	const span = options.span ?? 24 + random.NextNumber() * 16; // 24-40 studs
+	const depth = options.depth ?? span * (0.4 + random.NextNumber() * 0.15); // 40-55% of span
 
 	// Two edge points separated by span
 	const halfSpan = span / 2;
@@ -287,11 +287,11 @@ export function buildRectCut(botId: string, fromPoint: Vector2, options: CutOpti
 	const edgeUnit = getEdgeUnit(polygon, edgeIndex);
 	const outward = computeOutwardNormal(edgeUnit, nearEdge, centroid);
 
-	const cutDir = options.direction ?? outward;
+	const _cutDir = options.direction ?? outward;
 	const sideSign = random.NextNumber() > 0.5 ? 1 : -1;
 
-	const span = options.span ?? (30 + random.NextNumber() * 20); // 30-50 studs
-	const depth = options.depth ?? (12 + random.NextNumber() * 12); // 12-24 studs outward
+	const span = options.span ?? 30 + random.NextNumber() * 20; // 30-50 studs
+	const depth = options.depth ?? 12 + random.NextNumber() * 12; // 12-24 studs outward
 	const cornerRadius = 3 + random.NextNumber() * 3; // round the corners
 
 	const halfSpan = span / 2;

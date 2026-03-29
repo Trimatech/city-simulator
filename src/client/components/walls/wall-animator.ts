@@ -1,11 +1,6 @@
 import { CollectionService, TweenService, Workspace } from "@rbxts/services";
 import { getObserverPosition2D } from "client/utils/camera-position.utils";
-import {
-	WALL_ANIMATION_THRESHOLD,
-	WALL_ATTR_TARGET_Y,
-	WALL_ATTR_TIME_ADDED,
-	WALL_TAG,
-} from "shared/constants/core";
+import { WALL_ANIMATION_THRESHOLD, WALL_ATTR_TARGET_Y, WALL_ATTR_TIME_ADDED, WALL_TAG } from "shared/constants/core";
 
 const ANIMATION_DURATION = 0.8;
 const WALL_ANIMATION_DISTANCE_THRESHOLD = 150; // Don't animate walls farther than this

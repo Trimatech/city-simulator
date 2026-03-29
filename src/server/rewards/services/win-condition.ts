@@ -1,4 +1,4 @@
-import { Players, Workspace } from "@rbxts/services";
+import { Players } from "@rbxts/services";
 import { store } from "server/store";
 import { killSoldier, onPlayerDeath } from "server/world";
 import { Badge } from "shared/assetsFolder";
@@ -35,12 +35,7 @@ export function initWinConditionService() {
 	});
 }
 
-function triggerWorldDominationWin(
-	winnerId: string,
-	winnerName: string,
-	areaSize: number,
-	eliminations: number,
-) {
+function triggerWorldDominationWin(winnerId: string, winnerName: string, areaSize: number, eliminations: number) {
 	if (winInProgress) return;
 	winInProgress = true;
 

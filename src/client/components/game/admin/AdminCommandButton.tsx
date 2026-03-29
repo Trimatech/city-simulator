@@ -18,12 +18,7 @@ export function AdminCommandButton({ text, color, size, onClick, layoutOrder }: 
 	const pillRadius = new UDim(0, rem(0.8));
 
 	return (
-		<ReactiveButton2
-			onClick={onClick}
-			backgroundTransparency={1}
-			size={size}
-			layoutOrder={layoutOrder}
-		>
+		<ReactiveButton2 onClick={onClick} backgroundTransparency={1} size={size} layoutOrder={layoutOrder}>
 			<Frame
 				backgroundColor={color}
 				cornerRadius={pillRadius}

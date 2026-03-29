@@ -5,6 +5,7 @@ import { GameWindow } from "client/components/menu/shop/GameWindow";
 import { GameWindowTitleHeader } from "client/components/menu/shop/GameWindowTitleHeader";
 import { useRem } from "client/ui/rem/useRem";
 import { SCROLLBAR_COLOR, SCROLLBAR_THICKNESS, SCROLLBAR_TRANSPARENCY } from "client/ui/scrollbar.constants";
+
 import { BadgeTargets } from "./components/BadgeTargets";
 import { LifetimeMilestones } from "./components/LifetimeMilestones";
 

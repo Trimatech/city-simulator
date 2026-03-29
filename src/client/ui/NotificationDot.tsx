@@ -28,7 +28,7 @@ export function NotificationDot({
 	useEffect(() => {
 		if (!visible) return;
 
-		const connection = RunService.Heartbeat.Connect((dt) => {
+		const connection = RunService.Heartbeat.Connect((_dt) => {
 			const border = borderRef.current;
 			if (!border) return;
 

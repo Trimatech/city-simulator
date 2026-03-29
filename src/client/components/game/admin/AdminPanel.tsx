@@ -3,8 +3,8 @@ import { HStack, VStack } from "@rbxts-ui/layout";
 import { Frame, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
 import { useRem } from "client/ui/rem/useRem";
-import { remotes } from "shared/remotes";
 import { palette } from "shared/constants/palette";
+import { remotes } from "shared/remotes";
 
 import { AdminCommandButton } from "./AdminCommandButton";
 import { AdminNumberInput } from "./AdminNumberInput";
@@ -18,7 +18,14 @@ type PanelView =
 	| { kind: "main" }
 	| { kind: "number"; command: string; label: string; presets: number[]; target: string; argsPrefix?: string }
 	| { kind: "targetPicker"; command: string; label: string; then: TargetThen }
-	| { kind: "soldier"; command: string; label: string; needsNumber?: boolean; numberLabel?: string; numberPresets?: number[] }
+	| {
+			kind: "soldier";
+			command: string;
+			label: string;
+			needsNumber?: boolean;
+			numberLabel?: string;
+			numberPresets?: number[];
+	  }
 	| { kind: "soldierNumber"; command: string; soldierId: string; label: string; presets: number[] }
 	| { kind: "powerup"; soldierId?: string };
 
@@ -115,9 +122,7 @@ export function AdminPanel({ onClose }: AdminPanelProps) {
 							}}
 						/>
 					)}
-					{view.kind === "targetPicker" && (
-						<TargetPickerView view={view} setView={setView} />
-					)}
+					{view.kind === "targetPicker" && <TargetPickerView view={view} setView={setView} />}
 					{view.kind === "soldier" && (
 						<AdminSoldierPicker
 							label={view.label}
@@ -147,9 +152,7 @@ export function AdminPanel({ onClose }: AdminPanelProps) {
 							}}
 						/>
 					)}
-					{view.kind === "powerup" && (
-						<PowerupView soldierId={view.soldierId} setView={setView} />
-					)}
+					{view.kind === "powerup" && <PowerupView soldierId={view.soldierId} setView={setView} />}
 				</scrollingframe>
 			</VStack>
 		</Frame>
@@ -276,19 +279,25 @@ function MainView({ setView }: MainViewProps) {
 					text="Set Orbs"
 					color={orbColor}
 					size={btnSize}
-					onClick={() => setView(targetedNumberView("orbset", "Set Orbs", "Set Orbs To", [0, 50, 100, 200, 400]))}
+					onClick={() =>
+						setView(targetedNumberView("orbset", "Set Orbs", "Set Orbs To", [0, 50, 100, 200, 400]))
+					}
 				/>
 				<AdminCommandButton
 					text="Add Orbs"
 					color={orbColor}
 					size={btnSize}
-					onClick={() => setView(targetedNumberView("orbadd", "Add Orbs", "Add Orbs", [10, 25, 50, 100, 200]))}
+					onClick={() =>
+						setView(targetedNumberView("orbadd", "Add Orbs", "Add Orbs", [10, 25, 50, 100, 200]))
+					}
 				/>
 				<AdminCommandButton
 					text="Remove Orbs"
 					color={orbColor}
 					size={btnSize}
-					onClick={() => setView(targetedNumberView("orbremove", "Remove Orbs", "Remove Orbs", [10, 25, 50, 100, 200]))}
+					onClick={() =>
+						setView(targetedNumberView("orbremove", "Remove Orbs", "Remove Orbs", [10, 25, 50, 100, 200]))
+					}
 				/>
 			</frame>
 
@@ -304,13 +313,24 @@ function MainView({ setView }: MainViewProps) {
 					text="Add Money"
 					color={moneyColor}
 					size={btnSize}
-					onClick={() => setView(targetedNumberView("moneyadd", "Add Money", "Add Money", [100, 500, 1000, 5000, 10000]))}
+					onClick={() =>
+						setView(targetedNumberView("moneyadd", "Add Money", "Add Money", [100, 500, 1000, 5000, 10000]))
+					}
 				/>
 				<AdminCommandButton
 					text="Remove Money"
 					color={moneyColor}
 					size={btnSize}
-					onClick={() => setView(targetedNumberView("moneyremove", "Remove Money", "Remove Money", [100, 500, 1000, 5000, 10000]))}
+					onClick={() =>
+						setView(
+							targetedNumberView(
+								"moneyremove",
+								"Remove Money",
+								"Remove Money",
+								[100, 500, 1000, 5000, 10000],
+							),
+						)
+					}
 				/>
 			</frame>
 
@@ -326,7 +346,16 @@ function MainView({ setView }: MainViewProps) {
 					text="Grow Area"
 					color={areaColor}
 					size={btnSize}
-					onClick={() => setView(targetedNumberView("areagrow", "Grow Area", "Grow Area (studs)", [50, 100, 500, 1000, 5000]))}
+					onClick={() =>
+						setView(
+							targetedNumberView(
+								"areagrow",
+								"Grow Area",
+								"Grow Area (studs)",
+								[50, 100, 500, 1000, 5000],
+							),
+						)
+					}
 				/>
 				<AdminCommandButton
 					text="Shape: Narrow"
@@ -456,7 +485,12 @@ function MainView({ setView }: MainViewProps) {
 							kind: "targetPicker",
 							command: "scenario",
 							label: "Tower Scenario",
-							then: { kind: "number", label: "Tower Scenario (bot count)", presets: [1, 3, 5, 10], argsPrefix: "tower" },
+							then: {
+								kind: "number",
+								label: "Tower Scenario (bot count)",
+								presets: [1, 3, 5, 10],
+								argsPrefix: "tower",
+							},
 						})
 					}
 				/>

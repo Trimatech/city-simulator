@@ -3,7 +3,7 @@ import { useSelector } from "@rbxts/react-reflex";
 import { formatInteger } from "client/utils/format-integer";
 import { USER_NAME } from "shared/constants/core";
 
-import { BadgeTarget, BADGE_TARGETS } from "../constants";
+import { BADGE_TARGETS, BadgeTarget } from "../constants";
 import { ProgressCardItem } from "./ProgressCardItem";
 import { SectionHeader } from "./SectionHeader";
 

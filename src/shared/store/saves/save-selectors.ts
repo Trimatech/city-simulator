@@ -1,4 +1,5 @@
 import { DEFAULT_MILESTONE_PROGRESS, MilestoneCategory } from "shared/constants/lifetime-milestones";
+
 import { SharedState } from "..";
 
 export const selectPlayerSaves = (state: SharedState) => {

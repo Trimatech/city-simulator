@@ -140,12 +140,7 @@ export function getEdgeSpawnPosition(): Vector2 | undefined {
 	const occupied = buildOccupiedCells();
 	const random = new Random();
 
-	const directions = [
-		new Vector2(1, 0),
-		new Vector2(-1, 0),
-		new Vector2(0, 1),
-		new Vector2(0, -1),
-	];
+	const directions = [new Vector2(1, 0), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(0, -1)];
 
 	// Find boundary cells: unoccupied cells adjacent to occupied ones
 	const boundaryCells: Vector2[] = [];

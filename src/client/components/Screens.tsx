@@ -5,16 +5,12 @@ import { store } from "client/store";
 import { selectCachedDeadline, selectWinData } from "client/store/screen";
 import { IS_ADMIN } from "shared/constants/admin";
 import { remotes } from "shared/remotes";
-import {
-	selectHasLocalSoldier,
-	selectLocalDeathChoiceDeadline,
-	selectLocalSoldier,
-} from "shared/store/soldiers";
+import { selectHasLocalSoldier, selectLocalDeathChoiceDeadline, selectLocalSoldier } from "shared/store/soldiers";
 
 import { AdminPanel } from "./game/admin/AdminPanel";
 import { AdminToggleButton } from "./game/admin/AdminToggleButton";
-import { GameUI } from "./game/GameUI";
 import { DeathScreen } from "./game/death/DeathScreen";
+import { GameUI } from "./game/GameUI";
 import { WinScreen } from "./game/win/WinScreen";
 import { Home } from "./menu/home/home";
 
@@ -86,12 +82,8 @@ export function Screens() {
 			)}
 			<WinScreen winData={winData} onDismiss={() => store.setWinData(undefined)} />
 			{!spawned && <Home visible={homeVisible} />}
-			{IS_ADMIN && !adminPanelOpen && (
-				<AdminToggleButton onClick={() => setAdminPanelOpen(true)} />
-			)}
-			{IS_ADMIN && adminPanelOpen && (
-				<AdminPanel onClose={() => setAdminPanelOpen(false)} />
-			)}
+			{IS_ADMIN && !adminPanelOpen && <AdminToggleButton onClick={() => setAdminPanelOpen(true)} />}
+			{IS_ADMIN && adminPanelOpen && <AdminPanel onClose={() => setAdminPanelOpen(false)} />}
 		</>
 	);
 }

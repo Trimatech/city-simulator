@@ -2,7 +2,7 @@ import "client/app/react-config";
 
 import React, { useEffect } from "@rbxts/react";
 import ReactRoblox from "@rbxts/react-roblox";
-import { Number, String, InferFusionProps } from "@rbxts/ui-labs";
+import { InferFusionProps, Number, String } from "@rbxts/ui-labs";
 import { WinScreen } from "client/components/game/win/WinScreen";
 import { RootProvider } from "client/providers/root-provider";
 import type { WinData } from "client/store/screen";

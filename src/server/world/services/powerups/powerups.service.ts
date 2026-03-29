@@ -161,7 +161,7 @@ function magnitude2D(a: Vector2, b: Vector2) {
 	return a.sub(b).Magnitude;
 }
 
-function pushHumanoidAway(h: Humanoid, from3D: Vector3, strength: number) {
+function _pushHumanoidAway(h: Humanoid, from3D: Vector3, strength: number) {
 	const root = h.RootPart as BasePart | undefined;
 	if (!root) return;
 	const dir = root.Position.sub(from3D);

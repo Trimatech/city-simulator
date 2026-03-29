@@ -12,12 +12,12 @@ import { selectAliveSoldiersById, selectSoldierById, selectSoldiersById } from "
 import { createScheduler } from "shared/utils/scheduler";
 
 import { getRandomBotName } from "../bots/bot-names";
+import { isInsideAnyEnemyPolygon } from "../collision/collision-tick.utils";
 import { applyInitialPolygonClaim } from "../soldiers/soldier-claims";
 import { soldierIsInsideChanged } from "../soldiers/soldier-events";
 import { registerSoldierInput } from "../soldiers/soldier-tick";
-import { isInsideAnyEnemyPolygon } from "../collision/collision-tick.utils";
 import { getEffectiveSpeed, setSoldierSpeed } from "../soldiers/soldiers.utils";
-import { evaluateStrategy, BotStrategy } from "./bot-brain";
+import { BotStrategy, evaluateStrategy } from "./bot-brain";
 import { closestPointOnPolygonEdge, getPolygonCentroid } from "./bot-cuts";
 import { botStopped } from "./bot-events";
 
@@ -355,7 +355,6 @@ export async function initBotService() {
 				}
 				return;
 			}
-
 		},
 	);
 

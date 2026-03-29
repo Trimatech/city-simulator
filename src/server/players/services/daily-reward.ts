@@ -1,8 +1,8 @@
 import { Players } from "@rbxts/services";
 import { tryGrantBadge } from "server/rewards/services/badges";
 import { store } from "server/store";
-import { Badge } from "shared/assetsFolder";
 import assets from "shared/assets";
+import { Badge } from "shared/assetsFolder";
 import {
 	DAILY_REWARD_CYCLE,
 	DAILY_STREAK_WINDOW,

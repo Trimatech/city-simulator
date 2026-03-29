@@ -28,7 +28,11 @@ function StoryContent({ current, target, celebrating }: { current: number; targe
 	};
 
 	return (
-		<frame BackgroundTransparency={1} Size={new UDim2(0, rem(22), 0, rem(6))} Position={new UDim2(0.5, rem(-11), 0.5, rem(-3))}>
+		<frame
+			BackgroundTransparency={1}
+			Size={new UDim2(0, rem(22), 0, rem(6))}
+			Position={new UDim2(0.5, rem(-11), 0.5, rem(-3))}
+		>
 			<MilestoneItem data={data} celebrating={celebrating} />
 		</frame>
 	);
@@ -40,7 +44,13 @@ const story = {
 	controls,
 	story: (props: InferFusionProps<typeof controls>) => {
 		const c = props.controls;
-		return <StoryContent current={c.current as number} target={c.target as number} celebrating={c.celebrating as boolean} />;
+		return (
+			<StoryContent
+				current={c.current as number}
+				target={c.target as number}
+				celebrating={c.celebrating as boolean}
+			/>
+		);
 	},
 };
 

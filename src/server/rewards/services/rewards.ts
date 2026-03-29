@@ -9,8 +9,8 @@ import {
 } from "server/store/milestones";
 import { ScoreMilestone } from "server/store/milestones/milestone-utils";
 import { getSoldier } from "server/world";
-import { Badge } from "shared/assetsFolder";
 import assets from "shared/assets";
+import { Badge } from "shared/assetsFolder";
 import { KILL_BOUNTY_CAP } from "shared/constants/lifetime-milestones";
 import { palette } from "shared/constants/palette";
 import { remotes } from "shared/remotes";

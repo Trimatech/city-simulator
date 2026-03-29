@@ -21,7 +21,9 @@ function promptPurchase(productId: number) {
 	const [ok, info] = pcall(() => MarketplaceService.GetProductInfo(productId, Enum.InfoType.Product));
 	if (ok) {
 		const product = info as { Name: string; IsForSale: boolean; Creator: { CreatorTargetId: number } };
-		print(`[Shop] Product found: Name="${product.Name}", IsForSale=${product.IsForSale}, CreatorId=${product.Creator.CreatorTargetId}`);
+		print(
+			`[Shop] Product found: Name="${product.Name}", IsForSale=${product.IsForSale}, CreatorId=${product.Creator.CreatorTargetId}`,
+		);
 	} else {
 		warn(`[Shop] GetProductInfo FAILED for ${productId}: ${info}`);
 	}

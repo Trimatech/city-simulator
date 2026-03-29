@@ -1,5 +1,6 @@
 import { store } from "server/store";
 import { selectSoldierById } from "shared/store/soldiers";
+
 import { buildBlobCut, closestPointOnPolygonEdge } from "../bot-cuts";
 
 /**

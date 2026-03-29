@@ -163,10 +163,7 @@ export async function initializeBotModel(id: string): Promise<Model> {
 		const timeoutPromise = new Promise<undefined>((resolve) => {
 			task.delay(10, () => resolve(undefined));
 		});
-		const result = await Promise.race([
-			noobPromise.then((m) => m),
-			timeoutPromise,
-		]);
+		const result = await Promise.race([noobPromise.then((m) => m), timeoutPromise]);
 		if (result !== undefined) {
 			const prev = result.Archivable;
 			result.Archivable = true;

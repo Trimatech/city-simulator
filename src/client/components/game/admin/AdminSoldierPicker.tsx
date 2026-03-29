@@ -1,6 +1,6 @@
+import Object from "@rbxts/object-utils";
 import React from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
-import Object from "@rbxts/object-utils";
 import { VStack } from "@rbxts-ui/layout";
 import { Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";

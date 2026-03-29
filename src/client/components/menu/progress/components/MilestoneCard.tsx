@@ -12,7 +12,7 @@ import { palette } from "shared/constants/palette";
 
 const BURST_EMIT_DURATION = 0.4;
 const BURST_LIFETIME_MAX = 1.5;
-const CELEBRATION_DURATION = 1.8;
+const _CELEBRATION_DURATION = 1.8;
 
 function getCelebrationConfig(accent: Color3): ParticleEmitter2DConfig {
 	return {

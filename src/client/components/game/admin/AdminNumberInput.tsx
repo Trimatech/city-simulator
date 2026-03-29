@@ -1,5 +1,4 @@
 import React, { useState } from "@rbxts/react";
-import { ReactiveButton2 } from "@rbxts-ui/components";
 import { VStack } from "@rbxts-ui/layout";
 import { Frame, Text } from "@rbxts-ui/primitives";
 import { fonts } from "client/constants/fonts";
@@ -38,16 +37,18 @@ export function AdminNumberInput({ label, presets, onSubmit }: AdminNumberInputP
 					Wraps={true}
 					Padding={new UDim(0, rem(0.6))}
 				/>
-				{[...presets].sort((a, b) => a < b).map((n, i) => (
-					<AdminCommandButton
-						key={`preset-${n}`}
-						text={tostring(n)}
-						color={Color3.fromRGB(60, 120, 200)}
-						size={new UDim2(0, rem(7), 0, rem(3.5))}
-						onClick={() => onSubmit(n)}
-						layoutOrder={i}
-					/>
-				))}
+				{[...presets]
+					.sort((a, b) => a < b)
+					.map((n, i) => (
+						<AdminCommandButton
+							key={`preset-${n}`}
+							text={tostring(n)}
+							color={Color3.fromRGB(60, 120, 200)}
+							size={new UDim2(0, rem(7), 0, rem(3.5))}
+							onClick={() => onSubmit(n)}
+							layoutOrder={i}
+						/>
+					))}
 			</frame>
 
 			{/* Custom input */}
