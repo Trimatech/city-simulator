@@ -31,6 +31,18 @@ export const remotes = createRemotes({
 		powerupCarpet: remote<Client, [cframe: CFrame, size: Vector3]>(t.CFrame, t.Vector3),
 		powerupNuclear: remote<Client, [cframe: CFrame, size: Vector3]>(t.CFrame, t.Vector3),
 		orbsWasted: remote<Client, [amount: number]>(),
+		worldDominationWin: remote<
+			Client,
+			[
+				winnerId: string,
+				winnerName: string,
+				winnerUserId: number,
+				areaPercent: number,
+				eliminations: number,
+				moneyEarned: number,
+				crystalsEarned: number,
+			]
+		>(),
 	}),
 
 	powerups: namespace({

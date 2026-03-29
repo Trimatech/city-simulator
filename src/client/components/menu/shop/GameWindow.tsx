@@ -23,6 +23,7 @@ const styles = {
 		contentBgImage: assets.ui.shop.shop_room_bg,
 		contentBgTileSize: new UDim2(0, 256, 0, 256),
 		contentBgTint: undefined as Color3 | undefined,
+		contentBgTransparency: 0 as number,
 	},
 	progress: {
 		windowBg: Color3.fromHex("#6cbaff"),
@@ -41,10 +42,30 @@ const styles = {
 		contentBgImage: assets.ui.patterns.progress_content_bg,
 		contentBgTileSize: new UDim2(0, 1024, 0, 1024),
 		contentBgTint: Color3.fromHex("#76f4ff"),
+		contentBgTransparency: 0,
+	},
+	"win-screen": {
+		windowBg: Color3.fromHex("#d4a017"),
+		contentBg: Color3.fromHex("#1a0e00"),
+		contentBorderGradient: new ColorSequence([
+			new ColorSequenceKeypoint(0, Color3.fromHex("#FFE88C")),
+			new ColorSequenceKeypoint(0.5, Color3.fromHex("#D4A017")),
+			new ColorSequenceKeypoint(1, Color3.fromHex("#8B6914")),
+		]),
+		contentOuterBorder: palette.darkBorderColor,
+		windowBgImage: assets.ui.clouds_bg,
+		windowBgScaleType: Enum.ScaleType.Crop as Enum.ScaleType,
+		windowBgTileSize: undefined as UDim2 | undefined,
+		windowBgTint: undefined as Color3 | undefined,
+		windowBgGradient: new ColorSequence(Color3.fromHex("#f5d442"), Color3.fromHex("#c48a0a")),
+		contentBgImage: assets.ui.patterns.dots_pattern,
+		contentBgTileSize: new UDim2(0, 128, 0, 128),
+		contentBgTint: Color3.fromHex("#FFD700"),
+		contentBgTransparency: 0.92,
 	},
 };
 
-export type GameWindowVariant = "default" | "progress";
+export type GameWindowVariant = "default" | "progress" | "win-screen";
 
 interface GameWindowProps {
 	readonly header: React.Element;
@@ -132,7 +153,7 @@ export function GameWindow({ header, children, variant = "default" }: GameWindow
 							Size={new UDim2(1, 0, 1, 0)}
 							ScaleType={Enum.ScaleType.Tile}
 							TileSize={s.contentBgTileSize}
-							ImageTransparency={0}
+							ImageTransparency={s.contentBgTransparency}
 							ImageColor3={s.contentBgTint}
 						>
 							<uicorner CornerRadius={contentRadius} />
