@@ -7,6 +7,7 @@ import { IS_ADMIN } from "shared/constants/admin";
 import { remotes } from "shared/remotes";
 import { selectHasLocalSoldier, selectLocalDeathChoiceDeadline, selectLocalSoldier } from "shared/store/soldiers";
 
+import { PortalFrame } from "../providers/PortalFrame";
 import { AdminPanel } from "./game/admin/AdminPanel";
 import { AdminToggleButton } from "./game/admin/AdminToggleButton";
 import { DeathScreen } from "./game/death/DeathScreen";
@@ -75,7 +76,7 @@ export function Screens() {
 	const homeVisible = !spawned && !isDeathActive && !isWinActive;
 
 	return (
-		<>
+		<PortalFrame>
 			{spawned && <GameUI visible={gameUIVisible} />}
 			{!isWinActive && (
 				<DeathScreen activeDeadline={cachedDeadline} onDismiss={() => store.setCachedDeadline(undefined)} />
@@ -84,6 +85,6 @@ export function Screens() {
 			{!spawned && <Home visible={homeVisible} />}
 			{IS_ADMIN && !adminPanelOpen && <AdminToggleButton onClick={() => setAdminPanelOpen(true)} />}
 			{IS_ADMIN && adminPanelOpen && <AdminPanel onClose={() => setAdminPanelOpen(false)} />}
-		</>
+		</PortalFrame>
 	);
 }

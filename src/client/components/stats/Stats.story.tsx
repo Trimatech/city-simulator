@@ -1,9 +1,10 @@
 import "client/app/react-config";
 
-import React, { useEffect } from "@rbxts/react";
+import React, { useEffect, useRef } from "@rbxts/react";
 import ReactRoblox from "@rbxts/react-roblox";
 import { Boolean, InferFusionProps, Number } from "@rbxts/ui-labs";
 import { Stats } from "client/components/stats/Stats";
+import { PortalProvider } from "client/providers/PortalProvider";
 import { RootProvider } from "client/providers/root-provider";
 import { store } from "client/store";
 import { USER_NAME } from "shared/constants/core";
@@ -70,11 +71,16 @@ function StatsStoryContent({
 		}
 	}, [showBalance, balance]);
 
+	const portalRef = useRef<Frame>();
+
 	return (
 		<RootProvider>
-			<frame BackgroundTransparency={1} Size={new UDim2(1, 0, 1, 0)} Position={new UDim2(0.5, 0, 0.5, 0)}>
-				<Stats direction={horizontal ? "horizontal" : "vertical"} />
-			</frame>
+			<PortalProvider portalRef={portalRef}>
+				<frame BackgroundTransparency={1} Size={new UDim2(1, 0, 1, 0)} Position={new UDim2(0.5, 0, 0.5, 0)}>
+					<Stats direction={horizontal ? "horizontal" : "vertical"} />
+				</frame>
+				<frame ref={portalRef} BackgroundTransparency={1} Size={new UDim2(1, 0, 1, 0)} />
+			</PortalProvider>
 		</RootProvider>
 	);
 }
