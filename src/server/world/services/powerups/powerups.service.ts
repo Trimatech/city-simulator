@@ -270,81 +270,96 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-
 		if (!soldier || soldier.dead) continue;
 		if (soldier.shieldActiveUntil > Workspace.GetServerTimeNow()) continue;
 
-		print(`[DEBUG] Processing soldier ${soldierId} with polygon of ${soldier.polygon.size()} points`);
-		print(
-			`[DEBUG] Soldier ${soldierId} polygon points: ${soldier.polygon.map((p) => `(${p.X}, ${p.Y})`).join(", ")}`,
-		);
-
-		const soldierPolygon = pointsToPolygon(vectorsToPoints(soldier.polygon));
-
-		// First check if there's any intersection
-		let intersectionResult;
 		try {
-			intersectionResult = calculatePolygonOperation(soldierPolygon, damagePolygonObj, "Intersect");
-		} catch (err) {
-			warn(`[DEBUG] Intersection failed for ${soldierId}`, err);
-			continue;
-		}
-		print(`[DEBUG] Intersection result for ${soldierId}: ${intersectionResult.regions.size()} regions`);
-		if (intersectionResult.regions.size() > 0) {
-			print(`[DEBUG] Intersection found, proceeding with difference operation`);
-			let differenceResult;
+			print(`[DEBUG] Processing soldier ${soldierId} with polygon of ${soldier.polygon.size()} points`);
+			print(
+				`[DEBUG] Soldier ${soldierId} polygon points: ${soldier.polygon.map((p) => `(${p.X}, ${p.Y})`).join(", ")}`,
+			);
+
+			const soldierPolygon = pointsToPolygon(vectorsToPoints(soldier.polygon));
+
+			// First check if there's any intersection
+			let intersectionResult;
 			try {
-				differenceResult = calculatePolygonOperation(soldierPolygon, damagePolygonObj, "Difference");
+				intersectionResult = calculatePolygonOperation(soldierPolygon, damagePolygonObj, "Intersect");
 			} catch (err) {
-				warn(`[DEBUG] Difference failed for ${soldierId}`, err);
+				warn("[DEBUG] Intersection failed for soldier", { soldierId, err });
 				continue;
 			}
+			print(`[DEBUG] Intersection result for ${soldierId}: ${intersectionResult.regions.size()} regions`);
+			if (intersectionResult.regions.size() > 0) {
+				print(`[DEBUG] Intersection found, proceeding with difference operation`);
+				let differenceResult;
+				try {
+					differenceResult = calculatePolygonOperation(soldierPolygon, damagePolygonObj, "Difference");
+				} catch (err) {
+					warn("[DEBUG] Difference failed for soldier", { soldierId, err });
+					continue;
+				}
 
-			print(`[DEBUG] Difference result for ${soldierId}: ${differenceResult.regions.size()} regions`);
-			if (differenceResult.regions.size() > 0) {
-				print(`[DEBUG] Regions returned: ${differenceResult.regions.size()}`);
-			}
+				print(`[DEBUG] Difference result for ${soldierId}: ${differenceResult.regions.size()} regions`);
+				if (differenceResult.regions.size() > 0) {
+					print(`[DEBUG] Regions returned: ${differenceResult.regions.size()}`);
+				}
 
-			if (differenceResult.regions.size() > 0) {
-				const bestRegion = selectLargestRegionByArea(differenceResult.regions);
+				if (differenceResult.regions.size() > 0) {
+					const bestRegion = selectLargestRegionByArea(differenceResult.regions);
 
-				if (bestRegion !== undefined) {
-					const updatedPolygon = pointsToVectors(bestRegion);
-					const updatedArea = calculatePolygonArea(updatedPolygon);
+					if (bestRegion !== undefined) {
+						const updatedPolygon = pointsToVectors(bestRegion);
+						const updatedArea = calculatePolygonArea(updatedPolygon);
 
-					print(
-						`[DEBUG] Updating soldier ${soldierId} polygon: old area ${soldier.polygonAreaSize}, new area ${updatedArea}`,
-					);
-
-					store.setSoldierPolygon(soldierId as string, updatedPolygon, updatedArea);
-					store.setSoldierPolygonAreaSize(soldierId as string, updatedArea);
-					updateAreaGridForPolygon({
-						ownerId: soldierId as string,
-						polygon: updatedPolygon,
-						dropTracers: false,
-					});
-
-					// Kill soldier if area becomes too small or they lost connection to the kept region
-					let playerStillConnected: boolean;
-					if (soldier.isInside) {
-						playerStillConnected = isPointInPolygon(vector2ToPoint(soldier.position), bestRegion);
-					} else {
-						// Player is outside trailing — check if trail start is close to the kept polygon
-						const trailStart = soldier.tracers.size() > 0 ? soldier.tracers[0] : undefined;
-						if (trailStart === undefined) {
-							playerStillConnected = true;
-						} else {
-							playerStillConnected =
-								distanceToClosestPoint(vector2ToPoint(trailStart), bestRegion) <=
-								TRAIL_POLYGON_CONNECTION_THRESHOLD;
-						}
-					}
-					if (updatedArea < SOLDIER_MIN_AREA || !playerStillConnected) {
 						print(
-							`[DEBUG] Soldier ${soldierId} killed: area=${updatedArea}, connected=${playerStillConnected}`,
+							`[DEBUG] Updating soldier ${soldierId} polygon: old area ${soldier.polygonAreaSize}, new area ${updatedArea}`,
 						);
+
+						store.setSoldierPolygon(soldierId as string, updatedPolygon, updatedArea);
+						store.setSoldierPolygonAreaSize(soldierId as string, updatedArea);
+						updateAreaGridForPolygon({
+							ownerId: soldierId as string,
+							polygon: updatedPolygon,
+							dropTracers: false,
+						});
+
+						// Kill soldier if area becomes too small or they lost connection to the kept region
+						let playerStillConnected: boolean;
+						if (soldier.isInside) {
+							playerStillConnected = isPointInPolygon(vector2ToPoint(soldier.position), bestRegion);
+						} else {
+							// Player is outside trailing — check if trail start is close to the kept polygon
+							const trailStart = soldier.tracers.size() > 0 ? soldier.tracers[0] : undefined;
+							if (trailStart === undefined) {
+								playerStillConnected = true;
+							} else {
+								playerStillConnected =
+									distanceToClosestPoint(vector2ToPoint(trailStart), bestRegion) <=
+									TRAIL_POLYGON_CONNECTION_THRESHOLD;
+							}
+						}
+						if (updatedArea < SOLDIER_MIN_AREA || !playerStillConnected) {
+							print(
+								`[DEBUG] Soldier ${soldierId} killed: area=${updatedArea}, connected=${playerStillConnected}`,
+							);
+							onPlayerDeath(soldierId as string, killerId, killSource);
+						}
+					} else {
+						print(
+							`[DEBUG] No valid difference region for soldier ${soldierId} - fully covered, killing and clearing area`,
+						);
+						store.setSoldierPolygon(soldierId as string, [], 0, true);
+						store.setSoldierPolygonAreaSize(soldierId as string, 0);
+						updateAreaGridForPolygon({
+							ownerId: soldierId as string,
+							polygon: [] as Vector2[],
+							dropTracers: false,
+						});
 						onPlayerDeath(soldierId as string, killerId, killSource);
 					}
 				} else {
 					print(
-						`[DEBUG] No valid difference region for soldier ${soldierId} - fully covered, killing and clearing area`,
+						`[DEBUG] No valid difference result for soldier ${soldierId} - fully covered, killing and clearing area`,
 					);
+					// Fully covered by damage area: clear polygon immediately, then kill
 					store.setSoldierPolygon(soldierId as string, [], 0, true);
 					store.setSoldierPolygonAreaSize(soldierId as string, 0);
 					updateAreaGridForPolygon({
@@ -355,21 +370,10 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-
 					onPlayerDeath(soldierId as string, killerId, killSource);
 				}
 			} else {
-				print(
-					`[DEBUG] No valid difference result for soldier ${soldierId} - fully covered, killing and clearing area`,
-				);
-				// Fully covered by damage area: clear polygon immediately, then kill
-				store.setSoldierPolygon(soldierId as string, [], 0, true);
-				store.setSoldierPolygonAreaSize(soldierId as string, 0);
-				updateAreaGridForPolygon({
-					ownerId: soldierId as string,
-					polygon: [] as Vector2[],
-					dropTracers: false,
-				});
-				onPlayerDeath(soldierId as string, killerId, killSource);
+				print(`[DEBUG] No intersection found for soldier ${soldierId}, skipping difference operation`);
 			}
-		} else {
-			print(`[DEBUG] No intersection found for soldier ${soldierId}, skipping difference operation`);
+		} catch (err) {
+			warn("[Powerup] cutDamageAreaFromSoldiers failed for soldier", { soldierId, err });
 		}
 	}
 }
@@ -470,9 +474,13 @@ export function executePowerupForSoldier(
 			for (const [, s] of Object.entries(soldiers)) {
 				if (!s || s.dead || s.id === soldierId) continue;
 				if (s.shieldActiveUntil > Workspace.GetServerTimeNow()) continue;
-				if (isPointInRectangleWithCFrame(s.position, cframe, size)) {
-					laserHitEnemy = true;
-					onPlayerDeath(s.id, soldierId, "laser-beam");
+				try {
+					if (isPointInRectangleWithCFrame(s.position, cframe, size)) {
+						laserHitEnemy = true;
+						onPlayerDeath(s.id, soldierId, "laser-beam");
+					}
+				} catch (err) {
+					warn("[Powerup] laser-beam failed for soldier", { soldierId: s.id, err });
 				}
 			}
 			if (laserHitEnemy) {
@@ -499,8 +507,12 @@ export function executePowerupForSoldier(
 			for (const [, s] of Object.entries(soldiers)) {
 				if (!s || s.dead || s.id === soldierId) continue;
 				if (s.shieldActiveUntil > Workspace.GetServerTimeNow()) continue;
-				if (magnitude2D(s.position, center) <= cfg.radius) {
-					onPlayerDeath(s.id, soldierId, "nuke");
+				try {
+					if (magnitude2D(s.position, center) <= cfg.radius) {
+						onPlayerDeath(s.id, soldierId, "nuke");
+					}
+				} catch (err) {
+					warn("[Powerup] nuke failed for soldier", { soldierId: s.id, err });
 				}
 			}
 			const towers = store.getState(selectTowersById);
@@ -519,7 +531,7 @@ export function executePowerupForSoldier(
 			break;
 		}
 		default:
-			warn(`Unknown powerup id ${powerupId}`);
+			warn("Unknown powerup id", { powerupId });
 	}
 
 	// placeTower handles its own alerts (including failure cases)

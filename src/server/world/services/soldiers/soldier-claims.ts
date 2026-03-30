@@ -28,44 +28,48 @@ export function cutOthersByNewArea(ownerId: string, newCutPolygon: Polygon) {
 
 	for (const [, soldier] of pairs(soldiersById)) {
 		const otherId = soldier.id;
-		if (otherId === ownerId || !soldier.polygon) continue;
+		if (otherId === ownerId || !soldier.polygon || soldier.polygon.size() < 3) continue;
 
 		const otherBounds = soldier.polygonBounds;
 		if (!aabbIntersects(otherBounds, newCutBounds)) continue;
 
-		const otherSoldierPolygon = pointsToPolygon(vectorsToPoints(soldier.polygon as Vector2[]));
-		const differenceResult = calculatePolygonOperation(otherSoldierPolygon, newCutPolygon, "Difference");
+		try {
+			const otherSoldierPolygon = pointsToPolygon(vectorsToPoints(soldier.polygon));
+			const differenceResult = calculatePolygonOperation(otherSoldierPolygon, newCutPolygon, "Difference");
 
-		if (differenceResult.regions.size() > 0) {
-			const bestRegion = selectLargestRegionByArea(differenceResult.regions);
-			if (bestRegion !== undefined) {
-				const updatedPolygon = pointsToVectors(bestRegion);
-				const updatedArea = calculatePolygonArea(updatedPolygon);
-				store.setSoldierPolygon(otherId, updatedPolygon, updatedArea);
-				store.setSoldierPolygonAreaSize(otherId, updatedArea);
-				invalidateIsInsideCache(otherId);
+			if (differenceResult.regions.size() > 0) {
+				const bestRegion = selectLargestRegionByArea(differenceResult.regions);
+				if (bestRegion !== undefined) {
+					const updatedPolygon = pointsToVectors(bestRegion);
+					const updatedArea = calculatePolygonArea(updatedPolygon);
+					store.setSoldierPolygon(otherId, updatedPolygon, updatedArea);
+					store.setSoldierPolygonAreaSize(otherId, updatedArea);
+					invalidateIsInsideCache(otherId);
 
-				updateAreaGridForPolygon({
-					ownerId: otherId,
-					polygon: updatedPolygon as Vector2[],
-					dropTracers: false,
-				});
+					updateAreaGridForPolygon({
+						ownerId: otherId,
+						polygon: updatedPolygon,
+						dropTracers: false,
+					});
 
-				// We are checking if player is in its area and surrounded by other player trail and then he claimed it.
-				const isStillInside =
-					!soldier.isInside || isPointInPolygon(vector2ToPoint(soldier.position), bestRegion);
-				if (updatedArea < SOLDIER_MIN_AREA || !isStillInside) {
-					onPlayerDeath(otherId, ownerId, "trailing-wall-cut");
-					store.incrementSoldierEliminations(ownerId);
+					// We are checking if player is in its area and surrounded by other player trail and then he claimed it.
+					const isStillInside =
+						!soldier.isInside || isPointInPolygon(vector2ToPoint(soldier.position), bestRegion);
+					if (updatedArea < SOLDIER_MIN_AREA || !isStillInside) {
+						onPlayerDeath(otherId, ownerId, "trailing-wall-cut");
+						store.incrementSoldierEliminations(ownerId);
+					}
 				}
+			} else {
+				updateAreaGridForPolygon({ ownerId: otherId, polygon: [] as Vector2[], dropTracers: false });
+				invalidateIsInsideCache(otherId);
+				store.setSoldierPolygon(otherId, [], 0, true);
+				store.setSoldierPolygonAreaSize(otherId, 0);
+				onPlayerDeath(otherId, ownerId, "trailing-wall-cut");
+				store.incrementSoldierEliminations(ownerId);
 			}
-		} else {
-			updateAreaGridForPolygon({ ownerId: otherId, polygon: [] as Vector2[], dropTracers: false });
-			invalidateIsInsideCache(otherId);
-			store.setSoldierPolygon(otherId, [], 0, true);
-			store.setSoldierPolygonAreaSize(otherId, 0);
-			onPlayerDeath(otherId, ownerId, "trailing-wall-cut");
-			store.incrementSoldierEliminations(ownerId);
+		} catch (err) {
+			warn("[Claims] cutOthersByNewArea failed for soldier", { otherId, err });
 		}
 	}
 }

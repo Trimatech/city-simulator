@@ -35,7 +35,7 @@ function regenHealth() {
 export function registerSoldierInput(id: string, position: Vector2) {
 	const prevPosition = nextSoldierInputs.get(id);
 	if (prevPosition !== undefined && prevPosition.sub(position).Magnitude < 0.001) {
-		warn(`Soldier ${id} input is the same as the previous input, skipping`);
+		// Normal behavior — input unchanged, skip silently
 		return;
 	}
 

@@ -29,7 +29,7 @@ export function safeCloneInstance(instance: Instance, targetParent: Instance): I
 		clone.Parent = targetParent;
 		return clone;
 	} catch (error) {
-		warn(`Failed to clone part ${instance.Name}: ${error}`);
+		warn("Failed to clone part", { name: instance.Name, error });
 		return undefined;
 	}
 }

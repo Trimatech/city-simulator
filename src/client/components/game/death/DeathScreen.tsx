@@ -73,18 +73,21 @@ export function DeathScreen({ activeDeadline, persistent, onDismiss }: DeathScre
 
 	useEffect(() => {
 		if (effectiveDeadline !== undefined && !isExpired) {
-			warn(`[Death:DeathScreen] Animating IN (deadline=${effectiveDeadline}, isExpired=${isExpired})`);
+			print(`[Death:DeathScreen] Animating IN (deadline=${effectiveDeadline}, isExpired=${isExpired})`);
 			positionMotion.set(new UDim2(0.5, 0, 2.5, 0));
-			positionMotion.spring(new UDim2(0.5, 0, 0.5, 0), springs.responsive);
+			const thread = task.delay(1, () => {
+				positionMotion.spring(new UDim2(0.5, 0, 0.5, 0), springs.responsive);
+			});
+			return () => task.cancel(thread);
 		}
 	}, [effectiveDeadline, isExpired]);
 
 	useEffect(() => {
 		if (isExpired || isReviving) {
-			warn(`[Death:DeathScreen] Animating OUT (isExpired=${isExpired}, isReviving=${isReviving})`);
+			print(`[Death:DeathScreen] Animating OUT (isExpired=${isExpired}, isReviving=${isReviving})`);
 			positionMotion.spring(new UDim2(0.5, 0, 2.5, 0), springs.responsive);
 			const thread = task.delay(1, () => {
-				warn(`[Death:DeathScreen] Calling onDismiss`);
+				print(`[Death:DeathScreen] Calling onDismiss`);
 				onDismiss();
 			});
 			return () => task.cancel(thread);

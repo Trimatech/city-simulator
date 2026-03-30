@@ -102,13 +102,7 @@ const POWERUP_ALIASES: Record<string, PowerupId> = {
 	laserbeam: "laserBeam",
 };
 
-const VALID_POWERUP_IDS: ReadonlySet<PowerupId> = new Set([
-	"turbo",
-	"shield",
-	"tower",
-	"laserBeam",
-	"nuke",
-]);
+const VALID_POWERUP_IDS: ReadonlySet<PowerupId> = new Set(["turbo", "shield", "tower", "laserBeam", "nuke"]);
 
 function trimArg(s: string): string {
 	const match = string.match(s, "^%s*(.-)%s*$");

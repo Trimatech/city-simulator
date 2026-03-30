@@ -4,7 +4,7 @@ import { Character, onPlayerAdded, promiseCharacter, promisePlayerDisconnected }
 
 export async function initCharacterService() {
 	function onSpawn(character: Character, _player: Player) {
-		warn("Spawned character");
+		print("Spawned character");
 
 		// Set collision group for all character parts
 		character.GetDescendants().forEach((instance) => {
@@ -24,7 +24,7 @@ export async function initCharacterService() {
 		if (humanoid) {
 			humanoid.WalkSpeed = SOLDIER_SPEED;
 		} else {
-			warn(`No humanoid found for character ${character.Name}`);
+			warn("No humanoid found for character", { name: character.Name });
 		}
 	}
 

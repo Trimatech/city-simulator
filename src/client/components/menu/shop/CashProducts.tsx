@@ -25,7 +25,7 @@ function promptPurchase(productId: number) {
 			`[Shop] Product found: Name="${product.Name}", IsForSale=${product.IsForSale}, CreatorId=${product.Creator.CreatorTargetId}`,
 		);
 	} else {
-		warn(`[Shop] GetProductInfo FAILED for ${productId}: ${info}`);
+		warn("[Shop] GetProductInfo FAILED", { productId, info });
 	}
 
 	MarketplaceService.PromptProductPurchase(Players.LocalPlayer, productId);

@@ -83,7 +83,7 @@ export async function initSoldierService() {
 			character.PivotTo(new CFrame(safePoint.X, 100, safePoint.Y));
 			print("Move soldier to point", player.Name, safePoint);
 		} else {
-			warn(`No PrimaryPart found for player ${player.Name}`);
+			warn("No PrimaryPart found for player", { name: player.Name });
 		}
 	});
 
@@ -97,25 +97,30 @@ export async function initSoldierService() {
 
 	remotes.soldier.continue.connect(async (player) => {
 		const soldierId = player.Name;
-		warn(`[Revive] continue received from ${soldierId}`);
+		print(`[Revive] continue received from ${soldierId}`);
 		const soldier = store.getState(selectSoldierById(soldierId));
 		if (!soldier || !soldier.dead) {
-			warn(`[Revive] REJECTED: soldier=${soldier !== undefined}, dead=${soldier?.dead}`);
+			warn("[Revive] REJECTED: soldier not found or not dead", {
+				exists: soldier !== undefined,
+				dead: soldier?.dead,
+			});
 			return;
 		}
 
 		const crystals = store.getState(selectPlayerCrystals(soldierId)) ?? 0;
 		if (crystals < REVIVE_CRYSTAL_COST) {
-			warn(`[Revive] REJECTED: crystals=${crystals}, need=${REVIVE_CRYSTAL_COST}`);
+			warn("[Revive] REJECTED: not enough crystals", { crystals, needed: REVIVE_CRYSTAL_COST });
 			return;
 		}
 
 		const deadline = soldier.deathChoiceDeadline;
 		const now = Workspace.GetServerTimeNow();
 		if (deadline === undefined || now > deadline) {
-			warn(
-				`[Revive] REJECTED: deadline=${deadline}, serverTime=${now}, expired=${deadline !== undefined && now > deadline}`,
-			);
+			warn("[Revive] REJECTED: deadline expired", {
+				deadline,
+				serverTime: now,
+				expired: deadline !== undefined && now > deadline,
+			});
 			return;
 		}
 
@@ -123,7 +128,7 @@ export async function initSoldierService() {
 
 		const center = getPolygonCenterInside(soldierId);
 		if (!center) {
-			warn(`Cannot revive ${soldierId}: no valid polygon center`);
+			warn("Cannot revive soldier: no valid polygon center", { soldierId });
 			killSoldier(soldierId);
 			return;
 		}

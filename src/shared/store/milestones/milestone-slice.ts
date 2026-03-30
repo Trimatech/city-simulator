@@ -77,7 +77,7 @@ export const milestoneSlice = createProducer(initialState, {
 				return milestone;
 			}
 
-			warn(`${playerId} topArea=${topMilestone}`);
+			print(`${playerId} topArea=${topMilestone}`);
 
 			return {
 				...milestone,

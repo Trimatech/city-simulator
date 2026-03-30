@@ -272,7 +272,7 @@ export function tryGrantBadge(playerName: string, badgeId: number) {
 		Promise.try(() => {
 			BadgeService.AwardBadge(player.UserId, badgeId);
 		}).catch((e) => {
-			warn(`Failed to grant badge ${badgeId} to ${player}: ${e}`);
+			warn("Failed to grant badge", { badgeId, player, err: e });
 		});
 	}
 }

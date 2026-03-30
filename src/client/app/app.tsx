@@ -13,8 +13,8 @@ import { OverlayScreens } from "../components/OverlayScreens";
 import { Preloader } from "../components/preloader";
 import { Screens } from "../components/Screens";
 import { TopbarScreens } from "../components/TopbarScreens";
-import { PortalProvider } from "../providers/PortalProvider";
 import { World } from "../components/world/World";
+import { PortalProvider } from "../providers/PortalProvider";
 
 export function App() {
 	const mainScreenGuiRef = useRef<ScreenGui>();

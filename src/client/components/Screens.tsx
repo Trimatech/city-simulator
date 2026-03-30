@@ -46,7 +46,7 @@ export function Screens() {
 
 	useEffect(() => {
 		if (deathChoiceDeadline !== undefined) {
-			warn(
+			print(
 				`[Death:Client] deathChoiceDeadline received: ${deathChoiceDeadline}, timeLeft=${deathChoiceDeadline - Workspace.GetServerTimeNow()}s`,
 			);
 			store.setCachedDeadline(deathChoiceDeadline);
@@ -56,14 +56,14 @@ export function Screens() {
 	useEffect(() => {
 		if (soldier && !soldier.dead) {
 			if (cachedDeadline !== undefined) {
-				warn(`[Death:Client] Soldier alive, clearing cachedDeadline`);
+				print(`[Death:Client] Soldier alive, clearing cachedDeadline`);
 			}
 			store.setCachedDeadline(undefined);
 		}
 	}, [soldier, soldier?.dead]);
 
 	useEffect(() => {
-		warn(
+		print(
 			`[Death:Client] State: spawned=${spawned}, dead=${soldier?.dead}, deadline=${deathChoiceDeadline}, cached=${cachedDeadline}, isDeathActive=${cachedDeadline !== undefined}`,
 		);
 	}, [spawned, soldier?.dead, deathChoiceDeadline, cachedDeadline]);

@@ -67,12 +67,12 @@ export function tryCloneRandomPlayerCharacter(): Model | undefined {
 	for (const player of shuffled) {
 		const source = player.Character;
 		if (!source) {
-			warn(`[Bot] Player ${player.Name} has no character loaded, skipping`);
+			print(`[Bot] Player ${player.Name} has no character loaded, skipping`);
 			continue;
 		}
 
 		if (!isValidCharacterModel(source)) {
-			warn(`[Bot] Player ${player.Name} character missing HRP or Humanoid, skipping`);
+			print(`[Bot] Player ${player.Name} character missing HRP or Humanoid, skipping`);
 			continue;
 		}
 
@@ -82,7 +82,7 @@ export function tryCloneRandomPlayerCharacter(): Model | undefined {
 		source.Archivable = prev;
 
 		if (!isValidCharacterModel(clone)) {
-			warn(`[Bot] Cloned character from ${player.Name} is invalid (parts lost during clone), skipping`);
+			warn("[Bot] Cloned character is invalid (parts lost during clone), skipping", { playerName: player.Name });
 			clone.Destroy();
 			continue;
 		}
@@ -90,7 +90,7 @@ export function tryCloneRandomPlayerCharacter(): Model | undefined {
 		return clone;
 	}
 
-	warn("[Bot] Could not clone any player character — all players either have no character or invalid models");
+	print("[Bot] Could not clone any player character — all players either have no character or invalid models");
 	return undefined;
 }
 
@@ -141,7 +141,7 @@ export async function initializeBotModel(id: string): Promise<Model> {
 		source = existing.Clone();
 		existing.Archivable = prev;
 		if (source && !isValidCharacterModel(source)) {
-			warn(`[Bot:${id}] Existing model clone is invalid, discarding`);
+			warn("[Bot] Existing model clone is invalid, discarding", { id });
 			source.Destroy();
 			source = undefined;
 		}
@@ -171,13 +171,13 @@ export async function initializeBotModel(id: string): Promise<Model> {
 			result.Archivable = prev;
 			botDebug(id, "Successfully loaded Noob fallback model");
 		} else {
-			warn(`[Bot:${id}] Noob model load timed out after 10s`);
+			warn("[Bot] Noob model load timed out after 10s", { id });
 		}
 	}
 
 	// 4) Last resort: create a minimal placeholder model so the bot still functions
 	if (!source) {
-		warn(`[Bot:${id}] All character sources failed — creating minimal placeholder`);
+		warn("[Bot] All character sources failed — creating minimal placeholder", { id });
 		source = new Instance("Model");
 		source.Name = id;
 

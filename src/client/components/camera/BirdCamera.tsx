@@ -4,48 +4,16 @@ import { useSelector } from "@rbxts/react-reflex";
 import { Players, RunService } from "@rbxts/services";
 import { WORLD_BOUNDS } from "shared/constants/core";
 import { remotes } from "shared/remotes";
-import { selectLocalIsSpawned, selectLocalSoldier } from "shared/store/soldiers";
+import { selectLocalIsSpawned, selectLocalSoldier, selectSoldiersById } from "shared/store/soldiers";
 import { clampToCircle } from "shared/utils/world-bounds";
 
-function noiseDirection(t: number, seedX: number, seedY: number) {
-	const nx = math.noise(t, seedX);
-	const ny = math.noise(seedY, t);
-	const v = new Vector2(nx, ny);
-	return v === Vector2.zero ? new Vector2(1, 0) : v.Unit;
-}
-
-function clamp01(value: number) {
-	return math.clamp(value, 0, 1);
-}
-
-function rotateTowards(current: Vector2, target: Vector2, maxAngleRadians: number) {
-	if (current === Vector2.zero) {
-		return target;
-	}
-
-	if (target === Vector2.zero) {
-		return current;
-	}
-
-	const currentUnit = current.Unit;
-	const targetUnit = target.Unit;
-	const dot = currentUnit.X * targetUnit.X + currentUnit.Y * targetUnit.Y;
-	const crossZ = currentUnit.X * targetUnit.Y - currentUnit.Y * targetUnit.X;
-	const angle = math.atan2(crossZ, dot);
-	const absAngle = math.abs(angle);
-
-	if (absAngle <= maxAngleRadians) {
-		return targetUnit; // can snap to target within limit
-	}
-
-	const rotateBy = maxAngleRadians * math.sign(angle);
-	const cosA = math.cos(rotateBy);
-	const sinA = math.sin(rotateBy);
-	// 2D rotation
-	const x = currentUnit.X * cosA - currentUnit.Y * sinA;
-	const y = currentUnit.X * sinA + currentUnit.Y * cosA;
-	return new Vector2(x, y);
-}
+import {
+	clamp01,
+	computeDeathCameraCFrame,
+	getDirectionToKiller,
+	noiseDirection,
+	rotateTowards,
+} from "./BirdCamera.utils";
 
 export function BirdCamera() {
 	const camera = useCamera();
@@ -99,9 +67,13 @@ export function BirdCamera() {
 			return;
 		}
 
-		// During death choice period, keep camera on the ragdolling character
+		// During death choice period, offset camera to the side so player can
+		// see their own ragdoll
 		if (isDead) {
-			return;
+			camera.CameraType = Enum.CameraType.Scriptable;
+			return () => {
+				camera.CameraType = Enum.CameraType.Custom;
+			};
 		}
 
 		const startPosition = localSoldier?.position;
@@ -121,7 +93,32 @@ export function BirdCamera() {
 		};
 	}, [isSpawned, isDead]);
 
+	const soldiersById = useSelector(selectSoldiersById);
+	const deathCamCFrameRef = useRef<CFrame | undefined>(undefined);
+
+	// Capture camera position at moment of death, facing toward the killer
+	useEffect(() => {
+		if (isDead) {
+			const character = Players.LocalPlayer.Character;
+			const root = character?.FindFirstChild("HumanoidRootPart") as BasePart | undefined;
+			if (root && localSoldier) {
+				const pos = root.Position;
+				const dir = getDirectionToKiller(pos, root.CFrame.LookVector, localSoldier, soldiersById);
+				deathCamCFrameRef.current = computeDeathCameraCFrame(pos, dir);
+			}
+		} else {
+			deathCamCFrameRef.current = undefined;
+		}
+	}, [isDead]);
+
 	useEventListener(RunService.RenderStepped, (dt) => {
+		// During death, hold the offset camera on the ragdoll
+		if (isDead && deathCamCFrameRef.current) {
+			camera.CameraType = Enum.CameraType.Scriptable;
+			camera.CFrame = deathCamCFrameRef.current;
+			return;
+		}
+
 		if (isSpawned || isDead) return;
 
 		// Ensure we keep control of the camera while spectating

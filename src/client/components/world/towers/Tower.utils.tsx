@@ -82,7 +82,7 @@ export function createAttackBeam(model: Model, targetId: string) {
 	}
 
 	if (!targetPart) {
-		warn(`No target part found for ${targetId}`);
+		warn("No target part found", { targetId });
 		return;
 	}
 

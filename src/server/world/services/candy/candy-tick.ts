@@ -12,16 +12,20 @@ export function onCandyTick() {
 			continue;
 		}
 
-		const range = SOLDIER_EAT_RADIUS;
+		try {
+			const range = SOLDIER_EAT_RADIUS;
 
-		const nearest = candyGrid.nearest(soldier.position, range, (point) => {
-			const candy = getCandy(point.metadata.id);
-			return candy !== undefined && !candy.eatenAt;
-		});
+			const nearest = candyGrid.nearest(soldier.position, range, (point) => {
+				const candy = getCandy(point.metadata.id);
+				return candy !== undefined && !candy.eatenAt;
+			});
 
-		if (nearest) {
-			eatCandy(nearest.metadata.id, soldier.id);
-			store.incrementMilestoneCandyCollected(soldier.id);
+			if (nearest) {
+				eatCandy(nearest.metadata.id, soldier.id);
+				store.incrementMilestoneCandyCollected(soldier.id);
+			}
+		} catch (err) {
+			warn("[Candy] tick failed for soldier", { soldierId: soldier.id, err });
 		}
 	}
 }
