@@ -1,4 +1,3 @@
-import { Falldown } from "@rbxts/falldown";
 import { Players, Workspace } from "@rbxts/services";
 import { setTimeout } from "@rbxts/set-timeout";
 import { handleElimination } from "server/rewards/services/social-feed";
@@ -16,6 +15,7 @@ import {
 import { calculatePolygonOperation, isPointInPolygon, vector2ToPoint } from "shared/polybool/poly-utils";
 import { pointsToPolygon } from "shared/polybool/polybool";
 import { createPolygonAroundPosition, getPolygonCentroid } from "shared/polygon-extra.utils";
+import { remotes } from "shared/remotes";
 import { KillSource } from "shared/store/milestones/milestone-utils";
 import { selectAliveSoldiersById } from "shared/store/soldiers";
 import { RAGDOLL_DURATION_SEC } from "shared/utils/ragdoll";
@@ -121,7 +121,7 @@ export function onPlayerDeath(soldierId: string, killerId: string, killSource: K
 	}
 
 	print(`[Death] onPlayerDeath(${soldierId}) — setting dead=true`);
-	store.setSoldierIsDead(soldierId);
+	store.setSoldierIsDead(soldierId, killerId);
 
 	print(
 		`[Death] onPlayerDeath(${soldierId}) — calling playerKilledSoldier(killer=${killerId}, victim=${soldierId}, source=${killSource})`,
@@ -132,13 +132,10 @@ export function onPlayerDeath(soldierId: string, killerId: string, killSource: K
 	const player = Players.FindFirstChild(soldierId);
 	if (player?.IsA("Player") && player.Character) {
 		const character = player.Character;
-		const ragdoll = Falldown.RagdollCharacter(character, 0);
-		if (ragdoll) {
-			ragdoll.AddRandomVelocity(50);
-		}
+		// Tell all clients to ragdoll this character locally for instant feedback
+		remotes.client.ragdoll.fireAll(character.Name);
+		// Server just destroys the character after the ragdoll duration
 		task.delay(RAGDOLL_DURATION_SEC, () => {
-			ragdoll?.Destroy(Falldown.ExitMode.Immediate);
-			task.wait(0.1);
 			if (character.Parent) {
 				character.Destroy();
 			}
@@ -166,18 +163,20 @@ export function onPlayerDeath(soldierId: string, killerId: string, killSource: K
 
 	// Verify the state was actually set
 	const verify = getSoldier(soldierId);
-	print(`[Death] onPlayerDeath(${soldierId}) — verify: dead=${verify?.dead}, deadline=${verify?.deathChoiceDeadline}`);
+	print(
+		`[Death] onPlayerDeath(${soldierId}) — verify: dead=${verify?.dead}, deadline=${verify?.deathChoiceDeadline}`,
+	);
 
 	const timer = task.delay(DEATH_CHOICE_TIMEOUT_SEC, () => {
 		deathChoiceTimers.delete(soldierId);
 		try {
-		const soldier = getSoldier(soldierId);
-		print(
-			`[Death] deathChoiceTimer expired for ${soldierId} — exists=${soldier !== undefined}, dead=${soldier?.dead}`,
-		);
-		if (soldier?.dead) {
-			killSoldier(soldierId);
-		}
+			const soldier = getSoldier(soldierId);
+			print(
+				`[Death] deathChoiceTimer expired for ${soldierId} — exists=${soldier !== undefined}, dead=${soldier?.dead}`,
+			);
+			if (soldier?.dead) {
+				killSoldier(soldierId);
+			}
 		} catch (err) {
 			warn("[Death] deathChoiceTimer callback failed for soldier", { soldierId, err });
 		}
@@ -210,14 +209,14 @@ export function killSoldier(soldierId: string) {
 	store.setSoldierIsDead(soldierId);
 
 	try {
-	const humanoid = getPlayerHumanoidByName(soldierId);
-	if (humanoid) {
-		// Remove any active ForceField to ensure death goes through
-		removeForceFieldFromHumanoid(humanoid);
-		// Force kill regardless of damage immunity
-		humanoid.Health = 0;
-		humanoid.TakeDamage(1000000);
-	}
+		const humanoid = getPlayerHumanoidByName(soldierId);
+		if (humanoid) {
+			// Remove any active ForceField to ensure death goes through
+			removeForceFieldFromHumanoid(humanoid);
+			// Force kill regardless of damage immunity
+			humanoid.Health = 0;
+			humanoid.TakeDamage(1000000);
+		}
 	} catch (err) {
 		warn("[Death] killSoldier humanoid cleanup failed", { soldierId, err });
 	}

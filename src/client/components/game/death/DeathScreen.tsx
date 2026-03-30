@@ -75,7 +75,10 @@ export function DeathScreen({ activeDeadline, persistent, onDismiss }: DeathScre
 		if (effectiveDeadline !== undefined && !isExpired) {
 			print(`[Death:DeathScreen] Animating IN (deadline=${effectiveDeadline}, isExpired=${isExpired})`);
 			positionMotion.set(new UDim2(0.5, 0, 2.5, 0));
-			positionMotion.spring(new UDim2(0.5, 0, 0.5, 0), springs.responsive);
+			const thread = task.delay(1, () => {
+				positionMotion.spring(new UDim2(0.5, 0, 0.5, 0), springs.responsive);
+			});
+			return () => task.cancel(thread);
 		}
 	}, [effectiveDeadline, isExpired]);
 

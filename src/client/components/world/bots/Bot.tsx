@@ -3,7 +3,7 @@ import { useSelector } from "@rbxts/react-reflex";
 import { RunService, TweenService, Workspace } from "@rbxts/services";
 import { WORLD_TICK } from "shared/constants/core";
 import { selectSoldierById, selectSoldierPosition } from "shared/store/soldiers";
-import { RAGDOLL_DURATION_SEC } from "shared/utils/ragdoll";
+import { RAGDOLL_DURATION_SEC, ragdollCharacter } from "shared/utils/ragdoll";
 
 import { NAME_DISPLAY_DISTANCE } from "../glow/label-constants";
 import { SoldierGlow } from "../glow/SoldierGlow";
@@ -59,40 +59,13 @@ export function Bot({ id }: BotProps) {
 		return () => {
 			cancelled = true;
 			tweenRef.current?.Cancel();
-			setModel(undefined);
+			tweenRef.current = undefined;
 			const model = modelRef.current;
+			modelRef.current = undefined;
+			setModel(undefined);
 			if (model) {
-				const humanoid = model.FindFirstChildOfClass("Humanoid");
-				if (humanoid) {
-					humanoid.ChangeState(Enum.HumanoidStateType.Physics);
-				}
-				// Stop all animations
-				const animator = humanoid?.FindFirstChildOfClass("Animator");
-				if (animator) {
-					animator.GetPlayingAnimationTracks().forEach((track) => track.Stop());
-				}
-				// Unanchor all parts, enable collision, and destroy Motor6D joints for ragdoll
-				const random = new Random();
-				model.GetDescendants().forEach((inst) => {
-					if (inst.IsA("BasePart")) {
-						inst.Anchored = false;
-						inst.CanCollide = true;
-						// Apply random force to each part
-						inst.AssemblyLinearVelocity = new Vector3(
-							random.NextNumber(-30, 30),
-							random.NextNumber(20, 60),
-							random.NextNumber(-30, 30),
-						);
-					}
-					if (inst.IsA("Motor6D")) {
-						inst.Destroy();
-					}
-				});
-				task.delay(RAGDOLL_DURATION_SEC, () => {
-					if (model.Parent) {
-						model.Destroy();
-					}
-				});
+				const destroyRagdoll = ragdollCharacter(model, 30);
+				task.delay(RAGDOLL_DURATION_SEC, destroyRagdoll);
 			}
 		};
 	}, []);

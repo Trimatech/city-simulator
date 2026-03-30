@@ -44,6 +44,7 @@ export interface SoldierEntity {
 	readonly maxHealth: number;
 	readonly zIndex: number;
 	readonly deathChoiceDeadline?: number;
+	readonly killedBy?: string;
 }
 
 const defaultEntity: SoldierEntity = {
@@ -226,10 +227,11 @@ export const soldiersSlice = createProducer(initialState, {
 		}));
 	},
 
-	setSoldierIsDead: (state, id: string) => {
+	setSoldierIsDead: (state, id: string, killedBy?: string) => {
 		return mapProperty(state, id, (soldier) => ({
 			...soldier,
 			dead: true,
+			killedBy,
 		}));
 	},
 
