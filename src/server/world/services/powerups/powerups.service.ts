@@ -449,13 +449,9 @@ export function executePowerupForSoldier(
 			break;
 		}
 		case "tower": {
-			if (!player) {
-				warn(`Cannot place tower: no player provided for ${soldierId}`);
-				break;
-			}
 			const dir = directionToward.Magnitude > 0.001 ? directionToward.Unit : new Vector2(0, 1);
 			const towerPos = center.add(dir.mul(10));
-			placeTower(player, { skipCost: true, position: towerPos });
+			placeTower(player ?? soldierId, { skipCost: true, position: towerPos });
 			break;
 		}
 		case "laserBeam": {
