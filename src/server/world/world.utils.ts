@@ -170,12 +170,16 @@ export function onPlayerDeath(soldierId: string, killerId: string, killSource: K
 
 	const timer = task.delay(DEATH_CHOICE_TIMEOUT_SEC, () => {
 		deathChoiceTimers.delete(soldierId);
+		try {
 		const soldier = getSoldier(soldierId);
 		print(
 			`[Death] deathChoiceTimer expired for ${soldierId} — exists=${soldier !== undefined}, dead=${soldier?.dead}`,
 		);
 		if (soldier?.dead) {
 			killSoldier(soldierId);
+		}
+		} catch (err) {
+			warn(`[Death] deathChoiceTimer callback failed for ${soldierId}:`, err);
 		}
 	});
 	deathChoiceTimers.set(soldierId, timer);
@@ -205,6 +209,7 @@ export function killSoldier(soldierId: string) {
 	cancelDeathChoiceTimer(soldierId);
 	store.setSoldierIsDead(soldierId);
 
+	try {
 	const humanoid = getPlayerHumanoidByName(soldierId);
 	if (humanoid) {
 		// Remove any active ForceField to ensure death goes through
@@ -212,6 +217,9 @@ export function killSoldier(soldierId: string) {
 		// Force kill regardless of damage immunity
 		humanoid.Health = 0;
 		humanoid.TakeDamage(1000000);
+	}
+	} catch (err) {
+		warn(`[Death] killSoldier humanoid cleanup failed for ${soldierId}:`, err);
 	}
 
 	store.removeTowersByOwnerId(soldierId);
