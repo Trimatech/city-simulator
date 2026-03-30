@@ -17,17 +17,15 @@ export async function initProcessReceiptService() {
 
 		const player = Players.GetPlayerByUserId(receipt.PlayerId);
 		if (!player) {
-			warn(`[ProcessReceipt] Player not found for UserId ${receipt.PlayerId}`);
+			warn("[ProcessReceipt] Player not found for UserId", { playerId: receipt.PlayerId });
 			return Enum.ProductPurchaseDecision.NotProcessedYet;
 		}
 
 		const handler = productHandlers.get(receipt.ProductId);
 		if (!handler) {
-			warn(
-				`[ProcessReceipt] No handler for ProductId ${receipt.ProductId}. Registered IDs: ${productHandlers.size()}`,
-			);
+			warn("[ProcessReceipt] No handler for ProductId", { productId: receipt.ProductId, registeredCount: productHandlers.size() });
 			for (const [id] of productHandlers) {
-				warn(`[ProcessReceipt]   Have handler for: ${id}`);
+				warn("[ProcessReceipt] Have handler for", { id });
 			}
 			return Enum.ProductPurchaseDecision.NotProcessedYet;
 		}
@@ -36,7 +34,7 @@ export async function initProcessReceiptService() {
 		const [success, message] = pcall(handler, player);
 
 		if (!success) {
-			warn(`[ProcessReceipt] Handler failed for ProductId ${receipt.ProductId}: ${message}`);
+			warn("[ProcessReceipt] Handler failed for ProductId", { productId: receipt.ProductId, message });
 			return Enum.ProductPurchaseDecision.NotProcessedYet;
 		}
 

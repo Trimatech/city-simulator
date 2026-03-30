@@ -66,7 +66,7 @@ export function onTowerTick(dt: number) {
 				onPlayerDeath(nearestId, tower.ownerId, "tower");
 			}
 		} catch (err) {
-			warn(`[Tower] tick failed for tower ${tower.id}:`, err);
+			warn("[Tower] tick failed for tower", { towerId: tower.id, err });
 		}
 	}
 }

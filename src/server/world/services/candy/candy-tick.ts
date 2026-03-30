@@ -25,7 +25,7 @@ export function onCandyTick() {
 				store.incrementMilestoneCandyCollected(soldier.id);
 			}
 		} catch (err) {
-			warn(`[Candy] tick failed for soldier ${soldier.id}:`, err);
+			warn("[Candy] tick failed for soldier", { soldierId: soldier.id, err });
 		}
 	}
 }

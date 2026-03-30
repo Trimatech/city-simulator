@@ -57,7 +57,7 @@ export function getPlayerHumanoidByName(name: string) {
 		if (humanoid) {
 			return humanoid;
 		} else {
-			warn(`No humanoid found for player ${name}`);
+			warn("No humanoid found for player", { name });
 		}
 	} else {
 		// Check if this name belongs to a registered bot
@@ -68,7 +68,7 @@ export function getPlayerHumanoidByName(name: string) {
 		// Bots are rendered client-side only and don't have server-side characters,
 		// so a missing humanoid is expected — only warn for real players
 		if (!isBot) {
-			warn(`No player found for name ${name}`);
+			warn("No player found for name", { name });
 		}
 	}
 	return undefined;
@@ -179,7 +179,7 @@ export function onPlayerDeath(soldierId: string, killerId: string, killSource: K
 			killSoldier(soldierId);
 		}
 		} catch (err) {
-			warn(`[Death] deathChoiceTimer callback failed for ${soldierId}:`, err);
+			warn("[Death] deathChoiceTimer callback failed for soldier", { soldierId, err });
 		}
 	});
 	deathChoiceTimers.set(soldierId, timer);
@@ -219,7 +219,7 @@ export function killSoldier(soldierId: string) {
 		humanoid.TakeDamage(1000000);
 	}
 	} catch (err) {
-		warn(`[Death] killSoldier humanoid cleanup failed for ${soldierId}:`, err);
+		warn("[Death] killSoldier humanoid cleanup failed", { soldierId, err });
 	}
 
 	store.removeTowersByOwnerId(soldierId);

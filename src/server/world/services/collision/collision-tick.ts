@@ -131,7 +131,7 @@ export function onCollisionTick() {
 			}
 			debug.profileend();
 		} catch (err) {
-			warn(`[Collision] tick failed for soldier ${soldier.id}:`, err);
+			warn("[Collision] tick failed for soldier", { soldierId: soldier.id, err });
 		}
 	}
 }

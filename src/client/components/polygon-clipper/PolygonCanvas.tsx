@@ -35,7 +35,7 @@ export function PolygonCanvas({ size, poly1, poly2, resultPolygon, snap, onPolyg
 				const isPoly1 = closest?.polygonIndex === 0;
 
 				if (closest) {
-					warn(`drag start for isPoly1=${isPoly1} ${closest.regionIndex} ${closest.pointIndex}`);
+					warn("drag start", { isPoly1, regionIndex: closest.regionIndex, pointIndex: closest.pointIndex });
 					dragInfo.current = {
 						isDragging: true,
 						isPoly1,

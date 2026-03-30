@@ -16,12 +16,12 @@ function getTargetCFrame(part: BasePart): CFrame {
 
 	// Check for streaming/replication issues
 	if (targetY === undefined) {
-		warn(`[WallAnimator] Missing WALL_ATTR_TARGET_Y on part "${part.Name}", using fallback`);
+		warn("[WallAnimator] Missing WALL_ATTR_TARGET_Y on part, using fallback", { partName: part.Name });
 	}
 
 	// Check if Size seems invalid (streaming issue - part not fully loaded)
 	if (part.Size.Y <= 0 || part.Size.Y > 100) {
-		warn(`[WallAnimator] Suspicious Size.Y=${part.Size.Y} on part "${part.Name}"`);
+		warn("[WallAnimator] Suspicious Size.Y on part", { sizeY: part.Size.Y, partName: part.Name });
 	}
 
 	// Fallback: calculate targetY from part height if attribute is missing
@@ -69,9 +69,11 @@ function setWallToTarget(part: BasePart): void {
 		const actualY = part.Position.Y;
 		// If replication overwrote our change, re-apply
 		if (math.abs(actualY - expectedY) > 1) {
-			warn(
-				`[WallAnimator] Part "${part.Name}" was reset by replication (expected Y=${expectedY}, got Y=${actualY}), re-applying`,
-			);
+			warn("[WallAnimator] Part was reset by replication, re-applying", {
+				partName: part.Name,
+				expectedY,
+				actualY,
+			});
 			part.CFrame = targetCFrame;
 		}
 	});
@@ -95,13 +97,13 @@ function processWallPart(part: BasePart): void {
 
 	// Check if part is properly streamed in
 	if (!part.IsDescendantOf(Workspace)) {
-		warn(`[WallAnimator] Part "${part.Name}" is not in Workspace yet (streaming issue?)`);
+		warn("[WallAnimator] Part is not in Workspace yet (streaming issue?)", { partName: part.Name });
 	}
 
 	const timeAdded = part.GetAttribute(WALL_ATTR_TIME_ADDED) as number | undefined;
 	if (timeAdded === undefined) {
 		// No time attribute - could be streaming issue or old part
-		warn(`[WallAnimator] Missing WALL_ATTR_TIME_ADDED on part "${part.Name}", setting to target directly`);
+		warn("[WallAnimator] Missing WALL_ATTR_TIME_ADDED on part, setting to target directly", { partName: part.Name });
 		setWallToTarget(part);
 		return;
 	}
@@ -120,7 +122,7 @@ function processWallPart(part: BasePart): void {
 
 function handlePartAdded(part: Instance): void {
 	if (!part.IsA("BasePart")) {
-		warn(`[WallAnimator] Tagged instance "${part.Name}" is not a BasePart (got ${part.ClassName})`);
+		warn("[WallAnimator] Tagged instance is not a BasePart", { name: part.Name, className: part.ClassName });
 		return;
 	}
 

@@ -39,13 +39,13 @@ function resolveModel(modelPath: string): Model | undefined {
 	for (let i = 1; i < parts.size(); i++) {
 		const child = current.FindFirstChild(parts[i]);
 		if (!child) {
-			warn(`[Rewards] Model path segment "${parts[i]}" not found in ${current.GetFullName()}`);
+			warn("[Rewards] Model path segment not found", { segment: parts[i], parent: current.GetFullName() });
 			return undefined;
 		}
 		current = child;
 	}
 	if (current.IsA("Model")) return current;
-	warn(`[Rewards] Resolved path is not a Model: ${current.GetFullName()}`);
+	warn("[Rewards] Resolved path is not a Model", { path: current.GetFullName() });
 	return undefined;
 }
 
@@ -55,7 +55,7 @@ export function createRewardPart(data: RewardPartData): Model | undefined {
 	// Clone the model from ReplicatedStorage
 	const sourceModel = resolveModel(config.modelPath);
 	if (!sourceModel) {
-		warn(`[Rewards] Could not find model at ${config.modelPath}`);
+		warn("[Rewards] Could not find model at path", { modelPath: config.modelPath });
 		return undefined;
 	}
 

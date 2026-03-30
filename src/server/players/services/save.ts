@@ -47,7 +47,7 @@ async function loadPlayerSave(player: Player) {
 		// Welcome badge — granted on every join (Roblox only awards it once)
 		tryGrantBadge(player.Name, Badge.WELCOME);
 	} catch (e) {
-		warn(`Failed to load data for ${player.Name}: ${e}`);
+		warn("Failed to load data for player", { name: player.Name, err: e });
 		fallbackPlayerSave(player);
 	}
 }

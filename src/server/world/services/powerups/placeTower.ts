@@ -54,7 +54,7 @@ export function placeTower(playerOrSoldierId: Player | string, options?: PlaceTo
 		serverPosition = options.position;
 	} else {
 		if (!player) {
-			warn(`Cannot place tower: no position or player provided for ${soldierId}`);
+			warn("Cannot place tower: no position or player provided", { soldierId });
 			return;
 		}
 		// Compute placement in front of the player's character on the server
@@ -64,7 +64,7 @@ export function placeTower(playerOrSoldierId: Player | string, options?: PlaceTo
 			(character?.FindFirstChild("HumanoidRootPart") as BasePart | undefined);
 
 		if (!primaryPart) {
-			warn(`Cannot place tower: missing PrimaryPart for ${player.Name}`);
+			warn("Cannot place tower: missing PrimaryPart for player", { name: player.Name });
 			return;
 		}
 

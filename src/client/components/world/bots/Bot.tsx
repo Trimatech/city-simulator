@@ -45,11 +45,11 @@ export function Bot({ id }: BotProps) {
 				modelRef.current = m;
 				setModel(m);
 			} catch (err) {
-				warn(`[Bot:${id}] initializeBotModel failed (attempt ${attempt}):`, err);
+				warn("[Bot] initializeBotModel failed", { id, attempt, err });
 				if (!cancelled && attempt < 3) {
 					task.delay(2, () => tryInit(attempt + 1));
 				} else {
-					warn(`[Bot:${id}] Giving up after ${attempt} attempts`);
+					warn("[Bot] Giving up after max attempts", { id, attempt });
 				}
 			}
 		};
@@ -128,7 +128,7 @@ export function Bot({ id }: BotProps) {
 					.GetChildren()
 					.map((c) => c.Name)
 					.join(", ");
-				warn(`[Bot:${id}] No primary part found — model children: ${children}`);
+				warn("[Bot] No primary part found", { id, children });
 				return;
 			}
 

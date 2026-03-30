@@ -69,7 +69,7 @@ export function cutOthersByNewArea(ownerId: string, newCutPolygon: Polygon) {
 				store.incrementSoldierEliminations(ownerId);
 			}
 		} catch (err) {
-			warn(`[Claims] cutOthersByNewArea failed for soldier ${otherId}:`, err);
+			warn("[Claims] cutOthersByNewArea failed for soldier", { otherId, err });
 		}
 	}
 }

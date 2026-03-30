@@ -24,7 +24,7 @@ export async function initCharacterService() {
 		if (humanoid) {
 			humanoid.WalkSpeed = SOLDIER_SPEED;
 		} else {
-			warn(`No humanoid found for character ${character.Name}`);
+			warn("No humanoid found for character", { name: character.Name });
 		}
 	}
 

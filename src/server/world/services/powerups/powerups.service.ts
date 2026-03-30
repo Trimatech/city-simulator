@@ -283,7 +283,7 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-
 		try {
 			intersectionResult = calculatePolygonOperation(soldierPolygon, damagePolygonObj, "Intersect");
 		} catch (err) {
-			warn(`[DEBUG] Intersection failed for ${soldierId}`, err);
+			warn("[DEBUG] Intersection failed for soldier", { soldierId, err });
 			continue;
 		}
 			print(`[DEBUG] Intersection result for ${soldierId}: ${intersectionResult.regions.size()} regions`);
@@ -293,7 +293,7 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-
 			try {
 				differenceResult = calculatePolygonOperation(soldierPolygon, damagePolygonObj, "Difference");
 			} catch (err) {
-				warn(`[DEBUG] Difference failed for ${soldierId}`, err);
+				warn("[DEBUG] Difference failed for soldier", { soldierId, err });
 				continue;
 			}
 
@@ -373,7 +373,7 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-
 				print(`[DEBUG] No intersection found for soldier ${soldierId}, skipping difference operation`);
 			}
 		} catch (err) {
-			warn(`[Powerup] cutDamageAreaFromSoldiers failed for soldier ${soldierId}:`, err);
+			warn("[Powerup] cutDamageAreaFromSoldiers failed for soldier", { soldierId, err });
 		}
 	}
 }
@@ -480,7 +480,7 @@ export function executePowerupForSoldier(
 						onPlayerDeath(s.id, soldierId, "laser-beam");
 					}
 				} catch (err) {
-					warn(`[Powerup] laser-beam failed for soldier ${s.id}:`, err);
+					warn("[Powerup] laser-beam failed for soldier", { soldierId: s.id, err });
 				}
 			}
 			if (laserHitEnemy) {
@@ -512,7 +512,7 @@ export function executePowerupForSoldier(
 						onPlayerDeath(s.id, soldierId, "nuke");
 					}
 				} catch (err) {
-					warn(`[Powerup] nuke failed for soldier ${s.id}:`, err);
+					warn("[Powerup] nuke failed for soldier", { soldierId: s.id, err });
 				}
 			}
 			const towers = store.getState(selectTowersById);
@@ -531,7 +531,7 @@ export function executePowerupForSoldier(
 			break;
 		}
 		default:
-			warn(`Unknown powerup id ${powerupId}`);
+			warn("Unknown powerup id", { powerupId });
 	}
 
 	// placeTower handles its own alerts (including failure cases)
