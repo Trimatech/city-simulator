@@ -64,6 +64,8 @@ export function Bot({ id }: BotProps) {
 			modelRef.current = undefined;
 			setModel(undefined);
 			if (model) {
+				// Rename so a respawning bot won't find and clone this ragdolled model
+				model.Name = `${model.Name}_ragdoll`;
 				const destroyRagdoll = ragdollCharacter(model, 30);
 				task.delay(RAGDOLL_DURATION_SEC, destroyRagdoll);
 			}
