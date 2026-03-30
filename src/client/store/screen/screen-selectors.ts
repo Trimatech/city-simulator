@@ -5,3 +5,5 @@ export const selectCachedDeadline = (state: RootState) => state.screen.cachedDea
 export const selectOpenMenuWindow = (state: RootState) => state.screen.openMenuWindow;
 
 export const selectWinData = (state: RootState) => state.screen.winData;
+
+export const selectAdminPanelOpen = (state: RootState) => state.screen.adminPanelOpen;
