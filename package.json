@@ -1,6 +1,6 @@
 {
 	"name": "zone-wars",
-	"version": "1.6.0",
+	"version": "1.6.5",
 	"scripts": {
 		"dev": "concurrently \"pnpm watch\" \"pnpm serve\"",
 		"lint": "eslint src && prettier --check src",
