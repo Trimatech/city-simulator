@@ -92,13 +92,6 @@ export function updateAreaGridForPolygon({
 	polygon: Vector2[];
 	dropTracers?: boolean;
 }) {
-	// Do not write grid lines for dead or missing owners to avoid re-adding walls after death
-	const soldiersById = selectSoldiersById(store.getState());
-	const owner = soldiersById[ownerId];
-	if (!owner || owner.dead) {
-		warn(`updateAreaGridForPolygon: owner ${ownerId} is dead or missing`);
-		return;
-	}
 	const state = store.getState();
 	const resolution = selectGridResolution({ grid: state.grid });
 

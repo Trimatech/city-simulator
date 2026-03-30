@@ -221,6 +221,9 @@ export function killSoldier(soldierId: string) {
 
 	dropCandyOnDeath(soldierId);
 
+	// Clear polygon so stale snapshots in cutOthersByNewArea can't re-add walls
+	store.setSoldierPolygon(soldierId, [], 0, true);
+
 	setTimeout(() => {
 		store.removeSoldier(soldierId);
 	}, 2);

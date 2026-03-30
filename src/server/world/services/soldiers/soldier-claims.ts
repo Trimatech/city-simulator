@@ -28,12 +28,12 @@ export function cutOthersByNewArea(ownerId: string, newCutPolygon: Polygon) {
 
 	for (const [, soldier] of pairs(soldiersById)) {
 		const otherId = soldier.id;
-		if (otherId === ownerId || !soldier.polygon) continue;
+		if (otherId === ownerId || !soldier.polygon || soldier.polygon.size() < 3) continue;
 
 		const otherBounds = soldier.polygonBounds;
 		if (!aabbIntersects(otherBounds, newCutBounds)) continue;
 
-		const otherSoldierPolygon = pointsToPolygon(vectorsToPoints(soldier.polygon as Vector2[]));
+		const otherSoldierPolygon = pointsToPolygon(vectorsToPoints(soldier.polygon));
 		const differenceResult = calculatePolygonOperation(otherSoldierPolygon, newCutPolygon, "Difference");
 
 		if (differenceResult.regions.size() > 0) {
@@ -47,7 +47,7 @@ export function cutOthersByNewArea(ownerId: string, newCutPolygon: Polygon) {
 
 				updateAreaGridForPolygon({
 					ownerId: otherId,
-					polygon: updatedPolygon as Vector2[],
+					polygon: updatedPolygon,
 					dropTracers: false,
 				});
 
