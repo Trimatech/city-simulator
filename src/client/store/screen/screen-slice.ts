@@ -21,12 +21,14 @@ export interface ScreenState {
 	readonly cachedDeadline: number | undefined;
 	readonly openMenuWindow: MenuWindow | undefined;
 	readonly winData: WinData | undefined;
+	readonly adminPanelOpen: boolean;
 }
 
 const initialState: ScreenState = {
 	cachedDeadline: undefined,
 	openMenuWindow: undefined,
 	winData: undefined,
+	adminPanelOpen: false,
 };
 
 export const screenSlice = createProducer(initialState, {
@@ -43,5 +45,10 @@ export const screenSlice = createProducer(initialState, {
 	setWinData: (state, winData: WinData | undefined) => ({
 		...state,
 		winData,
+	}),
+
+	setAdminPanelOpen: (state, adminPanelOpen: boolean) => ({
+		...state,
+		adminPanelOpen,
 	}),
 });
