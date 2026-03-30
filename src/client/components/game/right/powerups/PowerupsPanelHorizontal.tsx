@@ -40,11 +40,11 @@ export function PowerupsPanelHorizontal({ visible }: Props) {
 				horizontalAlignment={Enum.HorizontalAlignment.Center}
 			>
 				<BuyPowerup
-					id="nuclearExplosion"
-					label="Nuclear"
-					enabled={orbs >= POWERUP_PRICES.nuclearExplosion}
+					id="nuke"
+					label="Nuke"
+					enabled={orbs >= POWERUP_PRICES.nuke}
 					order={5}
-					price={POWERUP_PRICES.nuclearExplosion}
+					price={POWERUP_PRICES.nuke}
 					panelVisible={visible}
 					expandDirection="top"
 				/>

@@ -3,7 +3,7 @@ export const POWERUP_PRICES = {
 	shield: 120,
 	tower: 100,
 	laserBeam: 200,
-	nuclearExplosion: 300,
+	nuke: 300,
 } as const;
 
 export type PowerupId = keyof typeof POWERUP_PRICES;
@@ -15,12 +15,12 @@ export const POWERUP_DURATIONS = {
 
 export interface ExplosionConfig {
 	readonly laserBeam: { length: number; width: number; damage: number };
-	readonly nuclearExplosion: { radius: number; damage: number };
+	readonly nuke: { radius: number; damage: number };
 }
 
 export const POWERUP_EXPLOSIONS: ExplosionConfig = {
 	laserBeam: { length: 200, width: 10, damage: 1000 },
-	nuclearExplosion: { radius: 80, damage: 1000 },
+	nuke: { radius: 80, damage: 1000 },
 };
 
 export const POWERUP_TURBO_SPEED = 40;
@@ -32,7 +32,7 @@ export const POWERUP_COLORS: Record<PowerupId, Color3> = {
 	shield: Color3.fromRGB(168, 171, 0), // #FCFF64
 	tower: Color3.fromRGB(94, 191, 5), // #B0EC78
 	laserBeam: Color3.fromRGB(161, 0, 181), // #BC5BA3
-	nuclearExplosion: Color3.fromRGB(186, 0, 3), // #FB5557
+	nuke: Color3.fromRGB(186, 0, 3), // #FB5557
 };
 
 export interface PowerupButtonStyle {
@@ -44,8 +44,8 @@ export interface PowerupButtonStyle {
 const OUTER_BORDER_COLOR = Color3.fromRGB(14, 42, 78); // #0E2A4E
 
 export const POWERUP_BUTTON_STYLES: Record<PowerupId, PowerupButtonStyle> = {
-	nuclearExplosion: {
-		backgroundColor: POWERUP_COLORS.nuclearExplosion,
+	nuke: {
+		backgroundColor: POWERUP_COLORS.nuke,
 		backgroundGradient: new ColorSequence(Color3.fromHex("#FF6264"), Color3.fromHex("#E33E40")),
 		borderGradient: new ColorSequence(Color3.fromRGB(255, 160, 160), Color3.fromRGB(180, 60, 60)),
 	},

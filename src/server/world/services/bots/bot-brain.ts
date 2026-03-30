@@ -73,7 +73,7 @@ export function evaluateStrategy(botId: string, botPosition: Vector2): BrainResu
 	}
 
 	// --- Priority 4: ATTACK (territory raid) — 40% chance when conditions met ---
-	if (area > INITIAL_AREA * 3 && healthPercent > 0.7 && random.NextNumber() < 0.4) {
+	if (area > INITIAL_AREA * 10 && healthPercent > 0.7 && random.NextNumber() < 0.4) {
 		const enemyEdge = getNearestEnemyPolygonEdgePoint(botId, botPosition);
 		if (enemyEdge !== undefined) {
 			const distToEnemyEdge = enemyEdge.point.sub(botPosition).Magnitude;

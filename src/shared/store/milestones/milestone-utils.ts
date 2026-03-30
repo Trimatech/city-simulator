@@ -7,7 +7,7 @@ export type KillSource =
 	| "trailing-wall-cut"
 	| "shield-reflect"
 	| "laser-beam"
-	| "nuclear"
+	| "nuke"
 	| "self-tracer"
 	| "wall"
 	| "tower"
@@ -21,7 +21,7 @@ export const KILL_SOURCE_LABELS: Record<KillSource, string> = {
 	"trailing-wall-cut": "trailing wall cut",
 	"shield-reflect": "shield reflect",
 	"laser-beam": "laser beam",
-	nuclear: "nuclear explosion",
+	nuke: "nuke",
 	"self-tracer": "own trail",
 	wall: "wall collision",
 	tower: "tower",

@@ -20,7 +20,7 @@ import { disconnectAllSchedulers } from "shared/utils/scheduler";
 
 export = benchmark({
 	functions: {
-		onSoldierTick,
+		onSoldierTick: () => onSoldierTick(1 / 60),
 		onCandyTick,
 		onCollisionTick,
 		getSafePointInWorld,

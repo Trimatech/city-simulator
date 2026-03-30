@@ -237,13 +237,14 @@ export const DEFAULT_MILESTONE_PROGRESS: MilestoneProgress = {
 };
 
 // Passive orb income from territory ownership
-export const PASSIVE_ORB_INTERVAL = 60; // seconds
-export const PASSIVE_ORB_CAP = 35; // max orbs per tick
+export const PASSIVE_ORB_INTERVAL = 30; // seconds
+export const PASSIVE_ORB_CAP = 350; // max orbs per tick
+export const PASSIVE_ORB_MULTIPLIER = 3; // tweak this to scale orb income
 
-/** Calculate passive orbs per minute based on area ownership. */
+/** Calculate passive orbs per interval based on area ownership. */
 export function getPassiveOrbRate(soldierArea: number): number {
 	const mapPercent = (soldierArea / MAP_AREA) * 100;
-	return math.min(math.floor(math.sqrt(mapPercent * 100) / 2), PASSIVE_ORB_CAP);
+	return math.min(math.floor((math.sqrt(mapPercent * 100) / 2) * PASSIVE_ORB_MULTIPLIER), PASSIVE_ORB_CAP);
 }
 
 // Kill bounty cap

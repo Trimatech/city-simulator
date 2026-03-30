@@ -64,7 +64,7 @@ declare const assets: {
 		}
 		powerups: {
 			laser2: string
-			nuclear: string
+			nuke: string
 			shield: string
 			speed: string
 			tower: string

@@ -158,7 +158,7 @@ interface SoldierEntity {
 | **Shield** | 20 orbs | Invulnerability for 10 seconds |
 | **Tower** | 50 orbs | Defensive structure that damages enemies |
 | **Laser Beam** | 100 orbs | Rectangular area damage corridor |
-| **Nuclear** | 150 orbs | Circular explosion, kills all in radius |
+| **Nuke** | 150 orbs | Circular explosion, kills all in radius |
 
 **Technical Challenges Solved:**
 - 3D geometry to 2D footprint conversion for collision

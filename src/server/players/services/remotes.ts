@@ -14,6 +14,7 @@ export async function initRemoteService() {
 		if (skin && balance !== undefined && balance >= skin.price) {
 			store.givePlayerSkin(player.Name, skinId);
 			store.givePlayerBalance(player.Name, -skin.price);
+			store.setPlayerSkin(player.Name, skinId);
 
 			remotes.client.alert.fire(player, {
 				emoji: "💵",

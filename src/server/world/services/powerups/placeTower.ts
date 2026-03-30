@@ -13,20 +13,23 @@ interface PlaceTowerOptions {
 	position?: Vector2;
 }
 
-export function placeTower(player: Player, options?: PlaceTowerOptions) {
-	const soldierId = player.Name;
+export function placeTower(playerOrSoldierId: Player | string, options?: PlaceTowerOptions) {
+	const player = typeIs(playerOrSoldierId, "Instance") ? (playerOrSoldierId as Player) : undefined;
+	const soldierId = player ? player.Name : (playerOrSoldierId as string);
 	const skipCost = options?.skipCost ?? false;
 
 	if (!skipCost) {
 		const orbCount = store.getState(selectSoldierOrbs(soldierId)) ?? 0;
 
 		if (orbCount < TOWER_PRICE) {
-			remotes.client.alert.fire(player, {
-				scope: "money",
-				emoji: "🔮",
-				message: `Not enough orbs!`,
-				color: palette.red,
-			});
+			if (player) {
+				remotes.client.alert.fire(player, {
+					scope: "money",
+					emoji: "🔮",
+					message: `Not enough orbs!`,
+					color: palette.red,
+				});
+			}
 			return;
 		}
 	}
@@ -34,12 +37,14 @@ export function placeTower(player: Player, options?: PlaceTowerOptions) {
 	// Check if the player is inside their own territory
 	const soldier = store.getState(selectSoldierById(soldierId));
 	if (!soldier || !soldier.isInside) {
-		remotes.client.alert.fire(player, {
-			scope: "money",
-			emoji: "🏗️",
-			message: `Can only place towers inside your territory!`,
-			color: palette.red,
-		});
+		if (player) {
+			remotes.client.alert.fire(player, {
+				scope: "money",
+				emoji: "🏗️",
+				message: `Can only place towers inside your territory!`,
+				color: palette.red,
+			});
+		}
 		return;
 	}
 
@@ -48,6 +53,10 @@ export function placeTower(player: Player, options?: PlaceTowerOptions) {
 	if (options?.position) {
 		serverPosition = options.position;
 	} else {
+		if (!player) {
+			warn(`Cannot place tower: no position or player provided for ${soldierId}`);
+			return;
+		}
 		// Compute placement in front of the player's character on the server
 		const character = player.Character;
 		const primaryPart =
@@ -67,12 +76,14 @@ export function placeTower(player: Player, options?: PlaceTowerOptions) {
 	// Verify the placement position is also inside the player's territory
 	const polygon = vectorsToPoints(soldier.polygon as Vector2[]);
 	if (!isPointInPolygon(vector2ToPoint(serverPosition), polygon)) {
-		remotes.client.alert.fire(player, {
-			scope: "money",
-			emoji: "🏗️",
-			message: `Tower placement is outside your territory!`,
-			color: palette.red,
-		});
+		if (player) {
+			remotes.client.alert.fire(player, {
+				scope: "money",
+				emoji: "🏗️",
+				message: `Tower placement is outside your territory!`,
+				color: palette.red,
+			});
+		}
 		return;
 	}
 
@@ -85,19 +96,21 @@ export function placeTower(player: Player, options?: PlaceTowerOptions) {
 	store.placeTower({
 		id: `${towerId}`,
 		position: serverPosition,
-		ownerId: player.Name,
+		ownerId: soldierId,
 		damage: 15,
-		shootRange: 50,
+		shootRange: 100,
 		lastAttackTime: 0,
 		lastAttackPlayerName: undefined,
 		currentTargetId: undefined,
 		hasEnemyInRange: false,
 	});
 
-	remotes.client.alert.fire(player, {
-		scope: "money",
-		emoji: "🔮",
-		message: `Tower placed!`,
-		color: palette.green,
-	});
+	if (player) {
+		remotes.client.alert.fire(player, {
+			scope: "money",
+			emoji: "🔮",
+			message: `Tower placed!`,
+			color: palette.green,
+		});
+	}
 }

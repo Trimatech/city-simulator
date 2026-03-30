@@ -81,5 +81,8 @@ export const CANDY_EAT_ANIMATION_DURATION = 1;
 export const CANDY_EAT_FLOAT_HEIGHT = 15;
 export const CANDY_EAT_FINAL_SIZE = 0.1;
 
+export const HEALTH_REGEN_AMOUNT = 1;
+export const HEALTH_REGEN_INTERVAL = 5;
+
 export const DEATH_CHOICE_TIMEOUT_SEC = 6;
 export const REVIVE_CRYSTAL_COST = 1;

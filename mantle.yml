@@ -183,8 +183,8 @@ target:
                 icon: assets/badges/powerups/laser-precision.png
                 enabled: true
             powerup-nuclear-option:
-                name: ☢️ Nuclear Option
-                description: Total destruction! Use the Nuclear Explosion powerup.
+                name: ☢️ Nuke Option
+                description: Total destruction! Use the Nuke powerup.
                 icon: assets/badges/powerups/nuclear-option.png
                 enabled: true
             powerup-arsenal:

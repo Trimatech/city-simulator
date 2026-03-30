@@ -288,13 +288,13 @@ export const GAME_BADGE_TARGETS: readonly BadgeTarget[] = [
 		select: msPowerup("laserBeam"),
 	},
 	{
-		title: "Nuclear Option",
-		detail: "Use the Nuclear Explosion powerup",
-		badge: Badge.NUCLEAR_OPTION,
-		key: "nuclear-option",
+		title: "Nuke Option",
+		detail: "Use the Nuke powerup",
+		badge: Badge.NUKE_OPTION,
+		key: "nuke-option",
 		accent: palette.peach,
 		target: 1,
-		select: msPowerup("nuclearExplosion"),
+		select: msPowerup("nuke"),
 	},
 	{
 		title: "Arsenal",

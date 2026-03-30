@@ -67,7 +67,7 @@ Badges for powerup usage. Each references its specific powerup.
 | **Shielded** | Block a death with Shield | `Glowing blue hexagonal energy shield bubble deflecting incoming projectile, impact sparks, protective blue aura` |
 | **Architect** | Place first Tower | `Chunky cartoon defensive tower on small green plot, tiny construction crane nearby, builder theme, warm orange and gray` |
 | **Laser Precision** | Hit enemy with Laser Beam | `Bright red laser beam cutting diagonally, cartoon explosion at impact point, precision crosshair overlay, red energy glow` |
-| **Nuclear Option** | Use Nuclear Explosion | `Chunky cartoon mushroom cloud explosion, radiation hazard symbol at base, orange and red inferno, destructive energy waves` |
+| **Nuke Option** | Use Nuke | `Chunky cartoon mushroom cloud explosion, radiation hazard symbol at base, orange and red inferno, destructive energy waves` |
 | **Arsenal** | Use all 5 powerups in one life | `Five miniature powerup icons arranged in circle (flame, shield, tower, laser, explosion), golden star in center, rainbow mastery glow` |
 
 ---

@@ -22,7 +22,7 @@ export const impactOverlayTriggers = {
 		color: palette.yellow,
 		transparency: 0.82,
 	},
-	nuclear: {
+	nuke: {
 		color: palette.claimYellow,
 		transparency: 0.7,
 	},
@@ -74,13 +74,13 @@ export function ImpactOverlay({ previewTrigger }: ImpactOverlayProps) {
 			triggerImpact("carpet");
 		});
 
-		const cleanupNuclear = remotes.client.powerupNuclear.connect(() => {
-			triggerImpact("nuclear");
+		const cleanupNuke = remotes.client.powerupNuke.connect(() => {
+			triggerImpact("nuke");
 		});
 
 		return () => {
 			cleanupCarpet();
-			cleanupNuclear();
+			cleanupNuke();
 		};
 	}, []);
 

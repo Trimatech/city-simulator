@@ -255,7 +255,7 @@ function createCircularExplosionPolygonFromPart(center: Vector2, radius: number)
 	return points;
 }
 
-function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-beam" | "nuclear", killerId: string) {
+function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-beam" | "nuke", killerId: string) {
 	const soldiers = store.getState(selectSoldiersById);
 	const damagePolygonObj = pointsToPolygon(vectorsToPoints(damagePolygon));
 
@@ -379,7 +379,7 @@ const POWERUP_ALERT_MESSAGES: Record<PowerupId, string> = {
 	shield: "Shield activated!",
 	tower: "Tower placed!",
 	laserBeam: "Laser Beam deployed!",
-	nuclearExplosion: "Nuclear Explosion detonated!",
+	nuke: "Nuke detonated!",
 };
 
 export function executePowerupForSoldier(
@@ -449,13 +449,9 @@ export function executePowerupForSoldier(
 			break;
 		}
 		case "tower": {
-			if (!player) {
-				warn(`Cannot place tower: no player provided for ${soldierId}`);
-				break;
-			}
 			const dir = directionToward.Magnitude > 0.001 ? directionToward.Unit : new Vector2(0, 1);
 			const towerPos = center.add(dir.mul(10));
-			placeTower(player, { skipCost: true, position: towerPos });
+			placeTower(player ?? soldierId, { skipCost: true, position: towerPos });
 			break;
 		}
 		case "laserBeam": {
@@ -497,14 +493,14 @@ export function executePowerupForSoldier(
 			remotes.client.powerupCarpet.fireAll(cframe, size);
 			break;
 		}
-		case "nuclearExplosion": {
-			const cfg = POWERUP_EXPLOSIONS.nuclearExplosion;
+		case "nuke": {
+			const cfg = POWERUP_EXPLOSIONS.nuke;
 			const soldiers = store.getState(selectSoldiersById);
 			for (const [, s] of Object.entries(soldiers)) {
 				if (!s || s.dead || s.id === soldierId) continue;
 				if (s.shieldActiveUntil > Workspace.GetServerTimeNow()) continue;
 				if (magnitude2D(s.position, center) <= cfg.radius) {
-					onPlayerDeath(s.id, soldierId, "nuclear");
+					onPlayerDeath(s.id, soldierId, "nuke");
 				}
 			}
 			const towers = store.getState(selectTowersById);
@@ -516,10 +512,10 @@ export function executePowerupForSoldier(
 				}
 			}
 			const damagePolygon = createCircularExplosionPolygonFromPart(center, cfg.radius);
-			cutDamageAreaFromSoldiers(damagePolygon, "nuclear", soldierId);
-			const nuclearCFrame = new CFrame(center.X, 0.5, center.Y);
+			cutDamageAreaFromSoldiers(damagePolygon, "nuke", soldierId);
+			const nukeCFrame = new CFrame(center.X, 0.5, center.Y);
 			const size = new Vector3(5, cfg.radius * 2, cfg.radius * 2);
-			remotes.client.powerupNuclear.fireAll(nuclearCFrame, size);
+			remotes.client.powerupNuke.fireAll(nukeCFrame, size);
 			break;
 		}
 		default:

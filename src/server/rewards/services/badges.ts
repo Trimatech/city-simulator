@@ -58,7 +58,7 @@ const ELIMINATION_BADGES: { threshold: number; badge: Badge }[] = [
 const UNDEFEATED_CHECK_INTERVAL = 10;
 const UNDEFEATED_DURATION = 300; // 5 minutes in seconds
 
-const ALL_POWERUP_IDS = ["turbo", "shield", "tower", "laserBeam", "nuclearExplosion"];
+const ALL_POWERUP_IDS = ["turbo", "shield", "tower", "laserBeam", "nuke"];
 
 export async function initBadgeService() {
 	store.observe(selectMilestones, identifyMilestone, (_, id) => {
@@ -147,7 +147,7 @@ function observeMilestone(id: string) {
 	const POWERUP_BADGES: { [key: string]: Badge } = {
 		turbo: Badge.SPEED_DEMON,
 		tower: Badge.ARCHITECT,
-		nuclearExplosion: Badge.NUCLEAR_OPTION,
+		nuke: Badge.NUKE_OPTION,
 	};
 
 	const unsubscribePowerups = store.subscribe(selectMilestonePowerupsUsed(id), (used) => {

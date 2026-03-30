@@ -27,6 +27,9 @@ const BOT_RESPAWN_DELAY = 2; // seconds to wait before replacing a dead bot
 // Track which player each bot is assigned to
 const botToPlayerMap = new Map<string, string>();
 
+const BOT_THINK_MIN = 0.4; // seconds to pause between paths (min)
+const BOT_THINK_MAX = 0.8; // seconds to pause between paths (max)
+
 interface BotController {
 	readonly id: string;
 	position: Vector2;
@@ -36,6 +39,7 @@ interface BotController {
 	wasInside: boolean;
 	lastDirection: Vector2;
 	strategy: BotStrategy;
+	thinkUntil: number; // tick() timestamp — bot idles until this time
 }
 
 const botControllers = new Map<string, BotController>();
@@ -140,6 +144,7 @@ async function spawnBot(botId: string, forceTargetPlayerId?: string) {
 		wasInside: true,
 		lastDirection: new Vector2(0, 1),
 		strategy: "circularCut",
+		thinkUntil: 0,
 	});
 	botStopped.Fire(botId);
 }
@@ -168,8 +173,12 @@ function tryMidPathShortcut(bot: BotController, soldier: { polygon: ReadonlyArra
 }
 
 function advanceBot(bot: BotController) {
+	// Idle while "thinking" between paths
+	if (bot.thinkUntil > tick()) return;
+
 	if (bot.waypoints.size() === 0) {
-		warn(`No waypoints found for bot ${bot.id}`);
+		// Bot is stuck with no path — re-trigger strategy evaluation
+		botStopped.Fire(bot.id);
 		return;
 	}
 
@@ -194,6 +203,8 @@ function advanceBot(bot: BotController) {
 
 		if (bot.waypointIndex === 0) {
 			bot.waypoints = [];
+			const thinkDelay = BOT_THINK_MIN + new Random().NextNumber() * (BOT_THINK_MAX - BOT_THINK_MIN);
+			bot.thinkUntil = tick() + thinkDelay;
 			botStopped.Fire(bot.id);
 		}
 	} else {
