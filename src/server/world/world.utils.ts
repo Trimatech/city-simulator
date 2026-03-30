@@ -116,14 +116,14 @@ export function cancelDeathChoiceTimer(soldierId: string) {
 export function onPlayerDeath(soldierId: string, killerId: string, killSource: KillSource) {
 	const existing = getSoldier(soldierId);
 	if (!existing || existing.dead) {
-		warn(`[Death] onPlayerDeath(${soldierId}) skipped: exists=${existing !== undefined}, dead=${existing?.dead}`);
+		print(`[Death] onPlayerDeath(${soldierId}) skipped: exists=${existing !== undefined}, dead=${existing?.dead}`);
 		return;
 	}
 
-	warn(`[Death] onPlayerDeath(${soldierId}) — setting dead=true`);
+	print(`[Death] onPlayerDeath(${soldierId}) — setting dead=true`);
 	store.setSoldierIsDead(soldierId);
 
-	warn(
+	print(
 		`[Death] onPlayerDeath(${soldierId}) — calling playerKilledSoldier(killer=${killerId}, victim=${soldierId}, source=${killSource})`,
 	);
 	store.playerKilledSoldier(killerId, soldierId, killSource);
@@ -159,19 +159,19 @@ export function onPlayerDeath(soldierId: string, killerId: string, killSource: K
 	clearOwnerTracersFromGrid(soldierId);
 
 	const deadline = Workspace.GetServerTimeNow() + DEATH_CHOICE_TIMEOUT_SEC;
-	warn(
+	print(
 		`[Death] onPlayerDeath(${soldierId}) — setting deathChoiceDeadline=${deadline} (serverTime=${Workspace.GetServerTimeNow()})`,
 	);
 	store.setSoldierDeathChoiceDeadline(soldierId, deadline);
 
 	// Verify the state was actually set
 	const verify = getSoldier(soldierId);
-	warn(`[Death] onPlayerDeath(${soldierId}) — verify: dead=${verify?.dead}, deadline=${verify?.deathChoiceDeadline}`);
+	print(`[Death] onPlayerDeath(${soldierId}) — verify: dead=${verify?.dead}, deadline=${verify?.deathChoiceDeadline}`);
 
 	const timer = task.delay(DEATH_CHOICE_TIMEOUT_SEC, () => {
 		deathChoiceTimers.delete(soldierId);
 		const soldier = getSoldier(soldierId);
-		warn(
+		print(
 			`[Death] deathChoiceTimer expired for ${soldierId} — exists=${soldier !== undefined}, dead=${soldier?.dead}`,
 		);
 		if (soldier?.dead) {
@@ -201,7 +201,7 @@ export function getPolygonCenterInside(soldierId: string): Vector2 | undefined {
 }
 
 export function killSoldier(soldierId: string) {
-	warn(`[Death] killSoldier(${soldierId}) called`);
+	print(`[Death] killSoldier(${soldierId}) called`);
 	cancelDeathChoiceTimer(soldierId);
 	store.setSoldierIsDead(soldierId);
 

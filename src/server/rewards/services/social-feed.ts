@@ -73,7 +73,7 @@ function getKillSourceSuffix(killSource?: KillSource): string {
 }
 
 export function handleElimination(killerId: string, victimId: string, killSource?: KillSource) {
-	warn(`[SocialFeed] handleElimination called: killer=${killerId}, victim=${victimId}, source=${killSource}`);
+	print(`[SocialFeed] handleElimination called: killer=${killerId}, victim=${victimId}, source=${killSource}`);
 	const sourceSuffix = getKillSourceSuffix(killSource);
 
 	if (killerId === "system") {
@@ -185,5 +185,5 @@ export function handleElimination(killerId: string, victimId: string, killSource
 }
 
 export function initSocialFeedService() {
-	warn("[SocialFeed] initSocialFeedService started");
+	print("[SocialFeed] initSocialFeedService started");
 }

@@ -67,12 +67,12 @@ export function tryCloneRandomPlayerCharacter(): Model | undefined {
 	for (const player of shuffled) {
 		const source = player.Character;
 		if (!source) {
-			warn(`[Bot] Player ${player.Name} has no character loaded, skipping`);
+			print(`[Bot] Player ${player.Name} has no character loaded, skipping`);
 			continue;
 		}
 
 		if (!isValidCharacterModel(source)) {
-			warn(`[Bot] Player ${player.Name} character missing HRP or Humanoid, skipping`);
+			print(`[Bot] Player ${player.Name} character missing HRP or Humanoid, skipping`);
 			continue;
 		}
 
@@ -90,7 +90,7 @@ export function tryCloneRandomPlayerCharacter(): Model | undefined {
 		return clone;
 	}
 
-	warn("[Bot] Could not clone any player character — all players either have no character or invalid models");
+	print("[Bot] Could not clone any player character — all players either have no character or invalid models");
 	return undefined;
 }
 

@@ -97,7 +97,7 @@ export async function initSoldierService() {
 
 	remotes.soldier.continue.connect(async (player) => {
 		const soldierId = player.Name;
-		warn(`[Revive] continue received from ${soldierId}`);
+		print(`[Revive] continue received from ${soldierId}`);
 		const soldier = store.getState(selectSoldierById(soldierId));
 		if (!soldier || !soldier.dead) {
 			warn(`[Revive] REJECTED: soldier=${soldier !== undefined}, dead=${soldier?.dead}`);

@@ -191,8 +191,7 @@ export function connectLineToPolygon(line: Line, polygon: Polygon) {
 		return [closestIntersection.point, line[1]];
 	}
 
-	//warn("No intersection found when connecting line to polygon", { line, polygon });
-	warn("No intersection found when connecting line to polygon");
+	print("No intersection found when connecting line to polygon");
 
 	return [getCenterPoint(line)];
 }
@@ -482,7 +481,7 @@ export function setIntersectionPoints(polygon: Polygon, drawPointsTemp: Point[])
 
 	// Early validation: check draw points
 	if (!drawPointsTemp || drawPointsTemp.size() < 3) {
-		warn("drawPointsTemp.size() < 3");
+		print("drawPointsTemp.size() < 3");
 		return undefined;
 	}
 
