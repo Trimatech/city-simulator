@@ -206,7 +206,7 @@ function getGroundAppearanceAt(position: Vector3): GroundAppearance {
 
 function createDebrisCube(color: Color3, material: Enum.Material, position: Vector3, sizeScale: number): Part {
 	const cube = new Instance("Part");
-	cube.Name = "NuclearDebris";
+	cube.Name = "NukeDebris";
 	cube.Size = new Vector3(1, 1, 1).mul(sizeScale);
 	cube.Position = position;
 	cube.Color = color;
@@ -351,7 +351,7 @@ export function createCarpetBombExplosionWithCFrame(center: Vector2, size: Vecto
 	return effects;
 }
 
-export function createNuclearExplosion(center: Vector2, size: Vector3): Part[] {
+export function createNukeExplosion(center: Vector2, size: Vector3): Part[] {
 	const effects: Part[] = [];
 
 	const center3 = new Vector3(center.X, 0.1, center.Y);
@@ -362,7 +362,7 @@ export function createNuclearExplosion(center: Vector2, size: Vector3): Part[] {
 	// Core flash (persistent root for audio/fade)
 	const coreInitialSize = new Vector3(size.X, math.max(2, size.Y * 0.25), math.max(2, size.Z * 0.25));
 	const core = createCylinderBasePart(
-		"NuclearCore",
+		"NukeCore",
 		coreInitialSize,
 		center3,
 		new Vector3(0, 0, 90),
@@ -388,7 +388,7 @@ export function createNuclearExplosion(center: Vector2, size: Vector3): Part[] {
 	// Shockwave ring 1 (fast, bright)
 	const ring1Initial = new Vector3(ringThickness, math.max(2, size.Y * 0.15), math.max(2, size.Z * 0.15));
 	const ring1 = createCylinderBasePart(
-		"NuclearShockwave1",
+		"NukeShockwave1",
 		ring1Initial,
 		new Vector3(center.X, 0.12, center.Y),
 		new Vector3(0, 0, 90),
@@ -409,7 +409,7 @@ export function createNuclearExplosion(center: Vector2, size: Vector3): Part[] {
 	// Shockwave ring 2 (slightly delayed, warmer)
 	const ring2Initial = new Vector3(ringThickness * 0.8, math.max(2, size.Y * 0.1), math.max(2, size.Z * 0.1));
 	const ring2 = createCylinderBasePart(
-		"NuclearShockwave2",
+		"NukeShockwave2",
 		ring2Initial,
 		new Vector3(center.X, 0.14, center.Y),
 		new Vector3(0, 0, 90),

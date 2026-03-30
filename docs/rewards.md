@@ -115,7 +115,7 @@ These are tracked in the milestone state and reset when the player's soldier die
 | Bot Kill Count | Bot kills this life | Yes — Bot Buster (10) |
 | Candy Collected | Candy picked up this life | Yes — Collector (500) |
 | Orbs Spent on Powerups | Total orbs spent this life | Yes — Big Spender (1,000) |
-| Powerups Used | Unique powerups used this life | Yes — Speed Demon (turbo), Architect (tower), Nuclear Option (nuke), Arsenal (all 5) |
+| Powerups Used | Unique powerups used this life | Yes — Speed Demon (turbo), Architect (tower), Nuke Option (nuke), Arsenal (all 5) |
 | Head-On Victory | Won a head-on collision | Yes — Head-On Victor |
 | Giant Slain | Eliminated the rank 1 player | Yes — Giant Slayer |
 | Tower Destroyed | Destroyed an enemy tower | Yes — Tower Destroyer |
@@ -196,7 +196,7 @@ When all 7 lifetime milestone categories are at max tier, the player can **Ascen
 
 | Scope | Badges |
 |-------|--------|
-| **Per-Life** | Settler, Landlord, Conqueror, Empire, World Dominator, Champion, Runner Up, Podium, First Blood, Killing Spree, Bounty Hunter, Executioner, Massacre, Bot Buster, Head-On Victor, Giant Slayer, Collector, Big Spender, Speed Demon, Architect, Nuclear Option, Arsenal, Tower Destroyer, Shielded, Untouchable, Close Call |
+| **Per-Life** | Settler, Landlord, Conqueror, Empire, World Dominator, Champion, Runner Up, Podium, First Blood, Killing Spree, Bounty Hunter, Executioner, Massacre, Bot Buster, Head-On Victor, Giant Slayer, Collector, Big Spender, Speed Demon, Architect, Nuke Option, Arsenal, Tower Destroyer, Shielded, Untouchable, Close Call |
 | **Per-Session** | Second Chance, Cat's Nine Lives, Repeat Champion, Undefeated |
 | **Lifetime** | Welcome, Dedicated, Wealthy, High Roller, Fashionista, Claimed, Laser Precision |
 

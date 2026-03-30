@@ -7,7 +7,7 @@ const MIN_OUTLINE_TRANSPARENCY = 0;
 const MAX_OUTLINE_TRANSPARENCY = 0.85;
 
 export function getGlowColor(orbs: number | undefined): Color3 {
-	if (orbs !== undefined && orbs >= POWERUP_PRICES.nuclearExplosion) return POWERUP_COLORS.nuclearExplosion;
+	if (orbs !== undefined && orbs >= POWERUP_PRICES.nuke) return POWERUP_COLORS.nuke;
 	if (orbs !== undefined && orbs >= POWERUP_PRICES.laserBeam) return POWERUP_COLORS.laserBeam;
 	return DEFAULT_GLOW_COLOR;
 }

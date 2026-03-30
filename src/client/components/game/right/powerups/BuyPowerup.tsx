@@ -29,7 +29,7 @@ interface Props {
 }
 
 const POWERUP_ICONS: Record<PowerupId, string> = {
-	nuclearExplosion: assets.ui.powerups.nuclear,
+	nuke: assets.ui.powerups.nuke,
 	laserBeam: assets.ui.powerups.laser2,
 	shield: assets.ui.powerups.shield,
 	tower: assets.ui.powerups.tower,

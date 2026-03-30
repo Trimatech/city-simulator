@@ -14,7 +14,7 @@ const TRIGGER_BUTTONS: ReadonlyArray<{
 }> = [
 	{ kind: "death", label: "Trigger Death" },
 	{ kind: "carpet", label: "Trigger Carpet" },
-	{ kind: "nuclear", label: "Trigger Nuclear" },
+	{ kind: "nuke", label: "Trigger Nuke" },
 ];
 
 function ImpactOverlayStoryContent() {

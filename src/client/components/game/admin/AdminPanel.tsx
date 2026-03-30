@@ -546,9 +546,9 @@ interface PowerupViewProps {
 	setView: (view: PanelView) => void;
 }
 
-const POWERUPS = ["nuclear", "laser", "shield", "tower", "turbo"] as const;
+const POWERUPS = ["nuke", "laser", "shield", "tower", "turbo"] as const;
 const POWERUP_COLORS: Record<string, Color3> = {
-	nuclear: Color3.fromRGB(255, 80, 80),
+	nuke: Color3.fromRGB(255, 80, 80),
 	laser: Color3.fromRGB(255, 50, 50),
 	shield: Color3.fromRGB(80, 180, 255),
 	tower: Color3.fromRGB(200, 160, 80),

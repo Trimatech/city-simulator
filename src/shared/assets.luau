@@ -64,7 +64,7 @@ local assets = {
 		},
 		powerups = {
 			laser2 = "rbxassetid://130492003013477",
-			nuclear = "rbxassetid://122681708460942",
+			nuke = "rbxassetid://122681708460942",
 			shield = "rbxassetid://101048923737006",
 			speed = "rbxassetid://74257669280897",
 			tower = "rbxassetid://80794465117778",

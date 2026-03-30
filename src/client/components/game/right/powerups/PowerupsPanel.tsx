@@ -41,11 +41,11 @@ export function PowerupsPanel({ visible }: Props) {
 				<uipadding PaddingTop={new UDim(0, rem(0.5))} />
 
 				<BuyPowerup
-					id="nuclearExplosion"
-					label="Nuclear"
-					enabled={orbs >= POWERUP_PRICES.nuclearExplosion}
+					id="nuke"
+					label="Nuke"
+					enabled={orbs >= POWERUP_PRICES.nuke}
 					order={1}
-					price={POWERUP_PRICES.nuclearExplosion}
+					price={POWERUP_PRICES.nuke}
 					panelVisible={visible}
 				/>
 

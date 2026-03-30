@@ -62,7 +62,7 @@ Commands for testing locally in Studio or by admins. All commands use the in-gam
 
 | Command | Args | Description |
 | ------- | ---- | ----------- |
-| `/botpower [id] [powerup]` | `id` (optional), `powerup` (string) | Make a bot use a powerup (no orb cost). Valid values: `nuclear`, `laser`, `shield`, `tower`, `turbo`. Targets nearest bot if `id` omitted. Laser direction is toward the commanding player. |
+| `/botpower [id] [powerup]` | `id` (optional), `powerup` (string) | Make a bot use a powerup (no orb cost). Valid values: `nuke`, `laser`, `shield`, `tower`, `turbo`. Targets nearest bot if `id` omitted. Laser direction is toward the commanding player. |
 
 ---
 

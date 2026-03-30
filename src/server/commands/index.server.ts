@@ -54,7 +54,7 @@ const COMMAND_LIST: { cmd: string; desc: string }[] = [
 	{ cmd: "/botgo [id]", desc: "Resume bot pathfinding" },
 	{ cmd: "/botface [id]", desc: "Bot rotate toward you" },
 	{ cmd: "/botcome [id]", desc: "Bot move toward you" },
-	{ cmd: "/botpower [id] [powerup]", desc: "Bot use powerup (nuclear, laser, shield, tower, turbo)" },
+	{ cmd: "/botpower [id] [powerup]", desc: "Bot use powerup (nuke, laser, shield, tower, turbo)" },
 	{ cmd: "/scenario tower [n]", desc: "Tower + bots scenario" },
 	{ cmd: "/scenario narrow", desc: "Narrow area cutting scenario" },
 	{ cmd: "/scenario crowd", desc: "Big area, many bots scenario" },
@@ -92,12 +92,13 @@ function getPlayerPosition(playerName: string): Vector2 | undefined {
 }
 
 const POWERUP_ALIASES: Record<string, PowerupId> = {
-	nuclear: "nuclearExplosion",
+	nuke: "nuke",
 	laser: "laserBeam",
 	shield: "shield",
 	tower: "tower",
 	turbo: "turbo",
-	nuclearexplosion: "nuclearExplosion",
+	nuclear: "nuke",
+	nuclearexplosion: "nuke",
 	laserbeam: "laserBeam",
 };
 
@@ -106,7 +107,7 @@ const VALID_POWERUP_IDS: ReadonlySet<PowerupId> = new Set([
 	"shield",
 	"tower",
 	"laserBeam",
-	"nuclearExplosion",
+	"nuke",
 ]);
 
 function trimArg(s: string): string {
