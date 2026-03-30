@@ -116,6 +116,17 @@ function observeLifetimeMilestones(playerId: string) {
 				const orbRate = getPassiveOrbRate(soldier.polygonAreaSize);
 				if (orbRate > 0) {
 					store.incrementSoldierOrbs(playerId, orbRate);
+
+					const player = getPlayerByName(playerId);
+					if (player) {
+						remotes.client.alert.fire(player, {
+							scope: "money",
+							emoji: "🔮",
+							color: palette.mauve,
+							message: `+${orbRate} orbs from territory`,
+							sound: assets.sounds.alert_money,
+						});
+					}
 				}
 			}, PASSIVE_ORB_INTERVAL);
 		},
