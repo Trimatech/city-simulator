@@ -28,7 +28,7 @@ const BOT_RESPAWN_DELAY = 2; // seconds to wait before replacing a dead bot
 const botToPlayerMap = new Map<string, string>();
 
 const BOT_THINK_MIN = 0.4; // seconds to pause between paths (min)
-const BOT_THINK_MAX = 1.2; // seconds to pause between paths (max)
+const BOT_THINK_MAX = 0.8; // seconds to pause between paths (max)
 
 interface BotController {
 	readonly id: string;
@@ -177,7 +177,8 @@ function advanceBot(bot: BotController) {
 	if (bot.thinkUntil > tick()) return;
 
 	if (bot.waypoints.size() === 0) {
-		warn(`No waypoints found for bot ${bot.id}`);
+		// Bot is stuck with no path — re-trigger strategy evaluation
+		botStopped.Fire(bot.id);
 		return;
 	}
 
