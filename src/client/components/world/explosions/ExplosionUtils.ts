@@ -361,14 +361,7 @@ export function createNukeExplosion(center: Vector2, size: Vector3): Part[] {
 
 	// Core flash (persistent root for audio/fade)
 	const coreInitialSize = new Vector3(size.X, math.max(2, size.Y * 0.25), math.max(2, size.Z * 0.25));
-	const core = createCylinderBasePart(
-		"NukeCore",
-		coreInitialSize,
-		center3,
-		new Vector3(0, 0, 90),
-		palette.yellow,
-		0,
-	);
+	const core = createCylinderBasePart("NukeCore", coreInitialSize, center3, new Vector3(0, 0, 90), palette.yellow, 0);
 	const coreLightRange = math.max(30, maxDiameter * 1.3);
 	const coreLight = createPointLight(palette.white, 20, coreLightRange, core);
 	const coreLightTween = TweenService.Create(

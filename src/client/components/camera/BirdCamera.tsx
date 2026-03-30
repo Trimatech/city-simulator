@@ -2,7 +2,6 @@ import { useCamera, useEventListener } from "@rbxts/pretty-react-hooks";
 import React, { useEffect, useMemo, useRef } from "@rbxts/react";
 import { useSelector } from "@rbxts/react-reflex";
 import { Players, RunService } from "@rbxts/services";
-
 import { WORLD_BOUNDS } from "shared/constants/core";
 import { remotes } from "shared/remotes";
 import { selectLocalIsSpawned, selectLocalSoldier, selectSoldiersById } from "shared/store/soldiers";

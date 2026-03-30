@@ -53,7 +53,10 @@ export function getDirectionToKiller(
 
 export function computeDeathCameraCFrame(pos: Vector3, direction: Vector3): CFrame {
 	const right = new Vector3(-direction.Z, 0, direction.X);
-	const eye = pos.sub(direction.mul(8)).add(right.mul(4)).add(new Vector3(0, 3, 0));
+	const eye = pos
+		.sub(direction.mul(8))
+		.add(right.mul(4))
+		.add(new Vector3(0, 3, 0));
 	const focus = pos.add(direction.mul(5)).add(new Vector3(0, 1, 0));
 	return CFrame.lookAt(eye, focus);
 }

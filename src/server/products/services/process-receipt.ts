@@ -23,7 +23,10 @@ export async function initProcessReceiptService() {
 
 		const handler = productHandlers.get(receipt.ProductId);
 		if (!handler) {
-			warn("[ProcessReceipt] No handler for ProductId", { productId: receipt.ProductId, registeredCount: productHandlers.size() });
+			warn("[ProcessReceipt] No handler for ProductId", {
+				productId: receipt.ProductId,
+				registeredCount: productHandlers.size(),
+			});
 			for (const [id] of productHandlers) {
 				warn("[ProcessReceipt] Have handler for", { id });
 			}

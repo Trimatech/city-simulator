@@ -100,7 +100,10 @@ export async function initSoldierService() {
 		print(`[Revive] continue received from ${soldierId}`);
 		const soldier = store.getState(selectSoldierById(soldierId));
 		if (!soldier || !soldier.dead) {
-			warn("[Revive] REJECTED: soldier not found or not dead", { exists: soldier !== undefined, dead: soldier?.dead });
+			warn("[Revive] REJECTED: soldier not found or not dead", {
+				exists: soldier !== undefined,
+				dead: soldier?.dead,
+			});
 			return;
 		}
 
@@ -113,7 +116,11 @@ export async function initSoldierService() {
 		const deadline = soldier.deathChoiceDeadline;
 		const now = Workspace.GetServerTimeNow();
 		if (deadline === undefined || now > deadline) {
-			warn("[Revive] REJECTED: deadline expired", { deadline, serverTime: now, expired: deadline !== undefined && now > deadline });
+			warn("[Revive] REJECTED: deadline expired", {
+				deadline,
+				serverTime: now,
+				expired: deadline !== undefined && now > deadline,
+			});
 			return;
 		}
 

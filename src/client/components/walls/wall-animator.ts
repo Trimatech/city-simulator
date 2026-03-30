@@ -103,7 +103,9 @@ function processWallPart(part: BasePart): void {
 	const timeAdded = part.GetAttribute(WALL_ATTR_TIME_ADDED) as number | undefined;
 	if (timeAdded === undefined) {
 		// No time attribute - could be streaming issue or old part
-		warn("[WallAnimator] Missing WALL_ATTR_TIME_ADDED on part, setting to target directly", { partName: part.Name });
+		warn("[WallAnimator] Missing WALL_ATTR_TIME_ADDED on part, setting to target directly", {
+			partName: part.Name,
+		});
 		setWallToTarget(part);
 		return;
 	}

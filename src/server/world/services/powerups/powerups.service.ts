@@ -279,23 +279,23 @@ function cutDamageAreaFromSoldiers(damagePolygon: Vector2[], killSource: "laser-
 			const soldierPolygon = pointsToPolygon(vectorsToPoints(soldier.polygon));
 
 			// First check if there's any intersection
-		let intersectionResult;
-		try {
-			intersectionResult = calculatePolygonOperation(soldierPolygon, damagePolygonObj, "Intersect");
-		} catch (err) {
-			warn("[DEBUG] Intersection failed for soldier", { soldierId, err });
-			continue;
-		}
+			let intersectionResult;
+			try {
+				intersectionResult = calculatePolygonOperation(soldierPolygon, damagePolygonObj, "Intersect");
+			} catch (err) {
+				warn("[DEBUG] Intersection failed for soldier", { soldierId, err });
+				continue;
+			}
 			print(`[DEBUG] Intersection result for ${soldierId}: ${intersectionResult.regions.size()} regions`);
 			if (intersectionResult.regions.size() > 0) {
 				print(`[DEBUG] Intersection found, proceeding with difference operation`);
-			let differenceResult;
-			try {
-				differenceResult = calculatePolygonOperation(soldierPolygon, damagePolygonObj, "Difference");
-			} catch (err) {
-				warn("[DEBUG] Difference failed for soldier", { soldierId, err });
-				continue;
-			}
+				let differenceResult;
+				try {
+					differenceResult = calculatePolygonOperation(soldierPolygon, damagePolygonObj, "Difference");
+				} catch (err) {
+					warn("[DEBUG] Difference failed for soldier", { soldierId, err });
+					continue;
+				}
 
 				print(`[DEBUG] Difference result for ${soldierId}: ${differenceResult.regions.size()} regions`);
 				if (differenceResult.regions.size() > 0) {
