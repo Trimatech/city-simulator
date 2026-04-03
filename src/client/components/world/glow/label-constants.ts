@@ -1,1 +1,0 @@
-export const NAME_DISPLAY_DISTANCE = 500;

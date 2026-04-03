@@ -1,32 +1,41 @@
 import { Players, RunService } from "@rbxts/services";
 
-// Premium benefit applied when earning money passively
-// during a game or when purchasing a product from the shop.
-export const PREMIUM_BENEFIT = 1.2;
+// ── Map dimensions ──────────────────────────────────────────────────
+export const MAP_WIDTH = 120;
+export const MAP_HEIGHT = 100;
+export const MAP_TOTAL_TILES = MAP_WIDTH * MAP_HEIGHT; // 12,000
 
-export const WORLD_BOUNDS = 960;
-export const WORLD_TICK = 1 / 20;
+// ── Rendering ───────────────────────────────────────────────────────
+export const TILE_SIZE = 4; // studs per tile edge
+export const CHUNK_SIZE = 10; // tiles per chunk edge (10×10 = 100 tiles per chunk)
+export const CHUNKS_X = MAP_WIDTH / CHUNK_SIZE; // 12 chunks across
+export const CHUNKS_Y = MAP_HEIGHT / CHUNK_SIZE; // 10 chunks down
 
-export const SOLDIER_MIN_AREA = 100;
-export const TRAIL_POLYGON_CONNECTION_THRESHOLD = 2;
+// ── Simulation ──────────────────────────────────────────────────────
+export const SIM_TICK = 1; // seconds between simulation ticks
+export const WORLD_TICK = 1 / 20; // replication tick rate (Roblox limit)
 
-export const SOLDIER_SPEED = 32;
-export const SOLDIER_BOOST_MULTIPLIER = 1.8;
-export const SOLDIER_OWN_TERRITORY_MULTIPLIER = 1.5;
-export const SOLDIER_ENEMY_TERRITORY_MULTIPLIER = 0.7;
-/**
- * Neutral: 32
- * Own territory: 32 × 1.5 = 48
- * Enemy territory: 32 × 0.7 = 22.4
- * Neutral + turbo: 32 × 1.8 = 57.6
- * Own territory + turbo: 32 × 1.5 × 1.8 = 86.4
- * Enemy territory + turbo: 32 × 0.7 × 1.8 = 40.3
- */
+// ── Economy ─────────────────────────────────────────────────────────
+export const STARTING_FUNDS = 20000;
 
-export const SOLDIER_MAX_ORBS = 400;
+// Tool costs (Micropolis standard)
+export const COST_RESIDENTIAL = 100;
+export const COST_COMMERCIAL = 100;
+export const COST_INDUSTRIAL = 100;
+export const COST_ROAD = 10;
+export const COST_RAIL = 20;
+export const COST_POWER_LINE = 5;
+export const COST_FIRE_STATION = 500;
+export const COST_POLICE_STATION = 500;
+export const COST_COAL_POWER = 3000;
+export const COST_NUCLEAR_POWER = 5000;
+export const COST_AIRPORT = 10000;
+export const COST_SEAPORT = 5000;
+export const COST_STADIUM = 5000;
+export const COST_PARK = 10;
+export const COST_BULLDOZE = 1;
 
-export const REMOTE_TICK = 1 / 20; // Roblox limits
-
+// ── Environment flags ───────────────────────────────────────────────
 export const IS_PROD = game.PlaceId === 137091142050829;
 export const IS_CANARY = !IS_PROD;
 export const IS_EDITOR = RunService.IsStudio() && !RunService.IsRunning();
@@ -34,55 +43,3 @@ export const IS_LOCAL = RunService.IsStudio() && RunService.IsRunning();
 
 export const USER_ID = Players.LocalPlayer ? Players.LocalPlayer.UserId : 0;
 export const USER_NAME = Players.LocalPlayer ? Players.LocalPlayer.Name : "(server)";
-
-export const INITIAL_POLYGON_DIAMETER = 70;
-export const INITIAL_POLYGON_ITEMS = 40;
-
-export const WALL_HEIGHT = 12.1;
-export const WALL_THICKNESS = 1;
-
-export const TRACER_PIECE_LENGTH = 5;
-export const TRACER_PIECE_HEIGHT = 6;
-
-// Wall tags for CollectionService
-export const WALL_TAG = "GameWall";
-
-// Wall attributes
-export const WALL_ATTR_TIME_ADDED = "TimeAdded";
-export const WALL_ATTR_KIND = "WallKind";
-export const WALL_ATTR_OWNER_ID = "OwnerId";
-export const WALL_ATTR_EDGE_ID = "EdgeId";
-export const WALL_ATTR_TARGET_Y = "TargetY";
-export const WALL_ATTR_SKIN_ID = "SkinId";
-
-// How far underground to spawn walls (just below ground level)
-export const WALL_UNDERGROUND_OFFSET = -2;
-
-// Animation threshold in seconds
-export const WALL_ANIMATION_THRESHOLD = 1;
-
-// Candy tags for CollectionService
-export const CANDY_TAG = "GameCandy";
-
-// Candy attributes
-export const CANDY_ATTR_ID = "CandyId";
-export const CANDY_ATTR_TIME_ADDED = "TimeAdded";
-export const CANDY_ATTR_SIZE = "Size";
-export const CANDY_ATTR_TARGET_Y = "TargetY";
-export const CANDY_ATTR_EATEN = "Eaten";
-
-// Candy spawn height (at ground level, will animate up)
-export const CANDY_GROUND_Y = 0;
-export const CANDY_TARGET_Y = 4;
-
-// Candy animation
-export const CANDY_SPAWN_ANIMATION_DURATION = 0.5;
-export const CANDY_EAT_ANIMATION_DURATION = 1;
-export const CANDY_EAT_FLOAT_HEIGHT = 15;
-export const CANDY_EAT_FINAL_SIZE = 0.1;
-
-export const HEALTH_REGEN_AMOUNT = 1;
-export const HEALTH_REGEN_INTERVAL = 5;
-
-export const DEATH_CHOICE_TIMEOUT_SEC = 6;
-export const REVIVE_CRYSTAL_COST = 1;

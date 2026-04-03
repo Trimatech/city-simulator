@@ -1,5 +1,5 @@
 {
-	"name": "zone-wars",
+	"name": "city-simulator",
 	"globIgnorePaths": [
 		"**/package.json",
 		"**/tsconfig.json"

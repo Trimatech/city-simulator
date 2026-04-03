@@ -1,5 +1,2 @@
-import { initiCollisionGroups } from "shared/constants/collision-groups";
-
-import { initPlayerServices } from "./services";
-initiCollisionGroups();
-initPlayerServices();
+// Player services initialization
+// City-specific player setup is handled by city-manager in sim-engine.server.ts
