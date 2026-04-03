@@ -3,102 +3,127 @@
     <Properties>
       <string name="Name">Lighting</string>
       <Color3 name="Ambient">
-        <R>0.5529412</R>
-        <G>0.5529412</G>
-        <B>0.5529412</B>
+        <R>0.27450982</R>
+        <G>0.27450982</G>
+        <B>0.27450982</B>
       </Color3>
-      <BinaryString name="AttributesSerialize">AgAAACYAAABSQlhfTGlnaHRpbmdUZWNobm9sb2d5VW5pZmllZE1pZ3JhdGlvbgMBIAAAAFJCWF9PcmlnaW5hbFRlY2hub2xvZ3lPbkZpbGVMb2FkBAQAAAA=</BinaryString>
-      <float name="Brightness">0.83</float>
+      <BinaryString name="AttributesSerialize">AgAAACYAAABSQlhfTGlnaHRpbmdUZWNobm9sb2d5VW5pZmllZE1pZ3JhdGlvbgMBIAAAAFJCWF9PcmlnaW5hbFRlY2hub2xvZ3lPbkZpbGVMb2FkBAMAAAA=</BinaryString>
+      <float name="Brightness">3</float>
       <SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
       <Color3 name="ColorShift_Bottom">
-        <R>1</R>
-        <G>1</G>
-        <B>1</B>
+        <R>0</R>
+        <G>0</G>
+        <B>0</B>
       </Color3>
       <Color3 name="ColorShift_Top">
-        <R>0.6784314</R>
-        <G>0.5764706</G>
-        <B>0.42352942</B>
+        <R>0</R>
+        <G>0</G>
+        <B>0</B>
       </Color3>
-      <float name="EnvironmentDiffuseScale">0.192</float>
-      <float name="EnvironmentSpecularScale">0.154</float>
-      <float name="ExposureCompensation">0.1</float>
+      <float name="EnvironmentDiffuseScale">1</float>
+      <float name="EnvironmentSpecularScale">1</float>
+      <float name="ExposureCompensation">0</float>
       <token name="ExtendLightRangeTo120">0</token>
       <Color3 name="FogColor">
-        <R>0.4117647</R>
-        <G>1</G>
-        <B>1</B>
+        <R>0.75294125</R>
+        <G>0.75294125</G>
+        <B>0.75294125</B>
       </Color3>
-      <float name="FogEnd">1250</float>
-      <float name="FogStart">150</float>
-      <float name="GeographicLatitude">60</float>
+      <float name="FogEnd">100000</float>
+      <float name="FogStart">0</float>
+      <float name="GeographicLatitude">0</float>
       <bool name="GlobalShadows">true</bool>
       <token name="LightingStyle">1</token>
       <Color3 name="OutdoorAmbient">
-        <R>0.6</R>
-        <G>0.6</G>
-        <B>0.69411767</B>
+        <R>0.27450982</R>
+        <G>0.27450982</G>
+        <B>0.27450982</B>
       </Color3>
       <bool name="Outlines">false</bool>
       <bool name="PrioritizeLightingQuality">true</bool>
       <bool name="DefinesCapabilities">false</bool>
-      <float name="ShadowSoftness">1</float>
+      <float name="ShadowSoftness">0.2</float>
       <int64 name="SourceAssetId">-1</int64>
       <BinaryString name="Tags"></BinaryString>
-      <token name="Technology">4</token>
-      <string name="TimeOfDay">12:12:00</string>
+      <token name="Technology">3</token>
+      <string name="TimeOfDay">14:30:00</string>
     </Properties>
-    <Item class="ColorCorrectionEffect" referent="1">
+    <Item class="Sky" referent="1">
       <Properties>
-        <string name="Name">ColorCorrection</string>
+        <string name="Name">Sky</string>
         <BinaryString name="AttributesSerialize"></BinaryString>
-        <float name="Brightness">0.18</float>
         <SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
-        <float name="Contrast">0.3</float>
-        <bool name="Enabled">true</bool>
+        <bool name="CelestialBodiesShown">true</bool>
+        <float name="MoonAngularSize">11</float>
+        <ContentId name="MoonTextureId">
+          <url>rbxassetid://6444320592</url>
+        </ContentId>
         <bool name="DefinesCapabilities">false</bool>
-        <float name="Saturation">0.7</float>
-        <int64 name="SourceAssetId">-1</int64>
+        <ContentId name="SkyboxBk">
+          <url>rbxassetid://6444884337</url>
+        </ContentId>
+        <ContentId name="SkyboxDn">
+          <url>rbxassetid://6444884785</url>
+        </ContentId>
+        <ContentId name="SkyboxFt">
+          <url>rbxassetid://6444884337</url>
+        </ContentId>
+        <ContentId name="SkyboxLf">
+          <url>rbxassetid://6444884337</url>
+        </ContentId>
+        <Vector3 name="SkyboxOrientation">
+          <X>0</X>
+          <Y>0</Y>
+          <Z>0</Z>
+        </Vector3>
+        <ContentId name="SkyboxRt">
+          <url>rbxassetid://6444884337</url>
+        </ContentId>
+        <ContentId name="SkyboxUp">
+          <url>rbxassetid://6412503613</url>
+        </ContentId>
+        <int64 name="SourceAssetId">332039975</int64>
+        <int name="StarCount">3000</int>
+        <float name="SunAngularSize">11</float>
+        <ContentId name="SunTextureId">
+          <url>rbxassetid://6196665106</url>
+        </ContentId>
         <BinaryString name="Tags"></BinaryString>
-        <Color3 name="TintColor">
-          <R>1</R>
-          <G>0.9529412</G>
-          <B>0.92156863</B>
-        </Color3>
       </Properties>
     </Item>
-    <Item class="Atmosphere" referent="2">
+    <Item class="SunRaysEffect" referent="2">
+      <Properties>
+        <string name="Name">SunRays</string>
+        <BinaryString name="AttributesSerialize"></BinaryString>
+        <SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+        <bool name="Enabled">true</bool>
+        <float name="Intensity">0.01</float>
+        <bool name="DefinesCapabilities">false</bool>
+        <int64 name="SourceAssetId">-1</int64>
+        <float name="Spread">0.1</float>
+        <BinaryString name="Tags"></BinaryString>
+      </Properties>
+    </Item>
+    <Item class="Atmosphere" referent="3">
       <Properties>
         <string name="Name">Atmosphere</string>
         <BinaryString name="AttributesSerialize"></BinaryString>
         <SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
         <Color3 name="Color">
-          <R>0.18431373</R>
-          <G>0.9882353</G>
-          <B>1</B>
+          <R>0.78039217</R>
+          <G>0.78039217</G>
+          <B>0.78039217</B>
         </Color3>
         <Color3 name="Decay">
-          <R>0.89411765</R>
-          <G>0.9647059</G>
-          <B>1</B>
+          <R>0.41568628</R>
+          <G>0.4392157</G>
+          <B>0.49019608</B>
         </Color3>
-        <float name="Density">0.27</float>
-        <float name="Glare">1.54</float>
-        <float name="Haze">1</float>
-        <float name="Offset">0</float>
+        <float name="Density">0.3</float>
+        <float name="Glare">0</float>
+        <float name="Haze">0</float>
+        <float name="Offset">0.25</float>
         <bool name="DefinesCapabilities">false</bool>
-        <int64 name="SourceAssetId">-1</int64>
-        <BinaryString name="Tags"></BinaryString>
-      </Properties>
-    </Item>
-    <Item class="BlurEffect" referent="3">
-      <Properties>
-        <string name="Name">Blur</string>
-        <BinaryString name="AttributesSerialize"></BinaryString>
-        <SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
-        <bool name="Enabled">true</bool>
-        <bool name="DefinesCapabilities">false</bool>
-        <float name="Size">0</float>
         <int64 name="SourceAssetId">-1</int64>
         <BinaryString name="Tags"></BinaryString>
       </Properties>
@@ -108,7 +133,7 @@
         <string name="Name">Bloom</string>
         <BinaryString name="AttributesSerialize"></BinaryString>
         <SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
-        <bool name="Enabled">false</bool>
+        <bool name="Enabled">true</bool>
         <float name="Intensity">1</float>
         <bool name="DefinesCapabilities">false</bool>
         <float name="Size">24</float>
@@ -117,46 +142,15 @@
         <float name="Threshold">2</float>
       </Properties>
     </Item>
-    <Item class="Clouds" referent="5">
-      <Properties>
-        <string name="Name">Clouds</string>
-        <BinaryString name="AttributesSerialize"></BinaryString>
-        <SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
-        <Color3 name="Color">
-          <R>1</R>
-          <G>1</G>
-          <B>1</B>
-        </Color3>
-        <float name="Cover">0.5</float>
-        <float name="Density">0.7</float>
-        <bool name="Enabled">false</bool>
-        <bool name="DefinesCapabilities">false</bool>
-        <int64 name="SourceAssetId">-1</int64>
-        <BinaryString name="Tags"></BinaryString>
-      </Properties>
-    </Item>
-    <Item class="SunRaysEffect" referent="6">
-      <Properties>
-        <string name="Name">SunRays</string>
-        <BinaryString name="AttributesSerialize"></BinaryString>
-        <SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
-        <bool name="Enabled">false</bool>
-        <float name="Intensity">0.25</float>
-        <bool name="DefinesCapabilities">false</bool>
-        <int64 name="SourceAssetId">-1</int64>
-        <float name="Spread">1</float>
-        <BinaryString name="Tags"></BinaryString>
-      </Properties>
-    </Item>
-    <Item class="DepthOfFieldEffect" referent="7">
+    <Item class="DepthOfFieldEffect" referent="5">
       <Properties>
         <string name="Name">DepthOfField</string>
         <BinaryString name="AttributesSerialize"></BinaryString>
         <SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
-        <bool name="Enabled">true</bool>
-        <float name="FarIntensity">0.111</float>
-        <float name="FocusDistance">50</float>
-        <float name="InFocusRadius">50</float>
+        <bool name="Enabled">false</bool>
+        <float name="FarIntensity">0.1</float>
+        <float name="FocusDistance">0.05</float>
+        <float name="InFocusRadius">30</float>
         <float name="NearIntensity">0.75</float>
         <bool name="DefinesCapabilities">false</bool>
         <int64 name="SourceAssetId">-1</int64>
