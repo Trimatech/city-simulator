@@ -1,43 +1,36 @@
 import { TILE_SIZE } from "shared/constants/core";
 import {
+	AIRPORTBASE,
 	COALBASE,
 	COMBASE,
-	COMCLR,
-	DIRT,
+	CZB,
 	FIREBASE,
 	FIRESTBASE,
 	FLOOD,
-	FREEZ,
+	HOUSE,
 	HPOWER,
 	HRAIL,
 	INDBASE,
-	INDCLR,
+	IZB,
 	LASTFIRE,
 	LASTFLOOD,
 	LASTPOWER,
 	LASTRAIL,
+	LASTRIVEDGE,
 	LASTROAD,
 	LASTTREE,
 	LOMASK,
 	NUCLEARBASE,
 	POLICESTBASE,
 	PORTBASE,
-	POWERPLANT,
 	RESBASE,
 	RIVER,
-	LASTRIVEDGE,
 	ROADBASE,
 	RUBBLE,
-	TREEBASE,
-	WOODS,
-	AIRPORTBASE,
-	STADIUMBASE,
-	HOUSE,
-	HHTHR,
 	RZB,
-	CZB,
-	IZB,
-	LASTIND,
+	STADIUMBASE,
+	TREEBASE,
+	ZONEBIT,
 } from "shared/simulation/tile-values";
 
 export interface TileMeshProps {
@@ -45,6 +38,10 @@ export interface TileMeshProps {
 	readonly height: number;
 	readonly material: Enum.Material;
 	readonly transparency: number;
+	/** If set, this tile is a building placeholder and should show a label. */
+	readonly buildingLabel?: string;
+	/** If true, this tile is a zone center (used for label positioning). */
+	readonly isZoneCenter?: boolean;
 }
 
 const GROUND_HEIGHT = 0.2;
@@ -62,6 +59,7 @@ const DEFAULT_PROPS: TileMeshProps = {
  */
 export function getTileMeshProps(tileValue: number): TileMeshProps {
 	const t = tileValue & LOMASK;
+	const isCenter = (tileValue & ZONEBIT) !== 0;
 
 	// Water
 	if (t >= RIVER && t <= LASTRIVEDGE) {
@@ -126,7 +124,7 @@ export function getTileMeshProps(tileValue: number): TileMeshProps {
 	// Power lines
 	if (t >= HPOWER && t <= LASTPOWER) {
 		return {
-			color: Color3.fromRGB(255, 255, 200),
+			color: Color3.fromRGB(255, 235, 59),
 			height: 1.5,
 			material: Enum.Material.Metal,
 			transparency: 0,
@@ -136,7 +134,7 @@ export function getTileMeshProps(tileValue: number): TileMeshProps {
 	// Rail
 	if (t >= HRAIL && t <= LASTRAIL) {
 		return {
-			color: Color3.fromRGB(100, 80, 60),
+			color: Color3.fromRGB(121, 85, 72),
 			height: 0.4,
 			material: Enum.Material.Metal,
 			transparency: 0,
@@ -146,103 +144,126 @@ export function getTileMeshProps(tileValue: number): TileMeshProps {
 	// Residential zones — height based on development level
 	if (t >= RESBASE && t < COMBASE) {
 		const level = t >= RZB ? math.min(math.floor((t - RZB) / 9), 8) : t >= HOUSE ? 1 : 0;
+		const levelLabel = level === 0 ? "Residential" : `Residential Lv.${level}`;
 		return {
-			color: Color3.fromRGB(76, 175, 80), // green
+			color: Color3.fromRGB(76, 175, 80),
 			height: math.max(1, level * TILE_SIZE),
 			material: Enum.Material.SmoothPlastic,
 			transparency: 0,
+			buildingLabel: isCenter ? levelLabel : undefined,
+			isZoneCenter: isCenter,
 		};
 	}
 
 	// Commercial zones — height based on development level
 	if (t >= COMBASE && t < INDBASE) {
 		const level = t >= CZB ? math.min(math.floor((t - CZB) / 9), 8) : 0;
+		const levelLabel = level === 0 ? "Commercial" : `Commercial Lv.${level}`;
 		return {
-			color: Color3.fromRGB(33, 150, 243), // blue
+			color: Color3.fromRGB(33, 150, 243),
 			height: math.max(1, level * TILE_SIZE),
 			material: Enum.Material.SmoothPlastic,
 			transparency: 0,
+			buildingLabel: isCenter ? levelLabel : undefined,
+			isZoneCenter: isCenter,
 		};
 	}
 
 	// Industrial zones — height based on development level
 	if (t >= INDBASE && t < PORTBASE) {
 		const level = t >= IZB ? math.min(math.floor((t - IZB) / 9), 8) : 0;
+		const levelLabel = level === 0 ? "Industrial" : `Industrial Lv.${level}`;
 		return {
-			color: Color3.fromRGB(255, 193, 7), // yellow/amber
+			color: Color3.fromRGB(255, 193, 7),
 			height: math.max(1, level * TILE_SIZE),
 			material: Enum.Material.SmoothPlastic,
 			transparency: 0,
+			buildingLabel: isCenter ? levelLabel : undefined,
+			isZoneCenter: isCenter,
 		};
 	}
 
 	// Seaport
 	if (t >= PORTBASE && t < AIRPORTBASE) {
 		return {
-			color: Color3.fromRGB(0, 150, 136), // teal
+			color: Color3.fromRGB(0, 150, 136),
 			height: 3,
 			material: Enum.Material.SmoothPlastic,
 			transparency: 0,
+			buildingLabel: isCenter ? "Seaport" : undefined,
+			isZoneCenter: isCenter,
 		};
 	}
 
 	// Airport
 	if (t >= AIRPORTBASE && t < COALBASE) {
 		return {
-			color: Color3.fromRGB(158, 158, 158), // grey
+			color: Color3.fromRGB(158, 158, 158),
 			height: 2,
 			material: Enum.Material.Concrete,
 			transparency: 0,
+			buildingLabel: isCenter ? "Airport" : undefined,
+			isZoneCenter: isCenter,
 		};
 	}
 
 	// Coal power plant
 	if (t >= COALBASE && t < FIRESTBASE) {
 		return {
-			color: Color3.fromRGB(66, 66, 66), // dark grey
+			color: Color3.fromRGB(66, 66, 66),
 			height: 6,
 			material: Enum.Material.Metal,
 			transparency: 0,
+			buildingLabel: isCenter ? "Coal Power" : undefined,
+			isZoneCenter: isCenter,
 		};
 	}
 
 	// Fire station
 	if (t >= FIRESTBASE && t < POLICESTBASE) {
 		return {
-			color: Color3.fromRGB(244, 67, 54), // red
+			color: Color3.fromRGB(244, 67, 54),
 			height: 3,
 			material: Enum.Material.SmoothPlastic,
 			transparency: 0,
+			buildingLabel: isCenter ? "Fire Dept" : undefined,
+			isZoneCenter: isCenter,
 		};
 	}
 
 	// Police station
 	if (t >= POLICESTBASE && t < STADIUMBASE) {
 		return {
-			color: Color3.fromRGB(63, 81, 181), // indigo
+			color: Color3.fromRGB(63, 81, 181),
 			height: 3,
 			material: Enum.Material.SmoothPlastic,
 			transparency: 0,
+			buildingLabel: isCenter ? "Police Dept" : undefined,
+			isZoneCenter: isCenter,
 		};
 	}
 
 	// Stadium
 	if (t >= STADIUMBASE && t < NUCLEARBASE) {
 		return {
-			color: Color3.fromRGB(156, 39, 176), // purple
+			color: Color3.fromRGB(156, 39, 176),
 			height: 5,
 			material: Enum.Material.SmoothPlastic,
 			transparency: 0,
+			buildingLabel: isCenter ? "Stadium" : undefined,
+			isZoneCenter: isCenter,
 		};
 	}
 
 	// Nuclear power
 	if (t >= NUCLEARBASE) {
 		return {
-			color: Color3.fromRGB(255, 235, 59), // yellow
+			color: Color3.fromRGB(255, 235, 59),
 			height: 8,
 			material: Enum.Material.Neon,
 			transparency: 0,
+			buildingLabel: isCenter ? "Nuclear Power" : undefined,
+			isZoneCenter: isCenter,
 		};
 	}
 

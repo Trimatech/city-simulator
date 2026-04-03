@@ -1,5 +1,6 @@
 {
 	"name": "city-simulator",
+	"servePort": 6666,
 	"globIgnorePaths": [
 		"**/package.json",
 		"**/tsconfig.json"
