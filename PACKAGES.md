@@ -4,12 +4,12 @@
 
 ## Architecture
 
-- **Runtime:** Roblox (Luau via roblox-ts compiler)
-- **Framework:** React 17 (@rbxts/react)
-- **Animations:** @rbxts/ripple (spring-based)
-- **State:** Reflex (@rbxts/reflex) for alerts; React hooks elsewhere
-- **Package Manager:** pnpm 8.15+
-- **Versioning:** Changesets (independent per package)
+-   **Runtime:** Roblox (Luau via roblox-ts compiler)
+-   **Framework:** React 17 (@rbxts/react)
+-   **Animations:** @rbxts/ripple (spring-based)
+-   **State:** Reflex (@rbxts/reflex) for alerts; React hooks elsewhere
+-   **Package Manager:** pnpm 8.15+
+-   **Versioning:** Changesets (independent per package)
 
 ---
 
@@ -21,8 +21,8 @@ Utility functions shared across the library.
 
 ### Exports
 
-| Export | Type | Description |
-|--------|------|-------------|
+| Export            | Type     | Description                                          |
+| ----------------- | -------- | ---------------------------------------------------- |
 | `omit(obj, keys)` | Function | Returns a copy of `obj` without the specified `keys` |
 
 ---
@@ -35,35 +35,51 @@ Centralized design tokens: colors, fonts, and animation springs.
 
 ### Exports
 
-| Export | Type | Description |
-|--------|------|-------------|
-| `Theme` | Interface | Shape of a theme object |
-| `defaultTheme` | `Theme` | Pre-configured default theme |
+| Export         | Type      | Description                  |
+| -------------- | --------- | ---------------------------- |
+| `Theme`        | Interface | Shape of a theme object      |
+| `defaultTheme` | `Theme`   | Pre-configured default theme |
 
 ### Theme Structure
 
 ```ts
 interface Theme {
-  palette: {
-    white, offwhite, black, darkgray, crust, overlay0, disabled,
-    blue, green, red, yellow, blueishColor, text,
-    surface1, lightblue, surface2, macRed, macYellow, macGreen
-  }
-  fonts: {
-    inter: { regular, medium, bold }
-    roboto: { light, regular, medium, bold }
-  }
-  springs: { slow, bubbly, responsive, gentle, world }
+	palette: {
+		white;
+		offwhite;
+		black;
+		darkgray;
+		crust;
+		overlay0;
+		disabled;
+		blue;
+		green;
+		red;
+		yellow;
+		blueishColor;
+		text;
+		surface1;
+		lightblue;
+		surface2;
+		macRed;
+		macYellow;
+		macGreen;
+	};
+	fonts: {
+		inter: { regular; medium; bold };
+		roboto: { light; regular; medium; bold };
+	};
+	springs: { slow; bubbly; responsive; gentle; world };
 }
 ```
 
 ### Key Colors
 
-- **Primary:** blue `(137, 180, 250)`
-- **Success:** green `(166, 227, 161)`
-- **Warning:** yellow `(249, 226, 175)`
-- **Error:** red `(243, 139, 168)`
-- **Text:** text `(205, 214, 244)`
+-   **Primary:** blue `(137, 180, 250)`
+-   **Success:** green `(166, 227, 161)`
+-   **Warning:** yellow `(249, 226, 175)`
+-   **Error:** red `(243, 139, 168)`
+-   **Text:** text `(205, 214, 244)`
 
 ---
 
@@ -75,25 +91,25 @@ Responsive rem-based scaling system. Converts logical units to screen pixels.
 
 ### Exports
 
-| Export | Type | Description |
-|--------|------|-------------|
+| Export        | Type      | Description                                                                                   |
+| ------------- | --------- | --------------------------------------------------------------------------------------------- |
 | `RemProvider` | Component | Context provider; props: `baseRem?` (default 9), `remOverride?`, `minimumRem?`, `maximumRem?` |
-| `useRem()` | Hook | Returns a scaling function `rem(value, mode?)` |
-| `RemContext` | Context | Raw React context |
-| `DEFAULT_REM` | Constant | `9` |
-| `MIN_REM` | Constant | Minimum rem value |
+| `useRem()`    | Hook      | Returns a scaling function `rem(value, mode?)`                                                |
+| `RemContext`  | Context   | Raw React context                                                                             |
+| `DEFAULT_REM` | Constant  | `9`                                                                                           |
+| `MIN_REM`     | Constant  | Minimum rem value                                                                             |
 
 ### Usage
 
 ```tsx
 // Wrap your app
 <RemProvider baseRem={9}>
-  <App />
-</RemProvider>
+	<App />
+</RemProvider>;
 
 // In components
 const rem = useRem();
-<frame Size={rem(new UDim2(0, 100, 0, 50))} />
+<frame Size={rem(new UDim2(0, 100, 0, 50))} />;
 // rem(10) => 90px at default baseRem
 ```
 
@@ -110,39 +126,44 @@ Low-level components that wrap Roblox GuiObject instances with camelCase props.
 ### Components
 
 #### `<Frame>`
+
 Wraps Roblox `Frame`. Supports `ref` via `forwardRef`.
 
 **Props:** `size`, `position`, `anchorPoint`, `backgroundColor`, `backgroundTransparency`, `clipsDescendants`, `visible`, `zIndex`, `layoutOrder`, `cornerRadius`, `active`, `automaticSize`, `rotation`, event/change handlers.
 
 #### `<Group>`
+
 Transparent Frame (always `backgroundTransparency=1`). Used for logical grouping.
 
 **Props:** Same as Frame except `backgroundColor` / `backgroundTransparency`.
 
 #### `<Text>`
+
 Wraps Roblox `TextLabel`.
 
 **Props:** `text`, `textColor`, `textSize`, `textScaled`, `textWrapped`, `textXAlignment`, `textYAlignment`, `textTruncate`, `font`, `padding`, `rem`, `rotation`, `cornerRadius`, `lineHeight`, `maxVisibleGraphemes`, `automaticSize`, `richText`, plus Frame props.
 
 #### `<Image>`
+
 Wraps Roblox `ImageLabel`.
 
 **Props:** `imageData`, `cornerRadius`, plus Frame props. Default `backgroundTransparency=1`.
 
 #### `<CanvasGroup>`
+
 Wraps Roblox `CanvasGroup`.
 
 **Props:** `groupColor`, `groupTransparency`, `cornerRadius`, plus Frame props.
 
 ### Utilities
 
-| Export | Description |
-|--------|-------------|
-| `fonts` | Font definitions (from `constants/fonts`) |
-| `mapPropsToPascalCase()` | Converts camelCase React props to PascalCase Roblox properties |
-| `CamelCase<S>` | Type utility |
-| `CamelCaseKeys<T>` | Type utility |
-| `InstancePropsCamelCase<T>` | Type utility |
+| Export                      | Description                                                    |
+| --------------------------- | -------------------------------------------------------------- |
+| `fonts`                     | Font definitions (from `constants/fonts`)                      |
+| `mapPropsToPascalCase()`    | Converts camelCase React props to PascalCase Roblox properties |
+| `CamelCase<S>`              | Type utility                                                   |
+| `CamelCaseKeys<T>`          | Type utility                                                   |
+| `InstancePropsCamelCase<T>` | Type utility                                                   |
 
 ---
 
@@ -155,39 +176,49 @@ Layout containers and structural components.
 ### Stack Components
 
 #### `<HStack>`
+
 Horizontal stack using `UIListLayout`.
 
 **Props:** `spacing`, `padding`, `horizontalAlignment`, `verticalAlignment`, `name`, plus Frame props.
 
 #### `<VStack>`
+
 Vertical stack using `UIListLayout`.
 
 **Props:** Same as HStack + `sortOrder`.
 
 #### `<HStackScrolling>`
+
 Horizontal scrolling stack. Extends `ScrollingFrameProps`. Auto canvas size on X axis.
 
 #### `<VStackScrolling>`
+
 Vertical scrolling stack. Additional props: `paddingTop`, `paddingBottom`, `paddingLeft`, `paddingRight`. Auto canvas size on Y axis.
 
 ### Container Components
 
 #### `<ScreenGui>`
+
 **Props:** `displayOrder`, `name`, `children`. Pre-configured: `ResetOnSpawn=false`, `IgnoreGuiInset=true`, `ZIndexBehavior="Sibling"`.
 
 #### `<Layer>`
+
 **Props:** `displayOrder`, `name`, `children`, `isEdit`. Renders as `ScreenGui` normally, `Group` in edit mode.
 
 #### `<Filler>`
+
 Flexible fill element using `UIFlexItem`. **Props:** `size?` (default fills height).
 
 #### `<ScrollingFrame>`
+
 **Props:** Extends `InstanceProps<ScrollingFrame>`, `children`. Pre-configured: `BorderSizePixel=0`, `ScrollBarThickness=rem(0.5)`.
 
 #### `<Portal>`
+
 **Props:** `children`, `containerId`, `onContainerNotFound`, `onContainerFound`. Creates a React portal to a named container instance.
 
 #### `<Transition>`
+
 Advanced component managing CanvasGroup/Frame layering for smooth transparency transitions.
 
 **Props:** `groupColor`, `groupTransparency`, `position`, `size`, `rotation`, `anchorPoint`, `zIndex`, `clipsDescendants`, `layoutOrder`, `event`, `change`, `children`, `directChildren`, `defaultColor`, `epsilon`.
@@ -203,75 +234,93 @@ High-level reusable UI components.
 ### Buttons
 
 #### `<Button>`
+
 Base button wrapping `TextButton`.
 
 **Props:** `onClick`, `onMouseDown`, `onMouseUp`, `onMouseEnter`, `onMouseLeave`, `onMouseClick`, `automaticSize`, `active`, `selectable`, `cornerRadius`, plus Frame props.
 
 #### `<ReactiveButton>`
+
 Animated button with spring-based hover/press effects.
 
 **Props:** Extends Button + `animatePosition`, `animatePositionStrength`, `animatePositionDirection`, `animateSize`, `animateSizeStrength`, `enabled`, `onHover`, `onPress`, `fill`.
 
 #### `<PrimaryButton>`
+
 Styled button with gradient overlay, outline, shadow, and glow options.
 
 **Props:** `onClick`, `onHover`, `size`, `position`, `backgroundColor`, `backgroundTransparency`, `overlayGradient`, `overlayTransparency`, `hasBackground`, `hasShadow`, `hasOutline`, `hasGlow`, `automaticSize`, `children`.
 
 #### `<TextButton>`
+
 Color-variant text button.
 
 **Props:** `text`, `onClick`, `variant` (`"Green"` | `"Red"` | `"Blue"` | `"Black"` | `"DarkGray"`), `isDisabled`, `padding`, `textSize`, `textScaled`, `fill`, `hasOutline`, `size`, `position`.
 
 #### `<IconRoundButton>`
+
 Round button with emoji or label, optional tooltip.
 
 **Props:** `onClick`, `emoji`, `label`, `primaryColor`, `enabled`, `order`, `circleSize`, `width`, `emojiSize`, `addShadow`, `tooltipText`, `tooltipComponent`, `position`.
 
 #### `<DropdownButton>`
+
 Like TextButton but with a dropdown arrow indicator.
 
 ### Form Components
 
 #### `<Checkbox>`
+
 **Props:** `checked`, `onChecked`, `text`, `variant` (`"default"` | `"large"` | `"small"`), `position`, `disabled`.
 
 #### `<Radio>`
+
 **Props:** Same as Checkbox. Circular selection indicator.
 
 #### `<TextBox>`
+
 Wraps Roblox `TextBox` with rem scaling.
 
 **Props:** Extends TextProps + `font`, `text`, `textColor`, `textSize`, `textWrapped`, `textEditable`, `lineHeight`, `clearTextOnFocus`, `placeholderText`, `maxVisibleGraphemes`, `richText`.
 
 #### `<TextField>`
+
 Enhanced TextBox with placeholder and multiline.
 
 **Props:** Extends TextProps + `placeholderText`, `placeholderColor`, `multiLine`, `textEditable`, `clearTextOnFocus`.
 
 #### `<Dropdown>`
+
 **Props:** `options` (`{label, value}[]`), `value`, `onChange`, `size`, `renderOption`, `portalRef`. Portal-based overlay with click-outside detection.
 
 #### `<SegmentedToggle>`
+
 **Props:** `options` (`{id, label, disabled}[]`), `value`, `onChange`, `disabled`, `size` (`"default"` | `"small"`), `label`, `children`.
 
 #### `<FormRow>`
+
 **Props:** `label`, `children`, `disabled`, `name`. Layout: label 30%, content 70%.
 
 ### Display Components
 
 #### `<Accordion>`
+
 **Props:** `title`, `children`, `isExpanded`, `onExpandedChange`, `backgroundColor`, `backgroundTransparency`, `cornerRadius`, `sortOrder`. Animated expand/collapse.
 
 #### `<Section>`
+
 **Props:** `title`, `children`, `cornerRadius`, `sortOrder`. Simple section with title header.
 
 #### `<AlertBox>`
+
 **Props:** `variant` (`"warning"` | `"info"`), `text`, `tooltipText`, `name`. Color-coded alert box.
 
 #### `<Divider>`
+
 **Props:** `color`, `thickness`, `orientation`, `zIndex`, `position`, `size`.
 
 #### `<Padding>`
+
 **Props:** `paddingX`, `paddingY` (or individual padding values). Creates `UIPadding`.
 
 #### `<Checkmark>`, `<Legend>`, `<PillText>`, `<TimeAgo>`, `<InfoIcon>`, `<WarningIcon>`
@@ -285,6 +334,7 @@ Table is a VStack wrapper. Use TableHeader/TableRow/TableCell for structured dat
 ### Tooltip
 
 #### `<Tooltip>`
+
 **Props:** `text`, `visible`, `position`, `backgroundColor`, `textColor`, `maxWidth`, `offsetX`, `offsetY`, `anchorPoint`.
 
 #### `useTooltip()` hook
@@ -292,6 +342,7 @@ Table is a VStack wrapper. Use TableHeader/TableRow/TableCell for structured dat
 ### DynamicWindow
 
 #### `<DynamicWindow>`
+
 Draggable, resizable window with traffic-light controls.
 
 **Props:** `size`, `position`, `backgroundColor`, `backgroundTransparency`, `title`, `onClose`, `onPositionChange`, `onSizeChange`, `resizeEnabled`, `active`, `zIndex`, `initialSize`, `initialPosition`, `children`.
@@ -299,36 +350,41 @@ Draggable, resizable window with traffic-light controls.
 ### Utility Components
 
 #### `<ErrorBoundary>`
+
 **Props:** `fallback` (component), `onError` (callback), `children`.
 
 #### `<DelayRender>`
+
 **Props:** `delay`, `fallback`, `children`. Delays rendering with optional fallback.
 
 #### `<ClickOutsideOverlay>` / `<ClickOutsideLayer>`
+
 **Props:** `onClickOutside`. Detects clicks outside a region.
 
 #### `<InputCapture>`
+
 **Props:** `onInput`. Captures user input events.
 
 #### `<Outline>`
+
 **Props:** `innerColor`, `innerTransparency`, `innerThickness`, `outerColor`, `outerTransparency`, `outerThickness`, `cornerRadius`, `children`.
 
 ### Hooks
 
-| Hook | Returns | Description |
-|------|---------|-------------|
-| `useButtonState()` | `[press, hover, events]` | Tracks mouse/touch press and hover state |
-| `useButtonAnimation(press, hover)` | `ButtonAnimation` | Spring animations for press/hover/position |
-| `useInputDevice()` | `"mouse"` \| `"touch"` | Detects current input device |
+| Hook                               | Returns                  | Description                                |
+| ---------------------------------- | ------------------------ | ------------------------------------------ |
+| `useButtonState()`                 | `[press, hover, events]` | Tracks mouse/touch press and hover state   |
+| `useButtonAnimation(press, hover)` | `ButtonAnimation`        | Spring animations for press/hover/position |
+| `useInputDevice()`                 | `"mouse"` \| `"touch"`   | Detects current input device               |
 
 ### Validation Functions
 
-| Function | Description |
-|----------|-------------|
-| `validateNumber(value)` | Validates value is a number |
+| Function                                | Description                   |
+| --------------------------------------- | ----------------------------- |
+| `validateNumber(value)`                 | Validates value is a number   |
 | `validateNumberBounds(value, min, max)` | Validates number within range |
-| `validatePosNumber(value)` | Validates positive number |
-| `validateAngle(value)` | Validates angle value |
+| `validatePosNumber(value)`              | Validates positive number     |
+| `validateAngle(value)`                  | Validates angle value         |
 
 ---
 
@@ -341,46 +397,49 @@ Notification/alert system with Reflex state management.
 ### Components
 
 #### `<Alerts>`
+
 Container that renders all active alerts. **Props:** `onDismiss`, `menuOffset`.
 
 #### `<Alert>`
+
 Individual alert. **Props:** `alert` (AlertI), `index`, `onDismiss`, `menuOffset`. Positioned bottom-right with stacking.
 
 #### `<AlertTimer>`
+
 Progress bar showing auto-dismiss countdown.
 
 ### Alert Interface
 
 ```ts
 interface AlertI {
-  id: number;
-  scope?: "ranking" | "money";
-  emoji: string;
-  message: string;
-  color: Color3;
-  colorSecondary?: Color3;
-  colorMessage?: Color3;
-  duration: number;
-  visible: boolean;
-  sound?: string;
+	id: number;
+	scope?: "ranking" | "money";
+	emoji: string;
+	message: string;
+	color: Color3;
+	colorSecondary?: Color3;
+	colorMessage?: Color3;
+	duration: number;
+	visible: boolean;
+	sound?: string;
 }
 ```
 
 ### Factory Functions
 
-| Function | Description |
-|----------|-------------|
+| Function                  | Description                                                                                       |
+| ------------------------- | ------------------------------------------------------------------------------------------------- |
 | `sendAlert(store, patch)` | Creates and shows an alert. Auto-dismisses after `duration`. Scope-based dedup. Returns alert ID. |
-| `dismissAlert(store, id)` | Dismisses with 0.25s fade-out. Returns promise. |
+| `dismissAlert(store, id)` | Dismisses with 0.25s fade-out. Returns promise.                                                   |
 
 ### State (Reflex Slice)
 
-| Export | Description |
-|--------|-------------|
-| `alertSlice` | Reflex slice with alert actions |
-| `selectAlerts` | Selector: all alerts |
-| `selectAlertsVisible` | Selector: visible alerts only |
-| `selectAlertIndex` | Selector: alert by index |
+| Export                | Description                     |
+| --------------------- | ------------------------------- |
+| `alertSlice`          | Reflex slice with alert actions |
+| `selectAlerts`        | Selector: all alerts            |
+| `selectAlertsVisible` | Selector: visible alerts only   |
+| `selectAlertIndex`    | Selector: alert by index        |
 
 ### Color Utilities
 
@@ -408,13 +467,13 @@ interface AlertI {
 
 ```json
 {
-  "@rbxts-ui/components": "file:../../rblx-ui/packages/components",
-  "@rbxts-ui/layout": "file:../../rblx-ui/packages/layout",
-  "@rbxts-ui/primitives": "file:../../rblx-ui/packages/primitives",
-  "@rbxts-ui/rem": "file:../../rblx-ui/packages/rem",
-  "@rbxts-ui/theme": "file:../../rblx-ui/packages/theme",
-  "@rbxts-ui/utils": "file:../../rblx-ui/packages/utils",
-  "@rbxts-ui/alerts": "file:../../rblx-ui/packages/alerts"
+	"@rbxts-ui/components": "file:../../rblx-ui/packages/components",
+	"@rbxts-ui/layout": "file:../../rblx-ui/packages/layout",
+	"@rbxts-ui/primitives": "file:../../rblx-ui/packages/primitives",
+	"@rbxts-ui/rem": "file:../../rblx-ui/packages/rem",
+	"@rbxts-ui/theme": "file:../../rblx-ui/packages/theme",
+	"@rbxts-ui/utils": "file:../../rblx-ui/packages/utils",
+	"@rbxts-ui/alerts": "file:../../rblx-ui/packages/alerts"
 }
 ```
 
@@ -422,9 +481,9 @@ interface AlertI {
 
 ```json
 {
-  "compilerOptions": {
-    "typeRoots": ["node_modules/@rbxts", "node_modules/@rbxts-ui", "@types"]
-  }
+	"compilerOptions": {
+		"typeRoots": ["node_modules/@rbxts", "node_modules/@rbxts-ui", "@types"]
+	}
 }
 ```
 
@@ -432,8 +491,8 @@ interface AlertI {
 
 ```json
 {
-  "@rbxts-ui": {
-    "$path": "node_modules/@rbxts-ui"
-  }
+	"@rbxts-ui": {
+		"$path": "node_modules/@rbxts-ui"
+	}
 }
 ```
